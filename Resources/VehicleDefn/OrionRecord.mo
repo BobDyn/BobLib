@@ -29,8 +29,8 @@ record OrionRecord
     R0 = 0.2045,
     rimR0 = 0.2045*0.625,
     rimWidth = 0.2045*0.625*1.4,
-    staticAlpha = 0,
-    staticGamma = 15);
+    staticAlpha = 0,  // in DEG
+    staticGamma = 0); // in DEG
   
   parameter Rack.RackAndPinionRecord pRack(
     leftPickup = {0.05715, 0.2260092, 0.1137158},

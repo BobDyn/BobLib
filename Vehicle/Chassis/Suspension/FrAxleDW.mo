@@ -17,8 +17,7 @@ model FrAxleDW
   
   Modelica.Mechanics.Rotational.Interfaces.Flange_a pinionFlange annotation(
     Placement(transformation(origin = {0, 140}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {0, 100}, extent = {{-10, -10}, {10, 10}})));
-  
-  // Left pushrod  
+  // Left pushrod
   BobLib.Vehicle.Chassis.Suspension.Linkages.Rod leftPushrod(r_a = pAxle.bellcrankPickup2,
                                                              r_b = pAxle.rodMount,
                                                              n1_a = Vectors.normalize(pAxle.bellcrankPivotAxis),

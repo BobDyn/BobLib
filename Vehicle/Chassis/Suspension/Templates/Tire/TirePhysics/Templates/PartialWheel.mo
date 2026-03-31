@@ -6,6 +6,8 @@ partial model PartialWheel
   // Record parameters
   parameter PartialWheelRecord partialWheelParams;
   
+  outer parameter Real linkDiameter;
+  
   // Frames
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a cpFrame annotation(
     Placement(transformation(origin = {0, -100}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {0, -100}, extent = {{-16, -16}, {16, 16}}, rotation = 90)));
@@ -25,7 +27,7 @@ partial model PartialWheel
     Placement(transformation(origin = {20, 0}, extent = {{-10, -10}, {10, 10}})));
 
   // Translational physics (wheel vertical deflection)
-  Modelica.Mechanics.MultiBody.Joints.Prismatic prismatic_z(useAxisFlange = true, n = {0, 0, -1}, animation = true) annotation(
+  Modelica.Mechanics.MultiBody.Joints.Prismatic prismatic_z(useAxisFlange = true, n = {0, 0, -1}, animation = true, boxWidth = linkDiameter, boxHeight = linkDiameter) annotation(
     Placement(transformation(origin = {0, -40}, extent = {{10, -10}, {-10, 10}}, rotation = 90)));
 
   // Rotational dynamics

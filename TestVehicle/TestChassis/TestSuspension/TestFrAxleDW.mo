@@ -5,8 +5,8 @@ model TestFrAxleDW
   import Modelica.Mechanics.MultiBody.Frames;
   import BobLib.Resources.VehicleDefn.OrionRecord;
   
-  // Custom linalg
   import BobLib.Utilities.Math.Vector;
+  
   parameter OrionRecord pVehicle;
   
   inner parameter Real linkDiameter = 0.020;
