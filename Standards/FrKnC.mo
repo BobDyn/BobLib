@@ -9,58 +9,12 @@ model FrKnC
   
   import BobLib.Resources.VehicleDefn.OrionRecord;
   
-  import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.DoubleWishbone.WishboneUprightLoopRecord;
+  parameter OrionRecord pVehicle annotation(
+    Placement(visible = false, transformation(origin = {nan, nan}, extent = {{nan, nan}, {nan, nan}})));
   
-  inner parameter Boolean useInternalInput = true;
-  
-  parameter OrionRecord pVehicle;
-  
-//  parameter SIunits.Position upperFore_i[3] = pVehicle.pFrDW.upperFore_i "Upper control arm fore inboard joint, expressed in chassis frame" annotation(
-//    Evaluate = false,
-//    Dialog(group = "Geometry"));
-//  parameter SIunits.Position upperAft_i[3] = pVehicle.pFrDW.upperAft_i "Upper control arm aft inboard joint, expressed in chassis frame" annotation(
-//    Evaluate = false,
-//    Dialog(group = "Geometry"));
-//  parameter SIunits.Position lowerFore_i[3] = pVehicle.pFrDW.lowerFore_i "Lower control arm fore inboard joint, expressed in chassis frame" annotation(
-//    Evaluate = false,
-//    Dialog(group = "Geometry"));
-//  parameter SIunits.Position lowerAft_i[3] = pVehicle.pFrDW.lowerAft_i "Lower control arm aft inboard joint, expressed in chassis frame" annotation(
-//    Evaluate = false,
-//    Dialog(group = "Geometry"));
-//  parameter SIunits.Position upper_o[3] = pVehicle.pFrDW.upper_o "Upper control arm outboard joint, expressed in chassis frame" annotation(
-//    Evaluate = false,
-//    Dialog(group = "Geometry"));
-//  parameter SIunits.Position lower_o[3] = pVehicle.pFrDW.lower_o "Lower control arm outboard joint, expressed in chassis frame" annotation(
-//    Evaluate = false,
-//    Dialog(group = "Geometry"));
-//  parameter SIunits.Position tie_o[3] = pVehicle.pFrDW.tie_o "Tie rod outboard joint, expressed in chassis frame" annotation(
-//    Evaluate = false,
-//    Dialog(group = "Geometry"));
-//  parameter SIunits.Position wheelCenter[3] = pVehicle.pFrDW.wheelCenter "Centroid of volume enclosing wheel, expressed in chassis frame" annotation(
-//    Evaluate = false,
-//    Dialog(group = "Geometry"));
-  
-  parameter SIunits.Position upperFore_i[3] = {0.1016, 0.237744, 0.2143252};
-  parameter SIunits.Position upperAft_i[3] = {-0.0680974, 0.2356358, 0.215138};
-  parameter SIunits.Position lowerFore_i[3] = {0.1016, 0.226314, 0.08001};
-  parameter SIunits.Position lowerAft_i[3] = {-0.0762, 0.226314, 0.08001};
-  parameter SIunits.Position upper_o[3] = {-0.0092964, 0.5420106, 0.2679954};
-  parameter SIunits.Position lower_o[3] = {0.0029972, 0.562991, 0.1139952};
-  parameter SIunits.Position tie_o[3] = {0.0569976, 0.546989, 0.1522222};
-  parameter SIunits.Position wheelCenter[3] = {0, 0.606110767456, 0.199898};
-  
-  Real _exposeUpperFore_i;
-  Real _exposeUpperAft_i;
-  Real _exposeLowerFore_i;
-  Real _exposeLowerAft_i;
-  Real _exposeUpper_o;
-  Real _exposeLower_o;
-  Real _exposeTie_o;
-  Real _exposeWheelCenter;  
-  
-  output Real leftSpringLength;
-  output Real rightSpringLength;
-  output Real stabarAngle;
+  Real leftSpringLength;
+  Real rightSpringLength;
+  Real stabarAngle;
   
   extends BobLib.Standards.Templates.KnC(final leftCPFixed(r = leftCPInit),
                                          final rightCPFixed(r = rightCPInit));
@@ -70,14 +24,7 @@ model FrKnC
                                                       pRack = pVehicle.pRack,
                                                       pStabar = pVehicle.pFrStabar,
                                                       pLeftPartialWheel = pVehicle.pFrPartialWheel,
-                                                      pLeftDW = WishboneUprightLoopRecord(upperFore_i = upperFore_i,
-                                                                                          upperAft_i = upperAft_i,
-                                                                                          lowerFore_i = lowerFore_i,
-                                                                                          lowerAft_i = lowerAft_i,
-                                                                                          upper_o = upper_o,
-                                                                                          lower_o = lower_o,
-                                                                                          tie_o = tie_o,
-                                                                                          wheelCenter = wheelCenter),
+                                                      pLeftDW = pVehicle.pFrDW,
                                                       pLeftAxleMass = pVehicle.pFrAxleMass,
                                                       redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.BaseTire leftTire(
                                                         redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.SlipModel.NoSlip slipModel),
@@ -86,6 +33,7 @@ model FrKnC
     Placement(transformation(origin = {0, 50.4444}, extent = {{-34, -26.4444}, {34, 26.4444}})));
 
 protected
+  // Calculated parameters
   final parameter Real leftCPInit[3] = pVehicle.pFrDW.wheelCenter + Frames.resolve1(Frames.axesRotations({1, 2, 3}, {pVehicle.pFrPartialWheel.staticGamma*pi/180, 0, pVehicle.pFrPartialWheel.staticAlpha*pi/180}, {0, 0, 0}), {0, 0, -pVehicle.pFrPartialWheel.R0});
   final parameter Real rightCPInit[3] = Vector.mirrorXZ(leftCPInit);
   
@@ -100,16 +48,6 @@ protected
     Placement(transformation(origin = {-30, 90}, extent = {{-10, -10}, {10, 10}})));
   
 equation
-  
-  _exposeUpperFore_i = upperFore_i[1] + upperFore_i[2] + upperFore_i[3];
-  _exposeUpperAft_i = upperAft_i[1] + upperAft_i[2] + upperAft_i[3];
-  _exposeLowerFore_i = lowerFore_i[1] + lowerFore_i[2] + lowerFore_i[3];
-  _exposeLowerAft_i = lowerAft_i[1] + lowerAft_i[2] + lowerAft_i[3];
-  _exposeUpper_o = upper_o[1] + upper_o[2] + upper_o[3];
-  _exposeLower_o = lower_o[1] + lower_o[2] + lower_o[3];
-  _exposeTie_o = tie_o[1] + tie_o[2] + tie_o[3];
-  _exposeWheelCenter = wheelCenter[1] + wheelCenter[2] + wheelCenter[3];
-  
   leftGamma = frAxleDW.leftTire.gamma;
 
   leftDeltaVec = Frames.resolve1(frAxleDW.leftCP.R, {1, 0, 0});
@@ -152,12 +90,12 @@ equation
     Line(points = {{-60, 20}, {-47, 20}, {-47, 50}, {-34, 50}}, color = {95, 95, 95}));
   connect(rightCPForce.frame_b, frAxleDW.rightCP) annotation(
     Line(points = {{60, 20}, {47, 20}, {47, 50}, {34, 50}}, color = {95, 95, 95}));
-  connect(rollDOF.frame_b, toAxle.frame_a) annotation(
-    Line(points = {{0, -30}, {0, 20}}, color = {95, 95, 95}));
   connect(left_DOF_xyz.frame_b, frAxleDW.leftCP) annotation(
     Line(points = {{-40, 0}, {-40, 50}, {-34, 50}}, color = {95, 95, 95}));
   connect(right_DOF_xyz.frame_b, frAxleDW.rightCP) annotation(
     Line(points = {{40, 0}, {40, 50}, {34, 50}}, color = {95, 95, 95}));
+  connect(toAxle.frame_a, rollDOF.frame_b) annotation(
+    Line(points = {{0, 20}, {0, -30}}, color = {95, 95, 95}));
   annotation(
     experiment(StartTime = 0, StopTime = 3, Tolerance = 1e-06, Interval = 0.002));
 end FrKnC;

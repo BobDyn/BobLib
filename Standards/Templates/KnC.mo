@@ -3,33 +3,24 @@ within BobLib.Standards.Templates;
 partial model KnC
   import Modelica.SIunits;
   
-  // External inputs (FMU / external driver)
-  input SIunits.Angle pinionAngle_in;
-  input SIunits.Angle rollAngle_in;
-  input SIunits.Force leftFx_in;
-  input SIunits.Force leftFy_in;
-  input SIunits.Force rightFx_in;
-  input SIunits.Force rightFy_in;
-  
   inner Modelica.Mechanics.MultiBody.World world(g = 0, n = {0, 0, -1}) annotation(
     Placement(transformation(origin = {-90, -90}, extent = {{-10, -10}, {10, 10}})));
-
-  output Real leftGamma;
-  output Real leftToe;
-  output Real leftCaster;
-  output Real leftKpi;
-  output Real leftMechTrail;
-  output Real leftMechScrub;
-
-  output Real rightGamma;
-  output Real rightToe;
-  output Real rightCaster;
-  output Real rightKpi;
-  output Real rightMechTrail;
-  output Real rightMechScrub;
-
-  output Real jackingForce;
   
+  Real leftGamma;
+  Real leftToe;
+  Real leftCaster;
+  Real leftKpi;
+  Real leftMechTrail;
+  Real leftMechScrub;
+
+  Real rightGamma;
+  Real rightToe;
+  Real rightCaster;
+  Real rightKpi;
+  Real rightMechTrail;
+  Real rightMechScrub;
+
+  Real jackingForce;
   
 protected
   Real leftDeltaVec[3];
@@ -41,15 +32,6 @@ protected
   Real rightGroundParam;
   Real rightGroundPoint[3];
   
-  // Routed signals used by the model / inheriting models
-  SIunits.Angle pinionAngle;
-  SIunits.Angle rollAngle;
-  SIunits.Force leftFx;
-  SIunits.Force leftFy;
-  SIunits.Force rightFx;
-  SIunits.Force rightFy;
-  
-  parameter Boolean useInternalInput = true;
   inner parameter SIunits.Length linkDiameter = 0.020;
   inner parameter SIunits.Length jointDiameter = 0.030;
   
@@ -159,45 +141,13 @@ protected
   Modelica.Mechanics.Rotational.Components.Disc rightAngleOffset(deltaPhi = -Modelica.Constants.pi / 2)  annotation(
     Placement(transformation(origin = {81, -5}, extent = {{5, -5}, {-5, 5}}, rotation = -0)));
 
-  // Internal roll input
+  // Roll input
   Modelica.Blocks.Sources.Ramp ramp(duration = 1, height = 2*Modelica.Constants.pi/180, startTime = 1) annotation(
     Placement(transformation(origin = {-50, -70}, extent = {{-10, -10}, {10, 10}})));
   
-  // Internal routed signals
-  SIunits.Angle rollAngle_internal;
-  SIunits.Force leftFx_internal;
-  SIunits.Force leftFy_internal;
-  SIunits.Force rightFx_internal;
-  SIunits.Force rightFy_internal;
-  
 equation
   // Instrumentation
-  
   jackingForce = sprungLoads.force[3];
-  
-  // Internal signal definitions
-  rollAngle_internal = ramp.y;
-  leftFx_internal = forceAmplitude*leftFxSource.y[1];
-  leftFy_internal = forceAmplitude*leftFySource.y[1];
-  rightFx_internal = forceAmplitude*rightFxSource.y[1];
-  rightFy_internal = forceAmplitude*rightFySource.y[1];
-  
-  // Routed external/internal signals
-  pinionAngle = pinionAngle_in;
-  rollAngle = if useInternalInput then rollAngle_internal else rollAngle_in;
-  leftFx = if useInternalInput then leftFx_internal else leftFx_in;
-  leftFy = if useInternalInput then leftFy_internal else leftFy_in;
-  rightFx = if useInternalInput then rightFx_internal else rightFx_in;
-  rightFy = if useInternalInput then rightFy_internal else rightFy_in;
-  
-  // Drive model inputs
-  rollPosition.phi_ref = rollAngle;
-  leftCPForce.force[1] = leftFx;
-  leftCPForce.force[2] = leftFy;
-  leftCPForce.force[3] = leftFzSource.y;
-  rightCPForce.force[1] = rightFx;
-  rightCPForce.force[2] = rightFy;
-  rightCPForce.force[3] = rightFzSource.y;
   
   connect(groundFixed.frame_b, sprungLoads.frame_a) annotation(
     Line(points = {{0, -100}, {0, -80}}, color = {95, 95, 95}));
@@ -231,5 +181,19 @@ equation
     Line(points = {{-70, -30}, {-40, -30}, {-40, -20}}, color = {95, 95, 95}));
   connect(rightRevolute.frame_b, right_DOF_xyz.frame_a) annotation(
     Line(points = {{70, -30}, {40, -30}, {40, -20}}, color = {95, 95, 95}));
+  connect(leftFxSource.y[1], leftCPForce.force[1]) annotation(
+    Line(points = {{-118, 80}, {-90, 80}, {-90, 20}, {-82, 20}}, color = {0, 0, 127}, thickness = 0.5));
+  connect(leftFySource.y[1], leftCPForce.force[2]) annotation(
+    Line(points = {{-118, 50}, {-100, 50}, {-100, 20}, {-82, 20}}, color = {0, 0, 127}, thickness = 0.5));
+  connect(leftFzSource.y, leftCPForce.force[3]) annotation(
+    Line(points = {{-118, 20}, {-82, 20}}, color = {0, 0, 127}));
+  connect(rightFxSource.y[1], rightCPForce.force[1]) annotation(
+    Line(points = {{120, 80}, {90, 80}, {90, 20}, {82, 20}}, color = {0, 0, 127}, thickness = 0.5));
+  connect(rightFySource.y[1], rightCPForce.force[2]) annotation(
+    Line(points = {{120, 50}, {100, 50}, {100, 20}, {82, 20}}, color = {0, 0, 127}, thickness = 0.5));
+  connect(rightFzSource.y, rightCPForce.force[3]) annotation(
+    Line(points = {{120, 20}, {82, 20}}, color = {0, 0, 127}));
+  connect(ramp.y, rollPosition.phi_ref) annotation(
+    Line(points = {{-38, -70}, {-22, -70}, {-22, -62}}, color = {0, 0, 127}));
   annotation();
 end KnC;
