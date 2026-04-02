@@ -39,6 +39,7 @@ protected
                                                                                                          {0, 0, 0}),
                                                                                     {0, 0, -pVehicle.pFrPartialWheel.R0});
   final parameter Real rightCPInit[3] = Vector.mirrorXZ(leftCPInit);
+  
   // Steer input
   Modelica.Blocks.Sources.Ramp steerRamp(duration = 1, height = 0*Modelica.Constants.pi/180, startTime = 1) annotation(
     Placement(transformation(origin = {-70, 110}, extent = {{-10, -10}, {10, 10}})));
