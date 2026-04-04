@@ -1,177 +1,197 @@
 within BobLib.Standards;
 
 model ISO4138
+  import Modelica.SIunits;
+  import Modelica.Constants.pi;
   import Modelica.Math.Vectors.norm;
-  final inner Modelica.Mechanics.MultiBody.World world(n = {0, 0, -1}) annotation(
-    Placement(transformation(origin = {-90, -90}, extent = {{-10, -10}, {10, 10}})));
-  // Chassis
-  BobLib.Vehicle.Chassis.RigidChassis chassisBase annotation(
-    Placement(transformation(extent = {{-20, -20}, {20, 20}})));
-  // Wheel torques
-  // Sensor package
-  output BobLib.Resources.Records.SENSING.VehicleTelemetry telem;
-  Real a_body[3];
-  Real vel_body[3];
-  Real w_body[3];
-  Real phi_body[3];
-  Real left_delta_vec[3];
-  Real right_delta_vec[3];
-  Real RL_delta_vec[3];
-  Real RR_delta_vec[3];
-  Real path_curv;
-  parameter Real k = 450;
-  parameter Real Ti = 0.8;
-  parameter Real Td = 0;
-  parameter Real yMax = 732.6;
-  Modelica.Blocks.Sources.Ramp ramp(height = 0.45*0.0254, duration = 20, offset = 0, startTime = 10) annotation(
-    Placement(transformation(origin = {-30, 50}, extent = {{-10, -10}, {10, 10}})));
-  Modelica.Mechanics.Rotational.Sources.Speed speed(exact = true) annotation(
-    Placement(transformation(origin = {-50, -30}, extent = {{-10, -10}, {10, 10}})));
-  Modelica.Blocks.Sources.Constant const(k = 15/chassisBase.FrAxle.left_tire.R0) annotation(
-    Placement(transformation(origin = {-90, -30}, extent = {{-10, -10}, {10, 10}})));
+  import Modelica.Mechanics.MultiBody.Frames;
+  import BobLib.Utilities.Math.Vector;
+  import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.Templates.PartialWheelRecord;
+  import BobLib.Resources.VehicleDefn.OrionRecord;
+  inner parameter SIunits.Length linkDiameter = 0.020;
+  inner parameter SIunits.Length jointDiameter = 0.030;
+  
+  // Record parameters
+  parameter OrionRecord pVehicle;
+  parameter SIunits.Velocity velocity = 10;
+  
+  // Outputs
+  Real body_accels[3];
+  Real normal_loads[4];
+  
+  Real long_LT;
+  Real lat_LT;
+  Real calc_FL;
+  Real calc_FR;
+  Real calc_RL;
+  Real calc_RR;
+
+  Real vCG;
+
+  inner Modelica.Mechanics.MultiBody.World world(n = {0, 0, -1}) annotation(
+    Placement(transformation(origin = {-130, -110}, extent = {{-10, -10}, {10, 10}})));
+  // Front axle
+  BobLib.Vehicle.Chassis.Suspension.FrAxleDW frAxleDW(pAxle = pVehicle.pFrAxleDW,
+                                                      pRack = pVehicle.pFrRack,
+                                                      pStabar = pVehicle.pFrStabar,
+                                                      pLeftPartialWheel = pVehicle.pFrPartialWheel,
+                                                      pLeftDW = pVehicle.pFrDW,
+                                                      pLeftAxleMass = pVehicle.pFrAxleMass,
+                                                      redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52Tire leftTire(pPartialWheel = pVehicle.pFrPartialWheel,
+                                                                                                                                   pTireModel = pVehicle.pFrTireModel,
+                                                                                                                                   redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.TirePhysics.Wheel1DOF_Y wheelModel(partialWheelParams = pVehicle.pFrPartialWheel,
+                                                                                                                                                                                                                                 wheel1DOF_YParams = pVehicle.pFrTireDOF),
+                                                                                                                                   redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.SlipModel.KinematicSlip slipModel),
+                                                      redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52Tire rightTire(pPartialWheel = pVehicle.pFrPartialWheel,
+                                                                                                                                    pTireModel = pVehicle.pFrTireModel,
+                                                                                                                                    redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.TirePhysics.Wheel1DOF_Y wheelModel(partialWheelParams = pVehicle.pFrPartialWheel,
+                                                                                                                                                                                                                                  wheel1DOF_YParams = pVehicle.pFrTireDOF), 
+                                                                                                                                    redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.SlipModel.KinematicSlip slipModel)) annotation(
+    Placement(transformation(origin = {0, 70.4444}, extent = {{-34, -26.4444}, {34, 26.4444}})));
+  
+  // Rear axle
+  BobLib.Vehicle.Chassis.Suspension.RrAxleDW rrAxleDW(pAxle = pVehicle.pRrAxleDW,
+                                                      pRack = pVehicle.pRrRack,
+                                                      pStabar = pVehicle.pRrStabar,
+                                                      pLeftPartialWheel = pVehicle.pRrPartialWheel,
+                                                      pLeftDW = pVehicle.pRrDW,
+                                                      pLeftAxleMass = pVehicle.pRrAxleMass,
+                                                      redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52Tire leftTire(pPartialWheel = pVehicle.pRrPartialWheel,
+                                                                                                                                   pTireModel = pVehicle.pRrTireModel,
+                                                                                                                                   redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.TirePhysics.Wheel1DOF_Y wheelModel(partialWheelParams = pVehicle.pRrPartialWheel,
+                                                                                                                                                                                                                                 wheel1DOF_YParams = pVehicle.pRrTireDOF),
+                                                                                                                                   redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.SlipModel.KinematicSlip slipModel),
+                                                      redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52Tire rightTire(pPartialWheel = pVehicle.pRrPartialWheel,
+                                                                                                                                    pTireModel = pVehicle.pRrTireModel,
+                                                                                                                                    redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.TirePhysics.Wheel1DOF_Y wheelModel(partialWheelParams = pVehicle.pRrPartialWheel,
+                                                                                                                                                                                                                                  wheel1DOF_YParams = pVehicle.pRrTireDOF), 
+                                                                                                                                    redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.SlipModel.KinematicSlip slipModel)) annotation(
+    Placement(transformation(origin = {0, -29.5556}, extent = {{-34, -26.4444}, {34, 26.4444}})));
+  
+  Modelica.Blocks.Sources.Ramp frSteerRamp(duration = 8, height = 60*Modelica.Constants.pi/180, startTime = 2) annotation(
+    Placement(transformation(origin = {-110, 110}, extent = {{-10, -10}, {10, 10}})));
+  Modelica.Mechanics.Rotational.Sources.Position frSteerPosition(exact = true) annotation(
+    Placement(transformation(origin = {-70, 110}, extent = {{-10, -10}, {10, 10}})));
+  Modelica.Mechanics.MultiBody.Parts.Mounting1D rearSteerLock annotation(
+    Placement(transformation(origin = {70, -10}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
+  
+  // Initial geometry
+  Modelica.Mechanics.MultiBody.Parts.Fixed fixedFL(r = cpInitFL, animation = false) annotation(
+    Placement(transformation(origin = {-110, 50}, extent = {{-10, -10}, {10, 10}})));
+  Modelica.Mechanics.MultiBody.Parts.Fixed fixedFR(r = cpInitFR, animation = false) annotation(
+    Placement(transformation(origin = {110, 50}, extent = {{10, -10}, {-10, 10}})));
+  Modelica.Mechanics.MultiBody.Parts.Fixed fixedRL(r = cpInitRL, animation = false) annotation(
+    Placement(transformation(origin = {-110, -70}, extent = {{-10, -10}, {10, 10}})));
+  Modelica.Mechanics.MultiBody.Parts.Fixed fixedRR(r = cpInitRR, animation = false) annotation(
+    Placement(transformation(origin = {110, -70}, extent = {{10, -10}, {-10, 10}})));
+  
+  // Calculated parameters
+  final parameter Real cpInitFL[3] = pVehicle.pFrDW.wheelCenter + Frames.resolve1(Frames.axesRotations({1, 2, 3}, {pVehicle.pFrPartialWheel.staticGamma*pi/180, 0, pVehicle.pFrPartialWheel.staticAlpha*pi/180}, {0, 0, 0}), {0, 0, -pVehicle.pFrPartialWheel.R0});
+  final parameter Real cpInitFR[3] = Vector.mirrorXZ(cpInitFL);
+  final parameter Real cpInitRL[3] = pVehicle.pRrDW.wheelCenter + Frames.resolve1(Frames.axesRotations({1, 2, 3}, {pVehicle.pRrPartialWheel.staticGamma*pi/180, 0, pVehicle.pRrPartialWheel.staticAlpha*pi/180}, {0, 0, 0}), {0, 0, -pVehicle.pRrPartialWheel.R0});
+  final parameter Real cpInitRR[3] = Vector.mirrorXZ(cpInitRL);
+
+  //protected
+  Modelica.Mechanics.MultiBody.Parts.Fixed frAxleFixed(r = frAxleDW.effectiveCenter)  annotation(
+    Placement(transformation(origin = {110, 100}, extent = {{10, -10}, {-10, 10}})));
+  Modelica.Mechanics.MultiBody.Joints.FreeMotion frFreeMotion(animation = false)  annotation(
+    Placement(transformation(origin = {70, 90}, extent = {{10, -10}, {-10, 10}})));
+  Modelica.Mechanics.Rotational.Sources.Torque2 leftTorque annotation(
+    Placement(transformation(origin = {-40, -50}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
+  Modelica.Mechanics.Rotational.Sources.Torque2 rightTorque annotation(
+    Placement(transformation(origin = {40, -50}, extent = {{10, -10}, {-10, 10}}, rotation = -180)));
+  Modelica.Mechanics.MultiBody.Parts.Mounting1D mounting1D annotation(
+    Placement(transformation(origin = {0, -50}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
+  Modelica.Blocks.Sources.RealExpression velErrorExpression(y = velocity - vCG) annotation(
+    Placement(transformation(origin = {-100, -110}, extent = {{-10, -10}, {10, 10}})));
+  Modelica.Blocks.Continuous.PI PI(T = 1, k = 200) annotation(
+    Placement(transformation(origin = {-60, -110}, extent = {{-10, -10}, {10, 10}})));
+  BobLib.Utilities.Mechanics.Multibody.GroundPhysics groundFL annotation(
+    Placement(transformation(origin = {-50, 50}, extent = {{-10, -10}, {10, 10}})));
+  BobLib.Utilities.Mechanics.Multibody.GroundPhysics groundFR annotation(
+    Placement(transformation(origin = {50, 50}, extent = {{10, -10}, {-10, 10}})));
+  BobLib.Utilities.Mechanics.Multibody.GroundPhysics groundRL annotation(
+    Placement(transformation(origin = {-70, -70}, extent = {{-10, -10}, {10, 10}})));
+  BobLib.Utilities.Mechanics.Multibody.GroundPhysics groundRR annotation(
+    Placement(transformation(origin = {70, -70}, extent = {{10, -10}, {-10, 10}})));
+  BobLib.Vehicle.Chassis.Body.CompliantFrame compliantFrame(frRef = frAxleDW.effectiveCenter,
+                                                            rrRef = rrAxleDW.effectiveCenter,
+                                                            pSprung = pVehicle.pSprungMass)  annotation(
+    Placement(transformation(origin = {0, 30}, extent = {{-20, -20}, {20, 20}}, rotation = -90)));
+
+initial equation
+  frAxleDW.leftTire.wheelModel.hubAxis.w = velocity/pVehicle.pFrPartialWheel.R0;
+  frAxleDW.rightTire.wheelModel.hubAxis.w = velocity/pVehicle.pFrPartialWheel.R0;
+  rrAxleDW.leftTire.wheelModel.hubAxis.w = velocity/pVehicle.pRrPartialWheel.R0;
+  rrAxleDW.rightTire.wheelModel.hubAxis.w = velocity/pVehicle.pRrPartialWheel.R0;
+
 equation
-  a_body = Modelica.Mechanics.MultiBody.Frames.resolve2(chassisBase.R_IMF, chassisBase.sprung_mass.a_0);
-  vel_body = Modelica.Mechanics.MultiBody.Frames.resolve2(chassisBase.R_IMF, chassisBase.sprung_mass.v_0);
-  w_body = Modelica.Mechanics.MultiBody.Frames.resolve2(chassisBase.R_IMF, chassisBase.sprung_mass.w_a);
-  phi_body = Modelica.Mechanics.MultiBody.Frames.resolve2(chassisBase.R_IMF, chassisBase.absoluteAngles.angles);
-// Input sensing
-  telem.input_sigs.handwheel_angle = chassisBase.FrAxle.steer_input;
-  telem.input_sigs.torque_command = 0;
-// Aero sensing
-  telem.aero_sigs.drag = 0;
-  telem.aero_sigs.side_force = 0;
-  telem.aero_sigs.lift = 0;
-  telem.aero_sigs.roll_moment = 0;
-  telem.aero_sigs.pitch_moment = 0;
-  telem.aero_sigs.yaw_moment = 0;
-// Kinematic sensing
-  telem.kin_sigs.roll = phi_body[1];
-  telem.kin_sigs.pitch = phi_body[2];
-  telem.kin_sigs.yaw = chassisBase.absoluteAngles.angles[3];
-  telem.kin_sigs.p = w_body[1];
-  telem.kin_sigs.q = w_body[2];
-  telem.kin_sigs.r = w_body[3];
-  telem.kin_sigs.vx = vel_body[1];
-  telem.kin_sigs.vy = vel_body[2];
-  telem.kin_sigs.vz = vel_body[3];
-  telem.kin_sigs.speed = norm(chassisBase.sprung_mass.v_0);
-  telem.kin_sigs.beta = atan2(vel_body[2], vel_body[1]);
-  telem.kin_sigs.X = chassisBase.sprung_mass.r_0[1];
-  telem.kin_sigs.Y = chassisBase.sprung_mass.r_0[2];
-  telem.kin_sigs.Z = chassisBase.sprung_mass.r_0[3];
-// Dynamic sensing
-  telem.dyn_sigs.ax = a_body[1];
-  telem.dyn_sigs.ay = a_body[2];
-  telem.dyn_sigs.az = a_body[3];
-  telem.dyn_sigs.Fx = 0;
-  telem.dyn_sigs.Fy = 0;
-  telem.dyn_sigs.Fz = 0;
-  telem.dyn_sigs.Mx = 0;
-  telem.dyn_sigs.My = 0;
-  telem.dyn_sigs.Mz = 0;
-// Powertrain sensing
-  telem.powertrain_sigs.wheel_torque[1] = 0;
-  telem.powertrain_sigs.wheel_torque[2] = 0;
-  telem.powertrain_sigs.wheel_torque[3] = 0;
-  telem.powertrain_sigs.wheel_torque[4] = 0;
-  telem.powertrain_sigs.wheel_power[1] = 0;
-  telem.powertrain_sigs.wheel_power[2] = 0;
-  telem.powertrain_sigs.wheel_power[3] = 0;
-  telem.powertrain_sigs.wheel_power[4] = 0;
-// Suspension sensing
-  telem.sus_sigs[1].frame_height = chassisBase.FL_frame_coord.r_rel[3];
-//  telem.sus_sigs[1].shock_deflection = chassisBase.FrAxle.left_tabular_spring.defl_abs*chassisBase.FrAxle.left_tabular_spring.sgn;
-//  telem.sus_sigs[1].shock_velocity = chassisBase.FrAxle.left_tabular_damper.v_abs*chassisBase.FrAxle.left_tabular_damper.vel_sgn;
-  telem.sus_sigs[1].stabar_torque = chassisBase.FrAxle.stabar.spring.tau;
-  telem.sus_sigs[1].stabar_angle = chassisBase.FrAxle.stabar.spring.phi_rel;
-  telem.sus_sigs[2].frame_height = chassisBase.FR_frame_coord.r_rel[3];
-//  telem.sus_sigs[2].shock_deflection = chassisBase.FrAxle.right_tabular_spring.defl_abs*chassisBase.FrAxle.right_tabular_spring.sgn;
-//  telem.sus_sigs[2].shock_velocity = chassisBase.FrAxle.right_tabular_damper.v_abs*chassisBase.FrAxle.right_tabular_damper.vel_sgn;
-  telem.sus_sigs[2].stabar_torque = chassisBase.FrAxle.stabar.spring.tau;
-  telem.sus_sigs[2].stabar_angle = chassisBase.FrAxle.stabar.spring.phi_rel;
-  telem.sus_sigs[3].frame_height = chassisBase.RL_frame_coord.r_rel[3];
-//  telem.sus_sigs[3].shock_deflection = chassisBase.RrAxle.left_tabular_spring.defl_abs*chassisBase.RrAxle.left_tabular_spring.sgn;
-//  telem.sus_sigs[3].shock_velocity = chassisBase.RrAxle.left_tabular_damper.v_abs*chassisBase.RrAxle.left_tabular_damper.vel_sgn;
-  telem.sus_sigs[3].stabar_torque = chassisBase.RrAxle.stabar.spring.tau;
-  telem.sus_sigs[3].stabar_angle = chassisBase.RrAxle.stabar.spring.phi_rel;
-  telem.sus_sigs[4].frame_height = chassisBase.RR_frame_coord.r_rel[3];
-//  telem.sus_sigs[4].shock_deflection = chassisBase.RrAxle.right_tabular_spring.defl_abs*chassisBase.RrAxle.right_tabular_spring.sgn;
-//  telem.sus_sigs[4].shock_velocity = chassisBase.RrAxle.right_tabular_damper.v_abs*chassisBase.RrAxle.right_tabular_damper.vel_sgn;
-  telem.sus_sigs[4].stabar_torque = chassisBase.RrAxle.stabar.spring.tau;
-  telem.sus_sigs[4].stabar_angle = chassisBase.RrAxle.stabar.spring.phi_rel;
-// Wheel sensing
-  telem.wheel_sigs[1].Fx = chassisBase.FrAxle.left_tire.Fx;
-  telem.wheel_sigs[1].Fy = chassisBase.FrAxle.left_tire.Fy;
-  telem.wheel_sigs[1].Mx = chassisBase.FrAxle.left_tire.Mx;
-  telem.wheel_sigs[1].My = chassisBase.FrAxle.left_tire.My;
-  telem.wheel_sigs[1].Mz = chassisBase.FrAxle.left_tire.Mz;
-  telem.wheel_sigs[1].Fz = chassisBase.FrAxle.left_tire.Fz;
-  telem.wheel_sigs[1].alpha = chassisBase.FrAxle.left_tire.alpha;
-  telem.wheel_sigs[1].kappa = chassisBase.FrAxle.left_tire.kappa;
-  telem.wheel_sigs[1].gamma = chassisBase.FrAxle.left_tire.gamma;
-  telem.wheel_sigs[1].omega = chassisBase.FrAxle.left_tire.tire2DOF.wheel_speed.w;
-  left_delta_vec = Modelica.Mechanics.MultiBody.Frames.resolve2(chassisBase.R_IMF, Modelica.Mechanics.MultiBody.Frames.resolve1(chassisBase.FrAxle.left_cp.R, {1, 0, 0}));
-  telem.wheel_sigs[1].delta = atan2(left_delta_vec[2], left_delta_vec[1]);
-  telem.wheel_sigs[2].Fx = chassisBase.FrAxle.right_tire.Fx;
-  telem.wheel_sigs[2].Fy = chassisBase.FrAxle.right_tire.Fy;
-  telem.wheel_sigs[2].Mx = chassisBase.FrAxle.right_tire.Mx;
-  telem.wheel_sigs[2].My = chassisBase.FrAxle.right_tire.My;
-  telem.wheel_sigs[2].Mz = chassisBase.FrAxle.right_tire.Mz;
-  telem.wheel_sigs[2].Fz = chassisBase.FrAxle.right_tire.Fz;
-  telem.wheel_sigs[2].alpha = chassisBase.FrAxle.right_tire.alpha;
-  telem.wheel_sigs[2].kappa = chassisBase.FrAxle.right_tire.kappa;
-  telem.wheel_sigs[2].gamma = chassisBase.FrAxle.right_tire.gamma;
-  telem.wheel_sigs[2].omega = chassisBase.FrAxle.right_tire.tire2DOF.wheel_speed.w;
-  right_delta_vec = Modelica.Mechanics.MultiBody.Frames.resolve2(chassisBase.R_IMF, Modelica.Mechanics.MultiBody.Frames.resolve1(chassisBase.FrAxle.right_cp.R, {1, 0, 0}));
-  telem.wheel_sigs[2].delta = atan2(right_delta_vec[2], right_delta_vec[1]);
-  telem.wheel_sigs[3].Fx = chassisBase.RrAxle.left_tire.Fx;
-  telem.wheel_sigs[3].Fy = chassisBase.RrAxle.left_tire.Fy;
-  telem.wheel_sigs[3].Mx = chassisBase.RrAxle.left_tire.Mx;
-  telem.wheel_sigs[3].My = chassisBase.RrAxle.left_tire.My;
-  telem.wheel_sigs[3].Mz = chassisBase.RrAxle.left_tire.Mz;
-  telem.wheel_sigs[3].Fz = chassisBase.RrAxle.left_tire.Fz;
-  telem.wheel_sigs[3].alpha = chassisBase.RrAxle.left_tire.alpha;
-  telem.wheel_sigs[3].kappa = chassisBase.RrAxle.left_tire.kappa;
-  telem.wheel_sigs[3].gamma = chassisBase.RrAxle.left_tire.gamma;
-  telem.wheel_sigs[3].omega = chassisBase.RrAxle.left_tire.tire2DOF.wheel_speed.w;
-  RL_delta_vec = Modelica.Mechanics.MultiBody.Frames.resolve2(chassisBase.R_IMF, Modelica.Mechanics.MultiBody.Frames.resolve1(chassisBase.RrAxle.left_cp.R, {1, 0, 0}));
-  telem.wheel_sigs[3].delta = atan2(RL_delta_vec[2], RL_delta_vec[1]);
-  telem.wheel_sigs[4].Fx = chassisBase.RrAxle.right_tire.Fx;
-  telem.wheel_sigs[4].Fy = chassisBase.RrAxle.right_tire.Fy;
-  telem.wheel_sigs[4].Mx = chassisBase.RrAxle.right_tire.Mx;
-  telem.wheel_sigs[4].My = chassisBase.RrAxle.right_tire.My;
-  telem.wheel_sigs[4].Mz = chassisBase.RrAxle.right_tire.Mz;
-  telem.wheel_sigs[4].Fz = chassisBase.RrAxle.right_tire.Fz;
-  telem.wheel_sigs[4].alpha = chassisBase.RrAxle.right_tire.alpha;
-  telem.wheel_sigs[4].kappa = chassisBase.RrAxle.right_tire.kappa;
-  telem.wheel_sigs[4].gamma = chassisBase.RrAxle.right_tire.gamma;
-  telem.wheel_sigs[4].omega = chassisBase.RrAxle.right_tire.tire2DOF.wheel_speed.w;
-  RR_delta_vec = Modelica.Mechanics.MultiBody.Frames.resolve2(chassisBase.R_IMF, Modelica.Mechanics.MultiBody.Frames.resolve1(chassisBase.RrAxle.right_cp.R, {1, 0, 0}));
-  telem.wheel_sigs[4].delta = atan2(RR_delta_vec[2], RR_delta_vec[1]);
-//  long_LT = chassisBase.sprung_mass.m*a_body[1]*Body.r_0[3]/norm(left_tire.cp_frame.r_0 - RL_tire.cp_frame.r_0);
-//  lat_LT = Body.m*body_accels[2]*Body.r_0[3]/norm(left_tire.cp_frame.r_0 - right_tire.cp_frame.r_0);
-//  calc_RL = Body.m*Modelica.Constants.g_n/4 + long_LT/2 - lat_LT/2;
-  if time < 7.5 then
-    path_curv = 0;
-  else
-    path_curv = telem.kin_sigs.r/max(0.5, telem.kin_sigs.vx);
-  end if;
-  connect(world.frame_b, chassisBase.world_frame) annotation(
-    Line(points = {{-80, -90}, {0, -90}, {0, -20}}, color = {95, 95, 95}));
-  connect(ramp.y, chassisBase.rack_input) annotation(
-    Line(points = {{-18, 50}, {0, 50}, {0, 24}}, color = {0, 0, 127}));
-  connect(const.y, speed.w_ref) annotation(
-    Line(points = {{-78, -30}, {-62, -30}}, color = {0, 0, 127}));
-  connect(speed.flange, chassisBase.RL_torque) annotation(
-    Line(points = {{-40, -30}, {-20, -30}, {-20, -14}}));
-  connect(speed.flange, chassisBase.RR_torque) annotation(
-    Line(points = {{-40, -30}, {20, -30}, {20, -14}}));
-  connect(speed.flange, chassisBase.FL_torque) annotation(
-    Line(points = {{-40, -30}, {-20, -30}, {-20, 14}}));
-  connect(speed.flange, chassisBase.FR_torque) annotation(
-    Line(points = {{-40, -30}, {20, -30}, {20, 14}}));
+  vCG = norm(compliantFrame.sprungBody.v_0);
+  body_accels = Modelica.Mechanics.MultiBody.Frames.resolve2(compliantFrame.sprungBody.frame_a.R, compliantFrame.sprungBody.a_0);
+  
+  normal_loads[1] = frAxleDW.leftTire.Fz;
+  normal_loads[2] = frAxleDW.rightTire.Fz;
+  normal_loads[3] = rrAxleDW.leftTire.Fz;
+  normal_loads[4] = rrAxleDW.rightTire.Fz;
+  
+  long_LT = compliantFrame.sprungBody.m*body_accels[1]*compliantFrame.sprungBody.r_0[3]/norm(frAxleDW.leftCP.r_0 - rrAxleDW.leftCP.r_0);
+  lat_LT = compliantFrame.sprungBody.m*body_accels[2]*compliantFrame.sprungBody.r_0[3]/norm(frAxleDW.leftCP.r_0 - frAxleDW.rightCP.r_0);
+  
+  calc_FL = compliantFrame.sprungBody.m*Modelica.Constants.g_n/4 - long_LT/2 - lat_LT/2;
+  calc_FR = compliantFrame.sprungBody.m*Modelica.Constants.g_n/4 - long_LT/2 + lat_LT/2;
+  calc_RL = compliantFrame.sprungBody.m*Modelica.Constants.g_n/4 + long_LT/2 - lat_LT/2;
+  calc_RR = compliantFrame.sprungBody.m*Modelica.Constants.g_n/4 + long_LT/2 + lat_LT/2;
+  
+  connect(frSteerRamp.y, frSteerPosition.phi_ref) annotation(
+    Line(points = {{-98, 110}, {-82, 110}}, color = {0, 0, 127}));
+  connect(frSteerPosition.flange, frAxleDW.pinionFlange) annotation(
+    Line(points = {{-60, 110}, {0, 110}, {0, 90}}));
+  connect(rearSteerLock.frame_a, rrAxleDW.axleFrame) annotation(
+    Line(points = {{60, -10}, {0, -10}, {0, -20}}, color = {95, 95, 95}));
+  connect(rearSteerLock.flange_b, rrAxleDW.pinionFlange) annotation(
+    Line(points = {{70, -20}, {70, -24}, {0, -24}}));
+  connect(frAxleFixed.frame_b, frFreeMotion.frame_a) annotation(
+    Line(points = {{100, 100}, {90, 100}, {90, 90}, {80, 90}}, color = {95, 95, 95}));
+  connect(frFreeMotion.frame_b, frAxleDW.axleFrame) annotation(
+    Line(points = {{60, 90}, {20, 90}, {20, 80}, {0, 80}}, color = {95, 95, 95}));
+  connect(rrAxleDW.axleFrame, mounting1D.frame_a) annotation(
+    Line(points = {{0, -20}, {0, -40}}, color = {95, 95, 95}));
+  connect(mounting1D.flange_b, leftTorque.flange_a) annotation(
+    Line(points = {{-10, -50}, {-30, -50}}));
+  connect(mounting1D.flange_b, rightTorque.flange_a) annotation(
+    Line(points = {{-10, -50}, {30, -50}}));
+  connect(leftTorque.flange_b, rrAxleDW.leftTorque) annotation(
+    Line(points = {{-50, -50}, {-60, -50}, {-60, -20}, {-34, -20}}));
+  connect(rightTorque.flange_b, rrAxleDW.rightTorque) annotation(
+    Line(points = {{50, -50}, {60, -50}, {60, -20}, {34, -20}}));
+  connect(velErrorExpression.y, PI.u) annotation(
+    Line(points = {{-88, -110}, {-72, -110}}, color = {0, 0, 127}));
+  connect(PI.y, leftTorque.tau) annotation(
+    Line(points = {{-48, -110}, {0, -110}, {0, -80}, {-40, -80}, {-40, -54}}, color = {0, 0, 127}));
+  connect(PI.y, rightTorque.tau) annotation(
+    Line(points = {{-48, -110}, {0, -110}, {0, -80}, {40, -80}, {40, -54}}, color = {0, 0, 127}));
+  connect(fixedFL.frame_b, groundFL.frame_a) annotation(
+    Line(points = {{-100, 50}, {-60, 50}}, color = {95, 95, 95}));
+  connect(fixedFR.frame_b, groundFR.frame_a) annotation(
+    Line(points = {{100, 50}, {60, 50}}, color = {95, 95, 95}));
+  connect(fixedRL.frame_b, groundRL.frame_a) annotation(
+    Line(points = {{-100, -70}, {-80, -70}}, color = {95, 95, 95}));
+  connect(fixedRR.frame_b, groundRR.frame_a) annotation(
+    Line(points = {{100, -70}, {80, -70}}, color = {95, 95, 95}));
+  connect(frAxleDW.leftCP, groundFL.frame_b) annotation(
+    Line(points = {{-34, 70}, {-50, 70}, {-50, 60}}, color = {95, 95, 95}));
+  connect(frAxleDW.rightCP, groundFR.frame_b) annotation(
+    Line(points = {{34, 70}, {50, 70}, {50, 60}}, color = {95, 95, 95}));
+  connect(rrAxleDW.leftCP, groundRL.frame_b) annotation(
+    Line(points = {{-34, -30}, {-70, -30}, {-70, -60}}, color = {95, 95, 95}));
+  connect(rrAxleDW.rightCP, groundRR.frame_b) annotation(
+    Line(points = {{34, -30}, {70, -30}, {70, -60}}, color = {95, 95, 95}));
+  connect(frAxleDW.axleFrame, compliantFrame.frontFrame) annotation(
+    Line(points = {{0, 80}, {0, 50}}, color = {95, 95, 95}));
+  connect(compliantFrame.rearFrame, rrAxleDW.axleFrame) annotation(
+    Line(points = {{0, 10}, {0, -20}}, color = {95, 95, 95}));
   annotation(
-    experiment(StartTime = 0, StopTime = 32.5, Tolerance = 1e-06, Interval = 0.02),
-    __OpenModelica_commandLineOptions = "--matchingAlgorithm=PFPlusExt --indexReductionMethod=dynamicStateSelection -d=initialization,NLSanalyticJacobian --maxSizeLinearTearing=5000 --daeMode",
-    __OpenModelica_simulationFlags(lv = "LOG_STDOUT,LOG_ASSERT,LOG_STATS", s = "dassl", variableFilter = ".*", noEventEmit = "()", daeMode = "()", noEquidistantTimeGrid = "()"));
+    Diagram(coordinateSystem(extent = {{-140, -120}, {140, 120}})),
+    Icon(coordinateSystem(extent = {{-140, -120}, {140, 120}})),
+    experiment(StartTime = 0, StopTime = 11, Tolerance = 1e-06, Interval = 0.002));
 end ISO4138;

@@ -11,6 +11,9 @@ model TestFourMF52
   parameter OrionRecord pCar;
   
   parameter SIunits.Velocity velocity = 10;
+  
+  inner parameter SIunits.Length linkDiameter = 0.020;
+  inner parameter SIunits.Length jointDiameter = 0.030;
 
   // Outputs
   Real body_accels[3];
@@ -124,7 +127,7 @@ protected
     Placement(transformation(origin = {0, 50}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation frToCG(r = {-1, 0, 0}, animation = false) annotation(
     Placement(transformation(origin = {30, 50}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
-  Modelica.Mechanics.MultiBody.Parts.Body bodyCG(r_CM = {0, 0, 0}, m = 150, I_11 = 40, I_22 = 50, I_33 = 60, animation = true, useQuaternions = false, angles_fixed = true, angles_start (each displayUnit = "rad"), v_0(start = {10, 0, 0})) annotation(
+  Modelica.Mechanics.MultiBody.Parts.Body bodyCG(r_CM = {0, 0, 0}, m = 150, I_11 = 40, I_22 = 50, I_33 = 60, animation = true, useQuaternions = false, angles_fixed = true, angles_start (each displayUnit = "rad"), v_0(start = {10, 0, 0}), r_0(start = {0, 0, pCar.pFrPartialWheel.R0})) annotation(
     Placement(transformation(origin = {30, 20}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
 
 initial equation
@@ -136,10 +139,12 @@ initial equation
 equation
   vCG = norm(bodyCG.v_0);
   body_accels = Modelica.Mechanics.MultiBody.Frames.resolve2(bodyCG.frame_a.R, bodyCG.a_0);
+  
   normal_loads[1] = tireFL.Fz;
   normal_loads[2] = tireFR.Fz;
   normal_loads[3] = tireRL.Fz;
   normal_loads[4] = tireRR.Fz;
+  
   long_LT = bodyCG.m*body_accels[1]*bodyCG.r_0[3]/norm(tireFL.cpFrame.r_0 - tireRL.cpFrame.r_0);
   lat_LT = bodyCG.m*body_accels[2]*bodyCG.r_0[3]/norm(tireFL.cpFrame.r_0 - tireFR.cpFrame.r_0);
   

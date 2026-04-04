@@ -32,8 +32,10 @@ model RrKnC
                                                       redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.BaseTire rightTire(
                                                         redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.SlipModel.NoSlip slipModel)) annotation(
     Placement(transformation(origin = {0, 50.4444}, extent = {{-34, -26.4444}, {34, 26.4444}})));
+  
   Modelica.Mechanics.MultiBody.Parts.Mounting1D steerLock annotation(
     Placement(transformation(origin = {0, 90}, extent = {{-10, -10}, {10, 10}})));
+
 protected
   // Calculated parameters
   final parameter Real leftCPInit[3] = pVehicle.pRrDW.wheelCenter + Frames.resolve1(Frames.axesRotations({1, 2, 3},
@@ -41,7 +43,7 @@ protected
                                                                                                          {0, 0, 0}),
                                                                                     {0, 0, -pVehicle.pRrPartialWheel.R0});
   final parameter Real rightCPInit[3] = Vector.mirrorXZ(leftCPInit);
-  // Steer input
+  
 equation
   leftGamma = rrAxleDW.leftTire.gamma;
   leftDeltaVec = Frames.resolve1(rrAxleDW.leftCP.R, {1, 0, 0});
