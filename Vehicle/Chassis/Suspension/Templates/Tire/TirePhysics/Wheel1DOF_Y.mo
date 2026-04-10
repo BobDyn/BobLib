@@ -6,7 +6,7 @@ model Wheel1DOF_Y
   // Record parameters
   parameter Wheel1DOF_YRecord wheel1DOF_YParams;
   
-  extends BobLib.Vehicle.Chassis.Suspension.Templates.Tire.TirePhysics.Templates.PartialWheel(inertia(J = wheel1DOF_YParams.wheelJ));
+  extends BobLib.Vehicle.Chassis.Suspension.Templates.Tire.TirePhysics.Templates.PartialWheel(inertia(J = wheel1DOF_YParams.wheelJ), prismatic_z(stateSelect = StateSelect.never));
   
   Modelica.Mechanics.Translational.Components.Rod fixedRadius(L = partialWheelParams.R0)  annotation(
     Placement(transformation(origin = {-30, -46}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));

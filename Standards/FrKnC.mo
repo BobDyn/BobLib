@@ -21,7 +21,7 @@ model FrKnC
                                          final rightCPFixed(r = rightCPInit));
   
   // Front axle
-  BobLib.Vehicle.Chassis.Suspension.FrAxleDW frAxleDW(pAxle = pVehicle.pFrAxleDW,
+  BobLib.Vehicle.Chassis.Suspension.FrAxleDW_BC_ARB frAxleDW(pAxle = pVehicle.pFrAxleDW,
                                                       pRack = pVehicle.pFrRack,
                                                       pStabar = pVehicle.pFrStabar,
                                                       pLeftPartialWheel = pVehicle.pFrPartialWheel,
@@ -31,8 +31,8 @@ model FrKnC
                                                         redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.SlipModel.NoSlip slipModel),
                                                       redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.BaseTire rightTire(
                                                         redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.SlipModel.NoSlip slipModel)) annotation(
-    Placement(transformation(origin = {0, 50.4444}, extent = {{-34, -26.4444}, {34, 26.4444}})));
-  
+    Placement(transformation(origin = {0, 50.4444}, extent = {{-39.75, -17.6667}, {39.75, 17.6667}})));
+
 protected
   // Calculated parameters
   final parameter Real leftCPInit[3] = pVehicle.pFrDW.wheelCenter + Frames.resolve1(Frames.axesRotations({1, 2, 3},
@@ -82,7 +82,7 @@ equation
 
   connect(steerRamp.y, steerPosition.phi_ref) annotation(
     Line(points = {{-59, 110}, {-43, 110}}, color = {0, 0, 127}));
-  connect(steerPosition.flange, frAxleDW.pinionFlange) annotation(
+  connect(steerPosition.flange, frAxleDW.steerFlange) annotation(
     Line(points = {{-20, 110}, {0, 110}, {0, 70}}));
   connect(leftCPForce.frame_b, frAxleDW.leftCP) annotation(
     Line(points = {{-60, 20}, {-47, 20}, {-47, 50}, {-34, 50}}, color = {95, 95, 95}));

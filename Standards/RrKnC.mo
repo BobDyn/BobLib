@@ -21,7 +21,7 @@ model RrKnC
                                          final rightCPFixed(r = rightCPInit));
   
   // Rear axle
-  BobLib.Vehicle.Chassis.Suspension.RrAxleDW rrAxleDW(pAxle = pVehicle.pRrAxleDW,
+  BobLib.Vehicle.Chassis.Suspension.RrAxleDW_BC_ARB rrAxleDW(pAxle = pVehicle.pRrAxleDW,
                                                       pRack = pVehicle.pRrRack,
                                                       pStabar = pVehicle.pRrStabar,
                                                       pLeftPartialWheel = pVehicle.pRrPartialWheel,
@@ -31,7 +31,7 @@ model RrKnC
                                                         redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.SlipModel.NoSlip slipModel),
                                                       redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.BaseTire rightTire(
                                                         redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.SlipModel.NoSlip slipModel)) annotation(
-    Placement(transformation(origin = {0, 50.4444}, extent = {{-34, -26.4444}, {34, 26.4444}})));
+    Placement(transformation(origin = {0, 50.4444}, extent = {{-38.5714, -15}, {38.5714, 15}})));
   
   Modelica.Mechanics.MultiBody.Parts.Mounting1D steerLock annotation(
     Placement(transformation(origin = {0, 90}, extent = {{-10, -10}, {10, 10}})));
@@ -46,28 +46,38 @@ protected
   
 equation
   leftGamma = rrAxleDW.leftTire.gamma;
+  
   leftDeltaVec = Frames.resolve1(rrAxleDW.leftCP.R, {1, 0, 0});
   leftToe = atan(leftDeltaVec[2]/leftDeltaVec[1]);
+  
   leftKingpinVec = rrAxleDW.leftWishboneUprightLoop.upperFrame_o.r_0 - rrAxleDW.leftWishboneUprightLoop.lowerFrame_o.r_0;
   leftCaster = atan(-1*leftKingpinVec[1]/leftKingpinVec[3]);
   leftKpi = atan(-1*leftKingpinVec[2]/leftKingpinVec[3]);
+  
   leftGroundParam = (rrAxleDW.leftCP.r_0[3] - rrAxleDW.leftWishboneUprightLoop.upperFrame_o.r_0[3])/leftKingpinVec[3];
   leftGroundPoint = rrAxleDW.leftWishboneUprightLoop.upperFrame_o.r_0 + leftGroundParam*leftKingpinVec;
   leftMechTrail = leftGroundPoint[1] - rrAxleDW.leftCP.r_0[1];
   leftMechScrub = rrAxleDW.leftCP.r_0[2] - leftGroundPoint[2];
+  
   rightGamma = rrAxleDW.rightTire.gamma;
+  
   rightDeltaVec = Frames.resolve1(rrAxleDW.rightCP.R, {1, 0, 0});
   rightToe = atan(rightDeltaVec[2]/rightDeltaVec[1]);
+  
   rightKingpinVec = rrAxleDW.rightWishboneUprightLoop.upperFrame_o.r_0 - rrAxleDW.rightWishboneUprightLoop.lowerFrame_o.r_0;
   rightCaster = atan(-1*rightKingpinVec[1]/rightKingpinVec[3]);
   rightKpi = atan(rightKingpinVec[2]/rightKingpinVec[3]);
+  
   rightGroundParam = (rrAxleDW.rightCP.r_0[3] - rrAxleDW.rightWishboneUprightLoop.upperFrame_o.r_0[3])/rightKingpinVec[3];
   rightGroundPoint = rrAxleDW.rightWishboneUprightLoop.upperFrame_o.r_0 + rightGroundParam*rightKingpinVec;
   rightMechTrail = rightGroundPoint[1] - rrAxleDW.rightCP.r_0[1];
   rightMechScrub = rightGroundPoint[2] - rrAxleDW.rightCP.r_0[2];
+  
   leftSpringLength = rrAxleDW.leftShockLinkage.lineForceWithMass.s;
   rightSpringLength = rrAxleDW.rightShockLinkage.lineForceWithMass.s;
+  
   stabarAngle = rrAxleDW.stabar.spring.phi_rel;
+  
   connect(leftCPForce.frame_b, rrAxleDW.leftCP) annotation(
     Line(points = {{-60, 20}, {-47, 20}, {-47, 50}, {-34, 50}}, color = {95, 95, 95}));
   connect(rightCPForce.frame_b, rrAxleDW.rightCP) annotation(
@@ -80,7 +90,7 @@ equation
     Line(points = {{0, 30}, {0, 60}}, color = {95, 95, 95}));
   connect(steerLock.frame_a, rrAxleDW.axleFrame) annotation(
     Line(points = {{0, 80}, {0, 60}}, color = {95, 95, 95}));
-  connect(steerLock.flange_b, rrAxleDW.pinionFlange) annotation(
+  connect(steerLock.flange_b, rrAxleDW.steerFlange) annotation(
     Line(points = {{10, 90}, {60, 90}, {60, 56}, {0, 56}}));
   annotation(
     experiment(StartTime = 0, StopTime = 91, Tolerance = 1e-06, Interval = 0.002));

@@ -24,7 +24,7 @@ model TestFrAxleDW
   // Steer input
   Modelica.Blocks.Sources.Ramp steerRamp(duration = 1,
                                          height = 90*Modelica.Constants.pi/180,
-                                         startTime = 1) annotation(
+                                         startTime = 0) annotation(
     Placement(transformation(origin = {-80, 70}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.Rotational.Sources.Position steerPosition(exact = true) annotation(
     Placement(transformation(origin = {-50, 70}, extent = {{-10, -10}, {10, 10}})));
@@ -32,26 +32,26 @@ model TestFrAxleDW
   // Left jounce input
   Modelica.Blocks.Sources.Ramp leftJounceRamp(duration = 1,
                                               height = 1*0.0254,
-                                              startTime = 1) annotation(
+                                              startTime = 0) annotation(
     Placement(transformation(origin = {-110, 0}, extent = {{-10, -10}, {10, 10}}, rotation = -0)));
   
   // Right jounce input
   Modelica.Blocks.Sources.Ramp rightJounceRamp(duration = 1,
                                                height = -1*0.0254,
-                                               startTime = 1) annotation(
+                                               startTime = 0) annotation(
     Placement(transformation(origin = {110, 0}, extent = {{10, -10}, {-10, 10}}, rotation = -0)));
   
   // Front axle
-  BobLib.Vehicle.Chassis.Suspension.FrAxleDW frAxleDW(pAxle = pVehicle.pFrAxleDW,
-                                                      pRack = pVehicle.pFrRack,
-                                                      pStabar = pVehicle.pFrStabar,
-                                                      pLeftPartialWheel = pVehicle.pFrPartialWheel,
-                                                      pLeftDW = pVehicle.pFrDW,
-                                                      pLeftAxleMass = pVehicle.pFrAxleMass,                                                      
-                                                      redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.BaseTire leftTire(redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.SlipModel.NoSlip slipModel),
-                                                      redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.BaseTire rightTire(redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.SlipModel.NoSlip slipModel)) annotation(
-    Placement(transformation(origin = {2.72478e-07, 6.44444}, extent = {{-34, -26.4444}, {34, 26.4444}})));
-  
+  BobLib.Vehicle.Chassis.Suspension.FrAxleDW_BC_ARB frAxleDW(pAxle = pVehicle.pFrAxleDW,
+                                                             pRack = pVehicle.pFrRack,
+                                                             pStabar = pVehicle.pFrStabar,
+                                                             pLeftPartialWheel = pVehicle.pFrPartialWheel,
+                                                             pLeftDW = pVehicle.pFrDW,
+                                                             pLeftAxleMass = pVehicle.pFrAxleMass,                                                      
+                                                             redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.BaseTire leftTire(redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.SlipModel.NoSlip slipModel),
+                                                             redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.BaseTire rightTire(redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.SlipModel.NoSlip slipModel)) annotation(
+    Placement(transformation(origin = {2.72478e-07, 31.4444}, extent = {{-33.5, -14.8889}, {33.5, 14.8889}})));
+
 protected
   // Left jounce input
   Modelica.Mechanics.MultiBody.Parts.Fixed leftJounceRef(animation = false, r = leftCPInit) annotation(
@@ -91,11 +91,9 @@ protected
   
 equation
   connect(axleFixed.frame_b, frAxleDW.axleFrame) annotation(
-    Line(points = {{0, 0}, {0, 16}}, color = {95, 95, 95}));
+    Line(points = {{0, 0}, {0, 30}}, color = {95, 95, 95}));
   connect(steerRamp.y, steerPosition.phi_ref) annotation(
     Line(points = {{-68, 70}, {-62, 70}}, color = {0, 0, 127}));
-  connect(steerPosition.flange, frAxleDW.pinionFlange) annotation(
-    Line(points = {{-40, 70}, {0, 70}, {0, 26}}));
   connect(leftJounceRamp.y, leftJouncePosition.s_ref) annotation(
     Line(points = {{-98, 0}, {-92, 0}}, color = {0, 0, 127}));
   connect(leftJouncePosition.support, left_DOF_z.support) annotation(
@@ -114,21 +112,22 @@ equation
     Line(points = {{-70, -70}, {-80, -70}, {-80, -60}}, color = {95, 95, 95}));
   connect(left_DOF_y.frame_b, left_DOF_z.frame_a) annotation(
     Line(points = {{-80, -40}, {-80, -30}, {-70, -30}}, color = {95, 95, 95}));
-  connect(left_DOF_z.frame_b, left_DOF_xyz.frame_a) annotation(
-    Line(points = {{-50, -30}, {-40, -30}, {-40, -20}}, color = {95, 95, 95}));
   connect(rightJounceRef.frame_b, right_DOF_x.frame_a) annotation(
     Line(points = {{40, -70}, {50, -70}}, color = {95, 95, 95}));
   connect(right_DOF_x.frame_b, right_DOF_y.frame_a) annotation(
     Line(points = {{70, -70}, {80, -70}, {80, -60}}, color = {95, 95, 95}));
   connect(right_DOF_y.frame_b, right_DOF_z.frame_a) annotation(
     Line(points = {{80, -40}, {80, -30}, {70, -30}}, color = {95, 95, 95}));
+  connect(left_DOF_z.frame_b, left_DOF_xyz.frame_a) annotation(
+    Line(points = {{-50, -30}, {-40, -30}, {-40, -20}}, color = {95, 95, 95}));
   connect(right_DOF_z.frame_b, right_DOF_xyz.frame_a) annotation(
     Line(points = {{50, -30}, {40, -30}, {40, -20}}, color = {95, 95, 95}));
-  connect(left_DOF_xyz.frame_b, frAxleDW.leftCP) annotation(
-    Line(points = {{-40, 0}, {-40, 6}, {-34, 6}}, color = {95, 95, 95}));
-  connect(right_DOF_xyz.frame_b, frAxleDW.rightCP) annotation(
-    Line(points = {{40, 0}, {40, 6}, {34, 6}}, color = {95, 95, 95}));
-  
+  connect(frAxleDW.leftCP, left_DOF_xyz.frame_b) annotation(
+    Line(points = {{-34, 20}, {-40, 20}, {-40, 0}}, color = {95, 95, 95}));
+  connect(frAxleDW.rightCP, right_DOF_xyz.frame_b) annotation(
+    Line(points = {{34, 20}, {40, 20}, {40, 0}}, color = {95, 95, 95}));
+  connect(steerPosition.flange, frAxleDW.steerFlange) annotation(
+    Line(points = {{-40, 70}, {0, 70}, {0, 38}}));
   annotation(
     experiment(StartTime = 0, StopTime = 3, Tolerance = 1e-06, Interval = 0.002),
     __OpenModelica_commandLineOptions = "--matchingAlgorithm=PFPlusExt --indexReductionMethod=dynamicStateSelection -d=initialization,NLSanalyticJacobian",
