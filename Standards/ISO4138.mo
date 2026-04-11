@@ -26,6 +26,9 @@ model ISO4138
   parameter Real curvGain = 4;
   parameter Real curvTi = 0.02;
   
+  parameter Real radErrorTol = 0.002;
+  parameter Real der_radErrorTol = 0.5;
+  
   discrete Real t_hit(start = -1);
   
   Real curvError;
@@ -113,12 +116,12 @@ equation
   radError = abs(speedCG / max(vehicle.chassis.spaceFrame.sprungBody.w_a[3], 0.1) - testRad);
   
   // Steady-state detection
-  when radError < 0.01 and pre(t_hit) < 0 then
+  when abs(radError) < radErrorTol and abs(der(radError)) < der_radErrorTol and pre(t_hit) < 0 then
     t_hit = time;
   end when;
   
-  when t_hit > 0 and time > t_hit + 0.5 then
-    terminate("Reached steady-state (held 0.5s)");
+  when t_hit > 0 and time > t_hit + 0.1 then
+    terminate("Reached steady-state (held 0.1s)");
   end when;
   
   curvError = smooth(1, min(1, max(0, (time - 1)/0.2))) * (1/testRad - vehicle.chassis.spaceFrame.sprungBody.w_a[3] / max(speedCG, 0.1));
