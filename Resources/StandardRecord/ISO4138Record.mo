@@ -4,8 +4,9 @@ record ISO4138Record
   import Modelica.SIunits;
   
   // Inputs
-  Modelica.SIunits.Angle steerAngle "Road wheel angle";
   Modelica.SIunits.Angle handwheelAngle "Steering wheel angle";
+  Modelica.SIunits.Angle leftSteerAngle "Left road wheel angle";
+  Modelica.SIunits.Angle rightSteerAngle "Right road wheel angle";
   
   // Kinematics
   Modelica.SIunits.Velocity velX "Longitudinal velocity";

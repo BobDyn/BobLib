@@ -23,7 +23,7 @@ model ISO4138
   parameter SIunits.Velocity testVel = 15;
   parameter SIunits.Length testRad = 20;
   
-  parameter Real curvGain = 4;
+  parameter Real curvGain = 3;
   parameter Real curvTi = 0.02;
   
   parameter Real radErrorTol = 0.002;
@@ -70,6 +70,9 @@ protected
                                                                                                        {0, 0, 0}),
                                                                                   {0, 0, -pVehicle.pRrPartialWheel.R0});
   final parameter Real cpInitRR[3] = Vector.mirrorXZ(cpInitRL);
+  
+  Real leftWheelVector[3];
+  Real rightWheelVector[3];
   
   // Initial geometry
   Modelica.Mechanics.MultiBody.Parts.Fixed fixedFL(r = cpInitFL, animation = false) annotation(
@@ -133,8 +136,12 @@ equation
   
   speedCG = norm(bodyVels);
   
+  leftWheelVector = Frames.resolve1(vehicle.chassis.frAxleFrame.R, Frames.resolve2(vehicle.frameFL.R, {1, 0, 0}));
+  rightWheelVector = Frames.resolve1(vehicle.chassis.frAxleFrame.R, Frames.resolve2(vehicle.frameFR.R, {1, 0, 0}));
+  
   // Output record
-  iso.steerAngle = 0;
+  iso.leftSteerAngle = -1 * atan(leftWheelVector[2] / leftWheelVector[1]);
+  iso.rightSteerAngle = -1 * atan(rightWheelVector[2] / rightWheelVector[1]);
   iso.handwheelAngle = vehicle.steerFlange.phi;
   
   // Kinematics

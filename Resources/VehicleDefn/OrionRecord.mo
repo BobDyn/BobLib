@@ -19,8 +19,9 @@ record OrionRecord
     bellcrankPickup3 = {-0.01102742905, 0.34553503283, 0.411259910778},
     rodMount = {0.006762552642, 0.525610676234, 0.134465050856},
     shockMount = {-0.020673469702, 0.247847085458, 0.561456926868},
-    springTable = [0, 0; 1, 1e6],
-    damperTable = [0, 0; 1, 1e2]);
+    springTable = [0, 0; 1, 43780],
+    springFreeLength = 0.1850,
+    damperTable = [-1, -850; 0, 0; 1, 850]);
 
   parameter Axle.AxleDWRecord pRrAxleDW(
     bellcrankPivot = {-1.39886851, 0.29230126, 0.1016},
@@ -30,8 +31,9 @@ record OrionRecord
     bellcrankPickup3 = {-1.41346984, 0.31057564, 0.12306883},
     rodMount = {-1.53509479, 0.50330883, 0.26648017},
     shockMount = {-1.50192144, 0.28884688, 0.36889916},
-    springTable = [0, 0; 1, 1e6],
-    damperTable = [0, 0; 1, 1e2]);
+    springTable = [0, 0; 1, 70050],
+    springFreeLength = 0.2513,
+    damperTable = [-1, -1300; 0, 0; 1, 1300]);
   
   parameter Stabar.StabarRecord pFrStabar(
     leftArmEnd = {-0.03682914, 0.2667, 0.11597939},

@@ -22,7 +22,7 @@ model FrAxleDW_BC_ARB "Double wishbone front axle with bellcranks and stabar"
     Placement(transformation(origin = {-50, -20}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
   
   // Left shock
-  Linkages.ShockLinkage leftShockLinkage(r_a = pAxle.bellcrankPickup3, r_b = pAxle.shockMount, s_0 = Vectors.norm(pAxle.bellcrankPickup3 - pAxle.shockMount), springTable = pAxle.springTable, damperTable = pAxle.damperTable, n_a = pAxle.bellcrankPivotAxis, n_b = Vectors.normalize(pAxle.bellcrankPivot - pAxle.bellcrankPickup3), linkDiameter = linkDiameter, jointDiameter = jointDiameter) annotation(
+  Linkages.ShockLinkage leftShockLinkage(r_a = pAxle.bellcrankPickup3, r_b = pAxle.shockMount, s_0 = pAxle.springFreeLength, springTable = pAxle.springTable, damperTable = pAxle.damperTable, n_a = pAxle.bellcrankPivotAxis, n_b = Vectors.normalize(pAxle.bellcrankPivot - pAxle.bellcrankPickup3), linkDiameter = linkDiameter, jointDiameter = jointDiameter) annotation(
     Placement(transformation(origin = {-50, -55}, extent = {{-15, -15}, {15, 15}}, rotation = -90)));
   
   // Right pushrod
@@ -34,7 +34,7 @@ model FrAxleDW_BC_ARB "Double wishbone front axle with bellcranks and stabar"
     Placement(transformation(origin = {50, -20}, extent = {{10, -10}, {-10, 10}}, rotation = -180)));
 
   // Right shock
-  Linkages.ShockLinkage rightShockLinkage(r_a = mirrorXZ(pAxle.bellcrankPickup3), r_b = mirrorXZ(pAxle.shockMount), s_0 = Vectors.norm(pAxle.bellcrankPickup3 - pAxle.shockMount), springTable = pAxle.springTable, damperTable = pAxle.damperTable, n_a = mirrorXZ(pAxle.bellcrankPivotAxis), n_b = Vectors.normalize(mirrorXZ(pAxle.bellcrankPivot - pAxle.bellcrankPickup3)), linkDiameter = linkDiameter, jointDiameter = jointDiameter) annotation(
+  Linkages.ShockLinkage rightShockLinkage(r_a = mirrorXZ(pAxle.bellcrankPickup3), r_b = mirrorXZ(pAxle.shockMount), s_0 = pAxle.springFreeLength, springTable = pAxle.springTable, damperTable = pAxle.damperTable, n_a = mirrorXZ(pAxle.bellcrankPivotAxis), n_b = Vectors.normalize(mirrorXZ(pAxle.bellcrankPivot - pAxle.bellcrankPickup3)), linkDiameter = linkDiameter, jointDiameter = jointDiameter) annotation(
     Placement(transformation(origin = {50, -55}, extent = {{-15, -15}, {15, 15}}, rotation = -90)));
 
   // Stabar

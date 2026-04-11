@@ -36,7 +36,7 @@ model RrAxleDW_BC_ARB "Double wishbone rear axle with bellcranks and stabar"
   // Left shock
   Linkages.ShockLinkage leftShockLinkage(r_a = pAxle.bellcrankPickup2,
                                          r_b = pAxle.shockMount,
-                                         s_0 = Vectors.norm(pAxle.bellcrankPickup2 - pAxle.shockMount),
+                                         s_0 = pAxle.springFreeLength,
                                          springTable = pAxle.springTable,
                                          damperTable = pAxle.damperTable,
                                          n_a = pAxle.bellcrankPivotAxis,
@@ -66,7 +66,7 @@ model RrAxleDW_BC_ARB "Double wishbone rear axle with bellcranks and stabar"
   // Right shock
   Linkages.ShockLinkage rightShockLinkage(r_a = mirrorXZ(pAxle.bellcrankPickup2),
                                           r_b = mirrorXZ(pAxle.shockMount),
-                                          s_0 = Vectors.norm(pAxle.bellcrankPickup2 - pAxle.shockMount),
+                                          s_0 = pAxle.springFreeLength,
                                           springTable = pAxle.springTable,
                                           damperTable = pAxle.damperTable,
                                           n_a = mirrorXZ(pAxle.bellcrankPivotAxis),
