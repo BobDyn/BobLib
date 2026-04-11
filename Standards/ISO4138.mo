@@ -116,7 +116,7 @@ initial equation
   vehicle.chassis.rrAxleDW.rightTire.wheelModel.hubAxis.w = testVel / pVehicle.pRrPartialWheel.R0;
 
 equation
-  radError = abs(speedCG / max(vehicle.chassis.spaceFrame.sprungBody.w_a[3], 0.1) - testRad);
+  radError = abs(speedCG / max(abs(vehicle.chassis.spaceFrame.sprungBody.w_a[3]), 0.1) - abs(testRad));
   
   // Steady-state detection
   when abs(radError) < radErrorTol and abs(der(radError)) < der_radErrorTol and pre(t_hit) < 0 then
