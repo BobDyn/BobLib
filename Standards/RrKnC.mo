@@ -12,10 +12,6 @@ model RrKnC
   parameter OrionRecord pVehicle annotation(
     Placement(visible = false, transformation(origin = {nan, nan}, extent = {{nan, nan}, {nan, nan}})));
   
-  Real leftSpringLength;
-  Real rightSpringLength;
-  Real stabarAngle;
-  
   extends BobLib.Standards.Templates.KnC(final toAxle(r = {pVehicle.pRrDW.wheelCenter[1], 0, pVehicle.pRrDW.wheelCenter[3]}),
                                          final leftCPFixed(r = leftCPInit),
                                          final rightCPFixed(r = rightCPInit));
@@ -45,38 +41,38 @@ protected
   final parameter Real rightCPInit[3] = Vector.mirrorXZ(leftCPInit);
   
 equation
-  leftGamma = rrAxleDW.leftTire.gamma;
+  knc.leftGamma = rrAxleDW.leftTire.gamma;
   
   leftDeltaVec = Frames.resolve1(rrAxleDW.leftCP.R, {1, 0, 0});
-  leftToe = atan(leftDeltaVec[2]/leftDeltaVec[1]);
+  knc.leftToe = atan(leftDeltaVec[2]/leftDeltaVec[1]);
   
   leftKingpinVec = rrAxleDW.leftWishboneUprightLoop.upperFrame_o.r_0 - rrAxleDW.leftWishboneUprightLoop.lowerFrame_o.r_0;
-  leftCaster = atan(-1*leftKingpinVec[1]/leftKingpinVec[3]);
-  leftKpi = atan(-1*leftKingpinVec[2]/leftKingpinVec[3]);
+  knc.leftCaster = atan(-1*leftKingpinVec[1]/leftKingpinVec[3]);
+  knc.leftKpi = atan(-1*leftKingpinVec[2]/leftKingpinVec[3]);
   
   leftGroundParam = (rrAxleDW.leftCP.r_0[3] - rrAxleDW.leftWishboneUprightLoop.upperFrame_o.r_0[3])/leftKingpinVec[3];
   leftGroundPoint = rrAxleDW.leftWishboneUprightLoop.upperFrame_o.r_0 + leftGroundParam*leftKingpinVec;
-  leftMechTrail = leftGroundPoint[1] - rrAxleDW.leftCP.r_0[1];
-  leftMechScrub = rrAxleDW.leftCP.r_0[2] - leftGroundPoint[2];
+  knc.leftMechTrail = leftGroundPoint[1] - rrAxleDW.leftCP.r_0[1];
+  knc.leftMechScrub = rrAxleDW.leftCP.r_0[2] - leftGroundPoint[2];
   
-  rightGamma = rrAxleDW.rightTire.gamma;
+  knc.rightGamma = rrAxleDW.rightTire.gamma;
   
   rightDeltaVec = Frames.resolve1(rrAxleDW.rightCP.R, {1, 0, 0});
-  rightToe = atan(rightDeltaVec[2]/rightDeltaVec[1]);
+  knc.rightToe = atan(rightDeltaVec[2]/rightDeltaVec[1]);
   
   rightKingpinVec = rrAxleDW.rightWishboneUprightLoop.upperFrame_o.r_0 - rrAxleDW.rightWishboneUprightLoop.lowerFrame_o.r_0;
-  rightCaster = atan(-1*rightKingpinVec[1]/rightKingpinVec[3]);
-  rightKpi = atan(rightKingpinVec[2]/rightKingpinVec[3]);
+  knc.rightCaster = atan(-1*rightKingpinVec[1]/rightKingpinVec[3]);
+  knc.rightKpi = atan(rightKingpinVec[2]/rightKingpinVec[3]);
   
   rightGroundParam = (rrAxleDW.rightCP.r_0[3] - rrAxleDW.rightWishboneUprightLoop.upperFrame_o.r_0[3])/rightKingpinVec[3];
   rightGroundPoint = rrAxleDW.rightWishboneUprightLoop.upperFrame_o.r_0 + rightGroundParam*rightKingpinVec;
-  rightMechTrail = rightGroundPoint[1] - rrAxleDW.rightCP.r_0[1];
-  rightMechScrub = rightGroundPoint[2] - rrAxleDW.rightCP.r_0[2];
+  knc.rightMechTrail = rightGroundPoint[1] - rrAxleDW.rightCP.r_0[1];
+  knc.rightMechScrub = rightGroundPoint[2] - rrAxleDW.rightCP.r_0[2];
   
-  leftSpringLength = rrAxleDW.leftShockLinkage.lineForceWithMass.s;
-  rightSpringLength = rrAxleDW.rightShockLinkage.lineForceWithMass.s;
+  knc.leftSpringLength = rrAxleDW.leftShockLinkage.lineForceWithMass.s;
+  knc.rightSpringLength = rrAxleDW.rightShockLinkage.lineForceWithMass.s;
   
-  stabarAngle = rrAxleDW.stabar.spring.phi_rel;
+  knc.stabarAngle = rrAxleDW.stabar.spring.phi_rel;
   
   connect(leftCPForce.frame_b, rrAxleDW.leftCP) annotation(
     Line(points = {{-60, 20}, {-47, 20}, {-47, 50}, {-34, 50}}, color = {95, 95, 95}));

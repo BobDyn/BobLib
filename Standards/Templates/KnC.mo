@@ -2,26 +2,8 @@ within BobLib.Standards.Templates;
 
 partial model KnC
   import Modelica.SIunits;
-
-  Real leftGamma;
-  Real leftToe;
-  Real leftCaster;
-  Real leftKpi;
-  Real leftMechTrail;
-  Real leftMechScrub;
-
-  Real rightGamma;
-  Real rightToe;
-  Real rightCaster;
-  Real rightKpi;
-  Real rightMechTrail;
-  Real rightMechScrub;
   
-  Real jackingForce;
-  Real heaveSignal;
-  Real rollSignal;
-  Real fxSignal;
-  Real fySignal;
+  import BobLib.Resources.StandardRecord.KnCRecord;
   
   inner parameter SIunits.Length linkDiameter = 0.020;
   inner parameter SIunits.Length jointDiameter = 0.030;
@@ -37,7 +19,10 @@ partial model KnC
   
   inner Modelica.Mechanics.MultiBody.World world(g = 0, n = {0, 0, -1}) annotation(
     Placement(transformation(origin = {-130, -110}, extent = {{-10, -10}, {10, 10}})));
-
+  
+  // Standard record
+  KnCRecord knc;
+  
 protected
   Real leftDeltaVec[3];
   Real leftKingpinVec[3];
@@ -147,13 +132,13 @@ protected
 
 equation
   // Instrumentation
-  jackingForce = sprungLoads.force[3];
+  knc.jackingForce = sprungLoads.force[3];
   
   // Route user-interface signals
-  heaveSignal = heaveGain.y;
-  rollSignal = rollGain.y;
-  fxSignal = leftFxGain.y*2;
-  fySignal = leftFyGain.y*2;
+  knc.heave = heaveGain.y;
+  knc.roll = rollGain.y;
+  knc.fx = leftFxGain.y*2;
+  knc.fy = leftFyGain.y*2;
   
   connect(groundFixed.frame_b, sprungLoads.frame_a) annotation(
     Line(points = {{0, -100}, {0, -80}}, color = {95, 95, 95}));
