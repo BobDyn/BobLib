@@ -7,6 +7,7 @@ model FrKnC
   import Modelica.Mechanics.MultiBody.Frames;
   import BobLib.Utilities.Math.Vector;
   
+  import BobLib.Resources.VehicleRecord.Chassis.Suspension.AxleDWRecord;
   import BobLib.Resources.VehicleDefn.OrionRecord;
   
   parameter OrionRecord pVehicle annotation(
@@ -17,16 +18,25 @@ model FrKnC
                                          final rightCPFixed(r = rightCPInit));
   
   // Front axle
-  BobLib.Vehicle.Chassis.Suspension.FrAxleDW_BC_ARB frAxleDW(pAxle = pVehicle.pFrAxleDW,
-                                                      pRack = pVehicle.pFrRack,
-                                                      pStabar = pVehicle.pFrStabar,
-                                                      pLeftPartialWheel = pVehicle.pFrPartialWheel,
-                                                      pLeftDW = pVehicle.pFrDW,
-                                                      pLeftAxleMass = pVehicle.pFrAxleMass,
-                                                      redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.BaseTire leftTire(
-                                                        redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.SlipModel.NoSlip slipModel),
-                                                      redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.BaseTire rightTire(
-                                                        redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.SlipModel.NoSlip slipModel)) annotation(
+  BobLib.Vehicle.Chassis.Suspension.FrAxleDW_BC_ARB frAxleDW(pAxle = AxleDWRecord(bellcrankPivot = pVehicle.pFrAxleDW.bellcrankPivot,
+                                                                                  bellcrankPivotAxis = pVehicle.pFrAxleDW.bellcrankPivotAxis,
+                                                                                  bellcrankPickup1 = pVehicle.pFrAxleDW.bellcrankPickup1,
+                                                                                  bellcrankPickup2 = pVehicle.pFrAxleDW.bellcrankPickup2,
+                                                                                  bellcrankPickup3 = pVehicle.pFrAxleDW.bellcrankPickup3,
+                                                                                  rodMount = pVehicle.pFrAxleDW.rodMount,
+                                                                                  shockMount = pVehicle.pFrAxleDW.shockMount,
+                                                                                  springTable = [0, 0; 1, 0],
+                                                                                  springFreeLength = pVehicle.pFrAxleDW.springFreeLength,
+                                                                                  damperTable = [0, 0; 1, 0]),
+                                                             pRack = pVehicle.pFrRack,
+                                                             pStabar = pVehicle.pFrStabar,
+                                                             pLeftPartialWheel = pVehicle.pFrPartialWheel,
+                                                             pLeftDW = pVehicle.pFrDW,
+                                                             pLeftAxleMass = pVehicle.pFrAxleMass,
+                                                             redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.BaseTire leftTire(
+                                                               redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.SlipModel.NoSlip slipModel),
+                                                             redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.BaseTire rightTire(
+                                                               redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.SlipModel.NoSlip slipModel)) annotation(
     Placement(transformation(origin = {0, 50.4444}, extent = {{-39.75, -17.6667}, {39.75, 17.6667}})));
 
 protected

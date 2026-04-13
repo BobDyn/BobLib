@@ -7,6 +7,7 @@ model RrKnC
   import Modelica.Mechanics.MultiBody.Frames;
   import BobLib.Utilities.Math.Vector;
   
+  import BobLib.Resources.VehicleRecord.Chassis.Suspension.AxleDWRecord;
   import BobLib.Resources.VehicleDefn.OrionRecord;
   
   parameter OrionRecord pVehicle annotation(
@@ -17,7 +18,16 @@ model RrKnC
                                          final rightCPFixed(r = rightCPInit));
   
   // Rear axle
-  BobLib.Vehicle.Chassis.Suspension.RrAxleDW_BC_ARB rrAxleDW(pAxle = pVehicle.pRrAxleDW,
+  BobLib.Vehicle.Chassis.Suspension.RrAxleDW_BC_ARB rrAxleDW(pAxle = AxleDWRecord(bellcrankPivot = pVehicle.pRrAxleDW.bellcrankPivot,
+                                                                                  bellcrankPivotAxis = pVehicle.pRrAxleDW.bellcrankPivotAxis,
+                                                                                  bellcrankPickup1 = pVehicle.pRrAxleDW.bellcrankPickup1,
+                                                                                  bellcrankPickup2 = pVehicle.pRrAxleDW.bellcrankPickup2,
+                                                                                  bellcrankPickup3 = pVehicle.pRrAxleDW.bellcrankPickup3,
+                                                                                  rodMount = pVehicle.pRrAxleDW.rodMount,
+                                                                                  shockMount = pVehicle.pRrAxleDW.shockMount,
+                                                                                  springTable = [0, 0; 1, 0],
+                                                                                  springFreeLength = pVehicle.pRrAxleDW.springFreeLength,
+                                                                                  damperTable = [0, 0; 1, 0]),
                                                       pRack = pVehicle.pRrRack,
                                                       pStabar = pVehicle.pRrStabar,
                                                       pLeftPartialWheel = pVehicle.pRrPartialWheel,
