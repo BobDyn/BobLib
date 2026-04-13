@@ -7,6 +7,7 @@ model RrKnC
   import Modelica.Mechanics.MultiBody.Frames;
   import BobLib.Utilities.Math.Vector;
   
+  import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Stabar.StabarRecord;
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.AxleDWRecord;
   import BobLib.Resources.VehicleDefn.OrionRecord;
   
@@ -29,7 +30,9 @@ model RrKnC
                                                                                   springFreeLength = pVehicle.pRrAxleDW.springFreeLength,
                                                                                   damperTable = [0, 0; 1, 0]),
                                                       pRack = pVehicle.pRrRack,
-                                                      pStabar = pVehicle.pRrStabar,
+                                                      pStabar = StabarRecord(leftArmEnd = pVehicle.pRrStabar.leftArmEnd,
+                                                                             leftBarEnd = pVehicle.pRrStabar.leftBarEnd,
+                                                                             barRate = 0),
                                                       pLeftPartialWheel = pVehicle.pRrPartialWheel,
                                                       pLeftDW = pVehicle.pRrDW,
                                                       pLeftAxleMass = pVehicle.pRrAxleMass,
