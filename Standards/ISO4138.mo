@@ -179,8 +179,7 @@ equation
   vis.frTie_i = vehicle.chassis.frAxleDW.leftTieRod.frame_a.r_0;
   vis.frTie_o = vehicle.chassis.frAxleDW.leftTieRod.frame_b.r_0;
   
-  vis.frWheelCenter = vehicle.chassis.frAxleDW.toLeftWheelCenter.frame_b.r_0;
-  
+  vis.frWheelCenter = vehicle.chassis.frAxleDW.leftTire.chassisFrame.r_0;
   
   connect(cgFixed.frame_b, cgFreeMotion.frame_a) annotation(
     Line(points = {{120, 90}, {110, 90}}, color = {95, 95, 95}));
