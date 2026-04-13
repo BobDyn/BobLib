@@ -34,11 +34,11 @@ model TestDoubleWishbone
     Placement(transformation(origin = {90, 10}, extent = {{10, -10}, {-10, 10}})));
   Modelica.Mechanics.MultiBody.Parts.Fixed lowerFixed_i(r = (pVehicle.pFrDW.lowerFore_i + pVehicle.pFrDW.lowerAft_i) / 2, animation = false) annotation(
     Placement(transformation(origin = {90, -30}, extent = {{10, -10}, {-10, 10}})));
-  Modelica.Mechanics.MultiBody.Parts.Fixed rackFixed(r = {pVehicle.pRack.leftPickup[1], 0, pVehicle.pRack.leftPickup[3]}, animation = false) annotation(
+  Modelica.Mechanics.MultiBody.Parts.Fixed rackFixed(r = {pVehicle.pFrRack.leftPickup[1], 0, pVehicle.pFrRack.leftPickup[3]}, animation = false) annotation(
     Placement(transformation(origin = {90, 50}, extent = {{-10, -10}, {10, 10}}, rotation = -180)));
   
   // Rack
-  BobLib.Vehicle.Chassis.Suspension.Templates.SteeringRack.RackAndPinion rackAndPinion(pRack = pVehicle.pRack,
+  BobLib.Vehicle.Chassis.Suspension.Templates.SteeringRack.RackAndPinion rackAndPinion(pRack = pVehicle.pFrRack,
                                                                                        linkDiameter = linkDiameter)  annotation(
     Placement(transformation(origin = {50, 60}, extent = {{-20, -20}, {20, 20}})));
   
@@ -51,7 +51,7 @@ model TestDoubleWishbone
     Placement(transformation(origin = {-40, 10}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
   
   // Tie rod
-  BobLib.Vehicle.Chassis.Suspension.Linkages.Rod tieRod(r_a = pVehicle.pRack.leftPickup,
+  BobLib.Vehicle.Chassis.Suspension.Linkages.Rod tieRod(r_a = pVehicle.pFrRack.leftPickup,
                                                         r_b = pVehicle.pFrDW.tie_o,
                                                         n1_a = {1, 0, 0},
                                                         linkDiameter = linkDiameter,

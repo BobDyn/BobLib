@@ -14,7 +14,10 @@ model ISO4138
   
   // Imoport standard record
   import BobLib.Resources.StandardRecord.ISO4138Record;
-
+  
+  // Import visual record
+  import BobLib.Resources.VisualRecord.ChassisVisualRecord;
+  
   inner parameter SIunits.Length linkDiameter = 0.020;
   inner parameter SIunits.Length jointDiameter = 0.030;
   
@@ -42,6 +45,9 @@ model ISO4138
   
   // Standard record
   ISO4138Record iso;
+  
+//  // Visual record
+//  ChassisVisualRecord vis;
 
   inner Modelica.Mechanics.MultiBody.World world(n = {0, 0, -1}) annotation(
     Placement(transformation(origin = {-130, -110}, extent = {{-10, -10}, {10, 10}})));
@@ -160,6 +166,30 @@ equation
   
   // Derived
   iso.curvature = vehicle.chassis.spaceFrame.sprungBody.w_a[3] / max(speedCG, 0.1);
+  
+//  // Wishbone (inner)
+//  Real frUpperFore_i[3];
+//  Real frUpperAft_i[3];
+//  Real frLowerFore_i[3];
+//  Real frLowerAft_i[3];
+
+//  // Upright (outer)
+//  Real frUpper_o[3];
+//  Real frLower_o[3];
+
+//  // Steering
+//  Real frTie_o[3];
+
+//  // Wheel
+//  Real frWheelCenter[3];
+  
+  // All visual variables
+
+  
+//  vis.cg = vehicle.chassis.cgFrame.r_0;
+//  vis.chassisOrigin = vehicle.chassis.frAxleFrame.r_0;
+//  vis.frBellcrankPivot = vehicle.chassis.frAxleDW.leftBellcrank.mountFrame.r_0;
+  
   
   connect(cgFixed.frame_b, cgFreeMotion.frame_a) annotation(
     Line(points = {{120, 90}, {110, 90}}, color = {95, 95, 95}));
