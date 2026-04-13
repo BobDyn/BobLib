@@ -46,8 +46,8 @@ model ISO4138
   // Standard record
   ISO4138Record iso;
   
-//  // Visual record
-//  ChassisVisualRecord vis;
+  // Visual record
+  ChassisVisualRecord vis;
 
   inner Modelica.Mechanics.MultiBody.World world(n = {0, 0, -1}) annotation(
     Placement(transformation(origin = {-130, -110}, extent = {{-10, -10}, {10, 10}})));
@@ -167,28 +167,19 @@ equation
   // Derived
   iso.curvature = vehicle.chassis.spaceFrame.sprungBody.w_a[3] / max(speedCG, 0.1);
   
-//  // Wishbone (inner)
-//  Real frUpperFore_i[3];
-//  Real frUpperAft_i[3];
-//  Real frLowerFore_i[3];
-//  Real frLowerAft_i[3];
-
-//  // Upright (outer)
-//  Real frUpper_o[3];
-//  Real frLower_o[3];
-
-//  // Steering
-//  Real frTie_o[3];
-
-//  // Wheel
-//  Real frWheelCenter[3];
-  
   // All visual variables
-
+  vis.frUpperFore_i = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.upperFrameToFore.frame_b.r_0;
+  vis.frUpperAft_i = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.upperFrameToAft.frame_b.r_0;
+  vis.frLowerFore_i = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.lowerFrameToFore.frame_b.r_0;
+  vis.frLowerAft_i = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.lowerFrameToAft.frame_b.r_0;
   
-//  vis.cg = vehicle.chassis.cgFrame.r_0;
-//  vis.chassisOrigin = vehicle.chassis.frAxleFrame.r_0;
-//  vis.frBellcrankPivot = vehicle.chassis.frAxleDW.leftBellcrank.mountFrame.r_0;
+  vis.frUpper_o = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.upperFrame_o.r_0;
+  vis.frLower_o = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.lowerFrame_o.r_0;
+  
+  vis.frTie_i = vehicle.chassis.frAxleDW.leftTieRod.frame_a.r_0;
+  vis.frTie_o = vehicle.chassis.frAxleDW.leftTieRod.frame_b.r_0;
+  
+  vis.frWheelCenter = vehicle.chassis.frAxleDW.toLeftWheelCenter.frame_b.r_0;
   
   
   connect(cgFixed.frame_b, cgFreeMotion.frame_a) annotation(
