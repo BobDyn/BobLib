@@ -11,12 +11,16 @@ model FrKnC
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.AxleDWRecord;
   import BobLib.Resources.VehicleDefn.OrionRecord;
   
+  import BobLib.Resources.VisualRecord.Chassis.Suspension.AxleDW_BC_ARB_VisualRecord;
+  
   parameter OrionRecord pVehicle annotation(
     Placement(visible = false, transformation(origin = {nan, nan}, extent = {{nan, nan}, {nan, nan}})));
   
   extends BobLib.Standards.Templates.KnC(final toAxle(r = {pVehicle.pFrDW.wheelCenter[1], 0, pVehicle.pFrDW.wheelCenter[3]}),
                                          final leftCPFixed(r = leftCPInit),
                                          final rightCPFixed(r = rightCPInit));
+  
+  AxleDW_BC_ARB_VisualRecord vis;
   
   // Front axle
   BobLib.Vehicle.Chassis.Suspension.FrAxleDW_BC_ARB frAxleDW(pAxle = AxleDWRecord(bellcrankPivot = pVehicle.pFrAxleDW.bellcrankPivot,
@@ -88,7 +92,63 @@ equation
   knc.leftSpringLength = frAxleDW.leftShockLinkage.lineForceWithMass.s;
   knc.rightSpringLength = frAxleDW.rightShockLinkage.lineForceWithMass.s;
   knc.stabarAngle = frAxleDW.stabar.spring.phi_rel;
-
+  
+  // All visuals
+  
+  // Left base
+  vis.leftUpperFore_i = frAxleDW.leftWishboneUprightLoop.upperFrameToFore.frame_b.r_0;
+  vis.leftUpperAft_i = frAxleDW.leftWishboneUprightLoop.upperFrameToAft.frame_b.r_0;
+  vis.leftLowerFore_i = frAxleDW.leftWishboneUprightLoop.lowerFrameToFore.frame_b.r_0;
+  vis.leftLowerAft_i = frAxleDW.leftWishboneUprightLoop.lowerFrameToAft.frame_b.r_0;
+  
+  vis.leftUpper_o = frAxleDW.leftWishboneUprightLoop.upperFrame_o.r_0;
+  vis.leftLower_o = frAxleDW.leftWishboneUprightLoop.lowerFrame_o.r_0;
+  
+  vis.leftTie_i = frAxleDW.leftTieRod.frame_a.r_0;
+  vis.leftTie_o = frAxleDW.leftTieRod.frame_b.r_0;
+  
+  vis.leftWheelCenter = frAxleDW.leftTire.chassisFrame.r_0;
+  vis.leftTire_ex = Frames.resolve1(frAxleDW.leftCP.R, {1, 0, 0});
+  vis.leftTire_ey = Frames.resolve1(frAxleDW.leftCP.R, {0, 1, 0});
+  
+  // Left enhanced
+  vis.leftBellcrankPivot = frAxleDW.leftBellcrank.mountFrame.r_0;
+  vis.leftBellcrankPickup1 = frAxleDW.leftBellcrank.pickupFrame1.r_0;
+  vis.leftBellcrankPickup2 = frAxleDW.leftBellcrank.pickupFrame2.r_0;
+  vis.leftBellcrankPickup3 = frAxleDW.leftBellcrank.pickupFrame3.r_0;
+  vis.leftRodMount = frAxleDW.leftPushrod.frame_b.r_0;
+  vis.leftShockMount = frAxleDW.leftShockLinkage.frame_b.r_0;
+  
+  vis.leftBarEnd = frAxleDW.stabar.toLeftBarEnd.frame_b.r_0;
+  vis.leftArmEnd = frAxleDW.stabar.leftArmFrame.r_0;
+  
+  // Right base
+  vis.rightUpperFore_i = frAxleDW.rightWishboneUprightLoop.upperFrameToFore.frame_b.r_0;
+  vis.rightUpperAft_i = frAxleDW.rightWishboneUprightLoop.upperFrameToAft.frame_b.r_0;
+  vis.rightLowerFore_i = frAxleDW.rightWishboneUprightLoop.lowerFrameToFore.frame_b.r_0;
+  vis.rightLowerAft_i = frAxleDW.rightWishboneUprightLoop.lowerFrameToAft.frame_b.r_0;
+  
+  vis.rightUpper_o = frAxleDW.rightWishboneUprightLoop.upperFrame_o.r_0;
+  vis.rightLower_o = frAxleDW.rightWishboneUprightLoop.lowerFrame_o.r_0;
+  
+  vis.rightTie_i = frAxleDW.rightTieRod.frame_a.r_0;
+  vis.rightTie_o = frAxleDW.rightTieRod.frame_b.r_0;
+  
+  vis.rightWheelCenter = frAxleDW.rightTire.chassisFrame.r_0;
+  vis.rightTire_ex = Frames.resolve1(frAxleDW.rightCP.R, {1, 0, 0});
+  vis.rightTire_ey = Frames.resolve1(frAxleDW.rightCP.R, {0, 1, 0});
+  
+  // Right enhanced
+  vis.rightBellcrankPivot = frAxleDW.rightBellcrank.mountFrame.r_0;
+  vis.rightBellcrankPickup1 = frAxleDW.rightBellcrank.pickupFrame1.r_0;
+  vis.rightBellcrankPickup2 = frAxleDW.rightBellcrank.pickupFrame2.r_0;
+  vis.rightBellcrankPickup3 = frAxleDW.rightBellcrank.pickupFrame3.r_0;
+  vis.rightRodMount = frAxleDW.rightPushrod.frame_b.r_0;
+  vis.rightShockMount = frAxleDW.rightShockLinkage.frame_b.r_0;
+  
+  vis.rightBarEnd = frAxleDW.stabar.toRightBarEnd.frame_b.r_0;
+  vis.rightArmEnd = frAxleDW.stabar.rightArmFrame.r_0;
+  
   connect(steerRamp.y, steerPosition.phi_ref) annotation(
     Line(points = {{-59, 110}, {-43, 110}}, color = {0, 0, 127}));
   connect(steerPosition.flange, frAxleDW.steerFlange) annotation(

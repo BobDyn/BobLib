@@ -18,6 +18,10 @@ model RrKnC
                                          final leftCPFixed(r = leftCPInit),
                                          final rightCPFixed(r = rightCPInit));
   
+  import BobLib.Resources.VisualRecord.Chassis.Suspension.AxleDW_BC_ARB_VisualRecord;
+  
+  AxleDW_BC_ARB_VisualRecord vis;
+  
   // Rear axle
   BobLib.Vehicle.Chassis.Suspension.RrAxleDW_BC_ARB rrAxleDW(pAxle = AxleDWRecord(bellcrankPivot = pVehicle.pRrAxleDW.bellcrankPivot,
                                                                                   bellcrankPivotAxis = pVehicle.pRrAxleDW.bellcrankPivotAxis,
@@ -86,6 +90,60 @@ equation
   knc.rightSpringLength = rrAxleDW.rightShockLinkage.lineForceWithMass.s;
   
   knc.stabarAngle = rrAxleDW.stabar.spring.phi_rel;
+  
+  // Left base
+  vis.leftUpperFore_i = rrAxleDW.leftWishboneUprightLoop.upperFrameToFore.frame_b.r_0;
+  vis.leftUpperAft_i = rrAxleDW.leftWishboneUprightLoop.upperFrameToAft.frame_b.r_0;
+  vis.leftLowerFore_i = rrAxleDW.leftWishboneUprightLoop.lowerFrameToFore.frame_b.r_0;
+  vis.leftLowerAft_i = rrAxleDW.leftWishboneUprightLoop.lowerFrameToAft.frame_b.r_0;
+  
+  vis.leftUpper_o = rrAxleDW.leftWishboneUprightLoop.upperFrame_o.r_0;
+  vis.leftLower_o = rrAxleDW.leftWishboneUprightLoop.lowerFrame_o.r_0;
+  
+  vis.leftTie_i = rrAxleDW.leftTieRod.frame_a.r_0;
+  vis.leftTie_o = rrAxleDW.leftTieRod.frame_b.r_0;
+  
+  vis.leftWheelCenter = rrAxleDW.leftTire.chassisFrame.r_0;
+  vis.leftTire_ex = Frames.resolve1(rrAxleDW.leftCP.R, {1, 0, 0});
+  vis.leftTire_ey = Frames.resolve1(rrAxleDW.leftCP.R, {0, 1, 0});
+  
+  // Left enhanced
+  vis.leftBellcrankPivot = rrAxleDW.leftBellcrank.mountFrame.r_0;
+  vis.leftBellcrankPickup1 = rrAxleDW.leftBellcrank.pickupFrame1.r_0;
+  vis.leftBellcrankPickup2 = rrAxleDW.leftBellcrank.pickupFrame2.r_0;
+  vis.leftBellcrankPickup3 = rrAxleDW.leftBellcrank.pickupFrame3.r_0;
+  vis.leftRodMount = rrAxleDW.leftPullrod.frame_b.r_0;
+  vis.leftShockMount = rrAxleDW.leftShockLinkage.frame_b.r_0;
+  
+  vis.leftBarEnd = rrAxleDW.stabar.toLeftBarEnd.frame_b.r_0;
+  vis.leftArmEnd = rrAxleDW.stabar.leftArmFrame.r_0;
+  
+  // Right base
+  vis.rightUpperFore_i = rrAxleDW.rightWishboneUprightLoop.upperFrameToFore.frame_b.r_0;
+  vis.rightUpperAft_i = rrAxleDW.rightWishboneUprightLoop.upperFrameToAft.frame_b.r_0;
+  vis.rightLowerFore_i = rrAxleDW.rightWishboneUprightLoop.lowerFrameToFore.frame_b.r_0;
+  vis.rightLowerAft_i = rrAxleDW.rightWishboneUprightLoop.lowerFrameToAft.frame_b.r_0;
+  
+  vis.rightUpper_o = rrAxleDW.rightWishboneUprightLoop.upperFrame_o.r_0;
+  vis.rightLower_o = rrAxleDW.rightWishboneUprightLoop.lowerFrame_o.r_0;
+  
+  vis.rightTie_i = rrAxleDW.rightTieRod.frame_a.r_0;
+  vis.rightTie_o = rrAxleDW.rightTieRod.frame_b.r_0;
+  
+  vis.rightWheelCenter = rrAxleDW.rightTire.chassisFrame.r_0;
+  vis.rightTire_ex = Frames.resolve1(rrAxleDW.rightCP.R, {1, 0, 0});
+  vis.rightTire_ey = Frames.resolve1(rrAxleDW.rightCP.R, {0, 1, 0});
+  
+  // Right enhanced
+  vis.rightBellcrankPivot = rrAxleDW.rightBellcrank.mountFrame.r_0;
+  vis.rightBellcrankPickup1 = rrAxleDW.rightBellcrank.pickupFrame1.r_0;
+  vis.rightBellcrankPickup2 = rrAxleDW.rightBellcrank.pickupFrame2.r_0;
+  vis.rightBellcrankPickup3 = rrAxleDW.rightBellcrank.pickupFrame3.r_0;
+  vis.rightRodMount = rrAxleDW.rightPullrod.frame_b.r_0;
+  vis.rightShockMount = rrAxleDW.rightShockLinkage.frame_b.r_0;
+  
+  vis.rightBarEnd = rrAxleDW.stabar.toRightBarEnd.frame_b.r_0;
+  vis.rightArmEnd = rrAxleDW.stabar.rightArmFrame.r_0;
   
   connect(leftCPForce.frame_b, rrAxleDW.leftCP) annotation(
     Line(points = {{-60, 20}, {-47, 20}, {-47, 50}, {-34, 50}}, color = {95, 95, 95}));
