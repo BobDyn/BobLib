@@ -16,7 +16,7 @@ model ISO4138
   import BobLib.Resources.StandardRecord.ISO4138Record;
   
   // Import visual record
-  import BobLib.Resources.VisualRecord.Chassis.Suspension.AxleDWBaseVisualRecord;
+  import BobLib.Resources.VisualRecord.Chassis.ChassisVisualRecord;
   
   inner parameter SIunits.Length linkDiameter = 0.020;
   inner parameter SIunits.Length jointDiameter = 0.030;
@@ -47,7 +47,7 @@ model ISO4138
   ISO4138Record iso;
   
   // Visual record
-  AxleDWBaseVisualRecord vis;
+  ChassisVisualRecord vis;
 
   inner Modelica.Mechanics.MultiBody.World world(n = {0, 0, -1}) annotation(
     Placement(transformation(origin = {-130, -110}, extent = {{-10, -10}, {10, 10}})));
@@ -168,35 +168,70 @@ equation
   iso.curvature = vehicle.chassis.spaceFrame.sprungBody.w_a[3] / max(speedCG, 0.1);
   
   // All visual variables
-  vis.leftUpperFore_i = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.upperFrameToFore.frame_b.r_0;
-  vis.leftUpperAft_i = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.upperFrameToAft.frame_b.r_0;
-  vis.leftLowerFore_i = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.lowerFrameToFore.frame_b.r_0;
-  vis.leftLowerAft_i = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.lowerFrameToAft.frame_b.r_0;
   
-  vis.leftUpper_o = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.upperFrame_o.r_0;
-  vis.leftLower_o = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.lowerFrame_o.r_0;
+  // Front left
+  vis.frontBaseAxle.leftUpperFore_i = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.upperFrameToFore.frame_b.r_0;
+  vis.frontBaseAxle.leftUpperAft_i = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.upperFrameToAft.frame_b.r_0;
+  vis.frontBaseAxle.leftLowerFore_i = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.lowerFrameToFore.frame_b.r_0;
+  vis.frontBaseAxle.leftLowerAft_i = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.lowerFrameToAft.frame_b.r_0;
   
-  vis.leftTie_i = vehicle.chassis.frAxleDW.leftTieRod.frame_a.r_0;
-  vis.leftTie_o = vehicle.chassis.frAxleDW.leftTieRod.frame_b.r_0;
+  vis.frontBaseAxle.leftUpper_o = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.upperFrame_o.r_0;
+  vis.frontBaseAxle.leftLower_o = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.lowerFrame_o.r_0;
   
-  vis.leftWheelCenter = vehicle.chassis.frAxleDW.leftTire.chassisFrame.r_0;
-  vis.leftTire_ex = Frames.resolve1(vehicle.chassis.frAxleDW.leftCP.R, {1, 0, 0});
-  vis.leftTire_ey = Frames.resolve1(vehicle.chassis.frAxleDW.leftCP.R, {0, 1, 0});
+  vis.frontBaseAxle.leftTie_i = vehicle.chassis.frAxleDW.leftTieRod.frame_a.r_0;
+  vis.frontBaseAxle.leftTie_o = vehicle.chassis.frAxleDW.leftTieRod.frame_b.r_0;
   
-  vis.rightUpperFore_i = vehicle.chassis.frAxleDW.rightWishboneUprightLoop.upperFrameToFore.frame_b.r_0;
-  vis.rightUpperAft_i = vehicle.chassis.frAxleDW.rightWishboneUprightLoop.upperFrameToAft.frame_b.r_0;
-  vis.rightLowerFore_i = vehicle.chassis.frAxleDW.rightWishboneUprightLoop.lowerFrameToFore.frame_b.r_0;
-  vis.rightLowerAft_i = vehicle.chassis.frAxleDW.rightWishboneUprightLoop.lowerFrameToAft.frame_b.r_0;
+  vis.frontBaseAxle.leftWheelCenter = vehicle.chassis.frAxleDW.leftTire.chassisFrame.r_0;
+  vis.frontBaseAxle.leftTire_ex = Frames.resolve1(vehicle.chassis.frAxleDW.leftCP.R, {1, 0, 0});
+  vis.frontBaseAxle.leftTire_ey = Frames.resolve1(vehicle.chassis.frAxleDW.leftCP.R, {0, 1, 0});
   
-  vis.rightUpper_o = vehicle.chassis.frAxleDW.rightWishboneUprightLoop.upperFrame_o.r_0;
-  vis.rightLower_o = vehicle.chassis.frAxleDW.rightWishboneUprightLoop.lowerFrame_o.r_0;
+  // Front right
+  vis.frontBaseAxle.rightUpperFore_i = vehicle.chassis.frAxleDW.rightWishboneUprightLoop.upperFrameToFore.frame_b.r_0;
+  vis.frontBaseAxle.rightUpperAft_i = vehicle.chassis.frAxleDW.rightWishboneUprightLoop.upperFrameToAft.frame_b.r_0;
+  vis.frontBaseAxle.rightLowerFore_i = vehicle.chassis.frAxleDW.rightWishboneUprightLoop.lowerFrameToFore.frame_b.r_0;
+  vis.frontBaseAxle.rightLowerAft_i = vehicle.chassis.frAxleDW.rightWishboneUprightLoop.lowerFrameToAft.frame_b.r_0;
   
-  vis.rightTie_i = vehicle.chassis.frAxleDW.rightTieRod.frame_a.r_0;
-  vis.rightTie_o = vehicle.chassis.frAxleDW.rightTieRod.frame_b.r_0;
+  vis.frontBaseAxle.rightUpper_o = vehicle.chassis.frAxleDW.rightWishboneUprightLoop.upperFrame_o.r_0;
+  vis.frontBaseAxle.rightLower_o = vehicle.chassis.frAxleDW.rightWishboneUprightLoop.lowerFrame_o.r_0;
   
-  vis.rightWheelCenter = vehicle.chassis.frAxleDW.rightTire.chassisFrame.r_0;
-  vis.rightTire_ex = Frames.resolve1(vehicle.chassis.frAxleDW.rightCP.R, {1, 0, 0});
-  vis.rightTire_ey = Frames.resolve1(vehicle.chassis.frAxleDW.rightCP.R, {0, 1, 0});
+  vis.frontBaseAxle.rightTie_i = vehicle.chassis.frAxleDW.rightTieRod.frame_a.r_0;
+  vis.frontBaseAxle.rightTie_o = vehicle.chassis.frAxleDW.rightTieRod.frame_b.r_0;
+  
+  vis.frontBaseAxle.rightWheelCenter = vehicle.chassis.frAxleDW.rightTire.chassisFrame.r_0;
+  vis.frontBaseAxle.rightTire_ex = Frames.resolve1(vehicle.chassis.frAxleDW.rightCP.R, {1, 0, 0});
+  vis.frontBaseAxle.rightTire_ey = Frames.resolve1(vehicle.chassis.frAxleDW.rightCP.R, {0, 1, 0});
+  
+  // Rear left
+  vis.rearBaseAxle.leftUpperFore_i = vehicle.chassis.rrAxleDW.leftWishboneUprightLoop.upperFrameToFore.frame_b.r_0;
+  vis.rearBaseAxle.leftUpperAft_i = vehicle.chassis.rrAxleDW.leftWishboneUprightLoop.upperFrameToAft.frame_b.r_0;
+  vis.rearBaseAxle.leftLowerFore_i = vehicle.chassis.rrAxleDW.leftWishboneUprightLoop.lowerFrameToFore.frame_b.r_0;
+  vis.rearBaseAxle.leftLowerAft_i = vehicle.chassis.rrAxleDW.leftWishboneUprightLoop.lowerFrameToAft.frame_b.r_0;
+  
+  vis.rearBaseAxle.leftUpper_o = vehicle.chassis.rrAxleDW.leftWishboneUprightLoop.upperFrame_o.r_0;
+  vis.rearBaseAxle.leftLower_o = vehicle.chassis.rrAxleDW.leftWishboneUprightLoop.lowerFrame_o.r_0;
+  
+  vis.rearBaseAxle.leftTie_i = vehicle.chassis.rrAxleDW.leftTieRod.frame_a.r_0;
+  vis.rearBaseAxle.leftTie_o = vehicle.chassis.rrAxleDW.leftTieRod.frame_b.r_0;
+  
+  vis.rearBaseAxle.leftWheelCenter = vehicle.chassis.rrAxleDW.leftTire.chassisFrame.r_0;
+  vis.rearBaseAxle.leftTire_ex = Frames.resolve1(vehicle.chassis.rrAxleDW.leftCP.R, {1, 0, 0});
+  vis.rearBaseAxle.leftTire_ey = Frames.resolve1(vehicle.chassis.rrAxleDW.leftCP.R, {0, 1, 0});
+  
+  // Rear right
+  vis.rearBaseAxle.rightUpperFore_i = vehicle.chassis.rrAxleDW.rightWishboneUprightLoop.upperFrameToFore.frame_b.r_0;
+  vis.rearBaseAxle.rightUpperAft_i = vehicle.chassis.rrAxleDW.rightWishboneUprightLoop.upperFrameToAft.frame_b.r_0;
+  vis.rearBaseAxle.rightLowerFore_i = vehicle.chassis.rrAxleDW.rightWishboneUprightLoop.lowerFrameToFore.frame_b.r_0;
+  vis.rearBaseAxle.rightLowerAft_i = vehicle.chassis.rrAxleDW.rightWishboneUprightLoop.lowerFrameToAft.frame_b.r_0;
+  
+  vis.rearBaseAxle.rightUpper_o = vehicle.chassis.rrAxleDW.rightWishboneUprightLoop.upperFrame_o.r_0;
+  vis.rearBaseAxle.rightLower_o = vehicle.chassis.rrAxleDW.rightWishboneUprightLoop.lowerFrame_o.r_0;
+  
+  vis.rearBaseAxle.rightTie_i = vehicle.chassis.rrAxleDW.rightTieRod.frame_a.r_0;
+  vis.rearBaseAxle.rightTie_o = vehicle.chassis.rrAxleDW.rightTieRod.frame_b.r_0;
+  
+  vis.rearBaseAxle.rightWheelCenter = vehicle.chassis.rrAxleDW.rightTire.chassisFrame.r_0;
+  vis.rearBaseAxle.rightTire_ex = Frames.resolve1(vehicle.chassis.rrAxleDW.rightCP.R, {1, 0, 0});
+  vis.rearBaseAxle.rightTire_ey = Frames.resolve1(vehicle.chassis.rrAxleDW.rightCP.R, {0, 1, 0});
   
   connect(cgFixed.frame_b, cgFreeMotion.frame_a) annotation(
     Line(points = {{120, 90}, {110, 90}}, color = {95, 95, 95}));
