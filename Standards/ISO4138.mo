@@ -180,6 +180,8 @@ equation
   vis.frTie_o = vehicle.chassis.frAxleDW.leftTieRod.frame_b.r_0;
   
   vis.frWheelCenter = vehicle.chassis.frAxleDW.leftTire.chassisFrame.r_0;
+  vis.frTire_ex = Frames.resolve1(vehicle.chassis.frAxleDW.leftCP.R, {1, 0, 0});
+  vis.frTire_ey = Frames.resolve1(vehicle.chassis.frAxleDW.leftCP.R, {0, 1, 0});
   
   connect(cgFixed.frame_b, cgFreeMotion.frame_a) annotation(
     Line(points = {{120, 90}, {110, 90}}, color = {95, 95, 95}));

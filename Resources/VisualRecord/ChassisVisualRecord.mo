@@ -22,6 +22,8 @@ record ChassisVisualRecord
 
   // Wheel
   Real frWheelCenter[3];
+  Real frTire_ex[3];
+  Real frTire_ey[3];
 
 //  // Bellcrank
 //  Real frBellcrankPivot[3];
