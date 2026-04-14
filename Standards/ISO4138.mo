@@ -244,7 +244,7 @@ equation
   vis.rearAxle.leftBellcrankPickup1 = vehicle.chassis.rrAxleDW.leftBellcrank.pickupFrame1.r_0;
   vis.rearAxle.leftBellcrankPickup2 = vehicle.chassis.rrAxleDW.leftBellcrank.pickupFrame2.r_0;
   vis.rearAxle.leftBellcrankPickup3 = vehicle.chassis.rrAxleDW.leftBellcrank.pickupFrame3.r_0;
-  vis.rearAxle.leftRodMount = vehicle.chassis.rrAxleDW.leftPushrod.frame_b.r_0;
+  vis.rearAxle.leftRodMount = vehicle.chassis.rrAxleDW.leftPullrod.frame_b.r_0;
   vis.rearAxle.leftShockMount = vehicle.chassis.rrAxleDW.leftShockLinkage.frame_b.r_0;
   
   vis.rearAxle.leftBarEnd = vehicle.chassis.rrAxleDW.stabar.toLeftBarEnd.frame_b.r_0;
@@ -271,7 +271,7 @@ equation
   vis.rearAxle.rightBellcrankPickup1 = vehicle.chassis.rrAxleDW.rightBellcrank.pickupFrame1.r_0;
   vis.rearAxle.rightBellcrankPickup2 = vehicle.chassis.rrAxleDW.rightBellcrank.pickupFrame2.r_0;
   vis.rearAxle.rightBellcrankPickup3 = vehicle.chassis.rrAxleDW.rightBellcrank.pickupFrame3.r_0;
-  vis.rearAxle.rightRodMount = vehicle.chassis.rrAxleDW.rightPushrod.frame_b.r_0;
+  vis.rearAxle.rightRodMount = vehicle.chassis.rrAxleDW.rightPullrod.frame_b.r_0;
   vis.rearAxle.rightShockMount = vehicle.chassis.rrAxleDW.rightShockLinkage.frame_b.r_0;
   
   vis.rearAxle.rightBarEnd = vehicle.chassis.rrAxleDW.stabar.toRightBarEnd.frame_b.r_0;
