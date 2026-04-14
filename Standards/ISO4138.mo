@@ -16,7 +16,7 @@ model ISO4138
   import BobLib.Resources.StandardRecord.ISO4138Record;
   
   // Import visual record
-  import BobLib.Resources.VisualRecord.ChassisVisualRecord;
+  import BobLib.Resources.VisualRecord.Chassis.Suspension.AxleDWBaseVisualRecord;
   
   inner parameter SIunits.Length linkDiameter = 0.020;
   inner parameter SIunits.Length jointDiameter = 0.030;
@@ -47,7 +47,7 @@ model ISO4138
   ISO4138Record iso;
   
   // Visual record
-  ChassisVisualRecord vis;
+  AxleDWBaseVisualRecord vis;
 
   inner Modelica.Mechanics.MultiBody.World world(n = {0, 0, -1}) annotation(
     Placement(transformation(origin = {-130, -110}, extent = {{-10, -10}, {10, 10}})));
@@ -168,20 +168,35 @@ equation
   iso.curvature = vehicle.chassis.spaceFrame.sprungBody.w_a[3] / max(speedCG, 0.1);
   
   // All visual variables
-  vis.frUpperFore_i = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.upperFrameToFore.frame_b.r_0;
-  vis.frUpperAft_i = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.upperFrameToAft.frame_b.r_0;
-  vis.frLowerFore_i = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.lowerFrameToFore.frame_b.r_0;
-  vis.frLowerAft_i = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.lowerFrameToAft.frame_b.r_0;
+  vis.leftUpperFore_i = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.upperFrameToFore.frame_b.r_0;
+  vis.leftUpperAft_i = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.upperFrameToAft.frame_b.r_0;
+  vis.leftLowerFore_i = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.lowerFrameToFore.frame_b.r_0;
+  vis.leftLowerAft_i = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.lowerFrameToAft.frame_b.r_0;
   
-  vis.frUpper_o = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.upperFrame_o.r_0;
-  vis.frLower_o = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.lowerFrame_o.r_0;
+  vis.leftUpper_o = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.upperFrame_o.r_0;
+  vis.leftLower_o = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.lowerFrame_o.r_0;
   
-  vis.frTie_i = vehicle.chassis.frAxleDW.leftTieRod.frame_a.r_0;
-  vis.frTie_o = vehicle.chassis.frAxleDW.leftTieRod.frame_b.r_0;
+  vis.leftTie_i = vehicle.chassis.frAxleDW.leftTieRod.frame_a.r_0;
+  vis.leftTie_o = vehicle.chassis.frAxleDW.leftTieRod.frame_b.r_0;
   
-  vis.frWheelCenter = vehicle.chassis.frAxleDW.leftTire.chassisFrame.r_0;
-  vis.frTire_ex = Frames.resolve1(vehicle.chassis.frAxleDW.leftCP.R, {1, 0, 0});
-  vis.frTire_ey = Frames.resolve1(vehicle.chassis.frAxleDW.leftCP.R, {0, 1, 0});
+  vis.leftWheelCenter = vehicle.chassis.frAxleDW.leftTire.chassisFrame.r_0;
+  vis.leftTire_ex = Frames.resolve1(vehicle.chassis.frAxleDW.leftCP.R, {1, 0, 0});
+  vis.leftTire_ey = Frames.resolve1(vehicle.chassis.frAxleDW.leftCP.R, {0, 1, 0});
+  
+  vis.rightUpperFore_i = vehicle.chassis.frAxleDW.rightWishboneUprightLoop.upperFrameToFore.frame_b.r_0;
+  vis.rightUpperAft_i = vehicle.chassis.frAxleDW.rightWishboneUprightLoop.upperFrameToAft.frame_b.r_0;
+  vis.rightLowerFore_i = vehicle.chassis.frAxleDW.rightWishboneUprightLoop.lowerFrameToFore.frame_b.r_0;
+  vis.rightLowerAft_i = vehicle.chassis.frAxleDW.rightWishboneUprightLoop.lowerFrameToAft.frame_b.r_0;
+  
+  vis.rightUpper_o = vehicle.chassis.frAxleDW.rightWishboneUprightLoop.upperFrame_o.r_0;
+  vis.rightLower_o = vehicle.chassis.frAxleDW.rightWishboneUprightLoop.lowerFrame_o.r_0;
+  
+  vis.rightTie_i = vehicle.chassis.frAxleDW.rightTieRod.frame_a.r_0;
+  vis.rightTie_o = vehicle.chassis.frAxleDW.rightTieRod.frame_b.r_0;
+  
+  vis.rightWheelCenter = vehicle.chassis.frAxleDW.rightTire.chassisFrame.r_0;
+  vis.rightTire_ex = Frames.resolve1(vehicle.chassis.frAxleDW.rightCP.R, {1, 0, 0});
+  vis.rightTire_ey = Frames.resolve1(vehicle.chassis.frAxleDW.rightCP.R, {0, 1, 0});
   
   connect(cgFixed.frame_b, cgFreeMotion.frame_a) annotation(
     Line(points = {{120, 90}, {110, 90}}, color = {95, 95, 95}));
