@@ -1,9 +1,9 @@
 within BobLib.Resources.VisualRecord.Chassis;
 
 record ChassisVisualRecord
-  import BobLib.Resources.VisualRecord.Chassis.Suspension.AxleDWBaseVisualRecord;
+  import BobLib.Resources.VisualRecord.Chassis.Suspension.AxleDW_BC_ARB_VisualRecord;
 
-  AxleDWBaseVisualRecord frontBaseAxle;
-  AxleDWBaseVisualRecord rearBaseAxle;
+  AxleDW_BC_ARB_VisualRecord frontAxle;
+  AxleDW_BC_ARB_VisualRecord rearAxle;
   
 end ChassisVisualRecord;
