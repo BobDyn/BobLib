@@ -1,3 +1,4 @@
 BaseSlipModel
 NoSlip
 KinematicSlip
+TransientSlip

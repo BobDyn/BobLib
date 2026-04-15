@@ -1,13 +1,11 @@
 within BobLib.Resources.StandardRecord;
 
-record ISO8726Record
+record ISO7401Record
   import Modelica.SIunits;
   
   // Inputs
   Modelica.SIunits.Angle handwheelAngle "Steering wheel angle";
-  Modelica.SIunits.Angle leftSteerAngle "Left road wheel angle";
-  Modelica.SIunits.Angle rightSteerAngle "Right road wheel angle";
-  
+
   // Kinematics
   Modelica.SIunits.Velocity velX "Longitudinal velocity";
   Modelica.SIunits.Velocity velY "Lateral velocity";
@@ -22,7 +20,4 @@ record ISO8726Record
   Modelica.SIunits.Angle roll "Vehicle roll angle";
   Modelica.SIunits.Torque handwheelTorque "Steering wheel torque";
   
-  // Derived
-  Real curvature "Path curvature (1/m)";
-  
-end ISO8726Record;
+end ISO7401Record;

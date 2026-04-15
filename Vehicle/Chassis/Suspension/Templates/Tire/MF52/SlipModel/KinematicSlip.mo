@@ -15,6 +15,10 @@ protected
   Real kappa_raw;
   Real blend;
 
+initial equation
+  u = sigma_kappa * (Vx - R0*omega) / max(abs(Vx), V_min);
+  v = sigma_alpha * Vy / max(abs(Vx), V_min);
+
 equation
   V_planar = sqrt(Vx^2 + Vy^2);
   V_ref = sqrt(Vx^2 + (R0*omega)^2 + V_min^2);

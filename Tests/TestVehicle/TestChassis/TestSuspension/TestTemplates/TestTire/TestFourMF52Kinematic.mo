@@ -1,6 +1,6 @@
 within BobLib.Tests.TestVehicle.TestChassis.TestSuspension.TestTemplates.TestTire;
 
-model TestFourMF52
+model TestFourMF52Kinematic
   import Modelica.SIunits;
   import Modelica.Math.Vectors.norm;
   
@@ -220,4 +220,4 @@ equation
     Diagram(coordinateSystem(extent = {{-120, -120}, {120, 120}})),
     Icon(coordinateSystem(extent = {{-120, -120}, {120, 120}})),
     experiment(StartTime = 0, StopTime = 10, Tolerance = 1e-06, Interval = 0.002));
-end TestFourMF52;
+end TestFourMF52Kinematic;
