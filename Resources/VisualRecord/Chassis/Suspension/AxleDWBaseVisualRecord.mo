@@ -22,7 +22,11 @@ record AxleDWBaseVisualRecord
   Real leftWheelCenter[3];
   Real leftTire_ex[3];
   Real leftTire_ey[3];
-
+  
+  // Contact patch and loads
+  Real leftCP[3];
+  Real leftCPForce[3];
+  
   // Right vals
 
   // Wishbone (inner)
@@ -43,5 +47,9 @@ record AxleDWBaseVisualRecord
   Real rightWheelCenter[3];
   Real rightTire_ex[3];
   Real rightTire_ey[3];
+  
+  // Contact patch and loads
+  Real rightCP[3];
+  Real rightCPForce[3];
 
 end AxleDWBaseVisualRecord;

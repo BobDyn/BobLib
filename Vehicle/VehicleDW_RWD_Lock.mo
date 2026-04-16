@@ -39,7 +39,7 @@ model VehicleDW_RWD_Lock
                                                                                                                                                                                                       redeclare Tire.TirePhysics.Wheel1DOF_Y wheelModel(partialWheelParams = pVehicle.pRrPartialWheel,
                                                                                                                                                                                                                                                         wheel1DOF_YParams = pVehicle.pRrTireDOF), 
                                                                                                                                                                                                       redeclare Tire.MF52.SlipModel.TransientSlip slipModel)),
-                                                                                               redeclare BobLib.Vehicle.Chassis.Body.FrameCompX spaceFrame(frRef = chassis.frAxleDW.effectiveCenter,
+                                                                                               redeclare BobLib.Vehicle.Chassis.Body.FrameRigid spaceFrame(frRef = chassis.frAxleDW.effectiveCenter,
                                                                                                                                                            rrRef = chassis.rrAxleDW.effectiveCenter,
                                                                                                                                                            pSprung = pVehicle.pSprungMass)));
   

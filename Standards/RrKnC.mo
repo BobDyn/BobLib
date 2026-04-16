@@ -118,6 +118,9 @@ equation
   vis.leftBarEnd = rrAxleDW.stabar.toLeftBarEnd.frame_b.r_0;
   vis.leftArmEnd = rrAxleDW.stabar.leftArmFrame.r_0;
   
+  vis.leftCP = rrAxleDW.leftCP.r_0;
+  vis.leftCPForce = -1 * rrAxleDW.leftCP.f;
+  
   // Right base
   vis.rightUpperFore_i = rrAxleDW.rightWishboneUprightLoop.upperFrameToFore.frame_b.r_0;
   vis.rightUpperAft_i = rrAxleDW.rightWishboneUprightLoop.upperFrameToAft.frame_b.r_0;
@@ -144,6 +147,9 @@ equation
   
   vis.rightBarEnd = rrAxleDW.stabar.toRightBarEnd.frame_b.r_0;
   vis.rightArmEnd = rrAxleDW.stabar.rightArmFrame.r_0;
+  
+  vis.rightCP = rrAxleDW.rightCP.r_0;
+  vis.rightCPForce = -1 * rrAxleDW.rightCP.f;
   
   connect(leftCPForce.frame_b, rrAxleDW.leftCP) annotation(
     Line(points = {{-60, 20}, {-47, 20}, {-47, 50}, {-34, 50}}, color = {95, 95, 95}));

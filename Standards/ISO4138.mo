@@ -196,6 +196,9 @@ equation
   vis.frontAxle.leftBarEnd = vehicle.chassis.frAxleDW.stabar.toLeftBarEnd.frame_b.r_0;
   vis.frontAxle.leftArmEnd = vehicle.chassis.frAxleDW.stabar.leftArmFrame.r_0;
   
+  vis.frontAxle.leftCP = vehicle.chassis.frAxleDW.leftCP.r_0;
+  vis.frontAxle.leftCPForce = -1 * vehicle.chassis.frAxleDW.leftCP.f;
+  
   // Front right (FR) base
   vis.frontAxle.rightUpperFore_i = vehicle.chassis.frAxleDW.rightWishboneUprightLoop.upperFrameToFore.frame_b.r_0;
   vis.frontAxle.rightUpperAft_i = vehicle.chassis.frAxleDW.rightWishboneUprightLoop.upperFrameToAft.frame_b.r_0;
@@ -222,6 +225,9 @@ equation
   
   vis.frontAxle.rightBarEnd = vehicle.chassis.frAxleDW.stabar.toRightBarEnd.frame_b.r_0;
   vis.frontAxle.rightArmEnd = vehicle.chassis.frAxleDW.stabar.rightArmFrame.r_0;
+  
+  vis.frontAxle.rightCP = vehicle.chassis.frAxleDW.rightCP.r_0;
+  vis.frontAxle.rightCPForce = -1 * vehicle.chassis.frAxleDW.rightCP.f;
   
   // Rear left (RL) base
   vis.rearAxle.leftUpperFore_i = vehicle.chassis.rrAxleDW.leftWishboneUprightLoop.upperFrameToFore.frame_b.r_0;
@@ -250,6 +256,9 @@ equation
   vis.rearAxle.leftBarEnd = vehicle.chassis.rrAxleDW.stabar.toLeftBarEnd.frame_b.r_0;
   vis.rearAxle.leftArmEnd = vehicle.chassis.rrAxleDW.stabar.leftArmFrame.r_0;
   
+  vis.rearAxle.leftCP = vehicle.chassis.rrAxleDW.leftCP.r_0;
+  vis.rearAxle.leftCPForce = -1 * vehicle.chassis.rrAxleDW.leftCP.f;
+  
   // Rear right (RR) base
   vis.rearAxle.rightUpperFore_i = vehicle.chassis.rrAxleDW.rightWishboneUprightLoop.upperFrameToFore.frame_b.r_0;
   vis.rearAxle.rightUpperAft_i = vehicle.chassis.rrAxleDW.rightWishboneUprightLoop.upperFrameToAft.frame_b.r_0;
@@ -276,6 +285,9 @@ equation
   
   vis.rearAxle.rightBarEnd = vehicle.chassis.rrAxleDW.stabar.toRightBarEnd.frame_b.r_0;
   vis.rearAxle.rightArmEnd = vehicle.chassis.rrAxleDW.stabar.rightArmFrame.r_0;
+  
+  vis.rearAxle.rightCP = vehicle.chassis.rrAxleDW.rightCP.r_0;
+  vis.rearAxle.rightCPForce = -1 * vehicle.chassis.rrAxleDW.rightCP.f;
   
   connect(cgFixed.frame_b, cgFreeMotion.frame_a) annotation(
     Line(points = {{120, 90}, {110, 90}}, color = {95, 95, 95}));

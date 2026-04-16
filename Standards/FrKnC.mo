@@ -122,6 +122,9 @@ equation
   vis.leftBarEnd = frAxleDW.stabar.toLeftBarEnd.frame_b.r_0;
   vis.leftArmEnd = frAxleDW.stabar.leftArmFrame.r_0;
   
+  vis.leftCP = frAxleDW.leftCP.r_0;
+  vis.leftCPForce = -1 * frAxleDW.leftCP.f;
+  
   // Right base
   vis.rightUpperFore_i = frAxleDW.rightWishboneUprightLoop.upperFrameToFore.frame_b.r_0;
   vis.rightUpperAft_i = frAxleDW.rightWishboneUprightLoop.upperFrameToAft.frame_b.r_0;
@@ -148,6 +151,9 @@ equation
   
   vis.rightBarEnd = frAxleDW.stabar.toRightBarEnd.frame_b.r_0;
   vis.rightArmEnd = frAxleDW.stabar.rightArmFrame.r_0;
+  
+  vis.rightCP = frAxleDW.rightCP.r_0;
+  vis.rightCPForce = -1 * frAxleDW.rightCP.f;
   
   connect(steerRamp.y, steerPosition.phi_ref) annotation(
     Line(points = {{-59, 110}, {-43, 110}}, color = {0, 0, 127}));

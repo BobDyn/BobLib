@@ -38,12 +38,12 @@ record OrionRecord
   parameter Stabar.StabarRecord pFrStabar(
     leftArmEnd = {-0.03682914, 0.2667, 0.11597939},
     leftBarEnd = {-0.10664664, 0.2667, 0.11811},
-    barRate = 0);
+    barRate = 1);
   
   parameter Stabar.StabarRecord pRrStabar(
     leftArmEnd = {-1.43001283, 0.3032125, 0.4054766},
     leftBarEnd = {-1.3925183, 0.3032125, 0.41224196},
-    barRate = 0);
+    barRate = 1);
     
   parameter Wheel.Templates.PartialWheelRecord pFrPartialWheel(
     R0 = 0.2045,
