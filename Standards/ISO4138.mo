@@ -185,6 +185,9 @@ equation
   vis.frontAxle.leftTire_ex = Frames.resolve1(vehicle.chassis.frAxleDW.leftCP.R, {1, 0, 0});
   vis.frontAxle.leftTire_ey = Frames.resolve1(vehicle.chassis.frAxleDW.leftCP.R, {0, 1, 0});
   
+  vis.frontAxle.leftCP = vehicle.chassis.frAxleDW.leftCP.r_0;
+  vis.frontAxle.leftCPForce = -1 * vehicle.chassis.frAxleDW.leftCP.f;
+  
   // FL enhanced
   vis.frontAxle.leftBellcrankPivot = vehicle.chassis.frAxleDW.leftBellcrank.mountFrame.r_0;
   vis.frontAxle.leftBellcrankPickup1 = vehicle.chassis.frAxleDW.leftBellcrank.pickupFrame1.r_0;
@@ -195,9 +198,6 @@ equation
   
   vis.frontAxle.leftBarEnd = vehicle.chassis.frAxleDW.stabar.toLeftBarEnd.frame_b.r_0;
   vis.frontAxle.leftArmEnd = vehicle.chassis.frAxleDW.stabar.leftArmFrame.r_0;
-  
-  vis.frontAxle.leftCP = vehicle.chassis.frAxleDW.leftCP.r_0;
-  vis.frontAxle.leftCPForce = -1 * vehicle.chassis.frAxleDW.leftCP.f;
   
   // Front right (FR) base
   vis.frontAxle.rightUpperFore_i = vehicle.chassis.frAxleDW.rightWishboneUprightLoop.upperFrameToFore.frame_b.r_0;

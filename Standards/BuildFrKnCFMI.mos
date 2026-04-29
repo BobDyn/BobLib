@@ -1,0 +1,25 @@
+clear();
+loadModel(Modelica);
+
+setCommandLineOptions(
+  "--simCodeTarget=C "
+  + "--maxSizeLinearTearing=5000 "
+  + "--fmiFlags=s:cvode "
+);
+
+// Load BobLib
+loadFile("package.mo");
+
+// Build dir
+cd("fmi_dump");
+
+// Build FMU
+res := buildModelFMU(
+  BobLib.Standards.FrKnCFMI,
+  version="2.0",
+  fmuType="me_cs",
+  fileNamePrefix="FrKnCFMI",
+  platforms={"static","dynamic"}
+);
+
+getErrorString();
