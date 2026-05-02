@@ -1,0 +1,37 @@
+// export_ISO4138_FMU.mos
+
+OpenModelica.Scripting.setCommandLineOptions("--simCodeTarget=C");
+OpenModelica.Scripting.setCommandLineOptions("--maxSizeLinearTearing=5000");
+OpenModelica.Scripting.setCommandLineOptions("--indexReductionMethod=dynamicStateSelection");
+OpenModelica.Scripting.setCommandLineOptions("-d=initialization");
+// OpenModelica.Scripting.setCommandLineOptions("-d=bltdump");
+// OpenModelica.Scripting.setCommandLineOptions("-d=optdaedump");
+// OpenModelica.Scripting.setCommandLineOptions("-d=dumpSimCode");
+
+clear();
+loadModel(Modelica);
+
+// Load BobLib
+loadFile("package.mo");
+
+// Go to build dir
+cd("Build/FMU");
+
+// res := buildModel(
+//   BobLib.Standards.VehicleFMI,
+//   startTime = 0,
+//   stopTime = 1,
+//   tolerance = 1e-6,
+//   numberOfIntervals = 0,
+//   outputFormat = "csv"
+// );
+// getErrorString();
+
+// Build FMU
+res := buildModelFMU(
+  BobLib.Standards.VehicleFMI,
+  version="2.0",
+  fmuType="me_cs",       // co-simulation for testing
+  platforms={"dynamic"}  // portable FMU
+);
+getErrorString();

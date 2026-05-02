@@ -20,7 +20,6 @@ model TestFrAxleDW
   
   inner Modelica.Mechanics.MultiBody.World world(n = {0, 0, -1}) annotation(
     Placement(transformation(origin = {-110, -90}, extent = {{-10, -10}, {10, 10}})));
-  
   // Steer input
   Modelica.Blocks.Sources.Ramp steerRamp(duration = 1,
                                          height = 90*Modelica.Constants.pi/180,
@@ -28,19 +27,16 @@ model TestFrAxleDW
     Placement(transformation(origin = {-80, 70}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.Rotational.Sources.Position steerPosition(exact = true) annotation(
     Placement(transformation(origin = {-50, 70}, extent = {{-10, -10}, {10, 10}})));
-  
   // Left jounce input
   Modelica.Blocks.Sources.Ramp leftJounceRamp(duration = 1,
                                               height = 1*0.0254,
                                               startTime = 0) annotation(
     Placement(transformation(origin = {-110, 0}, extent = {{-10, -10}, {10, 10}}, rotation = -0)));
-  
   // Right jounce input
   Modelica.Blocks.Sources.Ramp rightJounceRamp(duration = 1,
                                                height = -1*0.0254,
                                                startTime = 0) annotation(
     Placement(transformation(origin = {110, 0}, extent = {{10, -10}, {-10, 10}}, rotation = -0)));
-  
   // Front axle
   BobLib.Vehicle.Chassis.Suspension.FrAxleDW_BC_ARB frAxleDW(pAxle = pVehicle.pFrAxleDW,
                                                              pRack = pVehicle.pFrRack,
@@ -58,17 +54,14 @@ protected
     Placement(transformation(origin = {-30, -70}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
   Modelica.Mechanics.Translational.Sources.Position leftJouncePosition(exact = true, useSupport = true) annotation(
     Placement(transformation(origin = {-80, 0}, extent = {{-10, -10}, {10, 10}}, rotation = -0)));
-  
   // Right jounce input
   Modelica.Mechanics.MultiBody.Parts.Fixed rightJounceRef(animation = false, r = rightCPInit) annotation(
     Placement(transformation(origin = {30, -70}, extent = {{10, -10}, {-10, 10}}, rotation = -180)));
   Modelica.Mechanics.Translational.Sources.Position rightJouncePosition(exact = true, useSupport = true) annotation(
     Placement(transformation(origin = {80, 0}, extent = {{10, -10}, {-10, 10}}, rotation = -0)));
-  
   // Axle support
   Modelica.Mechanics.MultiBody.Parts.Fixed axleFixed(r = {pVehicle.pFrDW.wheelCenter[1], 0, pVehicle.pFrDW.wheelCenter[3]}) annotation(
     Placement(transformation(origin = {0, -10}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
-  
   // Left jounce DOFs
   Modelica.Mechanics.MultiBody.Joints.Prismatic left_DOF_x(animation = false, n = {1, 0, 0}) annotation(
     Placement(transformation(origin = {-60, -70}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
@@ -78,7 +71,6 @@ protected
     Placement(transformation(origin = {-60, -30}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.MultiBody.Joints.Spherical left_DOF_xyz(animation = false) annotation(
     Placement(transformation(origin = {-40, -10}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
-  
   // Right jounce DOFs
   Modelica.Mechanics.MultiBody.Joints.Prismatic right_DOF_x(animation = false, n = {1, 0, 0}) annotation(
     Placement(transformation(origin = {60, -70}, extent = {{10, -10}, {-10, 10}}, rotation = -180)));

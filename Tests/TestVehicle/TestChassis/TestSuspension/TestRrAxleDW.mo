@@ -13,7 +13,7 @@ model TestRrAxleDW
   inner Modelica.Mechanics.MultiBody.World world(n = {0, 0, -1}) annotation(
     Placement(transformation(origin = {-110, -90}, extent = {{-10, -10}, {10, 10}})));
   // Steer input
-  Modelica.Blocks.Sources.Ramp steerRamp(duration = 1, height = 90*Modelica.Constants.pi/180, startTime = 0) annotation(
+  Modelica.Blocks.Sources.Ramp steerRamp(duration = 1, height = 60*Modelica.Constants.pi/180, startTime = 0) annotation(
     Placement(transformation(origin = {-80, 70}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.Rotational.Sources.Position steerPosition(exact = true) annotation(
     Placement(transformation(origin = {-50, 70}, extent = {{-10, -10}, {10, 10}})));
@@ -58,7 +58,6 @@ protected
     Placement(transformation(origin = {60, -30}, extent = {{10, -10}, {-10, 10}})));
   Modelica.Mechanics.MultiBody.Joints.Spherical right_DOF_xyz(animation = false) annotation(
     Placement(transformation(origin = {40, -10}, extent = {{10, -10}, {-10, 10}}, rotation = -90)));
-
 equation
   connect(axleFixed.frame_b, rrAxleDW.axleFrame) annotation(
     Line(points = {{0, 0}, {0, 30}}, color = {95, 95, 95}));
@@ -99,7 +98,7 @@ equation
   connect(rrAxleDW.rightCP, right_DOF_xyz.frame_b) annotation(
     Line(points = {{36, 20}, {40, 20}, {40, 0}}, color = {95, 95, 95}));
   annotation(
-    experiment(StartTime = 0, StopTime = 3, Tolerance = 1e-06, Interval = 0.002),
+    experiment(StartTime = 0, StopTime = 1, Tolerance = 1e-06, Interval = 0.002),
     __OpenModelica_commandLineOptions = "--matchingAlgorithm=PFPlusExt --indexReductionMethod=dynamicStateSelection -d=initialization,NLSanalyticJacobian",
     Diagram(coordinateSystem(extent = {{-120, -100}, {120, 100}})),
     Icon(coordinateSystem(extent = {{-120, -100}, {120, 100}})),

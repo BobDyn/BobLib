@@ -119,9 +119,13 @@ record OrionRecord
                                    rCM = {-61 / 2 * 0.0254, 0, 11 * 0.0254},
                                    inertia = {{30, 1, 1}, {1, 40, 1}, {1, 1, 50}});
   
-  parameter Wheel.Wheel1DOF_YRecord pFrTireDOF(wheelJ = 0.02);
+  parameter Wheel.Wheel1DOF_YRecord pFrTire1DOF_YParams(wheelJ = 0.02);
+  parameter Wheel.Wheel1DOF_ZRecord pFrTire1DOF_ZParams(wheelC = 98947,
+                                                        wheelD = 115.844);
   
-  parameter Wheel.Wheel1DOF_YRecord pRrTireDOF(wheelJ = 0.02);
+  parameter Wheel.Wheel1DOF_YRecord pRrTire1DOF_YParams(wheelJ = 0.02);
+  parameter Wheel.Wheel1DOF_ZRecord pRrTire1DOF_ZParams(wheelC = 98947,
+                                                        wheelD = 115.844);
   
   parameter TireModel.MF52Record pFrTireModel(
     // Setup

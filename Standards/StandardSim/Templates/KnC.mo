@@ -1,4 +1,4 @@
-within BobLib.Standards.Templates;
+within BobLib.Standards.StandardSim.Templates;
 
 partial model KnC
   import Modelica.SIunits;

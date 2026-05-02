@@ -2,9 +2,7 @@ within BobLib.Vehicle.Chassis.Suspension.Linkages;
 
 model Bellcrank3
   import Modelica.SIunits;
-
   import Modelica.Math.Vectors;
-
   // Geometry parameters
   parameter SIunits.Position pivot[3] "Pivot coordinates" annotation(
     Dialog(group = "Geometry"));
@@ -16,14 +14,12 @@ model Bellcrank3
     Dialog(group = "Geometry"));
   parameter SIunits.Position pickup_3[3] "Third pickup coordinates" annotation(
     Dialog(group = "Geometry"));
-  
   // Visual parameters
   parameter SIunits.Length linkDiameter annotation(
     Dialog(tab = "Animation", group = "Sizing"));
   parameter SIunits.Length jointDiameter annotation(
     Dialog(tab = "Animation", group = "Sizing"));
-
-  // Frames  
+  // Frames
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a mountFrame annotation(
     Placement(transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}, rotation = 0)));
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b pickupFrame1 annotation(
@@ -32,12 +28,10 @@ model Bellcrank3
     Placement(transformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}})));
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b pickupFrame3 annotation(
     Placement(transformation(origin = {0, 100}, extent = {{-16, -16}, {16, 16}}, rotation = 90), iconTransformation(origin = {0, 100}, extent = {{-16, -16}, {16, 16}}, rotation = 90)));
-  
   // Rotational DOF
-  Modelica.Mechanics.MultiBody.Joints.Revolute revolute(n = Vectors.normalize(pivotAxis), animation = true, cylinderLength = jointDiameter, cylinderDiameter = jointDiameter, phi(nominal=0.05)) annotation(
+  Modelica.Mechanics.MultiBody.Joints.Revolute revolute(n = Vectors.normalize(pivotAxis), animation = true, cylinderLength = jointDiameter, cylinderDiameter = jointDiameter, phi(start = 0, fixed = true, displayUnit = "rad"), w(start = 0, fixed = true)) annotation(
     Placement(transformation(origin = {-70, 0}, extent = {{-10, -10}, {10, 10}})));
-
-  // Visualization  
+  // Visualization
   Modelica.Mechanics.MultiBody.Visualizers.FixedShape side_1(lengthDirection = Vectors.normalize(pickup_1 - pivot), length = Vectors.norm(pickup_1 - pivot), width = linkDiameter*0.75, height = linkDiameter*0.75, widthDirection = Vectors.normalize(pivotAxis), shapeType = "cylinder") annotation(
     Placement(transformation(origin = {-30, -20}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.MultiBody.Visualizers.FixedShape side_2(lengthDirection = Vectors.normalize(pickup_2 - pickup_1), widthDirection = Vectors.normalize(pivotAxis), length = Vectors.norm(pickup_2 - pickup_1), width = linkDiameter*0.75, height = linkDiameter*0.75, shapeType = "cylinder") annotation(
@@ -46,7 +40,6 @@ model Bellcrank3
     Placement(transformation(origin = {50, -20}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.MultiBody.Visualizers.FixedShape side_4(lengthDirection = Vectors.normalize(pivot - pickup_3), widthDirection = Vectors.normalize(pivotAxis), length = Vectors.norm(pivot - pickup_3), width = linkDiameter*0.75, height = linkDiameter*0.75, shapeType = "cylinder") annotation(
     Placement(transformation(origin = {40, 60}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
-
 protected
   // Kinematics
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation toFirstPickup(final r = pickup_1 - pivot, final extra = 0.0) annotation(
@@ -55,7 +48,6 @@ protected
     Placement(transformation(extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation toThirdPickup(final r = pickup_3 - pickup_2, final extra = 0.0) annotation(
     Placement(transformation(origin = {40, 0}, extent = {{-10, -10}, {10, 10}})));
-
 equation
   connect(mountFrame, revolute.frame_a) annotation(
     Line(points = {{-100, 0}, {-80, 0}}));

@@ -10,7 +10,6 @@ model TestDoubleWishbone
   
   inner Modelica.Mechanics.MultiBody.World world(n = {0, 0, -1}) annotation(
     Placement(transformation(origin = {-90, -90}, extent = {{-10, -10}, {10, 10}})));
-  
   // Steer input
   Modelica.Blocks.Sources.Ramp steerRamp(duration = 1,
                                          height = 100*Modelica.Constants.pi/180,
@@ -18,7 +17,6 @@ model TestDoubleWishbone
     Placement(transformation(origin = {-20, 80}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.Rotational.Sources.Position steerjouncePosition(exact = true) annotation(
     Placement(transformation(origin = {20, 80}, extent = {{-10, -10}, {10, 10}})));
-  
   // Jounce input
   Modelica.Mechanics.MultiBody.Parts.Fixed jounceRef(r = pVehicle.pFrDW.lower_o, animation = false) annotation(
     Placement(transformation(origin = {90, -90}, extent = {{10, -10}, {-10, 10}}, rotation = -0)));
@@ -28,7 +26,6 @@ model TestDoubleWishbone
     Placement(transformation(origin = {-90, -50}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.Translational.Sources.Position jouncePosition(useSupport = true, exact = true) annotation(
     Placement(transformation(origin = {-50, -50}, extent = {{-10, -10}, {10, 10}})));
-  
   // Inboard fixtures
   Modelica.Mechanics.MultiBody.Parts.Fixed upperFixed_i(r = (pVehicle.pFrDW.upperFore_i + pVehicle.pFrDW.upperAft_i) / 2, animation = false) annotation(
     Placement(transformation(origin = {90, 10}, extent = {{10, -10}, {-10, 10}})));
@@ -36,12 +33,10 @@ model TestDoubleWishbone
     Placement(transformation(origin = {90, -30}, extent = {{10, -10}, {-10, 10}})));
   Modelica.Mechanics.MultiBody.Parts.Fixed rackFixed(r = {pVehicle.pFrRack.leftPickup[1], 0, pVehicle.pFrRack.leftPickup[3]}, animation = false) annotation(
     Placement(transformation(origin = {90, 50}, extent = {{-10, -10}, {10, 10}}, rotation = -180)));
-  
   // Rack
   BobLib.Vehicle.Chassis.Suspension.Templates.SteeringRack.RackAndPinion rackAndPinion(pRack = pVehicle.pFrRack,
                                                                                        linkDiameter = linkDiameter)  annotation(
     Placement(transformation(origin = {50, 60}, extent = {{-20, -20}, {20, 20}})));
-  
   // Kinematic wishbone-upright loop
   BobLib.Vehicle.Chassis.Suspension.Templates.DoubleWishbone.WishboneUprightLoop wishboneUprightLoop(pDW = pVehicle.pFrDW,
                                                                                                      linkDiameter = linkDiameter,
@@ -49,7 +44,6 @@ model TestDoubleWishbone
     Placement(transformation(origin = {0, 10}, extent = {{30, -30}, {-30, 30}})));
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation tieConnection(r = pVehicle.pFrDW.lower_o - pVehicle.pFrDW.tie_o) annotation(
     Placement(transformation(origin = {-40, 10}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
-  
   // Tie rod
   BobLib.Vehicle.Chassis.Suspension.Linkages.Rod tieRod(r_a = pVehicle.pFrRack.leftPickup,
                                                         r_b = pVehicle.pFrDW.tie_o,

@@ -1,4 +1,4 @@
-within BobLib.Standards;
+within BobLib.Standards.StandardSim;
 
 model FrKnC
   import Modelica.SIunits;
