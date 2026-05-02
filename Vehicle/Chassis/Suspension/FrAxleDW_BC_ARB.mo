@@ -33,7 +33,7 @@ model FrAxleDW_BC_ARB "Double wishbone front axle with bellcranks and stabar"
   // Stabar
   Templates.Stabar.Stabar stabar(pStabar = pStabar, jointDiameter = jointDiameter, linkDiameter = linkDiameter) annotation(
     Placement(transformation(origin = {0, -116}, extent = {{20, -20}, {-20, 20}}, rotation = -180)));
-  BobLib.Vehicle.Chassis.Suspension.Linkages.ForceOnlyRod rightDroplink(r_a = mirrorXZ(pStabar.leftArmEnd),
+  BobLib.Vehicle.Chassis.Suspension.Linkages.Rod rightDroplink(r_a = mirrorXZ(pStabar.leftArmEnd),
                                                                r_b = mirrorXZ(pAxle.bellcrankPickup1),
                                                                n1_a = {0, 1, 0},
                                                                kinematicConstraint = true,
@@ -41,7 +41,7 @@ model FrAxleDW_BC_ARB "Double wishbone front axle with bellcranks and stabar"
                                                                jointDiameter = jointDiameter,
                                                                show_universal_axes = false) annotation(
     Placement(transformation(origin = {70, -90}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
-  BobLib.Vehicle.Chassis.Suspension.Linkages.ForceOnlyRod leftDroplink(r_a = pStabar.leftArmEnd,
+  BobLib.Vehicle.Chassis.Suspension.Linkages.Rod leftDroplink(r_a = pStabar.leftArmEnd,
                                                               r_b = pAxle.bellcrankPickup1,
                                                               n1_a = {0, 1, 0},
                                                               kinematicConstraint = true,

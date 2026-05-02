@@ -27,7 +27,6 @@ model VehicleFMI
   Real bodyVels[3];
   Real bodyAccels[3];
   Real bodyAngles[3];
-  
   // Standard outputs
   output SIunits.Acceleration accX;
   output SIunits.Acceleration accY;
@@ -40,14 +39,13 @@ model VehicleFMI
   output SIunits.Velocity velX;
   output SIunits.Velocity velY;
   output SIunits.AngularVelocity yawVel;
-  
   // Visual record
   ChassisVisualRecord vis;
 
   inner Modelica.Mechanics.MultiBody.World world(n = {0, 0, -1}) annotation(
     Placement(transformation(origin = {-130, -110}, extent = {{-10, -10}, {10, 10}})));
 
-  // Vehicle
+// Vehicle
   BobLib.Vehicle.VehicleDW_RWD_Lock vehicle(pVehicle = pVehicle)  annotation(
     Placement(transformation(origin = {0, 20}, extent = {{-45, -50}, {45, 50}})));
   // Angle sensor
@@ -96,7 +94,7 @@ protected
   BobLib.Utilities.Mechanics.Multibody.GroundPhysics groundRR annotation(
     Placement(transformation(origin = {100, -50}, extent = {{10, -10}, {-10, 10}})));
   // Front steer position
-  Modelica.Mechanics.Rotational.Sources.Position frSteerPosition(exact = false) annotation(
+  Modelica.Mechanics.Rotational.Sources.Position frSteerPosition(exact = false, w(start = 0, fixed = true)) annotation(
     Placement(transformation(origin = {-30, 110}, extent = {{-10, -10}, {10, 10}})));
   
 initial equation
@@ -106,37 +104,31 @@ initial equation
   vehicle.chassis.rrAxleDW.rightTire.wheelModel.hubAxis.w = initialVel / pVehicle.pRrPartialWheel.R0;
   
 equation
-  // General quantities
+// General quantities
   bodyVels = Frames.resolve2(cgFreeMotion.frame_b.R, cgFreeMotion.v_rel_a);
   bodyAccels = Frames.resolve2(cgFreeMotion.frame_b.R, cgFreeMotion.a_rel_a);
   bodyAngles = Frames.resolve2(cgFreeMotion.frame_b.R, sprungAngles.angles);
   
   leftWheelVector = Frames.resolve1(vehicle.chassis.frAxleFrame.R, Frames.resolve2(vehicle.frameFL.R, {1, 0, 0}));
   rightWheelVector = Frames.resolve1(vehicle.chassis.frAxleFrame.R, Frames.resolve2(vehicle.frameFR.R, {1, 0, 0}));
-  
-  // Output record
+// Output record
   leftSteerAngle = -1*atan(leftWheelVector[2]/leftWheelVector[1]);
   rightSteerAngle = -1*atan(rightWheelVector[2]/rightWheelVector[1]);
   handwheelAngle = vehicle.steerFlange.phi;
-  
-  // Kinematics
+// Kinematics
   velX = bodyVels[1];
   velY = bodyVels[2];
   yawVel = vehicle.chassis.spaceFrame.sprungBody.w_a[3];
   sideslip = atan(velY/velX);
-  
-  // Accelerations
+// Accelerations
   accX = bodyAccels[1];
   accY = bodyAccels[2];
-  
-  // Vehicle response
+// Vehicle response
   roll = bodyAngles[1];
   
   handwheelTorque = -1*vehicle.steerFlange.tau; // Note that .tau is the reaction by Newton's 3rd law. Negate for applied torque.
-  
-  // All visual variables
-  
-  // Front left (FL) base
+// All visual variables
+// Front left (FL) base
   vis.frontAxle.leftUpperFore_i = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.upperFrameToFore.frame_b.r_0;
   vis.frontAxle.leftUpperAft_i = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.upperFrameToAft.frame_b.r_0;
   vis.frontAxle.leftLowerFore_i = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.lowerFrameToFore.frame_b.r_0;
@@ -148,8 +140,7 @@ equation
   vis.frontAxle.leftWheelCenter = vehicle.chassis.frAxleDW.leftTire.chassisFrame.r_0;
   vis.frontAxle.leftTire_ex = Frames.resolve1(vehicle.chassis.frAxleDW.leftCP.R, {1, 0, 0});
   vis.frontAxle.leftTire_ey = Frames.resolve1(vehicle.chassis.frAxleDW.leftCP.R, {0, 1, 0});
-  
-  // FL enhanced
+// FL enhanced
   vis.frontAxle.leftBellcrankPivot = vehicle.chassis.frAxleDW.leftBellcrank.mountFrame.r_0;
   vis.frontAxle.leftBellcrankPickup1 = vehicle.chassis.frAxleDW.leftBellcrank.pickupFrame1.r_0;
   vis.frontAxle.leftBellcrankPickup2 = vehicle.chassis.frAxleDW.leftBellcrank.pickupFrame2.r_0;
@@ -160,8 +151,7 @@ equation
   vis.frontAxle.leftArmEnd = vehicle.chassis.frAxleDW.stabar.leftArmFrame.r_0;
   vis.frontAxle.leftCP = vehicle.chassis.frAxleDW.leftCP.r_0;
   vis.frontAxle.leftCPForce = -1*vehicle.chassis.frAxleDW.leftCP.f;
-  
-  // Front right (FR) base
+// Front right (FR) base
   vis.frontAxle.rightUpperFore_i = vehicle.chassis.frAxleDW.rightWishboneUprightLoop.upperFrameToFore.frame_b.r_0;
   vis.frontAxle.rightUpperAft_i = vehicle.chassis.frAxleDW.rightWishboneUprightLoop.upperFrameToAft.frame_b.r_0;
   vis.frontAxle.rightLowerFore_i = vehicle.chassis.frAxleDW.rightWishboneUprightLoop.lowerFrameToFore.frame_b.r_0;
@@ -173,8 +163,7 @@ equation
   vis.frontAxle.rightWheelCenter = vehicle.chassis.frAxleDW.rightTire.chassisFrame.r_0;
   vis.frontAxle.rightTire_ex = Frames.resolve1(vehicle.chassis.frAxleDW.rightCP.R, {1, 0, 0});
   vis.frontAxle.rightTire_ey = Frames.resolve1(vehicle.chassis.frAxleDW.rightCP.R, {0, 1, 0});
-  
-  // FR enhanced
+// FR enhanced
   vis.frontAxle.rightBellcrankPivot = vehicle.chassis.frAxleDW.rightBellcrank.mountFrame.r_0;
   vis.frontAxle.rightBellcrankPickup1 = vehicle.chassis.frAxleDW.rightBellcrank.pickupFrame1.r_0;
   vis.frontAxle.rightBellcrankPickup2 = vehicle.chassis.frAxleDW.rightBellcrank.pickupFrame2.r_0;
@@ -185,8 +174,7 @@ equation
   vis.frontAxle.rightArmEnd = vehicle.chassis.frAxleDW.stabar.rightArmFrame.r_0;
   vis.frontAxle.rightCP = vehicle.chassis.frAxleDW.rightCP.r_0;
   vis.frontAxle.rightCPForce = -1*vehicle.chassis.frAxleDW.rightCP.f;
-  
-  // Rear left (RL) base
+// Rear left (RL) base
   vis.rearAxle.leftUpperFore_i = vehicle.chassis.rrAxleDW.leftWishboneUprightLoop.upperFrameToFore.frame_b.r_0;
   vis.rearAxle.leftUpperAft_i = vehicle.chassis.rrAxleDW.leftWishboneUprightLoop.upperFrameToAft.frame_b.r_0;
   vis.rearAxle.leftLowerFore_i = vehicle.chassis.rrAxleDW.leftWishboneUprightLoop.lowerFrameToFore.frame_b.r_0;
@@ -198,8 +186,7 @@ equation
   vis.rearAxle.leftWheelCenter = vehicle.chassis.rrAxleDW.leftTire.chassisFrame.r_0;
   vis.rearAxle.leftTire_ex = Frames.resolve1(vehicle.chassis.rrAxleDW.leftCP.R, {1, 0, 0});
   vis.rearAxle.leftTire_ey = Frames.resolve1(vehicle.chassis.rrAxleDW.leftCP.R, {0, 1, 0});
-  
-  // RL enhanced
+// RL enhanced
   vis.rearAxle.leftBellcrankPivot = vehicle.chassis.rrAxleDW.leftBellcrank.mountFrame.r_0;
   vis.rearAxle.leftBellcrankPickup1 = vehicle.chassis.rrAxleDW.leftBellcrank.pickupFrame1.r_0;
   vis.rearAxle.leftBellcrankPickup2 = vehicle.chassis.rrAxleDW.leftBellcrank.pickupFrame2.r_0;
@@ -210,8 +197,7 @@ equation
   vis.rearAxle.leftArmEnd = vehicle.chassis.rrAxleDW.stabar.leftArmFrame.r_0;
   vis.rearAxle.leftCP = vehicle.chassis.rrAxleDW.leftCP.r_0;
   vis.rearAxle.leftCPForce = -1*vehicle.chassis.rrAxleDW.leftCP.f;
-  
-  // Rear right (RR) base
+// Rear right (RR) base
   vis.rearAxle.rightUpperFore_i = vehicle.chassis.rrAxleDW.rightWishboneUprightLoop.upperFrameToFore.frame_b.r_0;
   vis.rearAxle.rightUpperAft_i = vehicle.chassis.rrAxleDW.rightWishboneUprightLoop.upperFrameToAft.frame_b.r_0;
   vis.rearAxle.rightLowerFore_i = vehicle.chassis.rrAxleDW.rightWishboneUprightLoop.lowerFrameToFore.frame_b.r_0;
@@ -223,8 +209,7 @@ equation
   vis.rearAxle.rightWheelCenter = vehicle.chassis.rrAxleDW.rightTire.chassisFrame.r_0;
   vis.rearAxle.rightTire_ex = Frames.resolve1(vehicle.chassis.rrAxleDW.rightCP.R, {1, 0, 0});
   vis.rearAxle.rightTire_ey = Frames.resolve1(vehicle.chassis.rrAxleDW.rightCP.R, {0, 1, 0});
-  
-  // RR enhanced
+// RR enhanced
   vis.rearAxle.rightBellcrankPivot = vehicle.chassis.rrAxleDW.rightBellcrank.mountFrame.r_0;
   vis.rearAxle.rightBellcrankPickup1 = vehicle.chassis.rrAxleDW.rightBellcrank.pickupFrame1.r_0;
   vis.rearAxle.rightBellcrankPickup2 = vehicle.chassis.rrAxleDW.rightBellcrank.pickupFrame2.r_0;

@@ -29,7 +29,7 @@ model Bellcrank3
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b pickupFrame3 annotation(
     Placement(transformation(origin = {0, 100}, extent = {{-16, -16}, {16, 16}}, rotation = 90), iconTransformation(origin = {0, 100}, extent = {{-16, -16}, {16, 16}}, rotation = 90)));
   // Rotational DOF
-  Modelica.Mechanics.MultiBody.Joints.Revolute revolute(n = Vectors.normalize(pivotAxis), animation = true, cylinderLength = jointDiameter, cylinderDiameter = jointDiameter, phi(start = 0, fixed = true, displayUnit = "rad"), w(start = 0, fixed = true)) annotation(
+  Modelica.Mechanics.MultiBody.Joints.Revolute revolute(n = Vectors.normalize(pivotAxis), animation = true, cylinderLength = jointDiameter, cylinderDiameter = jointDiameter, phi(displayUnit = "rad"), w(start = 0, fixed = true)) annotation(
     Placement(transformation(origin = {-70, 0}, extent = {{-10, -10}, {10, 10}})));
   // Visualization
   Modelica.Mechanics.MultiBody.Visualizers.FixedShape side_1(lengthDirection = Vectors.normalize(pickup_1 - pivot), length = Vectors.norm(pickup_1 - pivot), width = linkDiameter*0.75, height = linkDiameter*0.75, widthDirection = Vectors.normalize(pivotAxis), shapeType = "cylinder") annotation(

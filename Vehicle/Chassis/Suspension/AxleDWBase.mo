@@ -80,7 +80,7 @@ partial model AxleDWBase
   BobLib.Vehicle.Chassis.Suspension.Linkages.ForceOnlyRod leftTieRod(r_a = pRack.leftPickup,
                                                             r_b = pLeftDW.tie_o,
                                                             show_universal_axes = false,
-                                                            kinematicConstraint = false,
+                                                            kinematicConstraint = true,
                                                             final linkDiameter = linkDiameter,
                                                             final jointDiameter = jointDiameter)  annotation(
     Placement(transformation(origin = {-60, 100}, extent = {{20, -20}, {-20, 20}})));
@@ -88,7 +88,7 @@ partial model AxleDWBase
   BobLib.Vehicle.Chassis.Suspension.Linkages.ForceOnlyRod rightTieRod(r_a = Vector.mirrorXZ(pRack.leftPickup),
                                                              r_b = pRightDW.tie_o,
                                                              show_universal_axes = false,
-                                                             kinematicConstraint = false,
+                                                             kinematicConstraint = true,
                                                              final linkDiameter = linkDiameter,
                                                              final jointDiameter = jointDiameter)  annotation(
     Placement(transformation(origin = {60, 100}, extent = {{-20, -20}, {20, 20}})));
@@ -140,7 +140,7 @@ protected
                                                       I_31 = pLeftAxleMass.lcaMass.inertia[3, 1],
                                                       I_32 = pLeftAxleMass.lcaMass.inertia[3, 2],
                                                       sphereDiameter = jointDiameter,
-                                                      cylinderDiameter = linkDiameter) annotation(
+                                                      cylinderDiameter = linkDiameter, w_0_fixed = false) annotation(
     Placement(transformation(origin = {-130, 12}, extent = {{10, -10}, {-10, 10}}, rotation = -0)));
   Modelica.Mechanics.MultiBody.Parts.Body leftUnsprungBody(m = pLeftAxleMass.unsprungMass.m,
                                                            r_CM = pLeftAxleMass.unsprungMass.rCM - pLeftDW.wheelCenter,
@@ -174,7 +174,7 @@ protected
                                                        I_31 = pRightAxleMass.lcaMass.inertia[3, 1],
                                                        I_32 = pRightAxleMass.lcaMass.inertia[3, 2],
                                                        sphereDiameter = jointDiameter,
-                                                       cylinderDiameter = linkDiameter) annotation(
+                                                       cylinderDiameter = linkDiameter, w_0_fixed = false) annotation(
     Placement(transformation(origin = {130, 12}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.MultiBody.Parts.Body rightUnsprungBody(m = pRightAxleMass.unsprungMass.m,
                                                             r_CM = pRightAxleMass.unsprungMass.rCM - pRightDW.wheelCenter,
