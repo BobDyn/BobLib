@@ -1,6 +1,6 @@
 within BobLib.Standards;
 
-model VehicleModel
+model VehicleM
   import Modelica.SIunits;
   import Modelica.Constants.pi;
   
@@ -258,4 +258,4 @@ equation
     Icon(coordinateSystem(extent = {{-140, -120}, {140, 120}})),
   experiment(StartTime = 0, StopTime = 5, Tolerance = 1e-06, Interval = 0.002),
   __OpenModelica_commandLineOptions = "--matchingAlgorithm=PFPlusExt --indexReductionMethod=dynamicStateSelection -d=initialization --maxSizeLinearTearing=5000");
-end VehicleModel;
+end VehicleM;

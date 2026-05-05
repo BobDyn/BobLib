@@ -3,7 +3,7 @@ within BobLib.Vehicle.Chassis.Body;
 model FrameCompX
   extends BobLib.Vehicle.Chassis.Body.FrameBase;
   
-  Modelica.Mechanics.MultiBody.Joints.Revolute torsionalRevolute(n = {1, 0, 0}, useAxisFlange = true, phi(nominal=1e-4)) annotation(
+  Modelica.Mechanics.MultiBody.Joints.Revolute torsionalRevolute(n = {1, 0, 0}, useAxisFlange = true, phi(nominal=1e-4), w(start = 0, fixed = true)) annotation(
     Placement(transformation(extent = {{-10, -10}, {10, 10}}, rotation = -180)));
   Modelica.Mechanics.Rotational.Components.Spring spring(c = 500000, phi_rel0 = 0) annotation(
     Placement(transformation(origin = {20, -30}, extent = {{10, -10}, {-10, 10}}, rotation = -0)));

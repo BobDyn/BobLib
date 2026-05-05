@@ -9,7 +9,7 @@ partial model FrameBase
   
   parameter MassRecord pSprung;
 
-  // Visual parameters
+// Visual parameters
   outer parameter SIunits.Length linkDiameter annotation(
     Placement(visible = false, transformation(origin = {nan, nan}, extent = {{nan, nan}, {nan, nan}})));
   outer parameter SIunits.Length jointDiameter annotation(

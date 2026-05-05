@@ -255,5 +255,5 @@ equation
     Diagram(coordinateSystem(extent = {{-140, -120}, {140, 120}})),
     Icon(coordinateSystem(extent = {{-140, -120}, {140, 120}})),
   experiment(StartTime = 0, StopTime = 1, Tolerance = 1e-06, Interval = 0.002),
-  __OpenModelica_commandLineOptions = "-d=initialization,bltdump --maxSizeLinearTearing=5000");
+  __OpenModelica_commandLineOptions = "--matchingAlgorithm=PFPlusExt --indexReductionMethod=dynamicStateSelection -d=initialization,NLSanalyticJacobian --maxSizeLinearTearing=5000");
 end VehicleFMI;

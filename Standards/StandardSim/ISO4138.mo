@@ -102,7 +102,6 @@ protected
     Placement(transformation(origin = {-70, -70}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Blocks.Continuous.PI speedPI(T = 1, k = 200) annotation(
     Placement(transformation(origin = {-30, -70}, extent = {{-10, -10}, {10, 10}})));
-  
   // Front steer input
   Modelica.Mechanics.Rotational.Sources.Position frSteerPosition(exact = false, w(start = 0, fixed = true)) annotation(
     Placement(transformation(origin = {-30, 110}, extent = {{-10, -10}, {10, 10}})));
