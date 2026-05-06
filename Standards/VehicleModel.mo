@@ -20,25 +20,27 @@ model VehicleModel
   
   parameter OrionRecord pVehicle;
   
-  parameter SIunits.Velocity initialVel = 10 "Initial velocity" annotation(Evaluate = false);
-  
   parameter Integer useMode = 0 "0 - closed-loop radius and velocity; 1 - open-loop sinusoidal steer, constant velocity; 2 - custom open-loop steer and drive torque" annotation(Evaluate = false);
   
   // Toggle controllers
-  Boolean closedLoopRadius = (useMode == 0);
-  Boolean closedLoopVelocity = (useMode == 0 or useMode == 1);
+  final parameter Boolean closedLoopRadius = (useMode == 0);
+  final parameter Boolean closedLoopVelocity = (useMode == 0 or useMode == 1);
   
   parameter Modelica.SIunits.Time steerStart = 1.0 "Start time" annotation(Evaluate = false);
   
   // Closed-loop parameters
   parameter SIunits.Length targetRad = 20 "Target maneuver curvature" annotation(Evaluate = false, Dialog(enable = (useMode == 0)));
-  parameter SIunits.Velocity targetVel = 10 "Target maneuver velocity" annotation(Evaluate = false, Dialog(enable = (useMode == 0 or useMode == 1)));
+  parameter SIunits.Velocity targetVel = 15 "Target maneuver velocity" annotation(Evaluate = false, Dialog(enable = (useMode == 0 or useMode == 1)));
+  parameter SIunits.Velocity initialVel = targetVel "Initial velocity" annotation(Evaluate = false);
 
-  parameter Real curvGain = 5 "Proportional gain of curvature controller" annotation(Evaluate = false, Dialog(enable = closedLoopRadius));
-  parameter Real curvTi = 0.1 "Time constant of curvature controller" annotation(Evaluate = false, Dialog(enable = closedLoopRadius));
+  parameter Real curvGain = 3 "Proportional gain of curvature controller" annotation(Evaluate = false, Dialog(enable = closedLoopRadius));
+  parameter Real curvTi = 0.02 "Time constant of curvature controller" annotation(Evaluate = false, Dialog(enable = closedLoopRadius));
   
   parameter Real velGain = 200 "Proportional gain of velocity controller" annotation(Evaluate = false, Dialog(enable = closedLoopVelocity));
   parameter Real velTi = 1 "Time constant of velocity controller" annotation(Evaluate = false, Dialog(enable = closedLoopVelocity));
+
+  parameter Real radErrorTol = 0.002 "ISO4138 radius error tolerance" annotation(Evaluate = false, Dialog(enable = closedLoopRadius));
+  parameter Real der_radErrorTol = 0.5 "ISO4138 radius error derivative tolerance" annotation(Evaluate = false, Dialog(enable = closedLoopRadius));
   
   // Frequency response parameters
   parameter SIunits.Angle steerAmp = 6 * Modelica.Constants.pi / 180 "Amplitude" annotation(Evaluate = false);
@@ -112,8 +114,6 @@ model VehicleModel
 
 protected
   // QSS detection variables
-  Real radErrorTol = 0.1;
-  Boolean inTol;
   discrete Real t_hit(start = -1);
   
   Real leftWheelVector[3];
@@ -137,11 +137,11 @@ protected
   BobLib.Utilities.Mechanics.Multibody.GroundPhysics groundFL annotation(
     Placement(transformation(origin = {-100, 10}, extent = {{-10, -10}, {10, 10}})));
   BobLib.Utilities.Mechanics.Multibody.GroundPhysics groundFR annotation(
-    Placement(transformation(origin = {100, 10}, extent = {{10, -10}, {-10, 10}})));
+    Placement(transformation(origin = {100, 10}, extent = {{10, -10}, {10, 10}})));
   BobLib.Utilities.Mechanics.Multibody.GroundPhysics groundRL annotation(
     Placement(transformation(origin = {-100, -50}, extent = {{-10, -10}, {10, 10}})));
   BobLib.Utilities.Mechanics.Multibody.GroundPhysics groundRR annotation(
-    Placement(transformation(origin = {100, -50}, extent = {{10, -10}, {-10, 10}})));
+    Placement(transformation(origin = {100, -50}, extent = {{10, -10}, {10, 10}})));
   
   // Curvature controller
   Modelica.Blocks.Sources.RealExpression curvErrorExpression(y = curvError)  annotation(
@@ -155,8 +155,7 @@ protected
   Modelica.Blocks.Sources.RealExpression velErrorExpression(y = velError) annotation(
     Placement(transformation(origin = {-70, -50}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Blocks.Continuous.PI speedPI(k = velGain,
-                                        T = velTi,
-                                        initType = Modelica.Blocks.Types.Init.InitialOutput) annotation(
+                                        T = velTi) annotation(
     Placement(transformation(origin = {-30, -50}, extent = {{-10, -10}, {10, 10}})));
   
 initial equation
@@ -170,17 +169,26 @@ equation
   
   // Curvature quantities
   curvature = vehicle.chassis.spaceFrame.sprungBody.w_a[3]/max(speed, 0.1);
-  curvError = steerEnable * (1 / targetRad - curvature);
-  radError = abs(speed/max(abs(yawVel), 0.1) - abs(targetRad));
+
+  // ISO4138-style radius error
+  radError = abs(speed/max(abs(vehicle.chassis.spaceFrame.sprungBody.w_a[3]), 0.1) - abs(targetRad));
   
-  // QSS detection
-  inTol = abs(radError) < radErrorTol;
-  when useMode == 0 and change(inTol) then
-    t_hit = if inTol then time else -1;
+  // ISO4138-style QSS detection, only active for useMode == 0
+  when useMode == 0 and abs(radError) < radErrorTol and abs(der(radError)) < der_radErrorTol and pre(t_hit) < 0 then
+    t_hit = time;
   end when;
+
   when useMode == 0 and t_hit > 0 and time > t_hit + 0.1 then
     terminate("Reached steady-state (held 0.1s)");
   end when;
+  
+  // ISO4138 curvature controller for useMode == 0.
+  // Intentionally matches old ISO4138: ramp from t = 1.0 to t = 1.2.
+  curvError =
+    if useMode == 0 then
+      smooth(1, min(1, max(0, (time - 1)/0.2))) * (1/targetRad - vehicle.chassis.spaceFrame.sprungBody.w_a[3]/max(speed, 0.1))
+    else
+      0;
   
   // Sinusoidal steering profile for useMode == 1
   steerSine =
