@@ -14,7 +14,7 @@ model VehicleModel
   inner parameter SIunits.Length linkDiameter = 0.020;
   inner parameter SIunits.Length jointDiameter = 0.030;
   parameter OrionRecord pVehicle;
-  parameter Integer useMode = 2 "0 - closed-loop radius and velocity; 1 - open-loop sinusoidal steer, constant velocity; 2 - custom open-loop steer and drive torque" annotation(
+  parameter Integer useMode = 0 "0 - closed-loop radius and velocity; 1 - open-loop sinusoidal steer, constant velocity; 2 - custom open-loop steer and drive torque" annotation(
     Evaluate = false);
   // Toggle controllers
   final parameter Boolean closedLoopRadius = (useMode == 0);
@@ -49,7 +49,7 @@ model VehicleModel
     Evaluate = false,
     Dialog(enable = closedLoopRadius));
   
-  parameter Real der_accYTol = 0.05;
+  parameter Real der_yawVelTol = 0.01;
   
   // Ramp-steer parameters
   parameter SIunits.Angle frRampSteerHeight = 5 * Modelica.Constants.pi / 180 "Ramp steer target angle";
@@ -177,7 +177,7 @@ equation
     t_accY_hit = time;
 
   elsewhen useMode == 2
-       and abs(der(accY)) >= der_accYTol then
+       and abs(der(yawVel)) >= der_yawVelTol then
     t_accY_hit = -1;
   end when;
 
