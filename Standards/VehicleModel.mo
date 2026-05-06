@@ -48,13 +48,13 @@ model VehicleModel
   parameter Real der_radErrorTol = 0.5 "ISO4138 radius error derivative tolerance" annotation(
     Evaluate = false,
     Dialog(enable = closedLoopRadius));
-  
+
   parameter Real der_yawVelTol = 0.01;
-  
+
   // Ramp-steer parameters
   parameter SIunits.Angle frRampSteerHeight = 5 * Modelica.Constants.pi / 180 "Ramp steer target angle";
   parameter SIunits.Time frRampSteerDuration = 0.001 "Ramp steer duration";
-  
+
   // Frequency response parameters
   parameter SIunits.Angle steerAmp = 6*Modelica.Constants.pi/180 "Amplitude" annotation(
     Evaluate = false);
@@ -112,11 +112,11 @@ model VehicleModel
 protected
   // QSS detection variables
   discrete Real t_curv_hit(start = -1);
-  discrete Real t_accY_hit(start = -1);
-  
+  discrete Real t_yawVel_hit(start = -1);
+
   Real leftWheelVector[3];
   Real rightWheelVector[3];
-  
+
   // Initial geometry
   Modelica.Mechanics.MultiBody.Parts.Fixed fixedFL(r = cpInitFL, animation = false) annotation(
     Placement(transformation(origin = {-130, 10}, extent = {{-10, -10}, {10, 10}})));
@@ -155,12 +155,12 @@ initial equation
 equation
   // Curvature quantities
   curvature = vehicle.chassis.spaceFrame.sprungBody.w_a[3]/max(speed, 0.1);
-  
+
   // ISO4138-style radius error
   radError = abs(speed/max(abs(vehicle.chassis.spaceFrame.sprungBody.w_a[3]), 0.1) - abs(targetRad));
-  
-  
-  
+
+
+
   // ISO4138-style QSS detection, only active for useMode == 0
   when useMode == 0 and abs(radError) < radErrorTol and abs(der(radError)) < der_radErrorTol and pre(t_curv_hit) < 0 then
     t_curv_hit = time;
@@ -168,25 +168,25 @@ equation
   when useMode == 0 and t_curv_hit > 0 and time > t_curv_hit + 0.1 then
     terminate("Reached steady-state (held 0.1s)");
   end when;
-  
+
   // Ramp-steer steady-state detection
   when useMode == 2
        and time > steerStart + frRampSteerDuration
-       and abs(der(accY)) < der_accYTol
-       and pre(t_accY_hit) < 0 then
-    t_accY_hit = time;
+       and abs(der(yawVel)) < der_yawVelTol
+       and pre(t_yawVel_hit) < 0 then
+    t_yawVel_hit = time;
 
   elsewhen useMode == 2
        and abs(der(yawVel)) >= der_yawVelTol then
-    t_accY_hit = -1;
+    t_yawVel_hit = -1;
   end when;
 
   when useMode == 2
-       and t_accY_hit > 0
-       and time > t_accY_hit + 0.1 then
-    terminate("Reached ramp-steer steady-state: der(accY) held below tolerance");
+       and t_yawVel_hit > 0
+       and time > t_yawVel_hit + 0.1 then
+    terminate("Reached ramp-steer steady-state: der(yawVel) below tolerance (held 0.1s)");
   end when;
-  
+
 // ISO4138 curvature controller for useMode == 0.
 // Intentionally matches old ISO4138: ramp from t = 1.0 to t = 1.2.
   curvError = if useMode == 0 then smooth(1, min(1, max(0, (time - 1)/0.2)))*(1/targetRad - vehicle.chassis.spaceFrame.sprungBody.w_a[3]/max(speed, 0.1)) else 0;
@@ -198,7 +198,7 @@ equation
 // Apply steer and drive torque
   frSteerPosition.phi_ref = frSteerCmd;
   vehicle.uPTNTorque = driveTorqueCmd;
-  
+
 // General quantities
   bodyVels = Frames.resolve2(vehicle.chassis.spaceFrame.sprungBody.frame_a.R, vehicle.chassis.spaceFrame.sprungBody.v_0);
   bodyAccels = Frames.resolve2(vehicle.chassis.spaceFrame.sprungBody.frame_a.R, vehicle.chassis.spaceFrame.sprungBody.a_0);
