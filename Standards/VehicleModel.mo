@@ -72,6 +72,7 @@ model VehicleModel
   Real radError;
   Real velError;
   Real steerSine;
+  Real steerRamp;
   // Standard outputs
   SIunits.Acceleration accX;
   SIunits.Acceleration accY;
@@ -107,8 +108,7 @@ model VehicleModel
   //    Placement(transformation(origin = {-70, 80}, extent = {{-10, -10}, {10, 10}})));
   //  Modelica.Blocks.Sources.CombiTimeTable driveTorqueTimeTable(table = [0, 0; 1, 0], columns = {2}, smoothness = Modelica.Blocks.Types.Smoothness.LinearSegments, extrapolation = Modelica.Blocks.Types.Extrapolation.HoldLastPoint)  annotation(
   //    Placement(transformation(origin = {-30, -80}, extent = {{-10, -10}, {10, 10}})));
-  Modelica.Blocks.Sources.Ramp frSteerRamp(height = frRampSteerHeight, duration = frRampSteerDuration, startTime = steerStart)  annotation(
-    Placement(transformation(origin = {-70, 70}, extent = {{-10, -10}, {10, 10}})));
+  
 protected
   // QSS detection variables
   discrete Real t_curv_hit(start = -1);
@@ -192,8 +192,11 @@ equation
   curvError = if useMode == 0 then smooth(1, min(1, max(0, (time - 1)/0.2)))*(1/targetRad - vehicle.chassis.spaceFrame.sprungBody.w_a[3]/max(speed, 0.1)) else 0;
 // Sinusoidal steering profile for useMode == 1
   steerSine = if noEvent((useMode == 1) and (time > steerStart)) then steerAmp*sin(2*pi*steerFreq*(time - steerStart)) else 0;
+// Ramp-steer profile for useMode == 2
+  steerRamp = frRampSteerHeight * noEvent(min(1, max(0, (time - steerStart) / frRampSteerDuration)));
+
 // Mode switching logic
-  frSteerCmd = if (useMode == 0) then curvPI.y else if (useMode == 1) then steerSine else if (useMode == 2) then frSteerRamp.y else 0;
+  frSteerCmd = if (useMode == 0) then curvPI.y else if (useMode == 1) then steerSine else if (useMode == 2) then steerRamp else 0;
   driveTorqueCmd = if ((useMode == 0) or (useMode == 1) or (useMode == 2)) then speedPI.y else 0;
 // Apply steer and drive torque
   frSteerPosition.phi_ref = frSteerCmd;
