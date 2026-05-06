@@ -28,12 +28,14 @@ model VehicleModel
   Boolean closedLoopRadius = (useMode == 0);
   Boolean closedLoopVelocity = (useMode == 0 or useMode == 1);
   
+  parameter Modelica.SIunits.Time steerStart = 1.0 "Start time" annotation(Evaluate = false);
+  
   // Closed-loop parameters
   parameter SIunits.Length targetRad = 20 "Target maneuver curvature" annotation(Evaluate = false, Dialog(enable = (useMode == 0)));
   parameter SIunits.Velocity targetVel = 10 "Target maneuver velocity" annotation(Evaluate = false, Dialog(enable = (useMode == 0 or useMode == 1)));
 
-  parameter Real curvGain = 10.0 "Proportional gain of curvature controller" annotation(Evaluate = false, Dialog(enable = closedLoopRadius));
-  parameter Real curvTi = 0.3 "Time constant of curvature controller" annotation(Evaluate = false, Dialog(enable = closedLoopRadius));
+  parameter Real curvGain = 5 "Proportional gain of curvature controller" annotation(Evaluate = false, Dialog(enable = closedLoopRadius));
+  parameter Real curvTi = 0.1 "Time constant of curvature controller" annotation(Evaluate = false, Dialog(enable = closedLoopRadius));
   
   parameter Real velGain = 200 "Proportional gain of velocity controller" annotation(Evaluate = false, Dialog(enable = closedLoopVelocity));
   parameter Real velTi = 1 "Time constant of velocity controller" annotation(Evaluate = false, Dialog(enable = closedLoopVelocity));
@@ -41,7 +43,6 @@ model VehicleModel
   // Frequency response parameters
   parameter SIunits.Angle steerAmp = 6 * Modelica.Constants.pi / 180 "Amplitude" annotation(Evaluate = false);
   parameter SIunits.Frequency steerFreq = 1.0 "Frequency (Hz)" annotation(Evaluate = false);
-  parameter Modelica.SIunits.Time steerStart = 1.0 "Start time" annotation(Evaluate = false);
   
   // Raw signal parameters
   
@@ -118,6 +119,8 @@ protected
   Real leftWheelVector[3];
   Real rightWheelVector[3];
   
+  Real steerEnable;
+  
   // Initial geometry
   Modelica.Mechanics.MultiBody.Parts.Fixed fixedFL(r = cpInitFL, animation = false) annotation(
     Placement(transformation(origin = {-130, 10}, extent = {{-10, -10}, {10, 10}})));
@@ -163,10 +166,12 @@ initial equation
   vehicle.chassis.rrAxleDW.rightTire.wheelModel.hubAxis.w = initialVel / pVehicle.pRrPartialWheel.R0;
 
 equation
+  steerEnable = if noEvent(time >= steerStart) then 1 else 0;
+  
   // Curvature quantities
   curvature = vehicle.chassis.spaceFrame.sprungBody.w_a[3]/max(speed, 0.1);
-  curvError = smooth(1, min(1, max(0, (time - 1)/0.2)))*(1/targetRad - curvature);
-  radError = abs(speed/max(abs(yawVel), 0.1) - targetRad);
+  curvError = steerEnable * (1 / targetRad - curvature);
+  radError = abs(speed/max(abs(yawVel), 0.1) - abs(targetRad));
   
   // QSS detection
   inTol = abs(radError) < radErrorTol;
@@ -257,5 +262,5 @@ equation
     Diagram(coordinateSystem(extent = {{-140, -120}, {140, 120}})),
     Icon(coordinateSystem(extent = {{-140, -120}, {140, 120}})),
   experiment(StartTime = 0, StopTime = 5, Tolerance = 1e-06, Interval = 0.002),
-  __OpenModelica_commandLineOptions = "--matchingAlgorithm=PFPlusExt --indexReductionMethod=dynamicStateSelection -d=initialization --maxSizeLinearTearing=5000");
+  __OpenModelica_commandLineOptions = "--matchingAlgorithm=PFPlusExt --indexReductionMethod=dynamicStateSelection --maxSizeLinearTearing=5000");
 end VehicleModel;
