@@ -3,7 +3,7 @@ within BobLib.Vehicle.Chassis.Suspension.Linkages;
 model ShockLinkage
   import Modelica.SIunits;
 
-  // Geometry parameters
+// Geometry parameters
   parameter SIunits.Position r_a[3] "Initial vector from origin to frame_a, resolved in world frame" annotation(
     Dialog(group = "Geometry"));
   parameter SIunits.Position r_b[3] "Initial vector from origin to frame_b, resolved in world frame" annotation(
@@ -12,29 +12,27 @@ model ShockLinkage
     Dialog(group = "Geometry"));
   parameter Modelica.Mechanics.MultiBody.Types.Axis n_b "Axis of revolute joint 2, resolved in world frame" annotation(
     Dialog(group = "Geometry"));
-  
   // Spring parameters
   parameter SIunits.Length s_0 "Spring free length" annotation(
     Dialog(group = "Spring Params"));
   parameter SIunits.TranslationalSpringConstant springTable[:, 2] "Table of spring force vs deflection (change in length)" annotation(
     Dialog(group = "Spring Params"));
-  
   // Damper parameters
   parameter SIunits.TranslationalDampingConstant damperTable[:, 2] "Table of damper force vs relative velocity" annotation(
     Dialog(group = "Damper Params"));
-  
   // Visual parameters (implement visuals later)
   parameter SIunits.Length linkDiameter "Link diameter" annotation(
     Dialog(tab = "Animation"));
   parameter SIunits.Length jointDiameter "Joint diameter" annotation(
     Dialog(tab = "Animation"));
-  
+  // Advanced parameters
+  parameter Boolean fixedRotationAtFrame_a = false annotation(tab="Advanced");
+  parameter Boolean fixedRotationAtFrame_b = false annotation(tab="Advanced");
   // Frames
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a frame_a annotation(
     Placement(transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}})));
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b frame_b annotation(
     Placement(transformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}})));
-  
   // Force elements
   BobLib.Vehicle.Chassis.Suspension.Linkages.TabularSpring TabularSpring(springTable = springTable, s_0 = s_0) annotation(
     Placement(transformation(origin = {0, 30}, extent = {{-10, -10}, {10, 10}})));
@@ -42,7 +40,7 @@ model ShockLinkage
     Placement(transformation(origin = {0, 50}, extent = {{-10, -10}, {10, 10}})));
 
   // Shock axis
-  Modelica.Mechanics.MultiBody.Forces.LineForceWithMass lineForceWithMass annotation(
+  Modelica.Mechanics.MultiBody.Forces.LineForceWithMass lineForceWithMass(fixedRotationAtFrame_a = fixedRotationAtFrame_a, fixedRotationAtFrame_b = fixedRotationAtFrame_b)  annotation(
     Placement(transformation(extent = {{-10, -10}, {10, 10}})));
 
 equation

@@ -1,6 +1,6 @@
 within BobLib.Vehicle.Chassis.Suspension;
 
-model FrAxleDW_BC_ARB "Double wishbone front axle with bellcranks and stabar"
+model FrAxleDW_BC_Stabar "Double wishbone front axle with bellcranks and stabar"
   import Modelica.SIunits;
   import Modelica.Math.Vectors;
   import BobLib.Utilities.Math.Vector.mirrorXZ;
@@ -10,8 +10,7 @@ model FrAxleDW_BC_ARB "Double wishbone front axle with bellcranks and stabar"
   parameter AxleDWRecord pAxle;
   parameter StabarRecord pStabar;
   
-  extends BobLib.Vehicle.Chassis.Suspension.AxleDWBase(rodInboard = pAxle.bellcrankPickup2);
-  
+  extends BobLib.Vehicle.Chassis.Suspension.AxleDWBase;
   // Left pushrod
   // Left bellcrank
   Linkages.Bellcrank3 leftBellcrank(pivot = pAxle.bellcrankPivot, pivotAxis = pAxle.bellcrankPivotAxis, pickup_1 = pAxle.bellcrankPickup1, pickup_2 = pAxle.bellcrankPickup2, pickup_3 = pAxle.bellcrankPickup3, linkDiameter = linkDiameter, jointDiameter = jointDiameter) annotation(
@@ -81,6 +80,8 @@ equation
     Line(points = {{0, 0}, {0, -20}, {10, -20}}));
   connect(axleFrame, toLeftShock.frame_a) annotation(
     Line(points = {{0, 0}, {0, -70}, {-10, -70}}));
+  connect(toRightBellcrank.frame_a, toRightShock.frame_a) annotation(
+    Line(points = {{10, -20}, {0, -20}, {0, -70}, {10, -70}}, color = {95, 95, 95}));
   connect(axleFrame, toStabar.frame_a) annotation(
     Line(points = {{0, 0}, {0, -80}}));
   connect(toStabar.frame_b, stabar.supportFrame) annotation(
@@ -95,14 +96,8 @@ equation
     Line(points = {{-70, -80}, {-70, -10}, {-50, -10}}, color = {95, 95, 95}));
   connect(rackAndPinion.pinionFlange, steerFlange) annotation(
     Line(points = {{0, 114}, {0, 140}}));
-  connect(toRightShock.frame_a, axleFrame) annotation(
-    Line(points = {{10, -70}, {0, -70}, {0, 0}}, color = {95, 95, 95}));
-  connect(leftPushrod.frame_a, leftBellcrank.pickupFrame2) annotation(
-    Line(points = {{-100, -30}, {-80, -30}, {-80, -20}, {-60, -20}}, color = {95, 95, 95}));
-  connect(rightPushrod.frame_a, rightBellcrank.pickupFrame2) annotation(
-    Line(points = {{100, -30}, {80, -30}, {80, -20}, {60, -20}}, color = {95, 95, 95}));
   annotation(
     experiment(StartTime = 0, StopTime = 1, Tolerance = 1e-06, Interval = 0.002),
     Diagram(coordinateSystem(extent = {{-180, -140}, {180, 140}}, preserveAspectRatio = true), graphics),
     Icon(coordinateSystem(extent = {{-180, -20}, {180, 140}}, preserveAspectRatio = true), graphics = {Line(origin = {0, 67}, points = {{0, -33}, {0, 33}}, thickness = 5), Ellipse(origin = {0, 100}, lineThickness = 5, extent = {{-26, 26}, {26, -26}}), Line(origin = {-10, 110}, points = {{10, -10}, {-14, -2}}, thickness = 5), Line(origin = {10, 110}, points = {{-10, -10}, {14, -2}}, thickness = 5), Ellipse(origin = {0, 100}, lineColor = {255, 255, 255}, lineThickness = 1, extent = {{-28, 28}, {28, -28}})}));
-end FrAxleDW_BC_ARB;
+end FrAxleDW_BC_Stabar;

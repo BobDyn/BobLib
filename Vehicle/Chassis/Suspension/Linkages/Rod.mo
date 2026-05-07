@@ -9,6 +9,8 @@ model Rod
     Evaluate = false, Dialog(group = "Geometry"));
   parameter Modelica.Mechanics.MultiBody.Types.Axis n1_a = {1, 0, 0} "Axis 1 of universal joint resolved in frame_a (axis 2 is orthogonal to axis 1 and to rod)" annotation(
     Evaluate = false, Dialog(group = "Geometry"));
+  parameter Boolean lockSideA = false "Whether to lock spherical bearing at frame_a" annotation(Dialog(tab = "Advanced"));
+  
   parameter Boolean kinematicConstraint = true annotation(
     Evaluate = false, Dialog(group = "Geometry"));
   // Visual parameters
@@ -38,6 +40,12 @@ protected
     Placement(transformation(extent = {{-20, -20}, {20, 20}})));
 
 equation
+  if lockSideA then
+    connect(rod.frame_a, rod.frame_ia);
+  else
+  
+  end if;
+  
   connect(rod.frame_a, frame_a) annotation(
     Line(points = {{-20, 0}, {-100, 0}}, color = {95, 95, 95}));
   connect(rod.frame_b, frame_b) annotation(
