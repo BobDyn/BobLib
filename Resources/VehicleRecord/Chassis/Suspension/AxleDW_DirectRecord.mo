@@ -4,9 +4,6 @@ record AxleDW_DirectRecord
   import Modelica.SIunits;
   
   // Geometry
-  parameter SIunits.Position rodToShock[3] "Vector from origin to point where push/pullrod meets shock, resolved in world frame" annotation(
-    Evaluate = false,
-    Dialog(group = "Geometry"));
   parameter SIunits.Position shockMount[3] "Vector from origin to shock chassis mount, resolved in world frame" annotation(
     Evaluate = false,
     Dialog(group = "Geometry"));
