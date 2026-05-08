@@ -14,8 +14,6 @@ model GroundPhysics
   parameter Real eps = 1e-6 "Smoothing length";
 
   Real pen "Smooth penetration";
-
-protected
   Real r_rel_z "Relative z displacement, positive when separated";
   Real f_z "Normal force";
 

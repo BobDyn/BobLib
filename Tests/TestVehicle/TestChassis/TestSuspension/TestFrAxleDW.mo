@@ -3,11 +3,11 @@ within BobLib.Tests.TestVehicle.TestChassis.TestSuspension;
 model TestFrAxleDW
   import Modelica.Constants.pi;
   import Modelica.Mechanics.MultiBody.Frames;
-  import BobLib.Resources.VehicleDefn.OrionRecord;
+  import BobLib.Resources.VehicleDefn.DWBCStabar_DWBCStabarRecord;
   
   import BobLib.Utilities.Math.Vector;
   
-  parameter OrionRecord pVehicle;
+  parameter DWBCStabar_DWBCStabarRecord pVehicle;
   
   inner parameter Real linkDiameter = 0.020;
   inner parameter Real jointDiameter = 0.030;

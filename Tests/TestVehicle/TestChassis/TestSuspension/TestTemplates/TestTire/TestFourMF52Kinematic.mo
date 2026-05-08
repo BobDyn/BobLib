@@ -5,10 +5,10 @@ model TestFourMF52Kinematic
   import Modelica.Math.Vectors.norm;
   
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.Templates.PartialWheelRecord;
-  import BobLib.Resources.VehicleDefn.OrionRecord;
+  import BobLib.Resources.VehicleDefn.DWBCStabar_DWBCStabarRecord;
 
   // Record parameters
-  parameter OrionRecord pCar;
+  parameter DWBCStabar_DWBCStabarRecord pCar;
   
   parameter SIunits.Velocity velocity = 10;
   

@@ -4,31 +4,69 @@ model RrAxleDW_BC_ARB "Double wishbone rear axle with bellcranks and stabar"
   import Modelica.SIunits;
   import Modelica.Math.Vectors;
   import BobLib.Utilities.Math.Vector.mirrorXZ;
-  import BobLib.Resources.VehicleRecord.Chassis.Suspension.AxleDWRecord;
+  import BobLib.Resources.VehicleRecord.Chassis.Suspension.AxleDW_BC_StabarRecord;
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Stabar.StabarRecord;
+  
   // Record parameters
-  parameter AxleDWRecord pAxle;
+  parameter AxleDW_BC_StabarRecord pAxle;
   parameter StabarRecord pStabar;
-  extends BobLib.Vehicle.Chassis.Suspension.AxleDWBase(rodToLower = false, rodInboard = pAxle.bellcrankPickup1);
-  // Left pullrod
+  extends BobLib.Vehicle.Chassis.Suspension.AxleDWBase;
+  
   // Left bellcrank
-  Linkages.Bellcrank3 leftBellcrank(pivot = pAxle.bellcrankPivot, pivotAxis = pAxle.bellcrankPivotAxis, pickup_1 = pAxle.bellcrankPickup1, pickup_2 = pAxle.bellcrankPickup2, pickup_3 = pAxle.bellcrankPickup3, linkDiameter = linkDiameter, jointDiameter = jointDiameter) annotation(
+  BobLib.Vehicle.Chassis.Suspension.Linkages.Bellcrank3 leftBellcrank(pivot = pAxle.bellcrankPivot,
+                                                                      pivotAxis = pAxle.bellcrankPivotAxis,
+                                                                      rRod = pAxle.bellcrankRodPickup,
+                                                                      rShock = pAxle.bellcrankShockPickup,
+                                                                      rStabar = pAxle.bellcrankStabarPickup,
+                                                                      linkDiameter = linkDiameter,
+                                                                      jointDiameter = jointDiameter,
+                                                                      rodPickup = pAxle.rodPickup,
+                                                                      shockPickup = pAxle.shockPickup,
+                                                                      stabarPickup = pAxle.stabarPickup) annotation(
     Placement(transformation(origin = {-50, -20}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
+  
   // Left shock
-  Linkages.ShockLinkage leftShockLinkage(r_a = pAxle.bellcrankPickup2, r_b = pAxle.shockMount, s_0 = pAxle.springFreeLength, springTable = pAxle.springTable, damperTable = pAxle.damperTable, n_a = pAxle.bellcrankPivotAxis, n_b = Vectors.normalize(pAxle.bellcrankPivot - pAxle.bellcrankPickup2), linkDiameter = linkDiameter, jointDiameter = jointDiameter) annotation(
+  BobLib.Vehicle.Chassis.Suspension.Linkages.ShockLinkage leftShockLinkage(r_a = pAxle.bellcrankShockPickup,
+                                                                           r_b = pAxle.shockMount,
+                                                                           s_0 = pAxle.springFreeLength,
+                                                                           springTable = pAxle.springTable,
+                                                                           damperTable = pAxle.damperTable,
+                                                                           n_a = pAxle.bellcrankPivotAxis,
+                                                                           n_b = {0, 1, 0},
+                                                                           linkDiameter = linkDiameter,
+                                                                           jointDiameter = jointDiameter) annotation(
     Placement(transformation(origin = {-80, -55}, extent = {{-15, -15}, {15, 15}}, rotation = -90)));
-  // Right pullrod
+  
   // Right bellcrank
-  Linkages.Bellcrank3 rightBellcrank(pivot = mirrorXZ(pAxle.bellcrankPivot), pivotAxis = mirrorXZ(pAxle.bellcrankPivotAxis), pickup_1 = mirrorXZ(pAxle.bellcrankPickup1), pickup_2 = mirrorXZ(pAxle.bellcrankPickup2), pickup_3 = mirrorXZ(pAxle.bellcrankPickup3), linkDiameter = linkDiameter, jointDiameter = jointDiameter) annotation(
+  BobLib.Vehicle.Chassis.Suspension.Linkages.Bellcrank3 rightBellcrank(pivot = mirrorXZ(pAxle.bellcrankPivot),
+                                                                       pivotAxis = mirrorXZ(pAxle.bellcrankPivotAxis),
+                                                                       rRod = mirrorXZ(pAxle.bellcrankRodPickup),
+                                                                       rShock = mirrorXZ(pAxle.bellcrankShockPickup),
+                                                                       rStabar = mirrorXZ(pAxle.bellcrankStabarPickup),
+                                                                       linkDiameter = linkDiameter,
+                                                                       jointDiameter = jointDiameter,
+                                                                       rodPickup = pAxle.rodPickup,
+                                                                       shockPickup = pAxle.shockPickup,
+                                                                       stabarPickup = pAxle.stabarPickup) annotation(
     Placement(transformation(origin = {50, -20}, extent = {{10, -10}, {-10, 10}}, rotation = -180)));
+  
   // Right shock
-  Linkages.ShockLinkage rightShockLinkage(r_a = mirrorXZ(pAxle.bellcrankPickup2), r_b = mirrorXZ(pAxle.shockMount), s_0 = pAxle.springFreeLength, springTable = pAxle.springTable, damperTable = pAxle.damperTable, n_a = mirrorXZ(pAxle.bellcrankPivotAxis), n_b = Vectors.normalize(mirrorXZ(pAxle.bellcrankPivot - pAxle.bellcrankPickup2)), linkDiameter = linkDiameter, jointDiameter = jointDiameter) annotation(
+  BobLib.Vehicle.Chassis.Suspension.Linkages.ShockLinkage rightShockLinkage(r_a = mirrorXZ(pAxle.bellcrankShockPickup),
+                                                                            r_b = mirrorXZ(pAxle.shockMount),
+                                                                            s_0 = pAxle.springFreeLength,
+                                                                            springTable = pAxle.springTable,
+                                                                            damperTable = pAxle.damperTable,
+                                                                            n_a = mirrorXZ(pAxle.bellcrankPivotAxis),
+                                                                            n_b = mirrorXZ({0, 1, 0}),
+                                                                            linkDiameter = linkDiameter,
+                                                                            jointDiameter = jointDiameter) annotation(
     Placement(transformation(origin = {80, -55}, extent = {{-15, -15}, {15, 15}}, rotation = -90)));
+  
   // Stabar
   Templates.Stabar.Stabar stabar(pStabar = pStabar, jointDiameter = jointDiameter, linkDiameter = linkDiameter) annotation(
     Placement(transformation(origin = {0, -116}, extent = {{20, -20}, {-20, 20}}, rotation = -180)));
   BobLib.Vehicle.Chassis.Suspension.Linkages.Rod rightDroplink(r_a = mirrorXZ(pStabar.leftArmEnd),
-                                                               r_b = mirrorXZ(pAxle.bellcrankPickup3),
+                                                               r_b = mirrorXZ(pAxle.bellcrankStabarPickup),
                                                                n1_a = {0, 1, 0},
                                                                kinematicConstraint = true,
                                                                linkDiameter = linkDiameter,
@@ -37,7 +75,7 @@ model RrAxleDW_BC_ARB "Double wishbone rear axle with bellcranks and stabar"
     Placement(transformation(origin = {50, -90}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
   
   BobLib.Vehicle.Chassis.Suspension.Linkages.Rod leftDroplink(r_a = pStabar.leftArmEnd,
-                                                              r_b = pAxle.bellcrankPickup3,
+                                                              r_b = pAxle.bellcrankStabarPickup,
                                                               n1_a = {0, 1, 0},
                                                               kinematicConstraint = true,
                                                               linkDiameter = linkDiameter,
@@ -59,7 +97,11 @@ protected
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRightShock(r = mirrorXZ(pAxle.shockMount) - effectiveCenter, animation = false) annotation(
     Placement(transformation(origin = {20, -70}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation toStabar(r = {pStabar.leftBarEnd[1], 0, pStabar.leftBarEnd[3]} - effectiveCenter, animation = false) annotation(
-    Placement(transformation(origin = {0, -90}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
+    Placement(transformation(origin = {0, -90}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));public
+  BobLib.Vehicle.Chassis.Suspension.Linkages.Rod leftPushrod(jointDiameter = jointDiameter, kinematicConstraint = true, linkDiameter = linkDiameter, n1_a = {1, 0, 0}, r_a = pAxle.bellcrankRodPickup, r_b = pLeftDW.rodMount) annotation(
+    Placement(transformation(origin = {-120, -30}, extent = {{20, -20}, {-20, 20}})));
+  BobLib.Vehicle.Chassis.Suspension.Linkages.Rod rightPushrod(jointDiameter = jointDiameter, kinematicConstraint = true, linkDiameter = linkDiameter, n1_a = {1, 0, 0}, r_a = mirrorXZ(pAxle.bellcrankRodPickup), r_b = mirrorXZ(pLeftDW.rodMount)) annotation(
+    Placement(transformation(origin = {120, -30}, extent = {{-20, -20}, {20, 20}})));
 equation
   connect(leftBellcrank.mountFrame, toLeftBellcrank.frame_b) annotation(
     Line(points = {{-40, -20}, {-30, -20}}, color = {95, 95, 95}));
@@ -95,6 +137,10 @@ equation
     Line(points = {{50, -100}, {50, -120}, {20, -120}}, color = {95, 95, 95}));
   connect(rackAndPinion.pinionFlange, steerFlange) annotation(
     Line(points = {{0, 114}, {0, 140}}));
+  connect(toLeftApex.frame_b, leftPushrod.frame_b) annotation(
+    Line(points = {{-100, -10}, {-150, -10}, {-150, -30}, {-140, -30}}, color = {95, 95, 95}));
+  connect(toRightApex.frame_b, rightPushrod.frame_b) annotation(
+    Line(points = {{100, -10}, {150, -10}, {150, -30}, {140, -30}}, color = {95, 95, 95}));
   connect(leftPushrod.frame_a, leftBellcrank.pickupFrame1) annotation(
     Line(points = {{-100, -30}, {-70, -30}, {-70, -10}, {-50, -10}}, color = {95, 95, 95}));
   connect(rightPushrod.frame_a, rightBellcrank.pickupFrame1) annotation(

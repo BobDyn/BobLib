@@ -9,11 +9,11 @@ model FrKnC
   
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Stabar.StabarRecord;
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.AxleDWRecord;
-  import BobLib.Resources.VehicleDefn.OrionRecord;
+  import BobLib.Resources.VehicleDefn.DWBCStabar_DWBCStabarRecord;
   
   import BobLib.Resources.VisualRecord.Chassis.Suspension.AxleDW_BC_ARB_VisualRecord;
   
-  parameter OrionRecord pVehicle annotation(
+  parameter DWBCStabar_DWBCStabarRecord pVehicle annotation(
     Placement(visible = false, transformation(origin = {nan, nan}, extent = {{nan, nan}, {nan, nan}})));
   
   extends BobLib.Standards.Templates.KnC(final toAxle(r = {pVehicle.pFrDW.wheelCenter[1], 0, pVehicle.pFrDW.wheelCenter[3]}),

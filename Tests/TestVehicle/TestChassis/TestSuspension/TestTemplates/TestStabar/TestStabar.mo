@@ -1,9 +1,9 @@
 within BobLib.Tests.TestVehicle.TestChassis.TestSuspension.TestTemplates.TestStabar;
 
 model TestStabar
-  import BobLib.Resources.VehicleDefn.OrionRecord;
+  import BobLib.Resources.VehicleDefn.DWBCStabar_DWBCStabarRecord;
   
-  parameter OrionRecord pVehicle;
+  parameter DWBCStabar_DWBCStabarRecord pVehicle;
   
   parameter Real linkDiameter = 0.020;
   parameter Real jointDiameter = 0.030;

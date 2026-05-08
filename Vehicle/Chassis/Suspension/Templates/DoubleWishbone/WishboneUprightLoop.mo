@@ -8,9 +8,8 @@ model WishboneUprightLoop "Kinematic loop consisting of upright, lower wishbone,
   
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.DoubleWishbone.WishboneUprightLoopRecord;
 
-  // Record parameters
+// Record parameters
   parameter WishboneUprightLoopRecord pDW;
-  
   // Visual parameters
   parameter SIunits.Length linkDiameter annotation(
     Evaluate = true,
@@ -18,7 +17,6 @@ model WishboneUprightLoop "Kinematic loop consisting of upright, lower wishbone,
   parameter SIunits.Length jointDiameter annotation(
     Evaluate = true,
     Dialog(tab = "Animation"));
-  
   // Frames
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a upperFrame_i annotation(
     Placement(transformation(origin = {-100, 60}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-100, 70}, extent = {{-16, -16}, {16, 16}})));
@@ -30,21 +28,17 @@ model WishboneUprightLoop "Kinematic loop consisting of upright, lower wishbone,
     Placement(transformation(origin = {0, -100}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {0, -100}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b steeringFrame annotation(
     Placement(transformation(origin = {100, -60}, extent = {{16, -16}, {-16, 16}}), iconTransformation(origin = {100, -70}, extent = {{-16, -16}, {16, 16}})));
-  
   // Upper wishbone + upright
   Modelica.Mechanics.MultiBody.Joints.Assemblies.JointUSR upperWishboneUpright(n1_a = {1, 0, 0}, n_b = Vectors.normalize(pDW.upperFore_i - pDW.upperAft_i), rRod1_ia = pDW.upper_o - pDW.lower_o, rRod2_ib = pDW.upper_o - (pDW.upperFore_i + pDW.upperAft_i)/2, sphereDiameter = jointDiameter, rod1Diameter = linkDiameter, rod2Diameter = 0, revoluteDiameter = linkDiameter, revoluteLength = Vectors.norm(pDW.upperFore_i - pDW.upperAft_i) + linkDiameter, cylinderLength = jointDiameter*0.125, cylinderDiameter = jointDiameter*0.125) annotation(
     Placement(transformation(origin = {-2, 18}, extent = {{20, -20}, {-20, 20}}, rotation = -90)));
-  
   // Lower wisbone
-  Modelica.Mechanics.MultiBody.Joints.Revolute lowerJoint_i(n = Vectors.normalize(pDW.lowerFore_i - pDW.lowerAft_i), cylinderLength = Vectors.norm(pDW.lowerFore_i - pDW.lowerAft_i) + linkDiameter, cylinderDiameter = linkDiameter, phi(displayUnit = "rad"), w(start = 0, fixed = true)) annotation(
+  Modelica.Mechanics.MultiBody.Joints.Revolute lowerJoint_i(n = Vectors.normalize(pDW.lowerFore_i - pDW.lowerAft_i), cylinderLength = Vectors.norm(pDW.lowerFore_i - pDW.lowerAft_i) + linkDiameter, cylinderDiameter = linkDiameter, phi(displayUnit = "rad")) annotation(
     Placement(transformation(origin = {-70, -60}, extent = {{-10, -10}, {10, 10}}, rotation = -0)));
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation lowerLink(r = pDW.lower_o - (pDW.lowerFore_i + pDW.lowerAft_i)/2, width = linkDiameter, height = linkDiameter, animation = false) annotation(
     Placement(transformation(origin = {-30, -60}, extent = {{-10, -10}, {10, 10}}, rotation = -0)));
-  
   // Steering interface
-  Modelica.Mechanics.MultiBody.Joints.Revolute steeringAxis(n = Vectors.normalize(pDW.upper_o - pDW.lower_o), cylinderLength = jointDiameter, cylinderDiameter = jointDiameter, phi(nominal = 0.1), w(start = 0, fixed = true)) annotation(
+  Modelica.Mechanics.MultiBody.Joints.Revolute steeringAxis(n = Vectors.normalize(pDW.upper_o - pDW.lower_o), cylinderLength = jointDiameter, cylinderDiameter = jointDiameter, phi(nominal = 0.1)) annotation(
     Placement(transformation(origin = {50, -60}, extent = {{10, -10}, {-10, 10}}, rotation = -180)));
-  
   // Visualization
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation upperFrameToFore(r = (pDW.upperFore_i - pDW.upperAft_i)/2) annotation(
     Placement(transformation(origin = {-70, 90}, extent = {{-10, -10}, {10, 10}})));

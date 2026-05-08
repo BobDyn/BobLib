@@ -7,16 +7,13 @@ partial model AxleDWBase
   import BobLib.Utilities.Math.Tensor;
   import Modelica.Math.Vectors.normalize;
   
-  import BobLib.Resources.VehicleRecord.Chassis.Suspension.AxleDWRecord;
+  import BobLib.Resources.VehicleRecord.Chassis.Suspension.AxleDW_DirectRecord;
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.Templates.PartialWheelRecord;
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.SteeringRack.RackAndPinionRecord;
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.DoubleWishbone.WishboneUprightLoopRecord;
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.AxleMassRecord;
   
-  parameter SIunits.Position[3] rodInboard "Vector to location where push/pullrod meets bellcrank or spring/damper, resolved in world frame";
-  
   // Record parameters
-  parameter AxleDWRecord pAxle;
   parameter PartialWheelRecord pLeftPartialWheel;
   parameter PartialWheelRecord pRightPartialWheel(R0 = pLeftPartialWheel.R0,
                                                   rimR0 = pLeftPartialWheel.rimR0,
@@ -25,7 +22,7 @@ partial model AxleDWBase
                                                   staticGamma = -pLeftPartialWheel.staticGamma);
   parameter RackAndPinionRecord pRack;
   parameter WishboneUprightLoopRecord pLeftDW;
-  parameter Boolean rodToLower = true "Whether push/pullrod mounts to lower wishbone. False if mounted to upper wishbone" annotation(Evaluate = true);
+  parameter Boolean rodToLower = pLeftDW.rodToLower annotation(Evaluate = true);
   parameter WishboneUprightLoopRecord pRightDW(upperFore_i = Vector.mirrorXZ(pLeftDW.upperFore_i),
                                                upperAft_i = Vector.mirrorXZ(pLeftDW.upperAft_i),
                                                lowerFore_i = Vector.mirrorXZ(pLeftDW.lowerFore_i),
@@ -33,7 +30,9 @@ partial model AxleDWBase
                                                upper_o = Vector.mirrorXZ(pLeftDW.upper_o),
                                                lower_o = Vector.mirrorXZ(pLeftDW.lower_o),
                                                tie_o = Vector.mirrorXZ(pLeftDW.tie_o),
-                                               wheelCenter = Vector.mirrorXZ(pLeftDW.wheelCenter));
+                                               wheelCenter = Vector.mirrorXZ(pLeftDW.wheelCenter),
+                                               rodToLower = pLeftDW.rodToLower,
+                                               rodMount = Vector.mirrorXZ(pLeftDW.rodMount));
   parameter AxleMassRecord pLeftAxleMass;
   parameter AxleMassRecord pRightAxleMass(unsprungMass(m = pLeftAxleMass.unsprungMass.m,
                                                        rCM = Vector.mirrorXZ(pLeftAxleMass.unsprungMass.rCM),
@@ -56,7 +55,7 @@ partial model AxleDWBase
   final parameter SIunits.Position[3] effectiveCenter = {pLeftDW.wheelCenter[1], 0, pLeftDW.wheelCenter[3]};
   
   // Wishbone to rod vector
-  final parameter SIunits.Position[3] toRodVector = if rodToLower then (pAxle.rodMount - pLeftDW.lower_o) else (pAxle.rodMount - pLeftDW.upper_o);
+  final parameter SIunits.Position[3] toRodVector = if rodToLower then (pLeftDW.rodMount - pLeftDW.lower_o) else (pLeftDW.rodMount - pLeftDW.upper_o);
 
 // Interface frames
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a axleFrame annotation(
@@ -197,11 +196,7 @@ protected
                                                             sphereDiameter = jointDiameter,
                                                             cylinderDiameter = linkDiameter)  annotation(
     Placement(transformation(origin = {170, 80}, extent = {{-10, -10}, {10, 10}})));
-public
-  BobLib.Vehicle.Chassis.Suspension.Linkages.Rod leftPushrod(jointDiameter = jointDiameter, kinematicConstraint = true, linkDiameter = linkDiameter, n1_a = normalize(pAxle.bellcrankPivotAxis), r_a = rodInboard, r_b = pAxle.rodMount) annotation(
-    Placement(transformation(origin = {-120, -30}, extent = {{20, -20}, {-20, 20}})));
-  BobLib.Vehicle.Chassis.Suspension.Linkages.Rod rightPushrod(jointDiameter = jointDiameter, kinematicConstraint = true, linkDiameter = linkDiameter, n1_a = normalize(Vector.mirrorXZ(pAxle.bellcrankPivotAxis)), r_a = Vector.mirrorXZ(rodInboard), r_b = Vector.mirrorXZ(pAxle.rodMount)) annotation(
-    Placement(transformation(origin = {120, -30}, extent = {{20, -20}, {-20, 20}}, rotation = -180)));
+
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation toLeftApex(height = linkDiameter, r = toRodVector, width = linkDiameter) annotation(
     Placement(transformation(origin = {-80, -20}, extent = {{0, 0}, {-20, 20}})));
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRightApex(height = linkDiameter, r = Vector.mirrorXZ(toRodVector), width = linkDiameter) annotation(
@@ -275,10 +270,6 @@ equation
     Line(points = {{-160, 80}, {-140, 80}, {-140, 50}, {-150, 50}}, color = {95, 95, 95}));
   connect(rightUnsprungBody.frame_a, rightTire.chassisFrame) annotation(
     Line(points = {{160, 80}, {140, 80}, {140, 50}, {152, 50}}, color = {95, 95, 95}));
-  connect(toLeftApex.frame_b, leftPushrod.frame_b) annotation(
-    Line(points = {{-100, -10}, {-150, -10}, {-150, -30}, {-140, -30}}, color = {95, 95, 95}));
-  connect(toRightApex.frame_b, rightPushrod.frame_b) annotation(
-    Line(points = {{100, -10}, {150, -10}, {150, -30}, {140, -30}}, color = {95, 95, 95}));
   annotation(
     Diagram(coordinateSystem(extent = {{-180, -60}, {180, 140}}, preserveAspectRatio = true, grid = {2, 2})),
     Icon(coordinateSystem(extent = {{-180, -20}, {180, 140}}, preserveAspectRatio = true, grid = {4, 2}), graphics = {Line(origin = {-25, 35}, points = {{-35, -15}, {25, 15}}), Line(origin = {-30, 65}, points = {{-30, -9}, {30, -15}}), Line(origin = {-82, 24}, points = {{22, -4}, {-24, 4}}, thickness = 5), Line(origin = {-82, 60}, points = {{22, -4}, {-22, 6}}, thickness = 5), Ellipse(origin = {-60, 20}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}), Ellipse(origin = {-60, 56}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}), Line(origin = {-30, 65}, points = {{90, -9}, {30, -15}}), Line(origin = {35, -5}, points = {{-35, 55}, {25, 25}}), Line(origin = {84, 16}, points = {{22, 12}, {-24, 4}}, thickness = 5, arrowSize = 2), Line(origin = {81, 61}, points = {{-21, -5}, {23, 5}}, thickness = 5), Ellipse(origin = {60, 56}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}), Ellipse(origin = {60, 20}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}), Line(origin = {-160, 4}, points = {{-20, -4}, {40, -4}, {40, 6}}), Line(origin = {160, 4}, points = {{20, -4}, {-40, -4}, {-40, 6}}), Line(origin = {-130, 50}, points = {{-10, 0}, {-50, 0}}, pattern = LinePattern.Dash, thickness = 1), Line(origin = {190, 50}, points = {{-10, 0}, {-50, 0}}, pattern = LinePattern.Dash, thickness = 1), Line(origin = {-80, 36}, points = {{20, -6}, {-22, 6}}, thickness = 5), Ellipse(origin = {-60, 30}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}), Rectangle(origin = {-120, 50}, fillColor = {71, 71, 71}, fillPattern = FillPattern.Solid, extent = {{-20, 40}, {20, -40}}, radius = 5), Line(origin = {40, 36}, points = {{20, -6}, {64, 6}}, thickness = 5), Ellipse(origin = {60, 30}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}), Rectangle(origin = {120, 50}, fillColor = {71, 71, 71}, fillPattern = FillPattern.Solid, extent = {{-20, 40}, {20, -40}}, radius = 5), Line(origin = {-25, 35}, points = {{-35, -15}, {25, 15}}), Line(origin = {35, -5}, points = {{-35, 55}, {25, 25}}), Line(origin = {-10, 30}, points = {{-36, 0}, {56, 0}}, thickness = 8), Line(origin = {-50, 30}, points = {{4, 0}, {-4, 0}}, color = {255, 0, 0}, thickness = 5), Line(origin = {50, 30}, points = {{4, 0}, {-4, 0}}, color = {255, 0, 0}, thickness = 5), Line(origin = {0, 46}, points = {{0, 4}, {0, -12}})}));

@@ -7,7 +7,7 @@ model TestMF52
   import Vehicle = BobLib.Resources.VehicleDefn;
 
   // Vehicle Definition
-  parameter Vehicle.OrionRecord car;
+  parameter Vehicle.DWBCStabar_DWBCStabarRecord car;
 
   // Operating Conditions
   parameter SIunits.Force Fz = 654;

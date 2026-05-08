@@ -9,7 +9,6 @@ model Rod
     Evaluate = false, Dialog(group = "Geometry"));
   parameter Modelica.Mechanics.MultiBody.Types.Axis n1_a = {1, 0, 0} "Axis 1 of universal joint resolved in frame_a (axis 2 is orthogonal to axis 1 and to rod)" annotation(
     Evaluate = false, Dialog(group = "Geometry"));
-  parameter Boolean lockSideA = false "Whether to lock spherical bearing at frame_a" annotation(Dialog(tab = "Advanced"));
   
   parameter Boolean kinematicConstraint = true annotation(
     Evaluate = false, Dialog(group = "Geometry"));
@@ -25,7 +24,7 @@ model Rod
     Placement(transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}})));
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b frame_b annotation(
     Placement(transformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}})));
-
+  
 protected
   // Kinematics
   Modelica.Mechanics.MultiBody.Joints.UniversalSpherical rod(n1_a = n1_a,
@@ -38,20 +37,13 @@ protected
                                                              kinematicConstraint = kinematicConstraint,
                                                              showUniversalAxes = show_universal_axes, computeRodLength = true)  annotation(
     Placement(transformation(extent = {{-20, -20}, {20, 20}})));
-
 equation
-  if lockSideA then
-    connect(rod.frame_a, rod.frame_ia);
-  else
-  
-  end if;
-  
   connect(rod.frame_a, frame_a) annotation(
     Line(points = {{-20, 0}, {-100, 0}}, color = {95, 95, 95}));
   connect(rod.frame_b, frame_b) annotation(
     Line(points = {{20, 0}, {100, 0}}, color = {95, 95, 95}));
-annotation(
+  annotation(
     Diagram(graphics),
-    Icon(graphics = {Line(origin = {-25.8, 3.2}, points = {{-54.2, -3.2}, {25.8, -3.2}, {105.8, -3.2}}, thickness = 5), Ellipse(origin = {-80, 0}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}), Ellipse(origin = {80, 0}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}), Line(origin = {-92, 0}, points = {{-8, 0}, {8, 0}, {8, 0}}), Line(origin = {92, 0}, points = {{8, 0}, {-8, 0}, {-8, 0}})}),
-  experiment(StartTime = 0, StopTime = 1, Tolerance = 1e-06, Interval = 0.002));
+    Icon(graphics = {Line(origin = {-25.8, 3.2}, points = {{-54.2, -3.2}, {25.8, -3.2}, {105.8, -3.2}}, thickness = 5), Ellipse(origin = {80, 0}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}), Line(origin = {-92, 0}, points = {{-8, 0}, {8, 0}, {8, 0}}), Line(origin = {92, 0}, points = {{8, 0}, {-8, 0}, {-8, 0}}), Ellipse(origin = {-80, 0}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}})}),
+    experiment(StartTime = 0, StopTime = 1, Tolerance = 1e-06, Interval = 0.002));
 end Rod;

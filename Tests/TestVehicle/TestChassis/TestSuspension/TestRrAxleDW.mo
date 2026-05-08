@@ -3,9 +3,9 @@ within BobLib.Tests.TestVehicle.TestChassis.TestSuspension;
 model TestRrAxleDW
   import Modelica.Constants.pi;
   import Modelica.Mechanics.MultiBody.Frames;
-  import BobLib.Resources.VehicleDefn.OrionRecord;
+  import BobLib.Resources.VehicleDefn.DWBCStabar_DWBCStabarRecord;
   import BobLib.Utilities.Math.Vector;
-  parameter OrionRecord pVehicle;
+  parameter DWBCStabar_DWBCStabarRecord pVehicle;
   inner parameter Real linkDiameter = 0.020;
   inner parameter Real jointDiameter = 0.030;
   parameter Real leftCPInit[3] = pVehicle.pRrDW.wheelCenter + Frames.resolve1(Frames.axesRotations({1, 2, 3}, {pVehicle.pRrPartialWheel.staticGamma*pi/180, 0, pVehicle.pRrPartialWheel.staticAlpha*pi/180}, {0, 0, 0}), {0, 0, -pVehicle.pRrPartialWheel.R0});

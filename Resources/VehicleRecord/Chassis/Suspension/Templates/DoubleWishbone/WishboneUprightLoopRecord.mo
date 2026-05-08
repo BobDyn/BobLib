@@ -28,5 +28,9 @@ record WishboneUprightLoopRecord
   parameter SIunits.Position wheelCenter[3] "Centroid of volume enclosing wheel, expressed in chassis frame" annotation(
     Evaluate = false,
     Dialog(group = "Geometry"));
+  parameter Boolean rodToLower "Whether push/pullrod mounts to lower wishbone. False if mounted to upper wishbone" annotation(Evaluate = true);
+  parameter SIunits.Position rodMount[3] "Vector from origin to push/pullrod wishbone mount, resolved in world frame" annotation(
+    Evaluate = false,
+    Dialog(group = "Geometry"));
   
 end WishboneUprightLoopRecord;

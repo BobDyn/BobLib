@@ -9,7 +9,7 @@ model ISO4138
   import BobLib.Utilities.Math.Vector;
   // Import vehicle records
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.Templates.PartialWheelRecord;
-  import BobLib.Resources.VehicleDefn.OrionRecord;
+  import BobLib.Resources.VehicleDefn.DWBCStabar_DWBCStabarRecord;
   // Imoport standard record
   import BobLib.Resources.StandardRecord.ISO4138Record;
   // Import visual record
@@ -18,7 +18,7 @@ model ISO4138
   inner parameter SIunits.Length linkDiameter = 0.020;
   inner parameter SIunits.Length jointDiameter = 0.030;
   
-  parameter OrionRecord pVehicle;
+  parameter DWBCStabar_DWBCStabarRecord pVehicle;
   
   parameter SIunits.Velocity testVel = 15;
   parameter SIunits.Length testRad = 20;
@@ -48,7 +48,7 @@ model ISO4138
     Placement(transformation(origin = {-130, -110}, extent = {{-10, -10}, {10, 10}})));
 
 // Vehicle
-  BobLib.Vehicle.VehicleDW_RWD_Lock vehicle(pVehicle = pVehicle)  annotation(
+  BobLib.Vehicle.Vehicle_DWBCStabar_DWBCStabar vehicle(pVehicle = pVehicle)  annotation(
     Placement(transformation(origin = {0, 20}, extent = {{-45, -50}, {45, 50}})));
 
 // Curvature controller

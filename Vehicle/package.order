@@ -3,4 +3,6 @@ Chassis
 Powertrain
 Electronics
 VehicleBase
-VehicleDW_RWD_Lock
+Vehicle_DWDirect_DWBCStabar
+Vehicle_DWBC_DWBCStabar
+Vehicle_DWBCStabar_DWBCStabar

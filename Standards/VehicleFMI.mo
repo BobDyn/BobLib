@@ -8,7 +8,7 @@ model VehicleFMI
   import Modelica.Mechanics.MultiBody.Frames;
   import BobLib.Utilities.Math.Vector;
   // Import vehicle records
-  import BobLib.Resources.VehicleDefn.OrionRecord;
+  import BobLib.Resources.VehicleDefn.DWBCStabar_DWBCStabarRecord;
   // Imoport standard record
   import BobLib.Resources.StandardRecord.VehicleFMIRecord;
   // Import visual record
@@ -17,7 +17,7 @@ model VehicleFMI
   inner parameter SIunits.Length linkDiameter = 0.020;
   inner parameter SIunits.Length jointDiameter = 0.030;
   
-  parameter OrionRecord pVehicle;
+  parameter DWBCStabar_DWBCStabarRecord pVehicle;
   
   parameter SIunits.Velocity initialVel = 10 "Initial velocity";
   
@@ -46,7 +46,7 @@ model VehicleFMI
     Placement(transformation(origin = {-130, -110}, extent = {{-10, -10}, {10, 10}})));
 
 // Vehicle
-  BobLib.Vehicle.VehicleDW_RWD_Lock vehicle(pVehicle = pVehicle)  annotation(
+  BobLib.Vehicle.Vehicle_DWBCStabar_DWBCStabar vehicle(pVehicle = pVehicle)  annotation(
     Placement(transformation(origin = {0, 20}, extent = {{-45, -50}, {45, 50}})));
   // Angle sensor
   Modelica.Mechanics.MultiBody.Sensors.RelativeAngles sprungAngles annotation(
