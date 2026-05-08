@@ -1,3 +1,9 @@
 DWDirect_DWDirectRecord
+DWDirect_DWBCRecord
+DWDirect_DWBCStabarRecord
+DWBC_DWDirectRecord
+DWBC_DWBCRecord
 DWBC_DWBCStabarRecord
+DWBCStabar_DWDirectRecord
+DWBCStabar_DWBCRecord
 DWBCStabar_DWBCStabarRecord

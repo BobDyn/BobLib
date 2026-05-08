@@ -1,6 +1,6 @@
 within BobLib.Resources.VehicleDefn;
 
-record DWBCStabar_DWBCStabarRecord
+record DWBCStabar_DWDirectRecord
 
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.MassRecord;
   
@@ -24,18 +24,11 @@ record DWBCStabar_DWBCStabarRecord
     springFreeLength = 0.200,
     damperTable = [-1, -850; 0, 0; 1, 850]);
 
-  parameter Axle.AxleDW_BC_StabarRecord pRrAxleDW(
-    bellcrankPivot = {-1.39886851, 0.29230126, 0.1016},
-    bellcrankPivotAxis = {0.8879624105984821, 0.3027085168586189, 0.3462518031510997},
-    bellcrankRodPickup = {-1.41267566, 0.35197317, 0.08484064},
-    bellcrankShockPickup = {-1.43801295, 0.36137285, 0.14160048},
-    bellcrankStabarPickup = {-1.41346984, 0.31057564, 0.12306883},
-    rodPickup = 1,
-    shockPickup = 2,
-    stabarPickup = 3,
-    shockMount = {-1.50192144, 0.28884688, 0.36889916},
-    springTable = [0, 0; 1, 43781.70875],
-    springFreeLength = 0.265,
+  parameter Axle.AxleDW_DirectRecord pRrAxleDW(
+    rodToShock = {-1.47732043, 0.40316828, 0.29406656},
+    shockMount = {-1.42763653, 0.29016283, 0.40877008},
+    springTable = [0, 0; 1, 26269.02525],
+    springFreeLength = 0.415,
     damperTable = [-1, -1300; 0, 0; 1, 1300]);
 
   parameter Stabar.StabarRecord pFrStabar(
@@ -91,8 +84,8 @@ record DWBCStabar_DWBCStabarRecord
     lower_o = {-1.55448000, 0.57658000, 0.11607800},
     tie_o = {-1.45796000, 0.58239660, 0.21435060},
     wheelCenter = {-1.5494, 0.60611077, 0.199898},
-    rodToLower = false,
-    rodMount = {-1.53509479, 0.50330883, 0.26648017});
+    rodToLower = true,
+    rodMount = {-1.54445540, 0.55586601, 0.13907432});
 
   parameter Axle.Templates.AxleMassRecord pFrAxleMass(
     unsprungMass = MassRecord(m = 7.8160579,
@@ -288,4 +281,4 @@ record DWBCStabar_DWBCStabarRecord
       RVY4=18.2625, RVY5=2.72152, RVY6=-10.5225,
       LS=1.0, LVYKA=1.0));
 
-end DWBCStabar_DWBCStabarRecord;
+end DWBCStabar_DWDirectRecord;

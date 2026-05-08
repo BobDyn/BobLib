@@ -24,7 +24,7 @@ model TestRrAxleDW
   Modelica.Blocks.Sources.Ramp rightJounceRamp(duration = 1, height = -1*0.0254, startTime = 0) annotation(
     Placement(transformation(origin = {110, 0}, extent = {{10, -10}, {-10, 10}}, rotation = -0)));
   // Front axle
-  BobLib.Vehicle.Chassis.Suspension.RrAxleDW_BC_ARB rrAxleDW(pAxle = pVehicle.pRrAxleDW, pRack = pVehicle.pRrRack, pStabar = pVehicle.pRrStabar, pLeftPartialWheel = pVehicle.pRrPartialWheel, pLeftDW = pVehicle.pRrDW, pLeftAxleMass = pVehicle.pRrAxleMass, redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.BaseTire leftTire(redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.SlipModel.NoSlip slipModel), redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.BaseTire rightTire(redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.SlipModel.NoSlip slipModel)) annotation(
+  BobLib.Vehicle.Chassis.Suspension.RrAxleDW_BC_Stabar rrAxleDW(pAxle = pVehicle.pRrAxleDW, pRack = pVehicle.pRrRack, pStabar = pVehicle.pRrStabar, pLeftPartialWheel = pVehicle.pRrPartialWheel, pLeftDW = pVehicle.pRrDW, pLeftAxleMass = pVehicle.pRrAxleMass, redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.BaseTire leftTire(redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.SlipModel.NoSlip slipModel), redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.BaseTire rightTire(redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.SlipModel.NoSlip slipModel)) annotation(
     Placement(transformation(origin = {2.72478e-07, 30.4444}, extent = {{-36, -14}, {36, 14}})));
 protected
   // Left jounce input

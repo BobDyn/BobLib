@@ -3,4 +3,12 @@ Chassis
 Powertrain
 Electronics
 VehicleBase
+Vehicle_DWDirect_DWDirect
+Vehicle_DWDirect_DWBC
+Vehicle_DWDirect_DWBCStabar
+Vehicle_DWBC_DWDirect
+Vehicle_DWBC_DWBC
+Vehicle_DWBC_DWBCStabar
+Vehicle_DWBCStabar_DWDirect
+Vehicle_DWBCStabar_DWBC
 Vehicle_DWBCStabar_DWBCStabar

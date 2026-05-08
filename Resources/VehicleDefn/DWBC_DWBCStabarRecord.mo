@@ -10,7 +10,6 @@ record DWBC_DWBCStabarRecord
   import Stabar = BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Stabar;
   import DW = BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.DoubleWishbone;
   import Axle = BobLib.Resources.VehicleRecord.Chassis.Suspension;
-  
   parameter Axle.AxleDW_BCRecord pFrAxleDW(
     bellcrankPivot = {-0.014493326106, 0.29230126, 0.1016},
     bellcrankPivotAxis = {1, 0, 0},
@@ -36,39 +35,39 @@ record DWBC_DWBCStabarRecord
     springTable = [0, 0; 1, 43781.70875],
     springFreeLength = 0.265,
     damperTable = [-1, -1300; 0, 0; 1, 1300]);
-  
+
   parameter Stabar.StabarRecord pFrStabar(
     leftArmEnd = {-0.03682914, 0.2667, 0.11597939},
     leftBarEnd = {-0.10664664, 0.2667, 0.11811},
     barRate = 1);
-  
+
   parameter Stabar.StabarRecord pRrStabar(
     leftArmEnd = {-1.43001283, 0.3032125, 0.4054766},
     leftBarEnd = {-1.3925183, 0.3032125, 0.41224196},
     barRate = 1);
-    
+
   parameter Wheel.Templates.PartialWheelRecord pFrPartialWheel(
     R0 = 0.2045,
     rimR0 = 0.2045*0.625,
     rimWidth = 0.2045*0.625*1.4,
     staticAlpha = 0,  // in DEG
-    staticGamma = 0); // in DEG
-  
+    staticGamma = 0);
+
   parameter Wheel.Templates.PartialWheelRecord pRrPartialWheel(
     R0 = 0.2045,
     rimR0 = 0.2045*0.625,
     rimWidth = 0.2045*0.625*1.4,
     staticAlpha = 0,  // in DEG
-    staticGamma = 0); // in DEG
-  
+    staticGamma = 0);
+
   parameter Rack.RackAndPinionRecord pFrRack(
     leftPickup = {0.05715, 0.2260092, 0.1137158},
     cFactor = 0.0889);
-  
+
   parameter Rack.RackAndPinionRecord pRrRack(
     leftPickup = {-1.37634980, 0.28971240, 0.17000220},
-    cFactor = 0.0889); // Keep nonzero for un-actuated rear
-  
+    cFactor = 0.0889);
+
   parameter DW.WishboneUprightLoopRecord pFrDW(
     upperFore_i = {0.1016, 0.237744, 0.2143252},
     upperAft_i = {-0.0680974, 0.2356358, 0.215138},
@@ -80,7 +79,7 @@ record DWBC_DWBCStabarRecord
     wheelCenter = {0, 0.606110767456, 0.199898},
     rodToLower = false,
     rodMount = {0.006762552642, 0.50330883, 0.26648017});
-  
+
   parameter DW.WishboneUprightLoopRecord pRrDW(
     upperFore_i = {-1.27914400, 0.29723080, 0.24823420},
     upperAft_i = {-1.49938740, 0.28384500, 0.24343360},
@@ -92,7 +91,7 @@ record DWBC_DWBCStabarRecord
     wheelCenter = {-1.5494, 0.60611077, 0.199898},
     rodToLower = false,
     rodMount = {-1.53509479, 0.50330883, 0.26648017});
-  
+
   parameter Axle.Templates.AxleMassRecord pFrAxleMass(
     unsprungMass = MassRecord(m = 7.8160579,
                               rCM = {-0.0061298, 0.60174377, 0.19797979},
@@ -106,7 +105,7 @@ record DWBC_DWBCStabarRecord
     tieMass = MassRecord(m = 0.13459415,
                          rCM = {0.05709287, 0.34616483, 0.1281302},
                          inertia = {{0.00178949, -0.00000083, -0.0000001}, {-0.00000083, 0.00002994, 0.00021109}, {-0.0000001, 0.000211, 0.001764}}));
-  
+
   parameter Axle.Templates.AxleMassRecord pRrAxleMass(
     unsprungMass = MassRecord(m = 7.35802418,
                               rCM = {-1.54948701, 0.60559861, 0.20104023},
@@ -120,19 +119,19 @@ record DWBC_DWBCStabarRecord
     tieMass = MassRecord(m = 0.13293714,
                          rCM = {-1.40704567, 0.39979876, 0.18668273},
                          inertia = {{0.00146339, -0.00039766, -0.00006025}, {-0.00039766, 0.00014812, 0.0002161}, {-0.00006025, 0.0002161, 0.00154153}}));
-  
+
   parameter MassRecord pSprungMass(m = 200,
                                    rCM = {-61 / 2 * 0.0254, 0, 11 * 0.0254},
                                    inertia = {{30, 1, 1}, {1, 40, 1}, {1, 1, 50}});
-  
+
   parameter Wheel.Wheel1DOF_YRecord pFrTire1DOF_YParams(wheelJ = 0.02);
   parameter Wheel.Wheel1DOF_ZRecord pFrTire1DOF_ZParams(wheelC = 98947,
                                                         wheelD = 115.844);
-  
+
   parameter Wheel.Wheel1DOF_YRecord pRrTire1DOF_YParams(wheelJ = 0.02);
   parameter Wheel.Wheel1DOF_ZRecord pRrTire1DOF_ZParams(wheelC = 98947,
                                                         wheelD = 115.844);
-  
+
   parameter TireModel.MF52Record pFrTireModel(
     // Setup
     setup = TireModel.SetupRecord(FNOMIN = 654.0, UNLOADED_RADIUS = pFrPartialWheel.R0),
@@ -209,7 +208,7 @@ record DWBC_DWBCStabarRecord
       RVY1=4.78297e-06, RVY2=0.0127967, RVY3=-0.498917,
       RVY4=18.2625, RVY5=2.72152, RVY6=-10.5225,
       LS=1.0, LVYKA=1.0));
-  
+
   parameter TireModel.MF52Record pRrTireModel(
     // Setup
     setup = TireModel.SetupRecord(FNOMIN = 654.0, UNLOADED_RADIUS = pFrPartialWheel.R0),

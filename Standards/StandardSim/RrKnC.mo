@@ -23,7 +23,7 @@ model RrKnC
   AxleDW_BC_ARB_VisualRecord vis;
   
   // Rear axle
-  BobLib.Vehicle.Chassis.Suspension.RrAxleDW_BC_ARB rrAxleDW(pAxle = AxleDWRecord(bellcrankPivot = pVehicle.pRrAxleDW.bellcrankPivot,
+  BobLib.Vehicle.Chassis.Suspension.RrAxleDW_BC_Stabar rrAxleDW(pAxle = AxleDWRecord(bellcrankPivot = pVehicle.pRrAxleDW.bellcrankPivot,
                                                                                   bellcrankPivotAxis = pVehicle.pRrAxleDW.bellcrankPivotAxis,
                                                                                   bellcrankPickup1 = pVehicle.pRrAxleDW.bellcrankPickup1,
                                                                                   bellcrankPickup2 = pVehicle.pRrAxleDW.bellcrankPickup2,

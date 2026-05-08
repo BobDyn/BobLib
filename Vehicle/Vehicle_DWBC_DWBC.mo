@@ -1,18 +1,17 @@
 within BobLib.Vehicle;
 
-model Vehicle_DWBCStabar_DWBCStabar
+model Vehicle_DWBC_DWBC
   import BobLib.Vehicle.Chassis.Suspension.Templates.Tire;
-  import BobLib.Resources.VehicleDefn.DWBCStabar_DWBCStabarRecord;
+  import BobLib.Resources.VehicleDefn.DWBC_DWBCRecord;
 
   // Record parameters
-  parameter DWBCStabar_DWBCStabarRecord pVehicle;
+  parameter DWBC_DWBCRecord pVehicle;
 
   extends BobLib.Vehicle.VehicleBase(
     redeclare BobLib.Vehicle.Chassis.Chassis_LockRrSteer chassis(
-          redeclare BobLib.Vehicle.Chassis.Suspension.FrAxleDW_BC_Stabar frAxleDW(
+          redeclare BobLib.Vehicle.Chassis.Suspension.FrAxleDW_BC frAxleDW(
     pAxle = pVehicle.pFrAxleDW,
     pRack = pVehicle.pFrRack,
-    pStabar = pVehicle.pFrStabar,
     pLeftPartialWheel = pVehicle.pFrPartialWheel,
     pLeftDW = pVehicle.pFrDW,
     pLeftAxleMass = pVehicle.pFrAxleMass,
@@ -30,10 +29,9 @@ model Vehicle_DWBCStabar_DWBCStabar
         partialWheelParams = pVehicle.pFrPartialWheel,
         wheel1DOF_YParams = pVehicle.pFrTire1DOF_YParams),
       redeclare Tire.MF52.SlipModel.TransientSlip slipModel)),
-          redeclare BobLib.Vehicle.Chassis.Suspension.RrAxleDW_BC_Stabar rrAxleDW(
+          redeclare BobLib.Vehicle.Chassis.Suspension.RrAxleDW_BC rrAxleDW(
     pAxle = pVehicle.pRrAxleDW,
     pRack = pVehicle.pRrRack,
-    pStabar = pVehicle.pRrStabar,
     pLeftPartialWheel = pVehicle.pRrPartialWheel,
     pLeftDW = pVehicle.pRrDW,
     pLeftAxleMass = pVehicle.pRrAxleMass,
@@ -101,4 +99,4 @@ annotation(
     Line(origin = {-80, -159}, points = {{80, -41}, {80, -31}, {-80, -31}, {-80, 39}}, color = {0, 0, 255}),
     Line(origin = {71.18, -171.82}, points = {{-71.1799, -18.1799}, {88.8201, -18.1799}, {88.8201, 51.8201}}, color = {0, 0, 255})
   }));
-end Vehicle_DWBCStabar_DWBCStabar;
+end Vehicle_DWBC_DWBC;
