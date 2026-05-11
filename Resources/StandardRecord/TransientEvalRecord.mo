@@ -1,6 +1,6 @@
 within BobLib.Resources.StandardRecord;
 
-record ISO7401Record
+record TransientEvalRecord
   import Modelica.SIunits;
   
   // Inputs
@@ -20,4 +20,4 @@ record ISO7401Record
   Modelica.SIunits.Angle roll "Vehicle roll angle";
   Modelica.SIunits.Torque handwheelTorque "Steering wheel torque";
   
-end ISO7401Record;
+end TransientEvalRecord;

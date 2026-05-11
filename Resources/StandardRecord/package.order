@@ -1,4 +1,4 @@
 VehicleFMIRecord
 SteadyStateEvalRecord
-ISO7401Record
+TransientEvalRecord
 KnCRecord

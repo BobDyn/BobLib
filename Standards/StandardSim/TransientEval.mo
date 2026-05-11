@@ -1,6 +1,6 @@
 within BobLib.Standards.StandardSim;
 
-model ISO7401
+model TransientEval
   import Modelica.SIunits;
   import Modelica.Constants.pi;
   
@@ -13,7 +13,7 @@ model ISO7401
   import BobLib.Resources.VehicleDefn.DWBCStabar_DWBCStabarRecord;
   
   // Import standard record
-  import BobLib.Resources.StandardRecord.ISO7401Record;
+  import BobLib.Resources.StandardRecord.TransientEvalRecord;
 
   // Import visual record
   import BobLib.Resources.VisualRecord.Chassis.ChassisVisualRecord;
@@ -43,7 +43,7 @@ model ISO7401
   Real speedCG;
   
   // Standard record
-  ISO7401Record iso;
+  TransientEvalRecord iso;
 
   // Visual record
   ChassisVisualRecord vis;
@@ -314,4 +314,4 @@ equation
     Icon(coordinateSystem(extent = {{-140, -120}, {140, 120}})),
     experiment(StartTime = 0, StopTime = 5, Tolerance = 1e-06, Interval = 0.002),
     __OpenModelica_commandLineOptions = "--matchingAlgorithm=PFPlusExt --indexReductionMethod=dynamicStateSelection -d=initialization,NLSanalyticJacobian --maxSizeLinearTearing=5000");
-end ISO7401;
+end TransientEval;
