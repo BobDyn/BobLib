@@ -2,12 +2,15 @@ within BobLib.Vehicle;
 
 model Vehicle_DWBCStabar_DWDirect
   import BobLib.Vehicle.Chassis.Suspension.Templates.Tire;
+  import Aero = BobLib.Resources.VehicleRecord.Aero;
   import BobLib.Resources.VehicleDefn.DWBCStabar_DWDirectRecord;
 
   // Record parameters
+  parameter Aero.CFDAeroMapRecord pAero = pVehicle.pAero;
   parameter DWBCStabar_DWDirectRecord pVehicle;
 
   extends BobLib.Vehicle.VehicleBase(
+    pAero = pAero,
     redeclare BobLib.Vehicle.Chassis.Chassis_LockRrSteer chassis(
           redeclare BobLib.Vehicle.Chassis.Suspension.FrAxleDW_BC_Stabar frAxleDW(
     pAxle = pVehicle.pFrAxleDW,

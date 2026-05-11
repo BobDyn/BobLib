@@ -67,13 +67,10 @@ equation
 
   connect(rackAndPinion.pinionFlange, steerFlange) annotation(
     Line(points = {{0, 114}, {0, 140}}));
-
-  connect(toLeftApex.frame_a, leftShockLinkage.frame_a) annotation(
-    Line(points = {{-80, -10}, {-50, -10}, {-50, -30}}, color = {95, 95, 95}));
-
-  connect(toRightApex.frame_a, rightShockLinkage.frame_a) annotation(
-    Line(points = {{80, -10}, {50, -10}, {50, -30}}, color = {95, 95, 95}));
-
+  connect(toLeftApex.frame_b, leftShockLinkage.frame_a) annotation(
+    Line(points = {{-100, -10}, {-110, -10}, {-110, -30}, {-50, -30}}, color = {95, 95, 95}));
+  connect(toRightApex.frame_b, rightShockLinkage.frame_a) annotation(
+    Line(points = {{100, -10}, {110, -10}, {110, -30}, {50, -30}}, color = {95, 95, 95}));
   annotation(
     experiment(StartTime = 0, StopTime = 1, Tolerance = 1e-06, Interval = 0.002),
     Diagram(coordinateSystem(extent = {{-180, -140}, {180, 140}}, preserveAspectRatio = true), graphics),

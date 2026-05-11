@@ -322,6 +322,7 @@ def render_vehicle_model(variant: VehicleVariant) -> str:
           parameter {variant.record_name} pVehicle;
 
           extends BobLib.Vehicle.VehicleBase(
+            pAero = pVehicle.pAero,
             redeclare BobLib.Vehicle.Chassis.Chassis_LockRrSteer chassis(
         {indent(fr_axle, 6)},
         {indent(rr_axle, 6)},
