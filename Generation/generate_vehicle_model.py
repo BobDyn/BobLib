@@ -462,11 +462,11 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
             annotation(Evaluate = false, Dialog(enable = closedLoopVelocity));
 
           parameter Real radErrorTol = 0.002
-            "ISO4138 radius error tolerance"
+            "SteadyStateEval radius error tolerance"
             annotation(Evaluate = false, Dialog(enable = closedLoopRadius));
 
           parameter Real der_radErrorTol = 0.5
-            "ISO4138 radius error derivative tolerance"
+            "SteadyStateEval radius error derivative tolerance"
             annotation(Evaluate = false, Dialog(enable = closedLoopRadius));
 
           parameter Real der_yawVelTol = 0.01;
@@ -655,12 +655,12 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
           curvature =
             vehicle.chassis.spaceFrame.sprungBody.w_a[3] / max(speed, 0.1);
 
-          // ISO4138-style radius error
+          // SteadyStateEval-style radius error
           radError =
             abs(speed / max(abs(vehicle.chassis.spaceFrame.sprungBody.w_a[3]), 0.1)
             - abs(targetRad));
 
-          // ISO4138-style QSS detection, only active for useMode == 0
+          // SteadyStateEval-style QSS detection, only active for useMode == 0
           when useMode == 0
              and abs(radError) < radErrorTol
              and abs(der(radError)) < der_radErrorTol
@@ -692,8 +692,8 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
             terminate("Reached ramp-steer steady-state: der(yawVel) below tolerance (held 0.1s)");
           end when;
 
-          // ISO4138 curvature controller for useMode == 0.
-          // Intentionally matches old ISO4138: ramp from t = 1.0 to t = 1.2.
+          // SteadyStateEval curvature controller for useMode == 0.
+          // Intentionally matches old SteadyStateEval: ramp from t = 1.0 to t = 1.2.
           curvError =
             if useMode == 0 then
               smooth(1, min(1, max(0, (time - 1)/0.2))) *

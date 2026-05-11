@@ -1,4 +1,4 @@
-// export_ISO4138_FMU.mos
+// export_SteadyStateEval_FMU.mos
 
 OpenModelica.Scripting.setCommandLineOptions("--simCodeTarget=C");
 OpenModelica.Scripting.setCommandLineOptions("--maxSizeLinearTearing=5000");

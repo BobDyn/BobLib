@@ -19,7 +19,7 @@ BobLib focuses on:
 
 > ⚠️ **Current Status:**
 > The **chassis subsystem** is the most mature component.
-> Vehicle tests (ISO4138, K&C) are functional. Other areas are under active development.
+> Vehicle tests (SteadyStateEval, K&C) are functional. Other areas are under active development.
 
 ---
 
@@ -53,7 +53,7 @@ In OMEdit:
 
 Good entry points:
 
-* `Standards.ISO4138`
+* `Standards.SteadyStateEval`
 * `Standards.FrKnC`
 * `Standards.RrKnC`
 
@@ -114,7 +114,7 @@ These enable clean separation between:
 
 Implements standardized vehicle tests:
 
-* `ISO4138` (steady-state cornering)
+* `SteadyStateEval` (steady-state cornering)
 * `KnC` (Kinematics & Compliance)
 
 Includes:
