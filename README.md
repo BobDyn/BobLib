@@ -1,6 +1,6 @@
 # BobLib
 
-**Note:** this repo should not be regarded as a standard library until it implements VehicleInterfaces and the latest version of the Modelica Standard Library. Current interfaces constitute a one-off layer targeted at BobDyn consumption.
+**Note:** this repo should not be regarded as a standard library until it implements [VehicleInterfaces](https://github.com/modelica/VehicleInterfaces/) and the latest version of the [Modelica Standard Library](https://github.com/modelica/ModelicaStandardLibrary). Current interfaces constitute a one-off layer targeted at BobDyn consumption.
 
 This library plans to move forward with accepted open-source standards, making BobLib interchangeable with existing Modelica infrastructure.
 
