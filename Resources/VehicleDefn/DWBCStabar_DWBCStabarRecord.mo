@@ -68,17 +68,17 @@ record DWBCStabar_DWBCStabarRecord
       wheelD = 115.844);
 
   parameter TireModel.MF52Record pFrTireModel(
-      fxCombined = TireModel.CombinedSlip.FxCombinedRecord(RBX1 = 8.151136, RBX2 = 5.388063, RCX1 = 1.122399, REX1 = 0.052014, REX2 = -0.89845, RHX1 = 0.0, RVX1 = 0.0, RVX2 = 0.0),
+      fxCombined = TireModel.CombinedSlip.FxCombinedRecord(RBX1 = 8.151136, RBX2 = 5.388063, RCX1 = 1.122399, REX1 = 0.052014, REX2 = -0.89845, RHX1 = 0.0),
       fxPure = TireModel.PureSlip.FxPureRecord(LFZO = 1.0, LGAX = 1.0, PCX1 = 1.53041, PDX1 = 2.597991, PDX2 = -0.618826, PDX3 = 11.156379, PKX1 = 55.079922, PKX2 = -1.7e-05, PKX3 = -0.16185, PHX1 = 0.0, PHX2 = 0.0, PVX1 = 0.0, PVX2 = 0.0, PEX1 = 0.0, PEX2 = 0.141806, PEX3 = -1.93495, PEX4 = 0.044722, LCX = 1.0, LMUX = 1.0, LKX = 1.0, LHX = 1.0, LVX = 1.0, LEX = 1.0, LXAL = 1.0),
       fyCombined = TireModel.CombinedSlip.FyCombinedRecord(RBY1 = 14.628, RBY2 = 10.4, RBY3 = 0.0, RCY1 = 1.044, REY1 = 0.048, REY2 = 0.025, RHY1 = 0.0, RHY2 = 0.0, RVY1 = 0.0, RVY2 = 0.0, RVY3 = 0.0, RVY4 = 0.0, RVY5 = 0.0, RVY6 = 0.0),
       fyPure = TireModel.PureSlip.FyPureRecord(LFZO = 1.0, LGAY = 1.0, PCY1 = 1.53041, PDY1 = -2.40275, PDY2 = 0.343535, PDY3 = 3.89743, PKY1 = -53.2421, PKY2 = 2.38205, PKY3 = 1.36502, PHY1 = 0.0, PHY2 = 0.0, PHY3 = 0.0, PVY1 = 0.0, PVY2 = 0.0, PVY3 = 0.0, PVY4 = 0.0, PEY1 = 0.0, PEY2 = -0.280762, PEY3 = 0.70403, PEY4 = -0.478297, LCY = 1.0, LMUY = 1.0, LEY = 1.0, LKY = 1.0, LHY = 1.0, LVY = 1.0, LYKA = 1.0, LVYKA = 1.0),
       mxCombined = TireModel.CombinedSlip.MxCombinedRecord(),
       mxPure = TireModel.PureSlip.MxPureRecord(QSX1 = -0.0130807, QSX2 = 0.0, QSX3 = 0.0587803, LMX = 1.0, LVMX = 1.0),
       myCombined = TireModel.CombinedSlip.MyCombinedRecord(),
-      myPure = TireModel.PureSlip.MyPureRecord(QSY1 = 0.0, QSY2 = 0.0, QSY3 = 0.0, QSY4 = 0.0, Vref = 11.176, LMY = 1.0),
+      myPure = TireModel.PureSlip.MyPureRecord(QSY1 = 0.0, QSY2 = 0.0, QSY3 = 0.0, QSY4 = 0.0, Vref = 12.0, LMY = 1.0),
       mzCombined = TireModel.CombinedSlip.MzCombinedRecord(SSZ1 = 0.0, SSZ2 = 0.0, SSZ3 = 0.0, SSZ4 = 0.0, RVY1 = 0.0, RVY2 = 0.0, RVY3 = 0.0, RVY4 = 0.0, RVY5 = 0.0, RVY6 = 0.0, LS = 1.0, LVYKA = 1.0),
       mzPure = TireModel.PureSlip.MzPureRecord(QBZ1 = 8.22843, QBZ2 = 2.98676, QBZ3 = -3.57739, QBZ4 = -0.429117, QBZ5 = 0.433125, QCZ1 = 1.41359, QDZ1 = 0.152526, QDZ2 = -0.0381101, QDZ3 = 0.387762, QDZ4 = -3.95699, QEZ1 = -0.239731, QEZ2 = 1.29253, QEZ3 = -1.21298, QEZ4 = 0.0, QEZ5 = 0.0, QHZ1 = 0.0, QHZ2 = 0.0, QHZ3 = 0.0, QHZ4 = 0.0, QBZ9 = 0.0, QBZ10 = -1.72926, QDZ6 = 0.00604966, QDZ7 = -0.000116241, QDZ8 = -2.33359, QDZ9 = -0.0379755, LTR = 1.0, LRES = 1.0, LKY = 1.0, LMUY = 1.0, LGAZ = 1.0),
-      setup = TireModel.SetupRecord(FNOMIN = 654.0, UNLOADED_RADIUS = pFrPartialWheel.R0));
+      setup = TireModel.SetupRecord(FNOMIN = 650.0, UNLOADED_RADIUS = pFrPartialWheel.R0));
 
   parameter Axle.AxleDW_BC_StabarRecord pRrAxleDW(
       bellcrankPivot = {-1.39886851, 0.29230126, 0.1016},
@@ -136,17 +136,17 @@ record DWBCStabar_DWBCStabarRecord
       wheelD = 115.844);
 
   parameter TireModel.MF52Record pRrTireModel(
-      fxCombined = TireModel.CombinedSlip.FxCombinedRecord(RBX1 = 8.151136, RBX2 = 5.388063, RCX1 = 1.122399, REX1 = 0.052014, REX2 = -0.89845, RHX1 = 0.0, RVX1 = 0.0, RVX2 = 0.0),
+      fxCombined = TireModel.CombinedSlip.FxCombinedRecord(RBX1 = 8.151136, RBX2 = 5.388063, RCX1 = 1.122399, REX1 = 0.052014, REX2 = -0.89845, RHX1 = 0.0),
       fxPure = TireModel.PureSlip.FxPureRecord(LFZO = 1.0, LGAX = 1.0, PCX1 = 1.53041, PDX1 = 2.597991, PDX2 = -0.618826, PDX3 = 11.156379, PKX1 = 55.079922, PKX2 = -1.7e-05, PKX3 = -0.16185, PHX1 = 0.0, PHX2 = 0.0, PVX1 = 0.0, PVX2 = 0.0, PEX1 = 0.0, PEX2 = 0.141806, PEX3 = -1.93495, PEX4 = 0.044722, LCX = 1.0, LMUX = 1.0, LKX = 1.0, LHX = 1.0, LVX = 1.0, LEX = 1.0, LXAL = 1.0),
       fyCombined = TireModel.CombinedSlip.FyCombinedRecord(RBY1 = 14.628, RBY2 = 10.4, RBY3 = 0.0, RCY1 = 1.044, REY1 = 0.048, REY2 = 0.025, RHY1 = 0.0, RHY2 = 0.0, RVY1 = 0.0, RVY2 = 0.0, RVY3 = 0.0, RVY4 = 0.0, RVY5 = 0.0, RVY6 = 0.0),
       fyPure = TireModel.PureSlip.FyPureRecord(LFZO = 1.0, LGAY = 1.0, PCY1 = 1.53041, PDY1 = -2.40275, PDY2 = 0.343535, PDY3 = 3.89743, PKY1 = -53.2421, PKY2 = 2.38205, PKY3 = 1.36502, PHY1 = 0.0, PHY2 = 0.0, PHY3 = 0.0, PVY1 = 0.0, PVY2 = 0.0, PVY3 = 0.0, PVY4 = 0.0, PEY1 = 0.0, PEY2 = -0.280762, PEY3 = 0.70403, PEY4 = -0.478297, LCY = 1.0, LMUY = 1.0, LEY = 1.0, LKY = 1.0, LHY = 1.0, LVY = 1.0, LYKA = 1.0, LVYKA = 1.0),
       mxCombined = TireModel.CombinedSlip.MxCombinedRecord(),
       mxPure = TireModel.PureSlip.MxPureRecord(QSX1 = -0.0130807, QSX2 = 0.0, QSX3 = 0.0587803, LMX = 1.0, LVMX = 1.0),
       myCombined = TireModel.CombinedSlip.MyCombinedRecord(),
-      myPure = TireModel.PureSlip.MyPureRecord(QSY1 = 0.0, QSY2 = 0.0, QSY3 = 0.0, QSY4 = 0.0, Vref = 11.176, LMY = 1.0),
+      myPure = TireModel.PureSlip.MyPureRecord(QSY1 = 0.0, QSY2 = 0.0, QSY3 = 0.0, QSY4 = 0.0, Vref = 12.0, LMY = 1.0),
       mzCombined = TireModel.CombinedSlip.MzCombinedRecord(SSZ1 = 0.0, SSZ2 = 0.0, SSZ3 = 0.0, SSZ4 = 0.0, RVY1 = 0.0, RVY2 = 0.0, RVY3 = 0.0, RVY4 = 0.0, RVY5 = 0.0, RVY6 = 0.0, LS = 1.0, LVYKA = 1.0),
       mzPure = TireModel.PureSlip.MzPureRecord(QBZ1 = 8.22843, QBZ2 = 2.98676, QBZ3 = -3.57739, QBZ4 = -0.429117, QBZ5 = 0.433125, QCZ1 = 1.41359, QDZ1 = 0.152526, QDZ2 = -0.0381101, QDZ3 = 0.387762, QDZ4 = -3.95699, QEZ1 = -0.239731, QEZ2 = 1.29253, QEZ3 = -1.21298, QEZ4 = 0.0, QEZ5 = 0.0, QHZ1 = 0.0, QHZ2 = 0.0, QHZ3 = 0.0, QHZ4 = 0.0, QBZ9 = 0.0, QBZ10 = -1.72926, QDZ6 = 0.00604966, QDZ7 = -0.000116241, QDZ8 = -2.33359, QDZ9 = -0.0379755, LTR = 1.0, LRES = 1.0, LKY = 1.0, LMUY = 1.0, LGAZ = 1.0),
-      setup = TireModel.SetupRecord(FNOMIN = 654.0, UNLOADED_RADIUS = pRrPartialWheel.R0));
+      setup = TireModel.SetupRecord(FNOMIN = 650.0, UNLOADED_RADIUS = pRrPartialWheel.R0));
 
   parameter MassRecord pSprungMass(
       m = 200,

@@ -61,7 +61,7 @@ record DWBC_DWBCRecord
       wheelD = 115.844);
 
   parameter TireModel.MF52Record pFrTireModel(
-      fxCombined = TireModel.CombinedSlip.FxCombinedRecord(RBX1 = 8.151136, RBX2 = 5.388063, RCX1 = 1.122399, REX1 = 0.052014, REX2 = -0.89845, RHX1 = 0.0, RVX1 = 0.0, RVX2 = 0.0),
+      fxCombined = TireModel.CombinedSlip.FxCombinedRecord(RBX1 = 8.151136, RBX2 = 5.388063, RCX1 = 1.122399, REX1 = 0.052014, REX2 = -0.89845, RHX1 = 0.0),
       fxPure = TireModel.PureSlip.FxPureRecord(LFZO = 1.0, LGAX = 1.0, PCX1 = 1.53041, PDX1 = 2.597991, PDX2 = -0.618826, PDX3 = 11.156379, PKX1 = 55.079922, PKX2 = -1.7e-05, PKX3 = -0.16185, PHX1 = 0.0, PHX2 = 0.0, PVX1 = 0.0, PVX2 = 0.0, PEX1 = 0.0, PEX2 = 0.141806, PEX3 = -1.93495, PEX4 = 0.044722, LCX = 1.0, LMUX = 1.0, LKX = 1.0, LHX = 1.0, LVX = 1.0, LEX = 1.0, LXAL = 1.0),
       fyCombined = TireModel.CombinedSlip.FyCombinedRecord(RBY1 = 14.628, RBY2 = 10.4, RBY3 = 0.0, RCY1 = 1.044, REY1 = 0.048, REY2 = 0.025, RHY1 = 0.0, RHY2 = 0.0, RVY1 = 0.0, RVY2 = 0.0, RVY3 = 0.0, RVY4 = 0.0, RVY5 = 0.0, RVY6 = 0.0),
       fyPure = TireModel.PureSlip.FyPureRecord(LFZO = 1.0, LGAY = 1.0, PCY1 = 1.53041, PDY1 = -2.40275, PDY2 = 0.343535, PDY3 = 3.89743, PKY1 = -53.2421, PKY2 = 2.38205, PKY3 = 1.36502, PHY1 = 0.0, PHY2 = 0.0, PHY3 = 0.0, PVY1 = 0.0, PVY2 = 0.0, PVY3 = 0.0, PVY4 = 0.0, PEY1 = 0.0, PEY2 = -0.280762, PEY3 = 0.70403, PEY4 = -0.478297, LCY = 1.0, LMUY = 1.0, LEY = 1.0, LKY = 1.0, LHY = 1.0, LVY = 1.0, LYKA = 1.0, LVYKA = 1.0),
@@ -122,7 +122,7 @@ record DWBC_DWBCRecord
       wheelD = 115.844);
 
   parameter TireModel.MF52Record pRrTireModel(
-      fxCombined = TireModel.CombinedSlip.FxCombinedRecord(RBX1 = 8.151136, RBX2 = 5.388063, RCX1 = 1.122399, REX1 = 0.052014, REX2 = -0.89845, RHX1 = 0.0, RVX1 = 0.0, RVX2 = 0.0),
+      fxCombined = TireModel.CombinedSlip.FxCombinedRecord(RBX1 = 8.151136, RBX2 = 5.388063, RCX1 = 1.122399, REX1 = 0.052014, REX2 = -0.89845, RHX1 = 0.0),
       fxPure = TireModel.PureSlip.FxPureRecord(LFZO = 1.0, LGAX = 1.0, PCX1 = 1.53041, PDX1 = 2.597991, PDX2 = -0.618826, PDX3 = 11.156379, PKX1 = 55.079922, PKX2 = -1.7e-05, PKX3 = -0.16185, PHX1 = 0.0, PHX2 = 0.0, PVX1 = 0.0, PVX2 = 0.0, PEX1 = 0.0, PEX2 = 0.141806, PEX3 = -1.93495, PEX4 = 0.044722, LCX = 1.0, LMUX = 1.0, LKX = 1.0, LHX = 1.0, LVX = 1.0, LEX = 1.0, LXAL = 1.0),
       fyCombined = TireModel.CombinedSlip.FyCombinedRecord(RBY1 = 14.628, RBY2 = 10.4, RBY3 = 0.0, RCY1 = 1.044, REY1 = 0.048, REY2 = 0.025, RHY1 = 0.0, RHY2 = 0.0, RVY1 = 0.0, RVY2 = 0.0, RVY3 = 0.0, RVY4 = 0.0, RVY5 = 0.0, RVY6 = 0.0),
       fyPure = TireModel.PureSlip.FyPureRecord(LFZO = 1.0, LGAY = 1.0, PCY1 = 1.53041, PDY1 = -2.40275, PDY2 = 0.343535, PDY3 = 3.89743, PKY1 = -53.2421, PKY2 = 2.38205, PKY3 = 1.36502, PHY1 = 0.0, PHY2 = 0.0, PHY3 = 0.0, PVY1 = 0.0, PVY2 = 0.0, PVY3 = 0.0, PVY4 = 0.0, PEY1 = 0.0, PEY2 = -0.280762, PEY3 = 0.70403, PEY4 = -0.478297, LCY = 1.0, LMUY = 1.0, LEY = 1.0, LKY = 1.0, LHY = 1.0, LVY = 1.0, LYKA = 1.0, LVYKA = 1.0),

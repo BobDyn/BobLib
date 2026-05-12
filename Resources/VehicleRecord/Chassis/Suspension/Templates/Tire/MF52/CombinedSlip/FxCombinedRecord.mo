@@ -11,9 +11,5 @@ record FxCombinedRecord
   // Shift (Shxa)
   Real RHX1 "Slip angle shift for combined slip [-]";
 
-  // Shift (Svxa) (not yet used, included for completeness)
-  Real RVX1 "Vertical shift base for combined slip [-]";
-  Real RVX2 "Vertical shift load dependency [-]";
-
 end FxCombinedRecord;
 
