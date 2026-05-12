@@ -1,5 +1,11 @@
 # BobLib
 
+**Note:** this repo should not be regarded as a standard library until it implements VehicleInterfaces and the latest version of the Modelica Standard Library. Current interfaces constitute a one-off layer targeted at BobDyn consumption.
+
+This library plans to move forward with accepted open-source standards, making BobLib interchangeable with existing Modelica infrastructure.
+
+---
+
 **BobLib** is a physically grounded, open-source Modelica library for vehicle dynamics simulation.
 It provides modular multibody vehicle models, tire models (MF5.2), and standardized test procedures for analyzing vehicle behavior.
 
