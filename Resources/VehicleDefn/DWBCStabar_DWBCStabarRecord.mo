@@ -64,8 +64,8 @@ record DWBCStabar_DWBCStabarRecord
       wheelJ = 0.02);
 
   parameter Wheel.Wheel1DOF_ZRecord pFrTire1DOF_ZParams(
-      wheelC = 98947,
-      wheelD = 115.844);
+      wheelC = 100000,
+      wheelD = 100);
 
   parameter TireModel.MF52Record pFrTireModel(
       fxCombined = TireModel.CombinedSlip.FxCombinedRecord(RBX1 = 8.151136, RBX2 = 5.388063, RCX1 = 1.122399, REX1 = 0.052014, REX2 = -0.89845, RHX1 = 0.0),
