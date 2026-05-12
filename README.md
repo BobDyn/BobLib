@@ -1,231 +1,186 @@
 # BobLib
 
-**Note:** this repo should not be regarded as a standard library until it implements [VehicleInterfaces](https://github.com/modelica/VehicleInterfaces/) and the latest version of the [Modelica Standard Library](https://github.com/modelica/ModelicaStandardLibrary). Current interfaces constitute a one-off layer targeted at BobDyn consumption.
+BobLib is a Modelica-based vehicle dynamics library for building modular multibody vehicle models, suspension assemblies, tire models, and standardized simulation workflows.
 
-This library plans to move forward with accepted open-source standards, making BobLib interchangeable with existing Modelica infrastructure.
+The codebase is organized as a reusable package tree with separate areas for vehicle structure, parameter records, utilities, standardized test models, and validation cases.
 
----
+> Note: this repository should not be treated as a standard library until it implements [VehicleInterfaces](https://github.com/modelica/VehicleInterfaces/) and the latest version of the [Modelica Standard Library](https://github.com/modelica/ModelicaStandardLibrary). The current interfaces are a one-off layer targeted at BobDyn consumption.
 
-**BobLib** is a physically grounded, open-source Modelica library for vehicle dynamics simulation.
-It provides modular multibody vehicle models, tire models (MF5.2), and standardized test procedures for analyzing vehicle behavior.
+## Highlights
 
-This library is designed to support high-fidelity simulation workflows and serve as the core modeling layer for the broader **BobDyn** ecosystem.
+- Modular vehicle architecture for chassis, suspension, powertrain, electronics, and aero
+- Record-based parameterization for clean separation between model structure and data
+- Standardized simulation entry points for steady-state and kinematics-and-compliance workflows
+- Tire modeling support based on MF5.2-style templates and slip models
+- Utility packages for math and multibody helpers
 
----
+## Requirements
 
-## Overview
+BobLib declares compatibility with:
 
-BobLib focuses on:
+- `Modelica 3.2.3`
 
-* First-principles multibody vehicle modeling
-* Modular subsystem design (chassis, suspension, tire, powertrain)
-* Standardized test procedures (ISO, K&C)
-* Clean parameterization via records
-* Compatibility with OpenModelica workflows
+A Modelica toolchain with OpenModelica scripting support is recommended if you want to use the provided build scripts in `Standards/`.
 
-> ⚠️ **Current Status:**
-> The **chassis subsystem** is the most mature component.
-> Vehicle tests (SteadyStateEval, K&C) are functional. Other areas are under active development.
+## Repository Layout
 
----
-
-## Installation
-
-Clone this repository into your OpenModelica libraries directory:
-
-```bash
-git clone https://github.com/BobDyn/BobLib.git ~/.openmodelica/libraries/BobLib
-```
-
-Alternatively, add the repo path manually in OMEdit:
-
-* **Tools → Options → Libraries → Add Path**
-
----
-
-## Getting Started
-
-### Load the library
-
-In OMEdit:
-
-1. Open OMEdit
-2. Load `BobLib`
-3. Browse the package tree
-
----
-
-### Run a test simulation
-
-Good entry points:
-
-* `Standards.SteadyStateEval`
-* `Standards.FrKnC`
-* `Standards.RrKnC`
-
-Or explore:
-
-```
-Tests.TestVehicle.*
-```
-
----
-
-## Repository Structure
-
-```
+```text
 BobLib/
-├── Vehicle/        # Physical system models (core library)
-├── Resources/      # Parameter records and definitions
-├── Standards/      # ISO and K&C test procedures
-├── Utilities/      # Math and multibody utilities
-├── Tests/          # Validation and development tests
+├── Vehicle/        # Physical vehicle models and subsystem assemblies
+├── Resources/      # Parameter records and visual/vehicle definitions
+├── Standards/      # Standard simulation models and build scripts
+├── Utilities/      # Shared math and multibody helpers
+├── Tests/          # Validation and development test models
+└── package.mo      # Root package definition
 ```
 
----
+## Main Packages
 
-### 🔧 Vehicle
+### `Vehicle`
 
-Core physical models:
+Contains the physical modeling layer for complete vehicles and subsystems.
 
-* `Chassis`
+Notable areas include:
 
-  * Double wishbone suspension
-  * Linkages (bellcrank, rod, damper, spring)
-  * Tire models (MF5.2 with combined slip)
-* `Powertrain`
-* `Electronics`
-* `Aero` (placeholder)
+- `Vehicle.Chassis`
+- `Vehicle.Chassis.Body`
+- `Vehicle.Chassis.Suspension`
+- `Vehicle.Chassis.Suspension.Linkages`
+- `Vehicle.Chassis.Suspension.Templates`
+- `Vehicle.Powertrain`
+- `Vehicle.Powertrain.Battery`
+- `Vehicle.Powertrain.Drivetrain`
+- `Vehicle.Powertrain.Electronics`
+- `Vehicle.Electronics`
+- `Vehicle.Aero`
 
-This is where full vehicle assemblies are built.
+### `Resources`
 
----
+Holds the parameter data and visualization records used by the models.
 
-### 📦 Resources
+Notable groups include:
 
-Parameter definitions and records:
+- `Resources.VehicleDefn`
+- `Resources.VehicleRecord`
+- `Resources.StandardRecord`
+- `Resources.VisualRecord`
 
-* Vehicle definitions (`VehicleDefn`)
-* Subsystem records (suspension, tire, etc.)
-* MF5.2 parameter sets
+These records are used to configure different vehicle combinations and test setups without hard-coding parameters into the model definitions.
 
-These enable clean separation between:
+### `Standards`
 
-* **structure (Vehicle/)**
-* **data (Resources/)**
+Contains standardized simulation models and automation scripts.
 
----
+Key models:
 
-### 📏 Standards
+- `Standards.VehicleSim`
+- `Standards.VehicleFMI`
+- `Standards.StandardSim.SteadyStateEval`
+- `Standards.StandardSim.TransientEval`
+- `Standards.StandardSim.FrKnC`
+- `Standards.StandardSim.RrKnC`
+- `Standards.StandardSim.Templates.KnC`
 
-Implements standardized vehicle tests:
+Build scripts:
 
-* `SteadyStateEval` (steady-state cornering)
-* `KnC` (Kinematics & Compliance)
+- `Standards/BuildVehicleModel.mos`
+- `Standards/BuildVehicleFMI.mos`
+- `Standards/StandardSim/BuildKnC.mos`
 
-Includes:
+### `Utilities`
 
-* `.mo` models (test definitions)
-* `.mos` scripts (build/run automation)
+Shared helper functions and components used throughout the library.
 
----
+Notable groups include:
 
-### 🧪 Tests
+- `Utilities.Math.Vector`
+- `Utilities.Math.Tensor`
+- `Utilities.Mechanics.Multibody`
+- `Utilities.FMI`
 
-Validation and development testing:
+### `Tests`
 
-* Unit-style tests for subsystems
-* Full vehicle test configurations
-* Tire validation (MF5.2)
+Validation and development tests for individual subsystems and full vehicle configurations.
 
 Examples:
 
+- `Tests.TestVehicle.TestChassis.TestSuspension.TestFrAxleDW`
+- `Tests.TestVehicle.TestChassis.TestSuspension.TestRrAxleDW`
+- `Tests.TestVehicle.TestPowertrain.TestPowertrain`
+- `Tests.TestVehicle.TestPowertrain.TestBatteryPack`
+- `Tests.TestUtilities.TestMechanics.TestMultibody.TestGroundPhysics`
+
+## Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone <repository-url> BobLib
 ```
-Tests.TestVehicle.TestSuspension.*
-Tests.TestVehicle.TestPowertrain.*
+
+### 2. Load the package in OMEdit
+
+Add the repository root to your Modelica library search path, then load `BobLib` from OMEdit.
+
+If you prefer to keep the library in the default OpenModelica library directory, place it under:
+
+```bash
+~/.openmodelica/libraries/BobLib
 ```
 
----
+### 3. Explore the package tree
 
-### 🧰 Utilities
+Start with one of these entry points:
 
-Reusable components:
+- `BobLib.Standards.VehicleSim`
+- `BobLib.Standards.VehicleFMI`
+- `BobLib.Standards.StandardSim.SteadyStateEval`
+- `BobLib.Standards.StandardSim.FrKnC`
+- `BobLib.Standards.StandardSim.RrKnC`
 
-* Math (vector, tensor ops)
-* Multibody utilities (constraints, actuators)
-* FMI utilities (WIP)
+## Building and Running
 
----
+The repository includes OpenModelica script files for common workflows.
 
-## Modeling Philosophy
+### Build a vehicle model
 
-BobLib follows a strict design philosophy:
+Run `Standards/BuildVehicleModel.mos` to build the configured vehicle simulation target.
 
-* **Physics-first**
-  No black-box models unless explicitly encapsulated (e.g., MF5.2)
+### Build an FMU
 
-* **Modularity**
-  Subsystems are composable and replaceable
+Run `Standards/BuildVehicleFMI.mos` to export `BobLib.Standards.VehicleFMI` as an FMU.
 
-* **Separation of concerns**
+### Kinematics and compliance workflow
 
-  * Structure → `Vehicle/`
-  * Parameters → `Resources/`
-  * Tests → `Standards/`, `Tests/`
+Run `Standards/StandardSim/BuildKnC.mos` for the standard K&C build flow.
 
-* **DAE-consistent modeling**
-  Designed for robust simulation with DAE solvers (IDA/DASSL)
+## Model Structure
 
----
+BobLib is intentionally split into a few layers:
 
-## Known Limitations
+- `Vehicle/` defines the model structure
+- `Resources/` provides the data for those models
+- `Standards/` wraps models in repeatable simulation and export workflows
+- `Tests/` captures regression and development cases
+- `Utilities/` contains reusable math and mechanics helpers
 
-* Chassis is the only fully mature subsystem
-* Aero is not yet implemented
-* Powertrain and electronics are early-stage
-* Some tests are exploratory rather than production-ready
+This separation makes it easier to swap vehicle definitions, reuse subsystem templates, and keep parameter data independent from the physical models.
 
----
+## Notes
 
-## Roadmap
-
-* Expand suspension architectures (bellcrank variants, push/pullrod configs)
-* Improve solver robustness and initialization
-* Add transient tire dynamics (relaxation length)
-* Integrate with BobSim for DOE workflows
-* Improve FMU parameter exposure
-
----
+- The library is still evolving, so some subsystems are more complete than others.
+- The chassis and suspension areas are the most mature parts of the tree.
+- The build scripts are written for OpenModelica-style command line execution.
 
 ## Contributing
 
-Contributions are welcome.
-Focus areas:
+Contributions are welcome. Useful areas of work include:
 
-* Model robustness
-* Additional templates
-* Test coverage
-* Documentation
-
----
+- Model robustness
+- Additional suspension and powertrain templates
+- Test coverage
+- Documentation improvements
 
 ## License
 
-This project is licensed under the GNU General Public License v3.0 (GPLv3).
-
-You are free to use, modify, and distribute this software, including for commercial purposes, provided that any distributed modifications or derivative works are also licensed under GPLv3 and include the corresponding source code.
-
-See the [LICENSE](LICENSE) file for full details.
-
----
-
-## Related Projects
-
-* **BobSim** – simulation orchestration and DOE workflows
-* **BobDocs** – documentation site (https://bobdyn.com)
-
----
-
-## Author
-
-Developed as part of the **BobDyn** project.
+BobLib is distributed under the GNU General Public License v3.0 (GPLv3). See the [LICENSE](LICENSE) file for details.
