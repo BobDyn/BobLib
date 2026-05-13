@@ -148,13 +148,25 @@ record DWBCStabar_DWBCStabarRecord
       mzPure = TireModel.PureSlip.MzPureRecord(QBZ1 = 8.22843, QBZ2 = 2.98676, QBZ3 = -3.57739, QBZ4 = -0.429117, QBZ5 = 0.433125, QCZ1 = 1.41359, QDZ1 = 0.152526, QDZ2 = -0.0381101, QDZ3 = 0.387762, QDZ4 = -3.95699, QEZ1 = -0.239731, QEZ2 = 1.29253, QEZ3 = -1.21298, QEZ4 = 0.0, QEZ5 = 0.0, QHZ1 = 0.0, QHZ2 = 0.0, QHZ3 = 0.0, QHZ4 = 0.0, QBZ9 = 0.0, QBZ10 = -1.72926, QDZ6 = 0.00604966, QDZ7 = -0.000116241, QDZ8 = -2.33359, QDZ9 = -0.0379755, LTR = 1.0, LRES = 1.0, LKY = 1.0, LMUY = 1.0, LGAZ = 1.0),
       setup = TireModel.SetupRecord(FNOMIN = 650.0, UNLOADED_RADIUS = pRrPartialWheel.R0));
 
-  parameter MassRecord pSprungMass(
+  parameter MassRecord pBaseSprungMass(
       m = 200,
       rCM = {-0.7747, 0, 0.2794},
       inertia = {{30, 1, 1}, {1, 40, 1}, {1, 1, 50}});
 
+  parameter MassRecord pDriverMass(
+      m = 0,
+      rCM = {0, 0, 0},
+      inertia = {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}});
+
+  parameter Modelica.SIunits.RotationalSpringConstant pTorsionalStiff = 500000;
+
+  parameter MassRecord pSprungMass = BobLib.Utilities.Mechanics.combineMassRecords({pBaseSprungMass, pDriverMass});
+
   parameter Aero.CFDAeroMapRecord pAero(
       referenceSpeed = 15.0,
+      aeroRef = {0, 0, 0},
+      FL_RideHeightRef = {0, 0.606110767456, 0.199898},
+      RL_RideHeightRef = {-1.5494, 0.60611077, 0.199898},
       frontRideHeightGrid = {0.03556, 0.05334, 0.07112, 0.0889, 0.10668},
       rearRideHeightGrid = {0.04191, 0.0635, 0.08382, 0.10414, 0.12573},
       dragTable = {{80.7986, 80.9749, 81.8435, 79.6167, 77.250725}, {82.2735, 82.36745, 86.1779, 86.0919, 85.1031}, {79.6194, 83.76, 86.2301, 88.2285, 90.0656}, {78.1912, 81.1352, 84.552, 87.3099, 89.4312}, {77.8347, 78.5104, 82.8739, 86.3913, 87.4556}},

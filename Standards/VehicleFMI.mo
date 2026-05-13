@@ -80,7 +80,7 @@ protected
     Placement(transformation(origin = {-130, -50}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.MultiBody.Parts.Fixed fixedRR(r = cpInitRR, animation = false) annotation(
     Placement(transformation(origin = {130, -50}, extent = {{10, -10}, {-10, 10}})));
-  Modelica.Mechanics.MultiBody.Parts.Fixed cgFixed(r = pVehicle.pSprungMass.rCM, animation = false) annotation(
+  Modelica.Mechanics.MultiBody.Parts.Fixed cgFixed(r = vehicle.pVehicleCG, animation = false) annotation(
     Placement(transformation(origin = {130, 90}, extent = {{10, -10}, {-10, 10}})));
   Modelica.Mechanics.MultiBody.Joints.FreeMotion cgFreeMotion(animation = false, r_rel_a(start = {0, 0, 0}, each fixed = true), enforceStates = true, v_rel_a(start = {initialVel, 0, 0}, each fixed = true), useQuaternions = false) annotation(
     Placement(transformation(origin = {100, 90}, extent = {{10, -10}, {-10, 10}})));

@@ -106,6 +106,7 @@ class VehicleVariant:
 class GeneratedPaths:
     build_dir: Path
     results_dir: Path
+    source_vehicle_path: Path
     vehicle_model_path: Path
     sim_model_path: Path
 
@@ -295,6 +296,19 @@ def render_axle_redeclare(
     )
 
 
+def render_space_frame_redeclare(*, fr_ref: str, rr_ref: str) -> str:
+    """Render the compliant body frame redeclare for the chassis."""
+    return dedent(
+        """
+        redeclare BobLib.Vehicle.Chassis.Body.FrameCompX spaceFrame(
+          frRef = {fr_ref},
+          rrRef = {rr_ref},
+          pSprungMass = pVehicle.pSprungMass,
+          torsionalStiff = pVehicle.pTorsionalStiff)
+        """
+    ).strip().format(fr_ref=fr_ref, rr_ref=rr_ref)
+
+
 def render_vehicle_model(variant: VehicleVariant) -> str:
     fr_axle = render_axle_redeclare(
         instance_name="frAxleDW",
@@ -310,75 +324,73 @@ def render_vehicle_model(variant: VehicleVariant) -> str:
         has_stabar=variant.rear.has_stabar,
     )
 
-    return dedent(
-        f"""
-        within BobLib.Vehicle;
+    chassis_params = ",\n".join(
+        [
+            "      pSprungMass = pVehicle.pSprungMass",
+            "      pVehicleCG = pVehicleCG",
+            indent(fr_axle.strip(), 6),
+            indent(rr_axle.strip(), 6),
+            indent(
+                render_space_frame_redeclare(
+                    fr_ref="{pVehicle.pFrDW.wheelCenter[1], 0, pVehicle.pFrDW.wheelCenter[3]}",
+                    rr_ref="{pVehicle.pRrDW.wheelCenter[1], 0, pVehicle.pRrDW.wheelCenter[3]}",
+                ),
+                6,
+            ),
+        ]
+    )
 
-        model {variant.vehicle_model_name}
-          import BobLib.Vehicle.Chassis.Suspension.Templates.Tire;
-          import BobLib.Resources.VehicleDefn.{variant.record_name};
-
-          // Record parameters
-          parameter {variant.record_name} pVehicle;
-
-          extends BobLib.Vehicle.VehicleBase(
-            pAero = pVehicle.pAero,
-            redeclare BobLib.Vehicle.Chassis.Chassis_LockRrSteer chassis(
-        {indent(fr_axle, 6)},
-        {indent(rr_axle, 6)},
-
-              redeclare BobLib.Vehicle.Chassis.Body.FrameCompX spaceFrame(
-                frRef = chassis.frAxleDW.effectiveCenter,
-                rrRef = chassis.rrAxleDW.effectiveCenter,
-                pSprung = pVehicle.pSprungMass)));
-
-          Powertrain.PTNPlaceholder ptnPlaceholder annotation(
-            Placement(transformation(origin = {{0, -70}}, extent = {{{{-20, -4}}, {{20, 4}}}})));
-
-          Modelica.Mechanics.Rotational.Interfaces.Flange_b flangeFL annotation(
-            Placement(transformation(origin = {{-100, 60}}, extent = {{{{-10, -10}}, {{10, 10}}}}),
-            iconTransformation(origin = {{-180, 120}}, extent = {{{{-10, -10}}, {{10, 10}}}})));
-
-          Modelica.Mechanics.Rotational.Interfaces.Flange_b flangeFR annotation(
-            Placement(transformation(origin = {{100, 60}}, extent = {{{{-10, -10}}, {{10, 10}}}}),
-            iconTransformation(origin = {{180, 120}}, extent = {{{{-10, -10}}, {{10, 10}}}})));
-
-          Modelica.Blocks.Interfaces.RealInput uPTNTorque annotation(
-            Placement(transformation(origin = {{0, -120}}, extent = {{{{-20, -20}}, {{20, 20}}}}, rotation = 90),
-            iconTransformation(origin = {{0, -220}}, extent = {{{{-20, -20}}, {{20, 20}}}}, rotation = 90)));
-
-        equation
-          connect(chassis.rrAxleFrame, ptnPlaceholder.mountFrame) annotation(
-            Line(points = {{{{0, -40}}, {{0, -66}}}}, color = {{95, 95, 95}}));
-
-          connect(ptnPlaceholder.leftFlange, chassis.flangeRL) annotation(
-            Line(points = {{{{-20, -70}}, {{-70, -70}}, {{-70, -40}}, {{-58, -40}}}}));
-
-          connect(ptnPlaceholder.rightFlange, chassis.flangeRR) annotation(
-            Line(points = {{{{20, -70}}, {{70, -70}}, {{70, -40}}, {{58, -40}}}}));
-
-          connect(flangeFL, chassis.flangeFL) annotation(
-            Line(points = {{{{-100, 60}}, {{-80, 60}}, {{-80, 38}}, {{-58, 38}}}}));
-
-          connect(flangeFR, chassis.flangeFR) annotation(
-            Line(points = {{{{100, 60}}, {{80, 60}}, {{80, 38}}, {{58, 38}}}}));
-
-          connect(uPTNTorque, ptnPlaceholder.u) annotation(
-            Line(points = {{{{0, -120}}, {{0, -78}}}}, color = {{0, 0, 127}}));
-
-        annotation(
-          Diagram(graphics),
-          Icon(graphics = {{
-            Line(origin = {{-130, 120}}, points = {{{{-10, 0}}, {{-50, 0}}}}, pattern = LinePattern.Dash, thickness = 1),
-            Line(origin = {{190, 120}}, points = {{{{-10, 0}}, {{-50, 0}}}}, pattern = LinePattern.Dash, thickness = 1),
-            Line(origin = {{-130, -120}}, points = {{{{-10, 0}}, {{-30, 0}}}}, pattern = LinePattern.Dash, thickness = 1),
-            Line(origin = {{190, -120}}, points = {{{{-30, 0}}, {{-50, 0}}}}, pattern = LinePattern.Dash, thickness = 1),
-            Line(origin = {{-80, -159}}, points = {{{{80, -41}}, {{80, -31}}, {{-80, -31}}, {{-80, 39}}}}, color = {{0, 0, 255}}),
-            Line(origin = {{71.18, -171.82}}, points = {{{{-71.1799, -18.1799}}, {{88.8201, -18.1799}}, {{88.8201, 51.8201}}}}, color = {{0, 0, 255}})
-          }}));
-        end {variant.vehicle_model_name};
-        """
-    ).strip() + "\n"
+    return (
+        f"within BobLib.Vehicle;\n\n"
+        f"model {variant.vehicle_model_name}\n"
+        "  import BobLib.Vehicle.Chassis.Suspension.Templates.Tire;\n"
+        f"  import BobLib.Resources.VehicleDefn.{variant.record_name};\n\n"
+        "  // Record parameters\n"
+        f"  parameter {variant.record_name} pVehicle;\n\n"
+        "  extends BobLib.Vehicle.VehicleBase(\n"
+        "    pAero = pVehicle.pAero,\n"
+        "    pSprungMass = pVehicle.pSprungMass,\n"
+        "    pFrAxleMass = pVehicle.pFrAxleMass,\n"
+        "    pRrAxleMass = pVehicle.pRrAxleMass,\n"
+        "    redeclare BobLib.Vehicle.Chassis.Chassis_LockRrSteer chassis(\n"
+        f"{chassis_params}\n"
+        "    ));\n\n"
+        "  Powertrain.PTNPlaceholder ptnPlaceholder annotation(\n"
+        "    Placement(transformation(origin = {0, -70}, extent = {{-20, -4}, {20, 4}})));\n\n"
+        "  Modelica.Mechanics.Rotational.Interfaces.Flange_b flangeFL annotation(\n"
+        "    Placement(transformation(origin = {-100, 60}, extent = {{-10, -10}, {10, 10}}),\n"
+        "    iconTransformation(origin = {-180, 120}, extent = {{-10, -10}, {10, 10}})));\n\n"
+        "  Modelica.Mechanics.Rotational.Interfaces.Flange_b flangeFR annotation(\n"
+        "    Placement(transformation(origin = {100, 60}, extent = {{-10, -10}, {10, 10}}),\n"
+        "    iconTransformation(origin = {180, 120}, extent = {{-10, -10}, {10, 10}})));\n\n"
+        "  Modelica.Blocks.Interfaces.RealInput uPTNTorque annotation(\n"
+        "    Placement(transformation(origin = {0, -120}, extent = {{-20, -20}, {20, 20}}, rotation = 90),\n"
+        "    iconTransformation(origin = {0, -220}, extent = {{-20, -20}, {20, 20}}, rotation = 90)));\n\n"
+        "equation\n"
+        "  connect(chassis.rrAxleFrame, ptnPlaceholder.mountFrame) annotation(\n"
+        "    Line(points = {{0, -40}, {0, -66}}, color = {95, 95, 95}));\n\n"
+        "  connect(ptnPlaceholder.leftFlange, chassis.flangeRL) annotation(\n"
+        "    Line(points = {{-20, -70}, {-70, -70}, {-70, -40}, {-58, -40}}));\n\n"
+        "  connect(ptnPlaceholder.rightFlange, chassis.flangeRR) annotation(\n"
+        "    Line(points = {{20, -70}, {70, -70}, {70, -40}, {58, -40}}));\n\n"
+        "  connect(flangeFL, chassis.flangeFL) annotation(\n"
+        "    Line(points = {{-100, 60}, {-80, 60}, {-80, 38}, {-58, 38}}));\n\n"
+        "  connect(flangeFR, chassis.flangeFR) annotation(\n"
+        "    Line(points = {{100, 60}, {80, 60}, {80, 38}, {58, 38}}));\n\n"
+        "  connect(uPTNTorque, ptnPlaceholder.u) annotation(\n"
+        "    Line(points = {{0, -120}, {0, -78}}, color = {0, 0, 127}));\n\n"
+        "annotation(\n"
+        "  Diagram(graphics),\n"
+        "  Icon(graphics = {\n"
+        "    Line(origin = {-130, 120}, points = {{-10, 0}, {-50, 0}}, pattern = LinePattern.Dash, thickness = 1),\n"
+        "    Line(origin = {190, 120}, points = {{-10, 0}, {-50, 0}}, pattern = LinePattern.Dash, thickness = 1),\n"
+        "    Line(origin = {-130, -120}, points = {{-10, 0}, {-30, 0}}, pattern = LinePattern.Dash, thickness = 1),\n"
+        "    Line(origin = {190, -120}, points = {{-30, 0}, {-50, 0}}, pattern = LinePattern.Dash, thickness = 1),\n"
+        "    Line(origin = {-80, -159}, points = {{80, -41}, {80, -31}, {-80, -31}, {-80, 39}}, color = {0, 0, 255}),\n"
+        "    Line(origin = {71.18, -171.82}, points = {{-71.1799, -18.1799}, {88.8201, -18.1799}, {88.8201, 51.8201}}, color = {0, 0, 255})\n"
+        "  }));\n"
+        f"end {variant.vehicle_model_name};\n"
+    )
 
 
 # =============================================================================
@@ -599,7 +611,7 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
             Placement(transformation(origin = {{130, -50}}, extent = {{{{10, -10}}, {{-10, 10}}}})));
 
           Modelica.Mechanics.MultiBody.Parts.Fixed cgFixed(
-            r = pVehicle.pSprungMass.rCM,
+            r = vehicle.pVehicleCG,
             animation = false) annotation(
             Placement(transformation(origin = {{130, 90}}, extent = {{{{10, -10}}, {{-10, 10}}}})));
 
@@ -864,10 +876,12 @@ def write_variant(
     build_dir.mkdir(parents=True, exist_ok=True)
     results_dir.mkdir(parents=True, exist_ok=True)
 
+    source_vehicle_path = boblib_root / "Vehicle" / f"{variant.vehicle_model_name}.mo"
     vehicle_model_path = build_dir / f"{variant.vehicle_model_name}.mo"
     sim_model_path = build_dir / "VehicleSim.mo"
 
     files = {
+        source_vehicle_path: render_vehicle_model(variant),
         vehicle_model_path: render_vehicle_model(variant),
         sim_model_path: render_vehicle_sim(variant),
     }
@@ -882,6 +896,7 @@ def write_variant(
     return GeneratedPaths(
         build_dir=build_dir,
         results_dir=results_dir,
+        source_vehicle_path=source_vehicle_path,
         vehicle_model_path=vehicle_model_path,
         sim_model_path=sim_model_path,
     )

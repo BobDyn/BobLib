@@ -6,6 +6,15 @@ record CFDAeroMapRecord
   parameter SIunits.Velocity referenceSpeed
     "Reference speed used by the CFD data";
 
+  parameter SIunits.Position aeroRef[3]
+    "World-frame vector from origin to the aero force application point";
+
+  parameter SIunits.Position FL_RideHeightRef[3]
+    "World-frame vector from origin to front-left ride-height reference point";
+
+  parameter SIunits.Position RL_RideHeightRef[3]
+    "World-frame vector from origin to rear-left ride-height reference point";
+
   parameter SIunits.Length frontRideHeightGrid[:]
     "Front ride-height breakpoints for the CFD sweep";
 
