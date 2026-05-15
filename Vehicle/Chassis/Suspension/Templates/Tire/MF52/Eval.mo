@@ -48,6 +48,9 @@ protected
 
   SetupRecord setup;
 
+  SIunits.Force FzEval;
+  Real loadScale;
+
 algorithm
   // Unpack once (clean + fast)
   pFxPure := tire.fxPure;
@@ -67,30 +70,42 @@ algorithm
 
   setup := tire.setup;
 
+  if Fz > 1e-3 then
+    if Fz > setup.FZMIN then
+      FzEval := Fz;
+    else
+      FzEval := setup.FZMIN;
+    end if;
+    loadScale := Fz / FzEval;
+  else
+    FzEval := setup.FZMIN;
+    loadScale := 0;
+  end if;
+
   // Forces
   Fx := FxCombinedEval(
-    Fz, kappa, alpha, gamma,
+    FzEval, kappa, alpha, gamma,
     pFxPure, pFxComb, setup
   );
 
   Fy := FyCombinedEval(
-    Fz, alpha, kappa, gamma,
+    FzEval, alpha, kappa, gamma,
     pFyPure, pFyComb, setup
   );
 
   // Moments
   Mx := MxCombinedEval(
-    Fz, Fy, gamma,
+    FzEval, Fy, gamma,
     pMxPure, pMxComb, setup
   );
 
   My := MyCombinedEval(
-    Fz, Fx, Vx,
+    FzEval, Fx, Vx,
     pMyPure, pMyComb, setup
   );
 
   (Mz, t, s) := MzCombinedEval(
-    Fz,
+    FzEval,
     Fx,
     Fy,
     alpha,
@@ -104,6 +119,12 @@ algorithm
     pMzComb,
     setup
   );
+
+  Fx := loadScale * Fx;
+  Fy := loadScale * Fy;
+  Mx := loadScale * Mx;
+  My := loadScale * My;
+  Mz := loadScale * Mz;
   
   // Z-up transform (apply at boundary)
   Fy := -Fy;

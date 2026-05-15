@@ -23,8 +23,8 @@ model SteadyStateEval
   parameter SIunits.Velocity testVel = 15;
   parameter SIunits.Length testRad = 20;
   
-  parameter Real curvGain = 3;
-  parameter Real curvTi = 0.02;
+  parameter Real curvGain = 1.8;
+  parameter Real curvTi = 0.10;
   
   parameter Real radErrorTol = 0.002;
   parameter Real der_radErrorTol = 0.5;
@@ -35,6 +35,7 @@ model SteadyStateEval
   Real radError;
   
   Real bodyVels[3];
+  Real bodyAngularVels[3];
   Real bodyAccels[3];
   Real bodyAngles[3];
   
@@ -113,7 +114,9 @@ initial equation
   vehicle.chassis.rrAxleDW.rightTire.wheelModel.hubAxis.w = testVel / pVehicle.pRrPartialWheel.R0;
 
 equation
-  radError = abs(speedCG / max(abs(vehicle.chassis.spaceFrame.sprungBody.w_a[3]), 0.1) - abs(testRad));
+  bodyAngularVels = Frames.angularVelocity2(cgFreeMotion.frame_b.R);
+
+  radError = abs(speedCG / max(abs(bodyAngularVels[3]), 0.1) - abs(testRad));
 // Steady-state detection
   when abs(radError) < radErrorTol and abs(der(radError)) < der_radErrorTol and pre(t_hit) < 0 then
     t_hit = time;
@@ -123,11 +126,11 @@ equation
     terminate("Reached steady-state (held 0.1s)");
   end when;
   
-  curvError = smooth(1, min(1, max(0, (time - 1)/0.2))) * (1/testRad - vehicle.chassis.spaceFrame.sprungBody.w_a[3] / max(speedCG, 0.1));
+  curvError = smooth(1, min(1, max(0, (time - 1)/0.2))) * (1/testRad - bodyAngularVels[3] / max(speedCG, 0.1));
 // General quantities
-  bodyVels = Frames.resolve2(vehicle.chassis.spaceFrame.sprungBody.frame_a.R, vehicle.chassis.spaceFrame.sprungBody.v_0);
-  bodyAccels = Frames.resolve2(vehicle.chassis.spaceFrame.sprungBody.frame_a.R, vehicle.chassis.spaceFrame.sprungBody.a_0);
-  bodyAngles = Frames.resolve2(vehicle.chassis.spaceFrame.sprungBody.frame_a.R, sprungAngles.angles);
+  bodyVels = Frames.resolve2(cgFreeMotion.frame_b.R, cgFreeMotion.v_rel_a);
+  bodyAccels = Frames.resolve2(cgFreeMotion.frame_b.R, cgFreeMotion.a_rel_a);
+  bodyAngles = Frames.resolve2(vehicle.chassis.cgFrame.R, sprungAngles.angles);
   
   speedCG = norm(bodyVels);
   
@@ -140,7 +143,7 @@ equation
 // Kinematics
   iso.velX = bodyVels[1];
   iso.velY = bodyVels[2];
-  iso.yawVel = vehicle.chassis.spaceFrame.sprungBody.w_a[3];
+  iso.yawVel = bodyAngularVels[3];
   iso.sideslip = atan(iso.velY / iso.velX);
 // Accelerations
   iso.accX = bodyAccels[1];
@@ -149,7 +152,7 @@ equation
   iso.roll = bodyAngles[1];
   iso.handwheelTorque = -1 * vehicle.steerFlange.tau; // Note that .tau is the reaction by Newton's 3rd law. Negate for applied torque.
 // Derived
-  iso.curvature = vehicle.chassis.spaceFrame.sprungBody.w_a[3] / max(speedCG, 0.1);
+  iso.curvature = bodyAngularVels[3] / max(speedCG, 0.1);
 // All visual variables
 // Front left (FL) base
   vis.frontAxle.leftUpperFore_i = vehicle.chassis.frAxleDW.leftWishboneUprightLoop.upperFrameToFore.frame_b.r_0;

@@ -6,6 +6,12 @@ record SetupRecord
   parameter SIunits.Force FNOMIN
     "Nominal vertical load used for normalization (Fz0 in MF formulations)";
 
+  parameter SIunits.Force FZMIN = 1e-3
+    "Minimum vertical load used for Magic Formula evaluation";
+
+  parameter SIunits.Force FZMAX = 1e60
+    "Maximum vertical load from the tire property fit";
+
   parameter SIunits.Length UNLOADED_RADIUS
     "Unloaded tire radius (used for kinematics and moment calculations)";
 

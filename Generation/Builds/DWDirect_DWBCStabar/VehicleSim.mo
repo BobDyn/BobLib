@@ -9,7 +9,6 @@ model VehicleSim
 
   // Import vehicle records
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.Templates.PartialWheelRecord;
-
   import BobLib.Resources.VehicleDefn.DWDirect_DWBCStabarRecord;
 
   inner parameter SIunits.Length linkDiameter = 0.020;
@@ -18,21 +17,21 @@ model VehicleSim
   parameter DWDirect_DWBCStabarRecord pVehicle;
 
   parameter Integer useMode = 0
-    "0 - closed-loop radius and velocity; 1 - open-loop sinusoidal steer, constant velocity; 2 - custom open-loop steer and drive torque"
+    "0 - open-loop slow ramp steer; 1 - open-loop sinusoidal steer, constant velocity; 2 - custom open-loop step steer and drive torque"
     annotation(Evaluate = false);
 
   // Toggle controllers
-  final parameter Boolean closedLoopRadius = useMode == 0;
+  final parameter Boolean openLoopAy = useMode == 0;
   final parameter Boolean closedLoopVelocity = useMode == 0 or useMode == 1 or useMode == 2;
 
   parameter Modelica.SIunits.Time steerStart = 1.0
     "Start time"
     annotation(Evaluate = false);
 
-  // Closed-loop parameters
-  parameter SIunits.Length targetRad = 20
-    "Target maneuver curvature"
-    annotation(Evaluate = false, Dialog(enable = closedLoopRadius));
+  // Open-loop ramp-steer parameters
+  parameter SIunits.Acceleration targetAy = 18
+    "Nominal target lateral acceleration used to size the open-loop ramp"
+    annotation(Evaluate = false, Dialog(enable = openLoopAy));
 
   parameter SIunits.Velocity targetVel = 15
     "Target maneuver velocity"
@@ -42,13 +41,21 @@ model VehicleSim
     "Initial velocity"
     annotation(Evaluate = false);
 
-  parameter Real curvGain = 3
-    "Proportional gain of curvature controller"
-    annotation(Evaluate = false, Dialog(enable = closedLoopRadius));
+  parameter Real steerRatioEstimateStart = 17.5
+    "Geometry-based bootstrap for handwheel-to-roadwheel ratio"
+    annotation(Evaluate = false, Dialog(enable = openLoopAy));
 
-  parameter Real curvTi = 0.02
-    "Time constant of curvature controller"
-    annotation(Evaluate = false, Dialog(enable = closedLoopRadius));
+  parameter Real steerRatioEstimateDecay = 15.5
+    "Gain-scheduling strength for the feedforward steer ratio"
+    annotation(Evaluate = false, Dialog(enable = openLoopAy));
+
+  parameter SIunits.Time ayRampDuration = 3.0
+    "Open-loop ramp duration"
+    annotation(Evaluate = false, Dialog(enable = openLoopAy));
+
+  parameter SIunits.Time steadyHoldDuration = 0.1
+    "Duration that the QSS plateau conditions must remain true before termination"
+    annotation(Evaluate = false, Dialog(enable = openLoopAy));
 
   parameter Real velGain = 200
     "Proportional gain of velocity controller"
@@ -58,15 +65,14 @@ model VehicleSim
     "Time constant of velocity controller"
     annotation(Evaluate = false, Dialog(enable = closedLoopVelocity));
 
-  parameter Real radErrorTol = 0.002
-    "SteadyStateEval radius error tolerance"
-    annotation(Evaluate = false, Dialog(enable = closedLoopRadius));
+  parameter Real der_yawVelTol = 0.01
+    "Yaw-rate derivative tolerance for ramp-steer steady-state detection";
 
-  parameter Real der_radErrorTol = 0.5
-    "SteadyStateEval radius error derivative tolerance"
-    annotation(Evaluate = false, Dialog(enable = closedLoopRadius));
+  parameter Real handwheelRateTol = 0.01
+    "Handwheel-rate derivative tolerance for open-loop QSS detection";
 
-  parameter Real der_yawVelTol = 0.01;
+  parameter SIunits.Time settleTimeout = 3.0
+    "Fail-fast timeout after the ramp ends if QSS is never reached";
 
   // Ramp-steer parameters
   parameter SIunits.Angle frRampSteerHeight = 5*pi/180
@@ -88,23 +94,47 @@ model VehicleSim
   Real frSteerCmd;
   Real driveTorqueCmd;
   Real bodyVels[3];
+  Real bodyAngularVels[3];
   Real bodyAccels[3];
   Real bodyAngles[3];
-  Real curvature;
+
   Real speed;
-  Real curvError;
+  Real curvature;
+  Real targetRad;
+  Real targetCurvature;
+  Real targetAyCmd;
+  Real targetCurvatureCmd;
+  Real targetRoadwheel;
+  Real targetRoadwheelCmd;
+  Real steerRatioEstimate;
+  Real steerFeedforward;
+  Real roadwheelMag;
+
+  Real rampXi;
+  Real ayRampFactor;
+  Real ayErrorRaw;
+  Real ayError;
+  Real curvatureErrorRaw;
+  Real curvatureError;
+
   Real radError;
   Real velError;
   Real steerSine;
-  Real steerRamp;
+  Real steerStep;
 
   // Standard outputs
   SIunits.Acceleration accX;
   SIunits.Acceleration accY;
   SIunits.Angle handwheelAngle;
+  SIunits.Angle steerExcess;
   SIunits.Torque handwheelTorque;
+  SIunits.Force Fz_FL;
+  SIunits.Force Fz_FR;
+  SIunits.Force Fz_RL;
+  SIunits.Force Fz_RR;
   SIunits.Angle leftSteerAngle;
   SIunits.Angle rightSteerAngle;
+  SIunits.Angle avgSteerAngle;
   SIunits.Angle roll;
   SIunits.Angle sideslip;
   SIunits.Velocity velX;
@@ -114,12 +144,10 @@ model VehicleSim
   inner Modelica.Mechanics.MultiBody.World world(n = {0, 0, -1}) annotation(
     Placement(transformation(origin = {-130, -110}, extent = {{-10, -10}, {10, 10}})));
 
-  // Vehicle
   BobLib.Vehicle.Vehicle_DWDirect_DWBCStabar vehicle(
     pVehicle = pVehicle) annotation(
     Placement(transformation(origin = {0, 20}, extent = {{-45, -50}, {45, 50}})));
 
-  // CG motion
   Modelica.Mechanics.MultiBody.Joints.FreeMotion cgFreeMotion(
     animation = false,
     r_rel_a(start = {0, 0, 0}, each fixed = true),
@@ -127,15 +155,14 @@ model VehicleSim
     v_rel_a(start = {initialVel, 0, 0}, each fixed = true)) annotation(
     Placement(transformation(origin = {100, 90}, extent = {{10, -10}, {-10, 10}})));
 
-  // Front steer position
-  Modelica.Mechanics.Rotational.Sources.Position frSteerPosition annotation(
+  Modelica.Mechanics.Rotational.Sources.Position frSteerPosition(
+    exact = false,
+    w(start = 0, fixed = true)) annotation(
     Placement(transformation(origin = {-30, 110}, extent = {{-10, -10}, {10, 10}}, rotation = -0)));
 
-  // Body attitude sensor
   Modelica.Mechanics.MultiBody.Sensors.RelativeAngles sprungAngles annotation(
     Placement(transformation(origin = {70, -70}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
 
-  // Calculated parameters
   final parameter Real cpInitFL[3] =
     pVehicle.pFrDW.wheelCenter +
     Frames.resolve1(
@@ -166,15 +193,16 @@ model VehicleSim
 
   final parameter Real cpInitRR[3] = Vector.mirrorXZ(cpInitRL);
 
+  final parameter SIunits.Length wheelbase = abs(
+    pVehicle.pFrDW.wheelCenter[1] - pVehicle.pRrDW.wheelCenter[1]);
+
 protected
-  // QSS detection variables
-  discrete Real t_curv_hit(start = -1);
+  discrete Real t_qss_hit(start = -1);
   discrete Real t_yawVel_hit(start = -1);
 
   Real leftWheelVector[3];
   Real rightWheelVector[3];
 
-  // Initial geometry
   Modelica.Mechanics.MultiBody.Parts.Fixed fixedFL(
     r = cpInitFL,
     animation = false) annotation(
@@ -193,45 +221,42 @@ protected
   Modelica.Mechanics.MultiBody.Parts.Fixed fixedRR(
     r = cpInitRR,
     animation = false) annotation(
-    Placement(transformation(origin = {130, -50}, extent = {{10, -10}, {-10, 10}})));
+    Placement(transformation(origin = {130, -50}, extent = {{10, -10}, {10, 10}})));
 
   Modelica.Mechanics.MultiBody.Parts.Fixed cgFixed(
     r = vehicle.pVehicleCG,
     animation = false) annotation(
     Placement(transformation(origin = {130, 90}, extent = {{10, -10}, {-10, 10}})));
 
-  // Ground interface
   BobLib.Utilities.Mechanics.Multibody.GroundPhysics groundFL annotation(
     Placement(transformation(origin = {-100, 10}, extent = {{-10, -10}, {10, 10}})));
 
   BobLib.Utilities.Mechanics.Multibody.GroundPhysics groundFR annotation(
-    Placement(transformation(origin = {100, 10}, extent = {{10, -10}, {-10, 10}})));
+    Placement(transformation(origin = {100, 10}, extent = {{10, -10}, {10, 10}})));
 
   BobLib.Utilities.Mechanics.Multibody.GroundPhysics groundRL annotation(
     Placement(transformation(origin = {-100, -50}, extent = {{-10, -10}, {10, 10}})));
 
   BobLib.Utilities.Mechanics.Multibody.GroundPhysics groundRR annotation(
-    Placement(transformation(origin = {100, -50}, extent = {{10, -10}, {-10, 10}})));
+    Placement(transformation(origin = {100, -50}, extent = {{10, -10}, {10, 10}})));
 
-  // Curvature controller
-  Modelica.Blocks.Sources.RealExpression curvErrorExpression(
-    y = curvError) annotation(
-    Placement(transformation(origin = {-110, 110}, extent = {{-10, -10}, {10, 10}})));
+  Modelica.Blocks.Sources.RealExpression velSetpointExpression(
+    y = targetVel) annotation(
+    Placement(transformation(origin = {-70, -30}, extent = {{-10, -10}, {10, 10}})));
 
-  Modelica.Blocks.Continuous.PI curvPI(
-    k = curvGain,
-    T = curvTi,
-    initType = Modelica.Blocks.Types.Init.InitialOutput) annotation(
-    Placement(transformation(origin = {-70, 110}, extent = {{-10, -10}, {10, 10}})));
+  Modelica.Blocks.Sources.RealExpression velMeasurementExpression(
+    y = speed) annotation(
+    Placement(transformation(origin = {-70, -10}, extent = {{-10, -10}, {10, 10}})));
 
-  // Speed Controller
-  Modelica.Blocks.Sources.RealExpression velErrorExpression(
-    y = velError) annotation(
-    Placement(transformation(origin = {-70, -50}, extent = {{-10, -10}, {10, 10}})));
-
-  Modelica.Blocks.Continuous.PI speedPI(
+  Modelica.Blocks.Continuous.LimPID speedPI(
+    controllerType = Modelica.Blocks.Types.SimpleController.PI,
     k = velGain,
-    T = velTi) annotation(
+    Ti = velTi,
+    yMax = 5000,
+    yMin = -5000,
+    Ni = 0.9,
+    initType = Modelica.Blocks.Types.InitPID.InitialOutput,
+    y_start = 0) annotation(
     Placement(transformation(origin = {-30, -50}, extent = {{-10, -10}, {10, 10}})));
 
 initial equation
@@ -248,32 +273,141 @@ initial equation
     initialVel / pVehicle.pRrPartialWheel.R0;
 
 equation
-  // Curvature quantities
+  targetRad =
+    if abs(targetAy) > 1e-6 then
+      noEvent(
+        (if targetAy >= 0 then 1 else -1) *
+        targetVel * targetVel / abs(targetAy)
+      )
+    else
+      1e9;
+
+  targetCurvature = noEvent(targetAy / max(targetVel * targetVel, 1e-6));
+  targetRoadwheel = noEvent(atan(wheelbase * targetCurvature));
+
   curvature =
-    vehicle.chassis.spaceFrame.sprungBody.w_a[3] / max(speed, 0.1);
+    bodyAngularVels[3] / max(speed, 0.1);
 
-  // SteadyStateEval-style radius error
   radError =
-    abs(speed / max(abs(vehicle.chassis.spaceFrame.sprungBody.w_a[3]), 0.1)
-    - abs(targetRad));
+    if abs(targetAy) > 1e-6 then
+      abs(curvature - targetCurvature) /
+      max(abs(targetCurvature), 1e-6) *
+      abs(targetRad)
+    else
+      0;
 
-  // SteadyStateEval-style QSS detection, only active for useMode == 0
+  // Fifth-order smootherstep ramp for target Ay.
+  // With steerStart = 1.0 and ayRampDuration = 3.0,
+  // the target finishes ramping at t = 4.0 s.
+  rampXi =
+    if useMode == 0 then
+      noEvent(
+        if time <= steerStart then
+          0
+        elseif time >= steerStart + ayRampDuration then
+          1
+        else
+          (time - steerStart) / ayRampDuration
+      )
+    else
+      0;
+
+  ayRampFactor =
+    if useMode == 0 then
+      noEvent(10*rampXi^3 - 15*rampXi^4 + 6*rampXi^5)
+    else
+      0;
+
+  targetAyCmd =
+    if useMode == 0 and noEvent(time >= steerStart) then
+      ayRampFactor * targetAy
+    else
+      0;
+
+  targetCurvatureCmd =
+    if useMode == 0 and noEvent(time >= steerStart) then
+      ayRampFactor * targetCurvature
+    else
+      0;
+
+  targetRoadwheelCmd =
+    if useMode == 0 and noEvent(time >= steerStart) then
+      ayRampFactor * targetRoadwheel
+    else
+      0;
+
+  ayErrorRaw =
+    if useMode == 0 and noEvent(time >= steerStart) then
+      targetAy - accY
+    else
+      0;
+
+  ayError =
+    if useMode == 0 and noEvent(time >= steerStart) then
+      targetAyCmd - accY
+    else
+      0;
+
+  curvatureErrorRaw =
+    if useMode == 0 and noEvent(time >= steerStart) then
+      targetCurvature - curvature
+    else
+      0;
+
+  curvatureError =
+    if useMode == 0 and noEvent(time >= steerStart) then
+      targetCurvatureCmd - curvature
+    else
+      0;
+
+  roadwheelMag =
+    if useMode == 0 and noEvent(time >= steerStart) then
+      sqrt(targetRoadwheelCmd*targetRoadwheelCmd + 1e-6)
+    else
+      0;
+
+  steerRatioEstimate =
+    if useMode == 0 and noEvent(time >= steerStart) then
+      steerRatioEstimateStart /
+      (1 + steerRatioEstimateDecay*roadwheelMag)
+    else
+      steerRatioEstimateStart;
+
+  steerFeedforward =
+    if useMode == 0 and noEvent(time >= steerStart) then
+      steerRatioEstimate * targetRoadwheelCmd
+    else
+      0;
+
+  // Open-loop QSS detection: the vehicle has settled when yaw rate and
+  // steering rate are both flat for long enough after the ramp ends.
   when useMode == 0
-     and abs(radError) < radErrorTol
-     and abs(der(radError)) < der_radErrorTol
-     and pre(t_curv_hit) < 0 then
-    t_curv_hit = time;
+     and time > steerStart + ayRampDuration
+     and abs(der(yawVel)) < der_yawVelTol
+     and abs(der(handwheelAngle)) < handwheelRateTol
+     and pre(t_qss_hit) < 0 then
+    t_qss_hit = time;
+
+  elsewhen useMode == 0
+     and time > steerStart + ayRampDuration
+     and (abs(der(yawVel)) >= der_yawVelTol
+          or abs(der(handwheelAngle)) >= handwheelRateTol) then
+    t_qss_hit = -1;
   end when;
 
   when useMode == 0
-     and t_curv_hit > 0
-     and time > t_curv_hit + 0.1 then
-    terminate("Reached steady-state (held 0.1s)");
+     and t_qss_hit > 0
+     and time > t_qss_hit + steadyHoldDuration then
+    terminate("Reached open-loop ramp-steer QSS plateau");
   end when;
 
-  // Ramp-steer steady-state detection
+  when useMode == 0
+     and time > steerStart + ayRampDuration + settleTimeout then
+    terminate("Open-loop ramp steer did not reach QSS plateau before timeout");
+  end when;
+
   when useMode == 2
-     and time > steerStart + frRampSteerDuration
+     and time > steerStart
      and abs(der(yawVel)) < der_yawVelTol
      and pre(t_yawVel_hit) < 0 then
     t_yawVel_hit = time;
@@ -286,38 +420,29 @@ equation
   when useMode == 2
      and t_yawVel_hit > 0
      and time > t_yawVel_hit + 0.1 then
-    terminate("Reached ramp-steer steady-state: der(yawVel) below tolerance (held 0.1s)");
+    terminate("Reached open-loop step-steer steady-state: der(yawVel) below tolerance (held 0.1s)");
   end when;
 
-  // SteadyStateEval curvature controller for useMode == 0.
-  // Intentionally matches old SteadyStateEval: ramp from t = 1.0 to t = 1.2.
-  curvError =
-    if useMode == 0 then
-      smooth(1, min(1, max(0, (time - 1)/0.2))) *
-      (1/targetRad - vehicle.chassis.spaceFrame.sprungBody.w_a[3]/max(speed, 0.1))
-    else
-      0;
-
-  // Sinusoidal steering profile for useMode == 1
   steerSine =
     if noEvent(useMode == 1 and time > steerStart) then
       steerAmp*sin(2*pi*steerFreq*(time - steerStart))
     else
       0;
 
-  // Ramp-steer profile for useMode == 2
-  steerRamp =
-    frRampSteerHeight *
-    noEvent(min(1, max(0, (time - steerStart) / frRampSteerDuration)));
+  steerStep =
+    if noEvent(time > steerStart) then
+      frRampSteerHeight
+    else
+      0;
 
-  // Mode switching logic
+  // Open-loop feedforward provides the nominal handwheel command.
   frSteerCmd =
-    if useMode == 0 then
-      curvPI.y
+    if useMode == 0 and noEvent(time >= steerStart) then
+      steerFeedforward
     elseif useMode == 1 then
       steerSine
     elseif useMode == 2 then
-      steerRamp
+      steerStep
     else
       0;
 
@@ -327,25 +452,20 @@ equation
     else
       0;
 
-  // Apply steer and drive torque
   frSteerPosition.phi_ref = frSteerCmd;
   vehicle.uPTNTorque = driveTorqueCmd;
 
-  // General quantities
   bodyVels =
-    Frames.resolve2(
-      vehicle.chassis.spaceFrame.sprungBody.frame_a.R,
-      vehicle.chassis.spaceFrame.sprungBody.v_0);
+    Frames.resolve2(cgFreeMotion.frame_b.R, cgFreeMotion.v_rel_a);
+
+  bodyAngularVels =
+    Frames.angularVelocity2(cgFreeMotion.frame_b.R);
 
   bodyAccels =
-    Frames.resolve2(
-      vehicle.chassis.spaceFrame.sprungBody.frame_a.R,
-      vehicle.chassis.spaceFrame.sprungBody.a_0);
+    Frames.resolve2(cgFreeMotion.frame_b.R, cgFreeMotion.a_rel_a);
 
   bodyAngles =
-    Frames.resolve2(
-      vehicle.chassis.spaceFrame.sprungBody.frame_a.R,
-      sprungAngles.angles);
+    Frames.resolve2(vehicle.chassis.cgFrame.R, sprungAngles.angles);
 
   leftWheelVector =
     Frames.resolve1(
@@ -359,25 +479,27 @@ equation
 
   leftSteerAngle = -1*atan(leftWheelVector[2] / leftWheelVector[1]);
   rightSteerAngle = -1*atan(rightWheelVector[2] / rightWheelVector[1]);
+  avgSteerAngle = (leftSteerAngle + rightSteerAngle) / 2;
 
   handwheelAngle = vehicle.steerFlange.phi;
+  steerExcess = avgSteerAngle - wheelbase * curvature;
 
-  // Speed quantities
   speed = norm(bodyVels);
-
   velError = targetVel - speed;
 
-  // Kinematics
   velX = bodyVels[1];
   velY = bodyVels[2];
-  yawVel = vehicle.chassis.spaceFrame.sprungBody.w_a[3];
+  yawVel = bodyAngularVels[3];
   sideslip = atan(velY / velX);
 
-  // Accelerations
   accX = bodyAccels[1];
   accY = bodyAccels[2];
 
-  // Vehicle response
+  Fz_FL = vehicle.chassis.frAxleDW.leftTire.Fz;
+  Fz_FR = vehicle.chassis.frAxleDW.rightTire.Fz;
+  Fz_RL = vehicle.chassis.rrAxleDW.leftTire.Fz;
+  Fz_RR = vehicle.chassis.rrAxleDW.rightTire.Fz;
+
   roll = bodyAngles[1];
 
   // Note that .tau is the reaction by Newton's 3rd law. Negate for applied torque.
@@ -385,9 +507,6 @@ equation
 
   connect(cgFixed.frame_b, cgFreeMotion.frame_a) annotation(
     Line(points = {{120, 90}, {110, 90}}, color = {95, 95, 95}));
-
-  connect(velErrorExpression.y, speedPI.u) annotation(
-    Line(points = {{-59, -50}, {-42, -50}}, color = {0, 0, 127}));
 
   connect(fixedFL.frame_b, groundFL.frame_a) annotation(
     Line(points = {{-120, 10}, {-110, 10}}, color = {95, 95, 95}));
@@ -401,8 +520,11 @@ equation
   connect(fixedRR.frame_b, groundRR.frame_a) annotation(
     Line(points = {{120, -50}, {110, -50}}, color = {95, 95, 95}));
 
-  connect(curvErrorExpression.y, curvPI.u) annotation(
-    Line(points = {{-99, 110}, {-82, 110}}, color = {0, 0, 127}));
+  connect(velSetpointExpression.y, speedPI.u_s) annotation(
+    Line(points = {{-59, -30}, {-42, -30}}, color = {0, 0, 127}));
+
+  connect(velMeasurementExpression.y, speedPI.u_m) annotation(
+    Line(points = {{-59, -10}, {-42, -10}}, color = {0, 0, 127}));
 
   connect(vehicle.frameRL, groundRL.frame_b) annotation(
     Line(points = {{-44, -22}, {-100, -22}, {-100, -40}}, color = {95, 95, 95}));
@@ -431,8 +553,12 @@ equation
   annotation(
     Diagram(coordinateSystem(extent = {{-140, -120}, {140, 120}})),
     Icon(coordinateSystem(extent = {{-140, -120}, {140, 120}})),
-    experiment(StartTime = 0, StopTime = 5, Tolerance = 1e-06, Interval = 0.002),
+    experiment(StartTime = 0.5, StopTime = 10, Tolerance = 1e-06, Interval = 0.002),
     __OpenModelica_commandLineOptions = "--matchingAlgorithm=PFPlusExt --indexReductionMethod=dynamicStateSelection -d=initialization,NLSanalyticJacobian --maxSizeLinearTearing=5000",
-    __OpenModelica_simulationFlags(lv = "LOG_STDOUT,LOG_ASSERT,LOG_STATS", noEquidistantTimeGrid = "()", s = "dassl", variableFilter = ".*"));
+    __OpenModelica_simulationFlags(
+      lv = "LOG_STDOUT,LOG_ASSERT,LOG_STATS",
+      noEventEmit = "()",
+      s = "dassl",
+      variableFilter = ".*"));
 
 end VehicleSim;

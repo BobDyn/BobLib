@@ -25,6 +25,7 @@ model VehicleFMI
   input SIunits.Torque driveTorqueCommand;
   
   Real bodyVels[3];
+  Real bodyAngularVels[3];
   Real bodyAccels[3];
   Real bodyAngles[3];
   // Standard outputs
@@ -106,6 +107,7 @@ initial equation
 equation
 // General quantities
   bodyVels = Frames.resolve2(cgFreeMotion.frame_b.R, cgFreeMotion.v_rel_a);
+  bodyAngularVels = Frames.angularVelocity2(cgFreeMotion.frame_b.R);
   bodyAccels = Frames.resolve2(cgFreeMotion.frame_b.R, cgFreeMotion.a_rel_a);
   bodyAngles = Frames.resolve2(cgFreeMotion.frame_b.R, sprungAngles.angles);
   
@@ -118,7 +120,7 @@ equation
 // Kinematics
   velX = bodyVels[1];
   velY = bodyVels[2];
-  yawVel = vehicle.chassis.spaceFrame.sprungBody.w_a[3];
+  yawVel = bodyAngularVels[3];
   sideslip = atan(velY/velX);
 // Accelerations
   accX = bodyAccels[1];

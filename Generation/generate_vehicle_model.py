@@ -42,7 +42,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+import sys
 from textwrap import dedent
+
+REPO_ROOT = Path(__file__).resolve().parents[4]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+import build_vehicle
 
 
 # =============================================================================
@@ -411,6 +418,15 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
 
     The variant-specific part is the imported record and instantiated vehicle.
     """
+    canonical_data = {
+        "output": {"sim_package": "BobLib.Standards"},
+        "architecture": {"vehicle_model": variant.vehicle_model_name},
+    }
+    return build_vehicle.render_vehicle_sim(
+        data=canonical_data,
+        record_name=variant.record_name,
+    )
+
     return dedent(
         f"""
         within BobLib.Standards;
@@ -440,13 +456,13 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
           final parameter Boolean closedLoopRadius = useMode == 0;
           final parameter Boolean closedLoopVelocity = useMode == 0 or useMode == 1 or useMode == 2;
 
-          parameter Modelica.SIunits.Time steerStart = 1.0
+          parameter Modelica.SIunits.Time steerStart = 2.0
             "Start time"
             annotation(Evaluate = false);
 
           // Closed-loop parameters
           parameter SIunits.Length targetRad = 20
-            "Target maneuver curvature"
+            "Target maneuver radius"
             annotation(Evaluate = false, Dialog(enable = closedLoopRadius));
 
           parameter SIunits.Velocity targetVel = 15
@@ -457,12 +473,32 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
             "Initial velocity"
             annotation(Evaluate = false);
 
-          parameter Real curvGain = 3
-            "Proportional gain of curvature controller"
+          parameter Real curvGain = 4.0
+            "Proportional gain of curvature trim controller"
             annotation(Evaluate = false, Dialog(enable = closedLoopRadius));
 
-          parameter Real curvTi = 0.02
-            "Time constant of curvature controller"
+          parameter SIunits.Angle curvTrimLimit = 1.0
+            "Maximum magnitude of curvature trim command"
+            annotation(Evaluate = false, Dialog(enable = closedLoopRadius));
+
+          parameter Real steerRatioEstimateStart = 17.5
+            "Geometry-based bootstrap for handwheel-to-roadwheel ratio"
+            annotation(Evaluate = false, Dialog(enable = closedLoopRadius));
+
+          parameter Real steerRatioEstimateDecay = 15.5
+            "Gain-scheduling strength for the feedforward steer ratio"
+            annotation(Evaluate = false, Dialog(enable = closedLoopRadius));
+
+          parameter SIunits.Time ayRampDuration = 3.0
+            "Lateral acceleration target ramp duration"
+            annotation(Evaluate = false, Dialog(enable = closedLoopRadius));
+
+          parameter SIunits.Time steadyHoldDuration = 0.1
+            "Duration that Ay error must remain below tolerance before termination"
+            annotation(Evaluate = false, Dialog(enable = closedLoopRadius));
+
+          parameter Real ayRelErrorTol = 0.20
+            "Relative lateral acceleration error tolerance"
             annotation(Evaluate = false, Dialog(enable = closedLoopRadius));
 
           parameter Real velGain = 200
@@ -507,7 +543,24 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
           Real bodyAngles[3];
           Real curvature;
           Real speed;
-          Real curvError;
+          Real targetCurvature;
+          Real targetAy;
+          Real targetAyCmd;
+          Real targetCurvatureCmd;
+          Real targetRoadwheel;
+          Real targetRoadwheelCmd;
+          Real steerRatioEstimate;
+          Real steerFeedforward;
+          Real roadwheelMag;
+          Real ayRelError;
+          Real curvatureTrimCmd;
+          Real curvatureTrim;
+          Real rampXi;
+          Real ayRampFactor;
+          Real ayErrorRaw;
+          Real ayError;
+          Real curvatureErrorRaw;
+          Real curvatureError;
           Real radError;
           Real velError;
           Real steerSine;
@@ -517,9 +570,11 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
           SIunits.Acceleration accX;
           SIunits.Acceleration accY;
           SIunits.Angle handwheelAngle;
+          SIunits.Angle steerExcess;
           SIunits.Torque handwheelTorque;
           SIunits.Angle leftSteerAngle;
           SIunits.Angle rightSteerAngle;
+          SIunits.Angle avgSteerAngle;
           SIunits.Angle roll;
           SIunits.Angle sideslip;
           SIunits.Velocity velX;
@@ -581,9 +636,11 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
 
           final parameter Real cpInitRR[3] = Vector.mirrorXZ(cpInitRL);
 
+          final parameter SIunits.Length wheelbase = abs(pVehicle.pFrDW.wheelCenter[1] - pVehicle.pRrDW.wheelCenter[1]);
+
         protected
           // QSS detection variables
-          discrete Real t_curv_hit(start = -1);
+          discrete Real t_ay_hit(start = -1);
           discrete Real t_yawVel_hit(start = -1);
 
           Real leftWheelVector[3];
@@ -630,13 +687,20 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
 
           // Curvature controller
           Modelica.Blocks.Sources.RealExpression curvErrorExpression(
-            y = curvError) annotation(
+            y = curvatureError) annotation(
             Placement(transformation(origin = {{-110, 110}}, extent = {{{{-10, -10}}, {{10, 10}}}})));
 
-          Modelica.Blocks.Continuous.PI curvPI(
+          Modelica.Blocks.Sources.Constant curvZero(k = 0) annotation(
+            Placement(transformation(origin = {{-110, 90}}, extent = {{{{-10, -10}}, {{10, 10}}}})));
+
+          Modelica.Blocks.Continuous.LimPID curvP(
+            controllerType = Modelica.Blocks.Types.SimpleController.P,
             k = curvGain,
-            T = curvTi,
-            initType = Modelica.Blocks.Types.Init.InitialOutput) annotation(
+            yMax = curvTrimLimit,
+            yMin = -curvTrimLimit,
+            Ni = 0.9,
+            initType = Modelica.Blocks.Types.InitPID.InitialOutput,
+            y_start = 0) annotation(
             Placement(transformation(origin = {{-70, 110}}, extent = {{{{-10, -10}}, {{10, 10}}}})));
 
           // Speed Controller
@@ -662,28 +726,125 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
           vehicle.chassis.rrAxleDW.rightTire.wheelModel.hubAxis.w =
             initialVel / pVehicle.pRrPartialWheel.R0;
 
-        equation
+          equation
+          targetCurvature = noEvent(1 / targetRad);
+          targetAy = noEvent(targetVel * targetVel / targetRad);
+          targetRoadwheel = noEvent(atan(wheelbase * targetCurvature));
+
           // Curvature quantities
           curvature =
-            vehicle.chassis.spaceFrame.sprungBody.w_a[3] / max(speed, 0.1);
+            Frames.angularVelocity2(cgFreeMotion.frame_b.R)[3] / max(speed, 0.1);
 
-          // SteadyStateEval-style radius error
           radError =
-            abs(speed / max(abs(vehicle.chassis.spaceFrame.sprungBody.w_a[3]), 0.1)
-            - abs(targetRad));
+            abs(curvature - targetCurvature) /
+            max(abs(targetCurvature), 1e-6) *
+            abs(targetRad);
 
-          // SteadyStateEval-style QSS detection, only active for useMode == 0
-          when useMode == 0
-             and abs(radError) < radErrorTol
-             and abs(der(radError)) < der_radErrorTol
-             and pre(t_curv_hit) < 0 then
-            t_curv_hit = time;
+          // Fifth-order smootherstep ramp for target Ay.
+          // With steerStart = 2.0 and ayRampDuration = 3.0,
+          // the target finishes ramping at t = 5.0 s.
+          rampXi =
+            if useMode == 0 then
+              noEvent(
+                if time <= steerStart then
+                  0
+                elseif time >= steerStart + ayRampDuration then
+                  1
+                else
+                  (time - steerStart) / ayRampDuration
+              )
+            else
+              0;
+
+          ayRampFactor =
+            if useMode == 0 then
+              noEvent(10*rampXi^3 - 15*rampXi^4 + 6*rampXi^5)
+            else
+              0;
+
+          targetAyCmd =
+            if useMode == 0 and noEvent(time >= steerStart) then
+              ayRampFactor * targetAy
+            else
+              0;
+
+          targetCurvatureCmd =
+            if useMode == 0 and noEvent(time >= steerStart) then
+              ayRampFactor * targetCurvature
+            else
+              0;
+
+          targetRoadwheelCmd =
+            if useMode == 0 and noEvent(time >= steerStart) then
+              ayRampFactor * targetRoadwheel
+            else
+              0;
+
+          ayErrorRaw =
+            if useMode == 0 and noEvent(time >= steerStart) then
+              targetAy - accY
+            else
+              0;
+
+          ayError =
+            if useMode == 0 and noEvent(time >= steerStart) then
+              targetAyCmd - accY
+            else
+              0;
+
+          ayRelError =
+            if useMode == 0 and noEvent(time >= steerStart) then
+              abs(ayErrorRaw) / max(abs(targetAy), 1e-6)
+            else
+              0;
+
+          curvatureErrorRaw =
+            if useMode == 0 and noEvent(time >= steerStart) then
+              targetCurvatureCmd - curvature
+            else
+              0;
+
+          curvatureError =
+            if useMode == 0 and noEvent(time >= steerStart) then
+              curvatureErrorRaw
+            else
+              0;
+
+          roadwheelMag =
+            if useMode == 0 and noEvent(time >= steerStart) then
+              sqrt(targetRoadwheelCmd*targetRoadwheelCmd + 1e-6)
+            else
+              0;
+
+          steerRatioEstimate =
+            if useMode == 0 and noEvent(time >= steerStart) then
+              steerRatioEstimateStart /
+              (1 + steerRatioEstimateDecay*roadwheelMag)
+            else
+              steerRatioEstimateStart;
+
+          steerFeedforward =
+            if useMode == 0 and noEvent(time >= steerStart) then
+              steerRatioEstimate * targetRoadwheelCmd
+            else
+              0;
+
+          // Strict Ay hold-window detection:
+          // timer starts only when relative Ay error enters tolerance
+          // timer resets immediately if relative Ay error leaves tolerance.
+          when useMode == 0 and time > steerStart + ayRampDuration and
+               ayRelError < ayRelErrorTol and pre(t_ay_hit) < 0 then
+            t_ay_hit = time;
+
+          elsewhen useMode == 0 and time > steerStart + ayRampDuration and
+               ayRelError >= ayRelErrorTol then
+            t_ay_hit = -1;
           end when;
 
           when useMode == 0
-             and t_curv_hit > 0
-             and time > t_curv_hit + 0.1 then
-            terminate("Reached steady-state (held 0.1s)");
+             and t_ay_hit > 0
+             and time > t_ay_hit + steadyHoldDuration then
+            terminate("Reached lateral acceleration target and held error below tolerance");
           end when;
 
           // Ramp-steer steady-state detection
@@ -704,15 +865,14 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
             terminate("Reached ramp-steer steady-state: der(yawVel) below tolerance (held 0.1s)");
           end when;
 
-          // SteadyStateEval curvature controller for useMode == 0.
-          // Intentionally matches old SteadyStateEval: ramp from t = 1.0 to t = 1.2.
-          curvError =
-            if useMode == 0 then
-              smooth(1, min(1, max(0, (time - 1)/0.2))) *
-              (1/targetRad - vehicle.chassis.spaceFrame.sprungBody.w_a[3]/max(speed, 0.1))
+          curvatureTrimCmd = curvP.y;
+          curvatureTrim =
+            if useMode == 0 and noEvent(time >= steerStart) then
+              curvatureTrimCmd
             else
               0;
 
+          // Curvature feedforward plus proportional trim provides the nominal handwheel command.
           // Sinusoidal steering profile for useMode == 1
           steerSine =
             if noEvent(useMode == 1 and time > steerStart) then
@@ -727,8 +887,8 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
 
           // Mode switching logic
           frSteerCmd =
-            if useMode == 0 then
-              curvPI.y
+            if useMode == 0 and noEvent(time >= steerStart) then
+              steerFeedforward + curvatureTrim
             elseif useMode == 1 then
               steerSine
             elseif useMode == 2 then
@@ -748,19 +908,16 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
 
           // General quantities
           bodyVels =
-            Frames.resolve2(
-              vehicle.chassis.spaceFrame.sprungBody.frame_a.R,
-              vehicle.chassis.spaceFrame.sprungBody.v_0);
+            Frames.resolve2(cgFreeMotion.frame_b.R, cgFreeMotion.v_rel_a);
+
+          bodyAngularVels =
+            Frames.angularVelocity2(cgFreeMotion.frame_b.R);
 
           bodyAccels =
-            Frames.resolve2(
-              vehicle.chassis.spaceFrame.sprungBody.frame_a.R,
-              vehicle.chassis.spaceFrame.sprungBody.a_0);
+            Frames.resolve2(cgFreeMotion.frame_b.R, cgFreeMotion.a_rel_a);
 
           bodyAngles =
-            Frames.resolve2(
-              vehicle.chassis.spaceFrame.sprungBody.frame_a.R,
-              sprungAngles.angles);
+            Frames.resolve2(vehicle.chassis.cgFrame.R, sprungAngles.angles);
 
           leftWheelVector =
             Frames.resolve1(
@@ -774,8 +931,10 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
 
           leftSteerAngle = -1*atan(leftWheelVector[2] / leftWheelVector[1]);
           rightSteerAngle = -1*atan(rightWheelVector[2] / rightWheelVector[1]);
+          avgSteerAngle = (leftSteerAngle + rightSteerAngle) / 2;
 
           handwheelAngle = vehicle.steerFlange.phi;
+          steerExcess = avgSteerAngle - wheelbase * curvature;
 
           // Speed quantities
           speed = norm(bodyVels);
@@ -785,7 +944,7 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
           // Kinematics
           velX = bodyVels[1];
           velY = bodyVels[2];
-          yawVel = vehicle.chassis.spaceFrame.sprungBody.w_a[3];
+          yawVel = bodyAngularVels[3];
           sideslip = atan(velY / velX);
 
           // Accelerations
@@ -816,8 +975,11 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
           connect(fixedRR.frame_b, groundRR.frame_a) annotation(
             Line(points = {{{{120, -50}}, {{110, -50}}}}, color = {{95, 95, 95}}));
 
-          connect(curvErrorExpression.y, curvPI.u) annotation(
+          connect(curvErrorExpression.y, curvP.u_s) annotation(
             Line(points = {{{{-99, 110}}, {{-82, 110}}}}, color = {{0, 0, 127}}));
+
+          connect(curvZero.y, curvP.u_m) annotation(
+            Line(points = {{{{-99, 90}}, {{-82, 90}}}}, color = {{0, 0, 127}}));
 
           connect(vehicle.frameRL, groundRL.frame_b) annotation(
             Line(points = {{{{-44, -22}}, {{-100, -22}}, {{-100, -40}}}}, color = {{95, 95, 95}}));

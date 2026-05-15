@@ -38,6 +38,7 @@ model TransientEval
   
   Real steerValue;
   Real bodyVels[3];
+  Real bodyAngularVels[3];
   Real bodyAccels[3];
   Real bodyAngles[3];
   Real speedCG;
@@ -133,9 +134,10 @@ equation
       (if time >= stepTime then steerStep else 0);
   
   // General quantities
-  bodyVels = Frames.resolve2(vehicle.chassis.spaceFrame.sprungBody.frame_a.R, vehicle.chassis.spaceFrame.sprungBody.v_0);
-  bodyAccels = Frames.resolve2(vehicle.chassis.spaceFrame.sprungBody.frame_a.R, vehicle.chassis.spaceFrame.sprungBody.a_0);
-  bodyAngles = Frames.resolve2(vehicle.chassis.spaceFrame.sprungBody.frame_a.R, sprungAngles.angles);
+  bodyVels = Frames.resolve2(cgFreeMotion.frame_b.R, cgFreeMotion.v_rel_a);
+  bodyAngularVels = Frames.angularVelocity2(cgFreeMotion.frame_b.R);
+  bodyAccels = Frames.resolve2(cgFreeMotion.frame_b.R, cgFreeMotion.a_rel_a);
+  bodyAngles = Frames.resolve2(vehicle.chassis.cgFrame.R, sprungAngles.angles);
   speedCG = norm(bodyVels);
 
   // Output record
@@ -144,7 +146,7 @@ equation
   // Kinematics
   iso.velX = bodyVels[1];
   iso.velY = bodyVels[2];
-  iso.yawVel = vehicle.chassis.spaceFrame.sprungBody.w_a[3];
+  iso.yawVel = bodyAngularVels[3];
   iso.sideslip = atan(iso.velY/iso.velX);
   
   // Accelerations
