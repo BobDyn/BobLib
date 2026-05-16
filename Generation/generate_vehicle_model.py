@@ -49,8 +49,6 @@ REPO_ROOT = Path(__file__).resolve().parents[4]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-import build_vehicle
-
 
 # =============================================================================
 # Topology metadata
@@ -418,6 +416,8 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
 
     The variant-specific part is the imported record and instantiated vehicle.
     """
+    import build_vehicle
+
     canonical_data = {
         "output": {"sim_package": "BobLib.Standards"},
         "architecture": {"vehicle_model": variant.vehicle_model_name},
@@ -449,12 +449,12 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
           parameter {variant.record_name} pVehicle;
 
           parameter Integer useMode = 0
-            "0 - closed-loop radius and velocity; 1 - open-loop sinusoidal steer, constant velocity; 2 - custom open-loop steer and drive torque"
+            "0 - closed-loop radius and velocity; 1 - open-loop sinusoidal steer, constant velocity; 2 - custom open-loop steer and drive torque; 3 - open-loop chirp steer, constant velocity"
             annotation(Evaluate = false);
 
           // Toggle controllers
           final parameter Boolean closedLoopRadius = useMode == 0;
-          final parameter Boolean closedLoopVelocity = useMode == 0 or useMode == 1 or useMode == 2;
+          final parameter Boolean closedLoopVelocity = useMode == 0 or useMode == 1 or useMode == 2 or useMode == 3;
 
           parameter Modelica.SIunits.Time steerStart = 2.0
             "Start time"
@@ -526,6 +526,9 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
           parameter SIunits.Time frRampSteerDuration = 0.001
             "Ramp steer duration";
 
+          parameter SIunits.Time stepDuration = frRampSteerDuration
+            "Step steer duration";
+
           // Frequency response parameters
           parameter SIunits.Angle steerAmp = 6*pi/180
             "Amplitude"
@@ -534,6 +537,22 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
           parameter SIunits.Frequency steerFreq = 1.0
             "Frequency (Hz)"
             annotation(Evaluate = false);
+
+          parameter SIunits.Frequency chirpStartFreq = 0.5
+            "Chirp start frequency (Hz)"
+            annotation(Evaluate = false, Dialog(enable = closedLoopVelocity));
+
+          parameter SIunits.Frequency chirpEndFreq = 2.0
+            "Chirp end frequency (Hz)"
+            annotation(Evaluate = false, Dialog(enable = closedLoopVelocity));
+
+          parameter SIunits.Time chirpSweepDuration = 10.0
+            "Chirp sweep duration"
+            annotation(Evaluate = false, Dialog(enable = closedLoopVelocity));
+
+          parameter Integer chirpSweepType = 0
+            "0 - linear frequency sweep; 1 - logarithmic frequency sweep"
+            annotation(Evaluate = false, Dialog(enable = closedLoopVelocity));
 
           // Raw signal parameters
           Real frSteerCmd;
@@ -565,10 +584,15 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
           Real velError;
           Real steerSine;
           Real steerRamp;
+          Real steerChirp;
+          Real chirpTau;
+          Real chirpPhase;
+          Real chirpPhaseEnd;
 
           // Standard outputs
           SIunits.Acceleration accX;
           SIunits.Acceleration accY;
+          SIunits.Angle steerCommand;
           SIunits.Angle handwheelAngle;
           SIunits.Angle steerExcess;
           SIunits.Torque handwheelTorque;
@@ -849,7 +873,7 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
 
           // Ramp-steer steady-state detection
           when useMode == 2
-             and time > steerStart + frRampSteerDuration
+             and time > steerStart + stepDuration
              and abs(der(yawVel)) < der_yawVelTol
              and pre(t_yawVel_hit) < 0 then
             t_yawVel_hit = time;
@@ -883,7 +907,51 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
           // Ramp-steer profile for useMode == 2
           steerRamp =
             frRampSteerHeight *
-            noEvent(min(1, max(0, (time - steerStart) / frRampSteerDuration)));
+            noEvent(min(1, max(0, (time - steerStart) / stepDuration)));
+
+          assert(chirpStartFreq > 0, "Chirp start frequency must be positive.");
+          assert(chirpEndFreq > 0, "Chirp end frequency must be positive.");
+          assert(chirpSweepDuration > 0, "Chirp sweep duration must be positive.");
+          assert(chirpSweepType == 0 or chirpSweepType == 1, "Chirp sweep type must be 0 (linear) or 1 (logarithmic).");
+
+          chirpTau =
+            if noEvent(useMode == 3 and time > steerStart) then
+              time - steerStart
+            else
+              0;
+
+          chirpPhaseEnd =
+            if chirpSweepType == 1 and abs(chirpEndFreq - chirpStartFreq) > 1e-12 then
+              2*pi*chirpSweepDuration*chirpStartFreq*(chirpEndFreq/chirpStartFreq - 1) /
+              log(chirpEndFreq/chirpStartFreq)
+            else
+              2*pi*(
+                chirpStartFreq*chirpSweepDuration +
+                0.5*(chirpEndFreq - chirpStartFreq)*chirpSweepDuration
+              );
+
+          chirpPhase =
+            if noEvent(useMode == 3 and time > steerStart) then
+              if chirpTau <= chirpSweepDuration then
+                if chirpSweepType == 1 and abs(chirpEndFreq - chirpStartFreq) > 1e-12 then
+                  2*pi*chirpSweepDuration*chirpStartFreq *
+                  (exp(log(chirpEndFreq/chirpStartFreq) * chirpTau / chirpSweepDuration) - 1) /
+                  log(chirpEndFreq/chirpStartFreq)
+                else
+                  2*pi*(
+                    chirpStartFreq*chirpTau +
+                    0.5*(chirpEndFreq - chirpStartFreq) * chirpTau^2 / chirpSweepDuration
+                  )
+              else
+                chirpPhaseEnd + 2*pi*chirpEndFreq*(chirpTau - chirpSweepDuration)
+            else
+              0;
+
+          steerChirp =
+            if noEvent(useMode == 3 and time > steerStart) then
+              steerAmp*sin(chirpPhase)
+            else
+              0;
 
           // Mode switching logic
           frSteerCmd =
@@ -893,11 +961,13 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
               steerSine
             elseif useMode == 2 then
               steerRamp
+            elseif useMode == 3 then
+              steerChirp
             else
               0;
 
           driveTorqueCmd =
-            if useMode == 0 or useMode == 1 or useMode == 2 then
+            if useMode == 0 or useMode == 1 or useMode == 2 or useMode == 3 then
               speedPI.y
             else
               0;
@@ -934,6 +1004,7 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
           avgSteerAngle = (leftSteerAngle + rightSteerAngle) / 2;
 
           handwheelAngle = vehicle.steerFlange.phi;
+          steerCommand = frSteerCmd;
           steerExcess = avgSteerAngle - wheelbase * curvature;
 
           // Speed quantities

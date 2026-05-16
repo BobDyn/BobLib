@@ -81,6 +81,9 @@ model VehicleSim
   parameter SIunits.Time frRampSteerDuration = 0.001
     "Ramp steer duration";
 
+  parameter SIunits.Time stepDuration = frRampSteerDuration
+    "Step steer duration";
+
   // Frequency response parameters
   parameter SIunits.Angle steerAmp = 6*pi/180
     "Amplitude"
@@ -297,8 +300,8 @@ equation
       0;
 
   // Fifth-order smootherstep ramp for target Ay.
-  // With steerStart = 1.0 and ayRampDuration = 3.0,
-  // the target finishes ramping at t = 4.0 s.
+  // With steerStart = 2.0 and ayRampDuration = 3.0,
+  // the target finishes ramping at t = 5.0 s.
   rampXi =
     if useMode == 0 then
       noEvent(
@@ -431,7 +434,7 @@ equation
 
   steerStep =
     if noEvent(time > steerStart) then
-      frRampSteerHeight
+      frRampSteerHeight * noEvent(min(1, max(0, (time - steerStart) / stepDuration)))
     else
       0;
 
