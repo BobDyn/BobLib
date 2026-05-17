@@ -1,11 +1,14 @@
 within BobLib.Utilities.Mechanics.Multibody;
 
 model ContactPatchFixture
-
+  import Modelica.SIunits;
+  
+  parameter SIunits.Position CP_init[3] "Vector from origin to initial contact patch location, resolved in world frame";
+  
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a frame_a annotation(
     Placement(transformation(origin = {70, 100}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {0, 20}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
   
-  Modelica.Mechanics.MultiBody.Parts.Fixed CP_Fixed(animation = false) annotation(
+  Modelica.Mechanics.MultiBody.Parts.Fixed CP_Fixed(r = CP_init, animation = false) annotation(
     Placement(transformation(origin = {-70, -50}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
   Modelica.Mechanics.MultiBody.Joints.Prismatic DOF_x(animation = false, n = {1, 0, 0}) annotation(
     Placement(transformation(origin = {-50, 0}, extent = {{-10, -10}, {10, 10}})));
