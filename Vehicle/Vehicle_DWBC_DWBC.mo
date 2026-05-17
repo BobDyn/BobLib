@@ -63,7 +63,7 @@ model Vehicle_DWBC_DWBC
     ));
 
   Powertrain.PTNPlaceholder ptnPlaceholder annotation(
-    Placement(transformation(origin = {0, -70}, extent = {{-20, -4}, {20, 4}})));
+    Placement(transformation(origin = {0, -80}, extent = {{-20, -4}, {20, 4}})));
 
   Modelica.Mechanics.Rotational.Interfaces.Flange_b flangeFL annotation(
     Placement(transformation(origin = {-100, 60}, extent = {{-10, -10}, {10, 10}}),
@@ -79,13 +79,13 @@ model Vehicle_DWBC_DWBC
 
 equation
   connect(chassis.rrAxleFrame, ptnPlaceholder.mountFrame) annotation(
-    Line(points = {{0, -40}, {0, -66}}, color = {95, 95, 95}));
+    Line(points = {{0, -40}, {0, -76}}, color = {95, 95, 95}));
 
   connect(ptnPlaceholder.leftFlange, chassis.flangeRL) annotation(
-    Line(points = {{-20, -70}, {-70, -70}, {-70, -40}, {-58, -40}}));
+    Line(points = {{-20, -80}, {-70, -80}, {-70, -40}, {-58, -40}}));
 
   connect(ptnPlaceholder.rightFlange, chassis.flangeRR) annotation(
-    Line(points = {{20, -70}, {70, -70}, {70, -40}, {58, -40}}));
+    Line(points = {{20, -80}, {70, -80}, {70, -40}, {58, -40}}));
 
   connect(flangeFL, chassis.flangeFL) annotation(
     Line(points = {{-100, 60}, {-80, 60}, {-80, 38}, {-58, 38}}));
@@ -94,7 +94,7 @@ equation
     Line(points = {{100, 60}, {80, 60}, {80, 38}, {58, 38}}));
 
   connect(uPTNTorque, ptnPlaceholder.u) annotation(
-    Line(points = {{0, -120}, {0, -78}}, color = {0, 0, 127}));
+    Line(points = {{0, -120}, {0, -88}}, color = {0, 0, 127}));
 
 annotation(
   Diagram(graphics),
