@@ -24,12 +24,12 @@ record DWBCStabar_DWBCStabarRecord
       shockMount = {-0.020673469702, 0.247847085458, 0.561456926868},
       springTable = [0, 0; 1, 26269.02525],
       springFreeLength = 0.2,
-      damperTable = [-1, -850.0; 0, 0; 1, 850]);
+      damperTable = [-1, -850; 0, 0; 1, 850]);
 
   parameter Stabar.StabarRecord pFrStabar(
       leftArmEnd = {-0.03682914, 0.2667, 0.11597939},
       leftBarEnd = {-0.10664664, 0.2667, 0.11811},
-      barRate = 258);
+      barRate = 1);
 
   parameter Wheel.Templates.PartialWheelRecord pFrPartialWheel(
       R0 = 0.2045,
@@ -92,12 +92,12 @@ record DWBCStabar_DWBCStabarRecord
       shockMount = {-1.50192144, 0.28884688, 0.36889916},
       springTable = [0, 0; 1, 43781.70875],
       springFreeLength = 0.265,
-      damperTable = [-1, -1300.0; 0, 0; 1, 1300]);
+      damperTable = [-1, -1300; 0, 0; 1, 1300]);
 
   parameter Stabar.StabarRecord pRrStabar(
       leftArmEnd = {-1.43001283, 0.3032125, 0.4054766},
       leftBarEnd = {-1.3925183, 0.3032125, 0.41224196},
-      barRate = 300);
+      barRate = 1);
 
   parameter Wheel.Templates.PartialWheelRecord pRrPartialWheel(
       R0 = 0.2045,
@@ -158,7 +158,7 @@ record DWBCStabar_DWBCStabarRecord
       rCM = {-0.541837, 6e-06, 0.395782},
       inertia = {{2.241988, 0.000284, -1.975938}, {0.000284, 7.621387, -5.3e-05}, {-1.975938, -5.3e-05, 6.749042}});
 
-  parameter Modelica.SIunits.RotationalSpringConstant pTorsionalStiff = 500000;
+  parameter Modelica.SIunits.RotationalSpringConstant pTorsionalStiff = 300000;
 
   parameter MassRecord pSprungMass = BobLib.Utilities.Mechanics.combineMassRecords({pBaseSprungMass, pDriverMass});
 

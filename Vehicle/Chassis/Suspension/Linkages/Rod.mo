@@ -12,6 +12,9 @@ model Rod
   
   parameter Boolean kinematicConstraint = true annotation(
     Evaluate = false, Dialog(group = "Geometry"));
+  parameter Boolean computeRodLength = false annotation(
+    Evaluate = false, Dialog(group = "Geometry"));
+
   // Visual parameters
   parameter SIunits.Length linkDiameter annotation(
     Evaluate = true, Dialog(tab="Animation"));
@@ -35,7 +38,8 @@ protected
                                                              cylinderLength = jointDiameter,
                                                              cylinderDiameter = jointDiameter,
                                                              kinematicConstraint = kinematicConstraint,
-                                                             showUniversalAxes = show_universal_axes, computeRodLength = true)  annotation(
+                                                             computeRodLength = computeRodLength,
+                                                             showUniversalAxes = show_universal_axes)  annotation(
     Placement(transformation(extent = {{-20, -20}, {20, 20}})));
 equation
   connect(rod.frame_a, frame_a) annotation(

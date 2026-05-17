@@ -86,20 +86,20 @@ partial model AxleDWBase
   BobLib.Vehicle.Chassis.Suspension.Templates.DoubleWishbone.WishboneUprightLoop rightWishboneUprightLoop(pDW = pRightDW, final linkDiameter = linkDiameter, final jointDiameter = jointDiameter) annotation(
     Placement(transformation(origin = {69, 50}, extent = {{-29, -29}, {29, 29}})));
   
-  BobLib.Vehicle.Chassis.Suspension.Linkages.ForceOnlyRod leftTieRod(r_a = pRack.leftPickup,
-                                                            r_b = pLeftDW.tie_o,
-                                                            show_universal_axes = false,
-                                                            kinematicConstraint = true,
-                                                            final linkDiameter = linkDiameter,
-                                                            final jointDiameter = jointDiameter)  annotation(
+  replaceable BobLib.Vehicle.Chassis.Suspension.Linkages.ForceOnlyRod leftTieRod(r_a = pRack.leftPickup,
+                                                                                 r_b = pLeftDW.tie_o,
+                                                                                 show_universal_axes = false,
+                                                                                 kinematicConstraint = true,
+                                                                                 final linkDiameter = linkDiameter,
+                                                                                 final jointDiameter = jointDiameter)  annotation(
     Placement(transformation(origin = {-60, 100}, extent = {{20, -20}, {-20, 20}})));
   
-  BobLib.Vehicle.Chassis.Suspension.Linkages.ForceOnlyRod rightTieRod(r_a = Vector.mirrorXZ(pRack.leftPickup),
-                                                             r_b = pRightDW.tie_o,
-                                                             show_universal_axes = false,
-                                                             kinematicConstraint = true,
-                                                             final linkDiameter = linkDiameter,
-                                                             final jointDiameter = jointDiameter)  annotation(
+  replaceable BobLib.Vehicle.Chassis.Suspension.Linkages.ForceOnlyRod rightTieRod(r_a = Vector.mirrorXZ(pRack.leftPickup),
+                                                                                  r_b = pRightDW.tie_o,
+                                                                                  show_universal_axes = false,
+                                                                                  kinematicConstraint = true,
+                                                                                  final linkDiameter = linkDiameter,
+                                                                                  final jointDiameter = jointDiameter)  annotation(
     Placement(transformation(origin = {60, 100}, extent = {{-20, -20}, {20, 20}})));
 
   BobLib.Vehicle.Chassis.Suspension.Templates.SteeringRack.RackAndPinion rackAndPinion(pRack = pRack, final linkDiameter = linkDiameter) annotation(

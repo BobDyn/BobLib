@@ -72,9 +72,9 @@ protected
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRightShock(r = mirrorXZ(pAxle.shockMount) - effectiveCenter, animation = false) annotation(
     Placement(transformation(origin = {20, -70}, extent = {{-10, -10}, {10, 10}})));
 
-  BobLib.Vehicle.Chassis.Suspension.Linkages.Rod leftPushrod(jointDiameter = jointDiameter, kinematicConstraint = false, linkDiameter = linkDiameter, n1_a = {1, 0, 0}, r_a = pAxle.bellcrankRodPickup, r_b = pLeftDW.rodMount) annotation(
+  BobLib.Vehicle.Chassis.Suspension.Linkages.Rod leftPushrod(jointDiameter = jointDiameter, kinematicConstraint = true, linkDiameter = linkDiameter, n1_a = {1, 0, 0}, r_a = pAxle.bellcrankRodPickup, r_b = pLeftDW.rodMount) annotation(
     Placement(transformation(origin = {-120, -30}, extent = {{20, -20}, {-20, 20}})));
-  BobLib.Vehicle.Chassis.Suspension.Linkages.Rod rightPushrod(jointDiameter = jointDiameter, kinematicConstraint = false, linkDiameter = linkDiameter, n1_a = {1, 0, 0}, r_a = mirrorXZ(pAxle.bellcrankRodPickup), r_b = mirrorXZ(pLeftDW.rodMount)) annotation(
+  BobLib.Vehicle.Chassis.Suspension.Linkages.Rod rightPushrod(jointDiameter = jointDiameter, kinematicConstraint = true, linkDiameter = linkDiameter, n1_a = {1, 0, 0}, r_a = mirrorXZ(pAxle.bellcrankRodPickup), r_b = mirrorXZ(pLeftDW.rodMount)) annotation(
     Placement(transformation(origin = {120, -30}, extent = {{-20, -20}, {20, 20}})));
 equation
   if pAxle.rodPickup == 1 then
