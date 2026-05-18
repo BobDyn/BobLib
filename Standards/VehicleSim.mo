@@ -17,12 +17,12 @@ model VehicleSim
   parameter DWBCStabar_DWBCStabarRecord pVehicle;
 
   parameter Integer useMode = 0
-    "0 - open-loop slow ramp steer; 1 - open-loop sinusoidal steer, constant velocity; 2 - custom open-loop step steer and drive torque"
+    "0 - open-loop ramp steer; 1 - open-loop sinusoidal steer; 2 - step steer; 3 - chirp steer"
     annotation(Evaluate = false);
 
   // Toggle controllers
   final parameter Boolean openLoopAy = useMode == 0;
-  final parameter Boolean closedLoopVelocity = useMode == 0 or useMode == 1 or useMode == 2;
+  final parameter Boolean closedLoopVelocity = useMode == 0 or useMode == 1 or useMode == 2 or useMode == 3;
 
   parameter Modelica.SIunits.Time steerStart = 2.0
     "Start time"
@@ -224,7 +224,7 @@ protected
   Modelica.Mechanics.MultiBody.Parts.Fixed fixedRR(
     r = cpInitRR,
     animation = false) annotation(
-    Placement(transformation(origin = {130, -50}, extent = {{10, -10}, {10, 10}})));
+    Placement(transformation(origin = {130, -50}, extent = {{10, -10}, {-10, 10}})));
 
   Modelica.Mechanics.MultiBody.Parts.Fixed cgFixed(
     r = vehicle.pVehicleCG,

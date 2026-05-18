@@ -3,51 +3,32 @@ within BobLib.Tests.TestVehicle.TestChassis.TestSuspension;
 model TestFrAxleDW
   import Modelica.Constants.pi;
   import Modelica.Mechanics.MultiBody.Frames;
-  import BobLib.Resources.VehicleDefn.DWBCStabar_DWBCStabarRecord;
-  
   import BobLib.Utilities.Math.Vector;
-  
-  parameter DWBCStabar_DWBCStabarRecord pVehicle;
-  
+  import BobLib.Resources.VehicleDefn.DWBC_DWBCRecord;
+  parameter DWBC_DWBCRecord pVehicle;
   inner parameter Real linkDiameter = 0.020;
   inner parameter Real jointDiameter = 0.030;
-  
-  parameter Real leftCPInit[3] = pVehicle.pFrDW.wheelCenter + Frames.resolve1(Frames.axesRotations({1, 2, 3},
-                                                                                                   {pVehicle.pFrPartialWheel.staticGamma*pi/180, 0, pVehicle.pFrPartialWheel.staticAlpha*pi/180},
-                                                                                                   {0, 0, 0}),
-                                                                              {0, 0, -pVehicle.pFrPartialWheel.R0});
+  parameter Real leftCPInit[3] = pVehicle.pFrDW.wheelCenter + Frames.resolve1(Frames.axesRotations({1, 2, 3}, {pVehicle.pFrPartialWheel.staticGamma*pi/180, 0, pVehicle.pFrPartialWheel.staticAlpha*pi/180}, {0, 0, 0}), {0, 0, -pVehicle.pFrPartialWheel.R0});
   parameter Real rightCPInit[3] = Vector.mirrorXZ(leftCPInit);
-  
   inner Modelica.Mechanics.MultiBody.World world(n = {0, 0, -1}) annotation(
     Placement(transformation(origin = {-110, -90}, extent = {{-10, -10}, {10, 10}})));
   // Steer input
-  Modelica.Blocks.Sources.Ramp steerRamp(duration = 1,
-                                         height = 90*Modelica.Constants.pi/180,
-                                         startTime = 0) annotation(
+  Modelica.Blocks.Sources.Ramp steerRamp(duration = 1, height = 90*Modelica.Constants.pi/180, startTime = 0) annotation(
     Placement(transformation(origin = {-80, 70}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.Rotational.Sources.Position steerPosition(exact = true) annotation(
     Placement(transformation(origin = {-50, 70}, extent = {{-10, -10}, {10, 10}})));
   // Left jounce input
-  Modelica.Blocks.Sources.Ramp leftJounceRamp(duration = 1,
-                                              height = 1*0.0254,
-                                              startTime = 0) annotation(
+  Modelica.Blocks.Sources.Ramp leftJounceRamp(duration = 1, height = 1*0.0254, startTime = 0) annotation(
     Placement(transformation(origin = {-110, 0}, extent = {{-10, -10}, {10, 10}}, rotation = -0)));
   // Right jounce input
-  Modelica.Blocks.Sources.Ramp rightJounceRamp(duration = 1,
-                                               height = -1*0.0254,
-                                               startTime = 0) annotation(
+  Modelica.Blocks.Sources.Ramp rightJounceRamp(duration = 1, height = -1*0.0254, startTime = 0) annotation(
     Placement(transformation(origin = {110, 0}, extent = {{10, -10}, {-10, 10}}, rotation = -0)));
   // Front axle
-  BobLib.Vehicle.Chassis.Suspension.FrAxleDW_BC_ARB frAxleDW(pAxle = pVehicle.pFrAxleDW,
-                                                             pRack = pVehicle.pFrRack,
-                                                             pStabar = pVehicle.pFrStabar,
-                                                             pLeftPartialWheel = pVehicle.pFrPartialWheel,
-                                                             pLeftDW = pVehicle.pFrDW,
-                                                             pLeftAxleMass = pVehicle.pFrAxleMass,                                                      
-                                                             redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.BaseTire leftTire(redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.SlipModel.NoSlip slipModel),
-                                                             redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.BaseTire rightTire(redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.SlipModel.NoSlip slipModel)) annotation(
+  BobLib.Vehicle.Chassis.Suspension.FrAxleDW_BC frAxleDW(pAxle = pVehicle.pFrAxleDW, pRack = pVehicle.pFrRack, pLeftPartialWheel = pVehicle.pFrPartialWheel, pLeftDW = pVehicle.pFrDW, pLeftAxleMass = pVehicle.pFrAxleMass,
+//  redeclare BobLib.Vehicle.Chassis.Suspension.Linkages.Rod leftTieRod(r_a = frAxleDW.pRack.leftPickup, r_b = frAxleDW.pLeftDW.tie_o , kinematicConstraint = true),
+//  redeclare BobLib.Vehicle.Chassis.Suspension.Linkages.Rod rightTieRod(r_a = Vector.mirrorXZ(pVehicle.pFrRack.leftPickup), r_b = Vector.mirrorXZ(pVehicle.pFrDW.tie_o), n1_a = {0, 0, 1}, show_universal_axes = false, kinematicConstraint = false, computeRodLength = true),
+  redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.BaseTire leftTire(redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.SlipModel.NoSlip slipModel), redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.BaseTire rightTire(redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.SlipModel.NoSlip slipModel)) annotation(
     Placement(transformation(origin = {2.72478e-07, 31.4444}, extent = {{-33.5, -14.8889}, {33.5, 14.8889}})));
-
 protected
   // Left jounce input
   Modelica.Mechanics.MultiBody.Parts.Fixed leftJounceRef(animation = false, r = leftCPInit) annotation(
@@ -80,7 +61,6 @@ protected
     Placement(transformation(origin = {60, -30}, extent = {{10, -10}, {-10, 10}})));
   Modelica.Mechanics.MultiBody.Joints.Spherical right_DOF_xyz(animation = false) annotation(
     Placement(transformation(origin = {40, -10}, extent = {{10, -10}, {-10, 10}}, rotation = -90)));
-  
 equation
   connect(axleFixed.frame_b, frAxleDW.axleFrame) annotation(
     Line(points = {{0, 0}, {0, 30}}, color = {95, 95, 95}));

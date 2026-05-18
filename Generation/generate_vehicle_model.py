@@ -44,6 +44,7 @@ from dataclasses import dataclass
 from pathlib import Path
 import sys
 from textwrap import dedent
+from typing import Any, cast
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 if str(REPO_ROOT) not in sys.path:
@@ -416,14 +417,14 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
 
     The variant-specific part is the imported record and instantiated vehicle.
     """
-    import build_vehicle
+    import build_vehicle_sim as build_vehicle
 
     canonical_data = {
         "output": {"sim_package": "BobLib.Standards"},
         "architecture": {"vehicle_model": variant.vehicle_model_name},
     }
     return build_vehicle.render_vehicle_sim(
-        data=canonical_data,
+        data=cast(dict[str, Any], canonical_data),
         record_name=variant.record_name,
     )
 
