@@ -7,11 +7,11 @@ partial model ChassisBase
   inner parameter SIunits.Length jointDiameter = 0.030;
   
   // Front axle
-  replaceable BobLib.Vehicle.Chassis.Suspension.FrAxleDW_BC frAxleDW annotation(
+  replaceable BobLib.Vehicle.Chassis.Suspension.FrAxleDW_BC_Stabar frAxleDW annotation(
     Placement(transformation(origin = {0.464283, 63}, extent = {{-64.25, -28.5556}, {64.25, 28.5556}})));
   
   // Rear axle
-  replaceable BobLib.Vehicle.Chassis.Suspension.RrAxleDW_BC rrAxleDW annotation(
+  replaceable BobLib.Vehicle.Chassis.Suspension.RrAxleDW_BC_Stabar rrAxleDW annotation(
     Placement(transformation(origin = {0.285708, -60.2776}, extent = {{-60.1429, -23.3889}, {60.1429, 23.3889}})));
   
   // Frame

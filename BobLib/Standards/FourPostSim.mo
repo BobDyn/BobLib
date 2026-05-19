@@ -11,11 +11,7 @@ model FourPostSim
   import BobLib.Resources.StandardRecord.FourPostEvalRecord;
 
   // Suspension axle models
-  import BobLib.Vehicle.Chassis.Suspension.FrAxleDW_Direct;
-  import BobLib.Vehicle.Chassis.Suspension.FrAxleDW_BC;
   import BobLib.Vehicle.Chassis.Suspension.FrAxleDW_BC_Stabar;
-  import BobLib.Vehicle.Chassis.Suspension.RrAxleDW_Direct;
-  import BobLib.Vehicle.Chassis.Suspension.RrAxleDW_BC;
   import BobLib.Vehicle.Chassis.Suspension.RrAxleDW_BC_Stabar;
 
   // Axle record types
@@ -30,12 +26,12 @@ model FourPostSim
   import BobLib.Vehicle.Chassis.Suspension.Templates.Tire;
 
   // Vehicle record
-  import BobLib.Resources.VehicleDefn.DWBC_DWBCRecord;
+  import BobLib.Resources.VehicleDefn.DWBCStabar_DWBCStabarRecord;
   
   inner parameter SIunits.Length linkDiameter = 0.020;
   inner parameter SIunits.Length jointDiameter = 0.030;
   
-  parameter DWBC_DWBCRecord pVehicle;
+  parameter DWBCStabar_DWBCStabarRecord pVehicle;
   
   parameter SIunits.Angle steerMagnitude = 0 "Maximum pinion angle magnitude" annotation(
     Dialog(group = "Test Parameters"));
@@ -55,13 +51,15 @@ model FourPostSim
   inner Modelica.Mechanics.MultiBody.World world(n = {0, 0, -1}, g = 0) annotation(
     Placement(transformation(origin = {-90, -90}, extent = {{-10, -10}, {10, 10}})));
   
-  parameter AxleDW_BCRecord fr_pAxle(
+  parameter AxleDW_BC_StabarRecord fr_pAxle(
       bellcrankPivot = pVehicle.pFrAxleDW.bellcrankPivot,
       bellcrankPivotAxis = pVehicle.pFrAxleDW.bellcrankPivotAxis,
       bellcrankRodPickup = pVehicle.pFrAxleDW.bellcrankRodPickup,
       bellcrankShockPickup = pVehicle.pFrAxleDW.bellcrankShockPickup,
+      bellcrankStabarPickup = pVehicle.pFrAxleDW.bellcrankStabarPickup,
       rodPickup = pVehicle.pFrAxleDW.rodPickup,
       shockPickup = pVehicle.pFrAxleDW.shockPickup,
+      stabarPickup = pVehicle.pFrAxleDW.stabarPickup,
       rodToLower = pVehicle.pFrAxleDW.rodToLower,
       rodMount = pVehicle.pFrAxleDW.rodMount,
       shockMount = pVehicle.pFrAxleDW.shockMount,
@@ -69,14 +67,20 @@ model FourPostSim
       springFreeLength = pVehicle.pFrAxleDW.springFreeLength,
       damperTable = pVehicle.pFrAxleDW.damperTable);
 
+  parameter StabarRecord pFrStabar(
+      leftArmEnd = pVehicle.pFrStabar.leftArmEnd,
+      leftBarEnd = pVehicle.pFrStabar.leftBarEnd,
+      barRate = 0);
 
-  parameter AxleDW_BCRecord rr_pAxle(
+  parameter AxleDW_BC_StabarRecord rr_pAxle(
       bellcrankPivot = pVehicle.pRrAxleDW.bellcrankPivot,
       bellcrankPivotAxis = pVehicle.pRrAxleDW.bellcrankPivotAxis,
       bellcrankRodPickup = pVehicle.pRrAxleDW.bellcrankRodPickup,
       bellcrankShockPickup = pVehicle.pRrAxleDW.bellcrankShockPickup,
+      bellcrankStabarPickup = pVehicle.pRrAxleDW.bellcrankStabarPickup,
       rodPickup = pVehicle.pRrAxleDW.rodPickup,
       shockPickup = pVehicle.pRrAxleDW.shockPickup,
+      stabarPickup = pVehicle.pRrAxleDW.stabarPickup,
       rodToLower = pVehicle.pRrAxleDW.rodToLower,
       rodMount = pVehicle.pRrAxleDW.rodMount,
       shockMount = pVehicle.pRrAxleDW.shockMount,
@@ -84,13 +88,20 @@ model FourPostSim
       springFreeLength = pVehicle.pRrAxleDW.springFreeLength,
       damperTable = pVehicle.pRrAxleDW.damperTable);
 
+  parameter StabarRecord pRrStabar(
+      leftArmEnd = pVehicle.pRrStabar.leftArmEnd,
+      leftBarEnd = pVehicle.pRrStabar.leftBarEnd,
+      barRate = 0);
 
   // Front axle
-  FrAxleDW_BC frAxleDW(pAxle = fr_pAxle,
+  FrAxleDW_BC_Stabar frAxleDW(pAxle = fr_pAxle,
                               pRack = pVehicle.pFrRack,
                               pLeftPartialWheel = pVehicle.pFrPartialWheel,
                               pLeftDW = pVehicle.pFrDW,
                               pLeftAxleMass = pVehicle.pFrAxleMass,
+                              pStabar = StabarRecord(leftBarEnd = pVehicle.pFrStabar.leftBarEnd,
+                                                     leftArmEnd = pVehicle.pFrStabar.leftArmEnd,
+                                                     barRate = 0),
                               redeclare Tire.BaseTire leftTire(pPartialWheel = pVehicle.pFrPartialWheel,
                                                                redeclare Tire.TirePhysics.Wheel0DOF wheelModel(partialWheelParams = pVehicle.pFrPartialWheel),
                                                                redeclare Tire.MF52.SlipModel.NoSlip slipModel),
@@ -99,11 +110,14 @@ model FourPostSim
                                                                redeclare Tire.MF52.SlipModel.NoSlip slipModel)) annotation(
     Placement(transformation(origin = {0.25, 52.4444}, extent = {{-37.25, -16.5556}, {37.25, 16.5556}})));
   // Rear axle
-  RrAxleDW_BC rrAxleDW(pAxle = rr_pAxle,
+  RrAxleDW_BC_Stabar rrAxleDW(pAxle = rr_pAxle,
                               pRack = pVehicle.pRrRack,
                               pLeftPartialWheel = pVehicle.pRrPartialWheel,
                               pLeftDW = pVehicle.pRrDW,
                               pLeftAxleMass = pVehicle.pRrAxleMass,
+                              pStabar = StabarRecord(leftBarEnd = pVehicle.pRrStabar.leftBarEnd,
+                                                     leftArmEnd = pVehicle.pRrStabar.leftArmEnd,
+                                                     barRate = 0),
                               redeclare Tire.BaseTire leftTire(pPartialWheel = pVehicle.pRrPartialWheel,
                                                                redeclare Tire.TirePhysics.Wheel0DOF wheelModel(partialWheelParams = pVehicle.pRrPartialWheel),
                                                                redeclare Tire.MF52.SlipModel.NoSlip slipModel),
@@ -238,7 +252,7 @@ equation
 
   frKnC.leftSpringLength = frAxleDW.leftShockLinkage.lineForceWithMass.s;
   frKnC.rightSpringLength = frAxleDW.rightShockLinkage.lineForceWithMass.s;
-  frKnC.stabarAngle = 0;
+  frKnC.stabarAngle = frAxleDW.stabar.spring.phi_rel;
   
   frKnC.jackingForce = frChassisActuator.jackingOutput;
   frKnC.heave = frChassisActuator.heaveInput;
@@ -277,7 +291,7 @@ equation
 
   rrKnC.leftSpringLength = rrAxleDW.leftShockLinkage.lineForceWithMass.s;
   rrKnC.rightSpringLength = rrAxleDW.rightShockLinkage.lineForceWithMass.s;
-  rrKnC.stabarAngle = 0;
+  rrKnC.stabarAngle = rrAxleDW.stabar.spring.phi_rel;
   
   rrKnC.jackingForce = rrChassisActuator.jackingOutput;
   rrKnC.heave = rrChassisActuator.heaveInput;

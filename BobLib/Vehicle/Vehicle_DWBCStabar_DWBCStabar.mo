@@ -1,11 +1,11 @@
 within BobLib.Vehicle;
 
-model Vehicle_DWBC_DWBC
+model Vehicle_DWBCStabar_DWBCStabar
   import BobLib.Vehicle.Chassis.Suspension.Templates.Tire;
-  import BobLib.Resources.VehicleDefn.DWBC_DWBCRecord;
+  import BobLib.Resources.VehicleDefn.DWBCStabar_DWBCStabarRecord;
 
   // Record parameters
-  parameter DWBC_DWBCRecord pVehicle;
+  parameter DWBCStabar_DWBCStabarRecord pVehicle;
 
   extends BobLib.Vehicle.VehicleBase(
     pAero = pVehicle.pAero,
@@ -13,9 +13,10 @@ model Vehicle_DWBC_DWBC
     pFrAxleMass = pVehicle.pFrAxleMass,
     pRrAxleMass = pVehicle.pRrAxleMass,
     redeclare BobLib.Vehicle.Chassis.Chassis_LockRrSteer chassis(
-      redeclare BobLib.Vehicle.Chassis.Suspension.FrAxleDW_BC frAxleDW(
+      redeclare BobLib.Vehicle.Chassis.Suspension.FrAxleDW_BC_Stabar frAxleDW(
             pAxle = pVehicle.pFrAxleDW,
             pRack = pVehicle.pFrRack,
+            pStabar = pVehicle.pFrStabar,
             pLeftPartialWheel = pVehicle.pFrPartialWheel,
             pLeftDW = pVehicle.pFrDW,
             pLeftAxleMass = pVehicle.pFrAxleMass,
@@ -33,9 +34,10 @@ model Vehicle_DWBC_DWBC
                 partialWheelParams = pVehicle.pFrPartialWheel,
                 wheel1DOF_YParams = pVehicle.pFrTire1DOF_YParams),
               redeclare Tire.MF52.SlipModel.TransientSlip slipModel)),
-      redeclare BobLib.Vehicle.Chassis.Suspension.RrAxleDW_BC rrAxleDW(
+      redeclare BobLib.Vehicle.Chassis.Suspension.RrAxleDW_BC_Stabar rrAxleDW(
             pAxle = pVehicle.pRrAxleDW,
             pRack = pVehicle.pRrRack,
+            pStabar = pVehicle.pRrStabar,
             pLeftPartialWheel = pVehicle.pRrPartialWheel,
             pLeftDW = pVehicle.pRrDW,
             pLeftAxleMass = pVehicle.pRrAxleMass,
@@ -53,10 +55,12 @@ model Vehicle_DWBC_DWBC
                 partialWheelParams = pVehicle.pRrPartialWheel,
                 wheel1DOF_YParams = pVehicle.pRrTire1DOF_YParams),
               redeclare Tire.MF52.SlipModel.TransientSlip slipModel)),
-      redeclare BobLib.Vehicle.Chassis.Body.FrameRigid spaceFrame(
+      redeclare BobLib.Vehicle.Chassis.Body.FrameCompX spaceFrame(
         frRef = {pVehicle.pFrDW.wheelCenter[1], 0, pVehicle.pFrDW.wheelCenter[3]},
         rrRef = {pVehicle.pRrDW.wheelCenter[1], 0, pVehicle.pRrDW.wheelCenter[3]},
-        pSprung = pVehicle.pSprungMass)
+        pSprung = pVehicle.pSprungMass,
+        pSprungMass = pVehicle.pSprungMass,
+        torsionalStiff = pVehicle.pTorsionalStiff)
     ));
 
   Powertrain.PTNPlaceholder ptnPlaceholder annotation(
@@ -103,4 +107,4 @@ annotation(
     Line(origin = {-80, -159}, points = {{80, -41}, {80, -31}, {-80, -31}, {-80, 39}}, color = {0, 0, 255}),
     Line(origin = {71.18, -171.82}, points = {{-71.1799, -18.1799}, {88.8201, -18.1799}, {88.8201, 51.8201}}, color = {0, 0, 255})
   }));
-end Vehicle_DWBC_DWBC;
+end Vehicle_DWBCStabar_DWBCStabar;

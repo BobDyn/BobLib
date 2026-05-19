@@ -98,18 +98,19 @@ def _side_axle_field_names(
     return list(axle_fields.keys())
 
 
-def _render_import_block(vehicle_record_name: str) -> str:
+def _render_import_block(
+    *,
+    front_topology: str,
+    rear_topology: str,
+    vehicle_record_name: str,
+) -> str:
     lines = [
         "  // FourPostEval record",
         "  import BobLib.Resources.StandardRecord.FourPostEvalRecord;",
         "",
         "  // Suspension axle models",
-        "  import BobLib.Vehicle.Chassis.Suspension.FrAxleDW_Direct;",
-        "  import BobLib.Vehicle.Chassis.Suspension.FrAxleDW_BC;",
-        "  import BobLib.Vehicle.Chassis.Suspension.FrAxleDW_BC_Stabar;",
-        "  import BobLib.Vehicle.Chassis.Suspension.RrAxleDW_Direct;",
-        "  import BobLib.Vehicle.Chassis.Suspension.RrAxleDW_BC;",
-        "  import BobLib.Vehicle.Chassis.Suspension.RrAxleDW_BC_Stabar;",
+        f"  import BobLib.Vehicle.Chassis.Suspension.{_topology_model_name('Fr', front_topology)};",
+        f"  import BobLib.Vehicle.Chassis.Suspension.{_topology_model_name('Rr', rear_topology)};",
         "",
         "  // Axle record types",
         "  import BobLib.Resources.VehicleRecord.Chassis.Suspension.AxleDW_DirectRecord;",
@@ -282,7 +283,16 @@ def render_four_post_sim(data: dict[str, object], yaml_path: Path) -> str:
     rear_topology = norm_arch(str(arch.get("rear")))
 
     active_vehicle_record = record_name_from_yaml(data, yaml_path)
-    text = FOUR_POST_IMPORT_RE.sub(_render_import_block(active_vehicle_record) + "\n", text, count=1)
+    text = FOUR_POST_IMPORT_RE.sub(
+        _render_import_block(
+            front_topology=front_topology,
+            rear_topology=rear_topology,
+            vehicle_record_name=active_vehicle_record,
+        )
+        + "\n",
+        text,
+        count=1,
+    )
     text = re.sub(
         r"  parameter [A-Za-z0-9_]+ pVehicle;",
         f"  parameter {active_vehicle_record} pVehicle;",

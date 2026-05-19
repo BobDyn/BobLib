@@ -1,6 +1,6 @@
 within BobLib.Resources.VehicleDefn;
 
-record DWBC_DWBCRecord
+record DWBCStabar_DWBCStabarRecord
 
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.MassRecord;
 
@@ -12,19 +12,26 @@ record DWBC_DWBCRecord
   import DW = BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.DoubleWishbone;
   import Axle = BobLib.Resources.VehicleRecord.Chassis.Suspension;
 
-  parameter Axle.AxleDW_BCRecord pFrAxleDW(
+  parameter Axle.AxleDW_BC_StabarRecord pFrAxleDW(
       bellcrankPivot = {-0.042144464098, 0.250754351932, 0.370010000136},
       bellcrankPivotAxis = {0.95754655, -0.26587315, -0.11142744},
       bellcrankRodPickup = {-0.014493326106, 0.348410770284, 0.374614186762},
       bellcrankShockPickup = {-0.01102742905, 0.34553503283, 0.411259910778},
-      rodPickup = 1,
-      shockPickup = 2,
+      bellcrankStabarPickup = {-0.029010173628, 0.2971411507, 0.37219698865},
+      rodPickup = 2,
+      shockPickup = 3,
+      stabarPickup = 1,
       rodToLower = true,
       rodMount = {0.006762552642, 0.525610676234, 0.134465050856},
       shockMount = {-0.020673469702, 0.247847085458, 0.561456926868},
       springTable = [0, 0; 1, 26269.02525],
       springFreeLength = 0.2,
       damperTable = [-1, -850; 0, 0; 1, 850]);
+
+  parameter Stabar.StabarRecord pFrStabar(
+      leftArmEnd = {-0.03682914, 0.2667, 0.11597939},
+      leftBarEnd = {-0.10664664, 0.2667, 0.11811},
+      barRate = 1);
 
   parameter Wheel.Templates.PartialWheelRecord pFrPartialWheel(
       R0 = 0.2045,
@@ -73,19 +80,26 @@ record DWBC_DWBCRecord
       mzPure = TireModel.PureSlip.MzPureRecord(QBZ1 = 8.22843, QBZ2 = 2.98676, QBZ3 = -3.57739, QBZ4 = -0.429117, QBZ5 = 0.433125, QCZ1 = 1.41359, QDZ1 = 0.152526, QDZ2 = -0.0381101, QDZ3 = 0.387762, QDZ4 = -3.95699, QEZ1 = -0.239731, QEZ2 = 1.29253, QEZ3 = -1.21298, QEZ4 = 0.0, QEZ5 = 0.0, QHZ1 = 0.0, QHZ2 = 0.0, QHZ3 = 0.0, QHZ4 = 0.0, QBZ9 = 0.0, QBZ10 = -1.72926, QDZ6 = 0.00604966, QDZ7 = -0.000116241, QDZ8 = -2.33359, QDZ9 = -0.0379755, LTR = 1.0, LRES = 1.0, LKY = 1.0, LMUY = 1.0, LGAZ = 1.0),
       setup = TireModel.SetupRecord(FNOMIN = 650.0, FZMIN = 100.0, FZMAX = 1800.0, UNLOADED_RADIUS = pFrPartialWheel.R0));
 
-  parameter Axle.AxleDW_BCRecord pRrAxleDW(
+  parameter Axle.AxleDW_BC_StabarRecord pRrAxleDW(
       bellcrankPivot = {-1.39886851, 0.29230126, 0.1016},
       bellcrankPivotAxis = {0.887962410598, 0.302708516859, 0.346251803151},
       bellcrankRodPickup = {-1.41267566, 0.35197317, 0.08484064},
       bellcrankShockPickup = {-1.43801295, 0.36137285, 0.14160048},
+      bellcrankStabarPickup = {-1.41346984, 0.31057564, 0.12306883},
       rodPickup = 1,
       shockPickup = 2,
+      stabarPickup = 3,
       rodToLower = false,
       rodMount = {-1.53509479, 0.50330883, 0.26648017},
       shockMount = {-1.50192144, 0.28884688, 0.36889916},
       springTable = [0, 0; 1, 43781.70875],
       springFreeLength = 0.265,
       damperTable = [-1, -1300; 0, 0; 1, 1300]);
+
+  parameter Stabar.StabarRecord pRrStabar(
+      leftArmEnd = {-1.43001283, 0.3032125, 0.4054766},
+      leftBarEnd = {-1.3925183, 0.3032125, 0.41224196},
+      barRate = 1);
 
   parameter Wheel.Templates.PartialWheelRecord pRrPartialWheel(
       R0 = 0.2045,
@@ -162,4 +176,4 @@ record DWBC_DWBCRecord
       mzTable = {{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}});
 
 
-end DWBC_DWBCRecord;
+end DWBCStabar_DWBCStabarRecord;

@@ -1,22 +1,25 @@
 within BobLib.Vehicle.Chassis.Suspension;
 
-model RrAxleDW_BC "Double wishbone axle with bellcranks mounting to shock and push/pullrod"
+model RrAxleDW_BC_Stabar "Double wishbone axle with bellcranks mounting to shock, push/pullrod, and stabar"
   import Modelica.SIunits;
   import Modelica.Math.Vectors;
   import BobLib.Utilities.Math.Vector.mirrorXZ;
-  import BobLib.Resources.VehicleRecord.Chassis.Suspension.AxleDW_BCRecord;
+  import BobLib.Resources.VehicleRecord.Chassis.Suspension.AxleDW_BC_StabarRecord;
+  import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Stabar.StabarRecord;
 
   // Record parameters
-  parameter AxleDW_BCRecord pAxle;
+  parameter AxleDW_BC_StabarRecord pAxle;
+  parameter StabarRecord pStabar;
 
   extends BobLib.Vehicle.Chassis.Suspension.AxleDWBase;
 
   // Left bellcrank
-  BobLib.Vehicle.Chassis.Suspension.Linkages.Bellcrank2 leftBellcrank(
+  BobLib.Vehicle.Chassis.Suspension.Linkages.Bellcrank3 leftBellcrank(
     pivot = pAxle.bellcrankPivot,
     pivotAxis = pAxle.bellcrankPivotAxis,
     pickup_1 = pAxle.bellcrankRodPickup,
     pickup_2 = pAxle.bellcrankShockPickup,
+    pickup_3 = pAxle.bellcrankStabarPickup,
     linkDiameter = linkDiameter,
     jointDiameter = jointDiameter) annotation(
     Placement(transformation(origin = {-50, -20}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
@@ -35,11 +38,12 @@ model RrAxleDW_BC "Double wishbone axle with bellcranks mounting to shock and pu
     Placement(transformation(origin = {-50, -55}, extent = {{-15, -15}, {15, 15}}, rotation = -90)));
 
   // Right bellcrank
-  BobLib.Vehicle.Chassis.Suspension.Linkages.Bellcrank2 rightBellcrank(
+  BobLib.Vehicle.Chassis.Suspension.Linkages.Bellcrank3 rightBellcrank(
     pivot = mirrorXZ(pAxle.bellcrankPivot),
     pivotAxis = mirrorXZ(pAxle.bellcrankPivotAxis),
     pickup_1 = mirrorXZ(pAxle.bellcrankRodPickup),
     pickup_2 = mirrorXZ(pAxle.bellcrankShockPickup),
+    pickup_3 = mirrorXZ(pAxle.bellcrankStabarPickup),
     linkDiameter = linkDiameter,
     jointDiameter = jointDiameter) annotation(
     Placement(transformation(origin = {50, -20}, extent = {{10, -10}, {-10, 10}}, rotation = -180)));
@@ -56,6 +60,23 @@ model RrAxleDW_BC "Double wishbone axle with bellcranks mounting to shock and pu
     linkDiameter = linkDiameter,
     jointDiameter = jointDiameter) annotation(
     Placement(transformation(origin = {50, -55}, extent = {{-15, -15}, {15, 15}}, rotation = -90)));
+
+  // Stabar
+  BobLib.Vehicle.Chassis.Suspension.Templates.Stabar.Stabar stabar(
+    pStabar = pStabar,
+    jointDiameter = jointDiameter,
+    linkDiameter = linkDiameter) annotation(
+    Placement(transformation(origin = {0, -116}, extent = {{20, -20}, {-20, 20}}, rotation = -180)));
+  Modelica.Mechanics.MultiBody.Joints.SphericalSpherical rightDroplink(
+    rodLength = Vectors.norm(mirrorXZ(pAxle.bellcrankStabarPickup - pStabar.leftArmEnd)),
+    sphereDiameter = jointDiameter,
+    rodDiameter = linkDiameter) annotation(
+    Placement(transformation(origin = {70, -90}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
+  Modelica.Mechanics.MultiBody.Joints.SphericalSpherical leftDroplink(
+    rodLength = Vectors.norm(pAxle.bellcrankStabarPickup - pStabar.leftArmEnd),
+    sphereDiameter = jointDiameter,
+    rodDiameter = linkDiameter) annotation(
+    Placement(transformation(origin = {-70, -90}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
 
   Modelica.Mechanics.Rotational.Interfaces.Flange_a steerFlange annotation(
     Placement(transformation(origin = {0, 140}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {0, 100}, extent = {{-10, -10}, {10, 10}})));
@@ -86,6 +107,10 @@ protected
     r = mirrorXZ(pAxle.rodMount - pLeftDW.upper_o),
     animation = false) annotation(
     Placement(transformation(origin = {90, -10}, extent = {{-10, -10}, {10, 10}})));
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toStabar(
+    r = {pStabar.leftBarEnd[1], 0, pStabar.leftBarEnd[3]} - effectiveCenter,
+    animation = false) annotation(
+    Placement(transformation(origin = {0, -90}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
 
 public
   BobLib.Vehicle.Chassis.Suspension.Linkages.Rod leftPushrod(
@@ -112,6 +137,8 @@ equation
       connect(rightPushrod.frame_a, rightBellcrank.pickupFrame1);
   connect(leftShockLinkage.frame_a, leftBellcrank.pickupFrame2);
       connect(rightShockLinkage.frame_a, rightBellcrank.pickupFrame2);
+  connect(leftDroplink.frame_b, leftBellcrank.pickupFrame3);
+      connect(rightDroplink.frame_b, rightBellcrank.pickupFrame3);
 
   connect(leftBellcrank.mountFrame, toLeftBellcrank.frame_b) annotation(
     Line(points = {{-40, -20}, {-30, -20}}, color = {95, 95, 95}));
@@ -129,6 +156,14 @@ equation
     Line(points = {{0, 0}, {0, -70}, {-10, -70}}));
   connect(toRightBellcrank.frame_a, toRightShock.frame_a) annotation(
     Line(points = {{10, -20}, {0, -20}, {0, -70}, {10, -70}}, color = {95, 95, 95}));
+  connect(axleFrame, toStabar.frame_a) annotation(
+    Line(points = {{0, 0}, {0, -80}}));
+  connect(toStabar.frame_b, stabar.supportFrame) annotation(
+    Line(points = {{0, -100}, {0, -110}}, color = {95, 95, 95}));
+  connect(stabar.rightArmFrame, rightDroplink.frame_a) annotation(
+    Line(points = {{20, -120}, {70, -120}, {70, -100}}, color = {95, 95, 95}));
+  connect(stabar.leftArmFrame, leftDroplink.frame_a) annotation(
+    Line(points = {{-20, -120}, {-70, -120}, {-70, -100}}, color = {95, 95, 95}));
   connect(rackAndPinion.pinionFlange, steerFlange) annotation(
     Line(points = {{0, 114}, {0, 140}}));
   connect(toRightShock.frame_a, axleFrame) annotation(
@@ -141,5 +176,4 @@ equation
     experiment(StartTime = 0, StopTime = 1, Tolerance = 1e-06, Interval = 0.002),
     Diagram(coordinateSystem(extent = {{-180, -140}, {180, 140}}, preserveAspectRatio = true), graphics),
     Icon(coordinateSystem(extent = {{-180, -20}, {180, 140}}, preserveAspectRatio = true), graphics = {Line(origin = {0, 67}, points = {{0, -33}, {0, 33}}, thickness = 5), Ellipse(origin = {0, 100}, lineThickness = 5, extent = {{-26, 26}, {26, -26}}), Line(origin = {-10, 110}, points = {{10, -10}, {-14, -2}}, thickness = 5), Line(origin = {10, 110}, points = {{-10, -10}, {14, -2}}, thickness = 5), Ellipse(origin = {0, 100}, lineColor = {255, 255, 255}, lineThickness = 1, extent = {{-28, 28}, {28, -28}})}));
-
-end RrAxleDW_BC;
+end RrAxleDW_BC_Stabar;

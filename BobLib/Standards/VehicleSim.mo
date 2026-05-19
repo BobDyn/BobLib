@@ -9,12 +9,12 @@ model VehicleSim
 
   // Import vehicle records
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.Templates.PartialWheelRecord;
-  import BobLib.Resources.VehicleDefn.DWBC_DWBCRecord;
+  import BobLib.Resources.VehicleDefn.DWBCStabar_DWBCStabarRecord;
 
   inner parameter SIunits.Length linkDiameter = 0.020;
   inner parameter SIunits.Length jointDiameter = 0.030;
 
-  parameter DWBC_DWBCRecord pVehicle;
+  parameter DWBCStabar_DWBCStabarRecord pVehicle;
 
   parameter Integer useMode = 0
     "0 - open-loop ramp steer; 1 - open-loop sinusoidal steer; 2 - step steer; 3 - chirp steer"
@@ -147,7 +147,7 @@ model VehicleSim
   inner Modelica.Mechanics.MultiBody.World world(n = {0, 0, -1}) annotation(
     Placement(transformation(origin = {-130, -110}, extent = {{-10, -10}, {10, 10}})));
 
-  BobLib.Vehicle.Vehicle_DWBC_DWBC vehicle(
+  BobLib.Vehicle.Vehicle_DWBCStabar_DWBCStabar vehicle(
     pVehicle = pVehicle) annotation(
     Placement(transformation(origin = {0, 20}, extent = {{-45, -50}, {45, 50}})));
 
@@ -561,10 +561,11 @@ equation
   annotation(
     Diagram(coordinateSystem(extent = {{-140, -120}, {140, 120}})),
     Icon(coordinateSystem(extent = {{-140, -120}, {140, 120}})),
-    experiment(StartTime = 0.5, StopTime = 10, Tolerance = 1e-06, Interval = 0.002),
+    experiment(StartTime = 0.0, StopTime = 10, Tolerance = 1e-06, Interval = 0.002),
     __OpenModelica_commandLineOptions = "--matchingAlgorithm=PFPlusExt --indexReductionMethod=dynamicStateSelection -d=initialization,NLSanalyticJacobian --maxSizeLinearTearing=5000",
     __OpenModelica_simulationFlags(
       lv = "LOG_STDOUT,LOG_ASSERT,LOG_STATS",
+      noEquidistantTimeGrid = "()",
       noEventEmit = "()",
       s = "dassl",
       variableFilter = ".*"));

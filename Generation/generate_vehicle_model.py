@@ -281,13 +281,15 @@ def render_axle_redeclare(
 
 
 def render_space_frame_redeclare(*, fr_ref: str, rr_ref: str) -> str:
-    """Render the analytical rigid body frame redeclare for the chassis."""
+    """Render the compliant chassis frame redeclare."""
     return dedent(
         """
-        redeclare BobLib.Vehicle.Chassis.Body.FrameRigid spaceFrame(
+        redeclare BobLib.Vehicle.Chassis.Body.FrameCompX spaceFrame(
           frRef = {fr_ref},
           rrRef = {rr_ref},
-          pSprung = pVehicle.pSprungMass)
+          pSprung = pVehicle.pSprungMass,
+          pSprungMass = pVehicle.pSprungMass,
+          torsionalStiff = pVehicle.pTorsionalStiff)
         """
     ).strip().format(fr_ref=fr_ref, rr_ref=rr_ref)
 

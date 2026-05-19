@@ -1,10 +1,10 @@
 schema: boblib.vehicle.v1
 vehicle:
-  name: DWBC_DWBC
+  name: DWBCStabar_DWBCStabar
   version: 0.1.0
 architecture:
-  front: bellcrank
-  rear: bellcrank
+  front: bellcrank_stabar
+  rear: bellcrank_stabar
 paths:
   boblib: _0_Utils/external/BobLib/BobLib
   vehicle_templates: _0_Utils/external/BobLib/Generation/vehicle_templates
@@ -72,7 +72,12 @@ front:
       pickups_m:
         rod: [-0.014493326106, 0.348410770284, 0.374614186762]
         shock: [-0.01102742905, 0.34553503283, 0.411259910778]
-      order: [rod, shock]
+        stabar: [-0.029010173628, 0.2971411507, 0.37219698865]
+      order: [stabar, rod, shock]
+    stabar:
+      arm_end_m: [-0.03682914, 0.2667, 0.11597939]
+      bar_end_m: [-0.10664664, 0.2667, 0.11811]
+      rate_n_m_per_rad: 1
   masses:
     unsprung:
       mass_kg: 7.82268281
@@ -147,7 +152,12 @@ rear:
       pickups_m:
         rod: [-1.41267566, 0.35197317, 0.08484064]
         shock: [-1.43801295, 0.36137285, 0.14160048]
-      order: [rod, shock]
+        stabar: [-1.41346984, 0.31057564, 0.12306883]
+      order: [rod, shock, stabar]
+    stabar:
+      arm_end_m: [-1.43001283, 0.3032125, 0.4054766]
+      bar_end_m: [-1.3925183, 0.3032125, 0.41224196]
+      rate_n_m_per_rad: 1
   masses:
     unsprung:
       mass_kg: 7.35220072
