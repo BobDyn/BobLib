@@ -99,7 +99,6 @@ model VehicleSim
   Real bodyVels[3];
   Real bodyAngularVels[3];
   Real bodyAccels[3];
-  Real bodyAngles[3];
 
   Real speed;
   Real curvature;
@@ -167,9 +166,6 @@ model VehicleSim
     exact = true,
     w(start = 0, fixed = true)) annotation(
     Placement(transformation(origin = {-30, 110}, extent = {{-10, -10}, {10, 10}}, rotation = -0)));
-
-  Modelica.Mechanics.MultiBody.Sensors.RelativeAngles sprungAngles annotation(
-    Placement(transformation(origin = {70, -70}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
 
   final parameter Real cpInitFL[3] =
     pVehicle.pFrDW.wheelCenter +
@@ -304,7 +300,7 @@ equation
     else
       0;
 
-  // Fifth-order smootherstep ramp for target Ay.
+  // Cubic smoothstep ramp for target Ay.
   // With steerStart = 2.0 and ayRampDuration = 3.0,
   // the target finishes ramping at t = 5.0 s.
   rampXi =
@@ -322,7 +318,7 @@ equation
 
   ayRampFactor =
     if useMode == 0 then
-      noEvent(10*rampXi^3 - 15*rampXi^4 + 6*rampXi^5)
+      noEvent(3*rampXi^2 - 2*rampXi^3)
     else
       0;
 
@@ -472,9 +468,6 @@ equation
   bodyAccels =
     Frames.resolve2(cgFreeMotion.frame_b.R, cgFreeMotion.a_rel_a);
 
-  bodyAngles =
-    Frames.resolve2(vehicle.chassis.cgFrame.R, sprungAngles.angles);
-
   leftWheelVector =
     Frames.resolve1(
       vehicle.chassis.frAxleFrame.R,
@@ -508,7 +501,8 @@ equation
   Fz_RL = vehicle.chassis.rrAxleDW.leftTire.Fz;
   Fz_RR = vehicle.chassis.rrAxleDW.rightTire.Fz;
 
-  roll = bodyAngles[1];
+  // Read roll directly from the chassis orientation matrix to avoid Euler branch flips.
+  roll = Modelica.Math.atan2(vehicle.chassis.cgFrame.R.T[2, 3], vehicle.chassis.cgFrame.R.T[3, 3]);
 
   // Note that .tau is the reaction by Newton's 3rd law. Negate for applied torque.
   handwheelTorque = -1*vehicle.steerFlange.tau;
@@ -551,12 +545,6 @@ equation
 
   connect(cgFreeMotion.frame_b, vehicle.cgFrame) annotation(
     Line(points = {{90, 90}, {70, 90}, {70, 20}, {46, 20}}, color = {95, 95, 95}));
-
-  connect(world.frame_b, sprungAngles.frame_a) annotation(
-    Line(points = {{-120, -110}, {70, -110}, {70, -80}}, color = {95, 95, 95}));
-
-  connect(vehicle.cgFrame, sprungAngles.frame_b) annotation(
-    Line(points = {{46, 20}, {70, 20}, {70, -60}}, color = {95, 95, 95}));
 
   annotation(
     Diagram(coordinateSystem(extent = {{-140, -120}, {140, 120}})),

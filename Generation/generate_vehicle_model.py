@@ -537,7 +537,6 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
           Real driveTorqueCmd;
           Real bodyVels[3];
           Real bodyAccels[3];
-          Real bodyAngles[3];
           Real curvature;
           Real speed;
           Real targetCurvature;
@@ -602,10 +601,6 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
           // Front steer position
           Modelica.Mechanics.Rotational.Sources.Position frSteerPosition annotation(
             Placement(transformation(origin = {{-30, 110}}, extent = {{{{-10, -10}}, {{10, 10}}}}, rotation = -0)));
-
-          // Body attitude sensor
-          Modelica.Mechanics.MultiBody.Sensors.RelativeAngles sprungAngles annotation(
-            Placement(transformation(origin = {{70, -70}}, extent = {{{{-10, -10}}, {{10, 10}}}}, rotation = 90)));
 
           // Calculated parameters
           final parameter Real cpInitFL[3] =
@@ -964,9 +959,6 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
           bodyAccels =
             Frames.resolve2(cgFreeMotion.frame_b.R, cgFreeMotion.a_rel_a);
 
-          bodyAngles =
-            Frames.resolve2(vehicle.chassis.cgFrame.R, sprungAngles.angles);
-
           leftWheelVector =
             Frames.resolve1(
               vehicle.chassis.frAxleFrame.R,
@@ -1001,7 +993,8 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
           accY = bodyAccels[2];
 
           // Vehicle response
-          roll = bodyAngles[1];
+          // Read roll directly from the chassis orientation matrix to avoid Euler branch flips.
+          roll = Modelica.Math.atan2(vehicle.chassis.cgFrame.R.T[2, 3], vehicle.chassis.cgFrame.R.T[3, 3]);
 
           // Note that .tau is the reaction by Newton's 3rd law. Negate for applied torque.
           handwheelTorque = -1*vehicle.steerFlange.tau;
@@ -1047,12 +1040,6 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
 
           connect(cgFreeMotion.frame_b, vehicle.cgFrame) annotation(
             Line(points = {{{{90, 90}}, {{70, 90}}, {{70, 20}}, {{46, 20}}}}, color = {{95, 95, 95}}));
-
-          connect(world.frame_b, sprungAngles.frame_a) annotation(
-            Line(points = {{{{-120, -110}}, {{70, -110}}, {{70, -80}}}}, color = {{95, 95, 95}}));
-
-          connect(vehicle.cgFrame, sprungAngles.frame_b) annotation(
-            Line(points = {{{{46, 20}}, {{70, 20}}, {{70, -60}}}}, color = {{95, 95, 95}}));
 
           annotation(
             Diagram(coordinateSystem(extent = {{{{-140, -120}}, {{140, 120}}}})),

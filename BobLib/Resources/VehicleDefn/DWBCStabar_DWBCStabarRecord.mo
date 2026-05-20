@@ -25,7 +25,7 @@ record DWBCStabar_DWBCStabarRecord
       rodMount = {0.006762552642, 0.525610676234, 0.134465050856},
       shockMount = {-0.020673469702, 0.247847085458, 0.561456926868},
       springTable = [0, 0; 1, 26269.02525],
-      springFreeLength = 0.2,
+      springFreeLength = 0.1997,
       damperTable = [-1, -850; 0, 0; 1, 850]);
 
   parameter Stabar.StabarRecord pFrStabar(
@@ -93,7 +93,7 @@ record DWBCStabar_DWBCStabarRecord
       rodMount = {-1.53509479, 0.50330883, 0.26648017},
       shockMount = {-1.50192144, 0.28884688, 0.36889916},
       springTable = [0, 0; 1, 43781.70875],
-      springFreeLength = 0.265,
+      springFreeLength = 0.2634,
       damperTable = [-1, -1300; 0, 0; 1, 1300]);
 
   parameter Stabar.StabarRecord pRrStabar(
@@ -158,7 +158,7 @@ record DWBCStabar_DWBCStabarRecord
       rCM = {-0.541837, 6e-06, 0.395782},
       inertia = {{2.241988, 0.000284, -1.975938}, {0.000284, 7.621387, -5.3e-05}, {-1.975938, -5.3e-05, 6.749042}});
 
-  parameter Modelica.SIunits.RotationalSpringConstant pTorsionalStiff = 500000;
+  parameter Modelica.SIunits.RotationalSpringConstant pTorsionalStiff = 300000;
 
   parameter MassRecord pSprungMass = BobLib.Utilities.Mechanics.combineMassRecords({pBaseSprungMass, pDriverMass});
 
