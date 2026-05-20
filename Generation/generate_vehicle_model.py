@@ -1,41 +1,13 @@
 #!/usr/bin/env python3
-"""
-Generate concrete BobLib vehicle and simulation Modelica files.
+"""Generate the active BobLib vehicle package from ``Generation/vehicle.yml``.
 
-Expected layout:
+`make sync-vehicle-yaml` copies the repo-root ``vehicle.yml`` into that staged
+location before generation runs.
 
-    Generation/
-      generate_vehicle_model.py
-      Builds/
-      Results/
-
-Running this script with no arguments generates all 9 structural setups and
-overwrites existing generated files:
-
-    python Generation/generate_vehicle_model.py
-
-A generated variant creates:
-
-    Generation/Builds/<Variant>/
-      Vehicle_<Variant>.mo
-      VehicleSim.mo
-
-    Generation/Results/<Variant>/
-
-Important convention:
-
-    Vehicle_<Variant>.mo keeps its variant-specific model name.
-
-    VehicleSim.mo is intentionally replaced per generated build and always
-    contains:
-
-        within BobLib.Standards;
-        model VehicleSim
-          ...
-        end VehicleSim;
-
-This matches the existing BobLib workflow where Standards.VehicleSim is the
-simulation entrypoint, but the vehicle wrapper underneath is variant-specific.
+The legacy multi-variant helpers remain in this module for tests and ad-hoc
+experiments, but the command-line entrypoint now builds the single active
+vehicle architecture plus the matching ``VehicleSim`` and ``FourPostSim``
+models.
 """
 
 from __future__ import annotations
@@ -44,10 +16,15 @@ from dataclasses import dataclass
 from pathlib import Path
 import sys
 from textwrap import dedent
+from typing import Any, cast
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
+GENERATION_DIR = Path(__file__).resolve().parent
+SCRIPTS_DIR = GENERATION_DIR / "scripts"
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
 
 
 # =============================================================================
@@ -87,6 +64,8 @@ TOPOLOGIES: dict[str, AxleTopology] = {
         has_stabar=True,
     ),
 }
+
+DEFAULT_TIRE_SLIP_MODEL = "TransientSlip"
 
 
 @dataclass(frozen=True)
@@ -174,9 +153,9 @@ def default_boblib_root() -> Path:
 
     and BobLib package.mo is at:
 
-        <repo>/package.mo
+        <repo>/BobLib/package.mo
     """
-    return Path(__file__).resolve().parent.parent
+    return Path(__file__).resolve().parent.parent / "BobLib"
 
 
 # =============================================================================
@@ -266,7 +245,7 @@ def render_tire_redeclare(axle_prefix: str, side: str) -> str:
           redeclare Tire.TirePhysics.Wheel1DOF_Y wheelModel(
             partialWheelParams = pVehicle.p{axle_prefix}PartialWheel,
             wheel1DOF_YParams = pVehicle.p{axle_prefix}Tire1DOF_YParams),
-          redeclare Tire.MF52.SlipModel.TransientSlip slipModel)
+          redeclare Tire.MF52.SlipModel.{DEFAULT_TIRE_SLIP_MODEL} slipModel)
         """
     ).strip()
 
@@ -302,12 +281,13 @@ def render_axle_redeclare(
 
 
 def render_space_frame_redeclare(*, fr_ref: str, rr_ref: str) -> str:
-    """Render the compliant body frame redeclare for the chassis."""
+    """Render the compliant chassis frame redeclare."""
     return dedent(
         """
         redeclare BobLib.Vehicle.Chassis.Body.FrameCompX spaceFrame(
           frRef = {fr_ref},
           rrRef = {rr_ref},
+          pSprung = pVehicle.pSprungMass,
           pSprungMass = pVehicle.pSprungMass,
           torsionalStiff = pVehicle.pTorsionalStiff)
         """
@@ -331,8 +311,6 @@ def render_vehicle_model(variant: VehicleVariant) -> str:
 
     chassis_params = ",\n".join(
         [
-            "      pSprungMass = pVehicle.pSprungMass",
-            "      pVehicleCG = pVehicleCG",
             indent(fr_axle.strip(), 6),
             indent(rr_axle.strip(), 6),
             indent(
@@ -416,14 +394,14 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
 
     The variant-specific part is the imported record and instantiated vehicle.
     """
-    import build_vehicle
+    import build_vehicle_sim as build_vehicle
 
     canonical_data = {
         "output": {"sim_package": "BobLib.Standards"},
         "architecture": {"vehicle_model": variant.vehicle_model_name},
     }
     return build_vehicle.render_vehicle_sim(
-        data=canonical_data,
+        data=cast(dict[str, Any], canonical_data),
         record_name=variant.record_name,
     )
 
@@ -559,7 +537,6 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
           Real driveTorqueCmd;
           Real bodyVels[3];
           Real bodyAccels[3];
-          Real bodyAngles[3];
           Real curvature;
           Real speed;
           Real targetCurvature;
@@ -624,10 +601,6 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
           // Front steer position
           Modelica.Mechanics.Rotational.Sources.Position frSteerPosition annotation(
             Placement(transformation(origin = {{-30, 110}}, extent = {{{{-10, -10}}, {{10, 10}}}}, rotation = -0)));
-
-          // Body attitude sensor
-          Modelica.Mechanics.MultiBody.Sensors.RelativeAngles sprungAngles annotation(
-            Placement(transformation(origin = {{70, -70}}, extent = {{{{-10, -10}}, {{10, 10}}}}, rotation = 90)));
 
           // Calculated parameters
           final parameter Real cpInitFL[3] =
@@ -986,9 +959,6 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
           bodyAccels =
             Frames.resolve2(cgFreeMotion.frame_b.R, cgFreeMotion.a_rel_a);
 
-          bodyAngles =
-            Frames.resolve2(vehicle.chassis.cgFrame.R, sprungAngles.angles);
-
           leftWheelVector =
             Frames.resolve1(
               vehicle.chassis.frAxleFrame.R,
@@ -1023,7 +993,8 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
           accY = bodyAccels[2];
 
           // Vehicle response
-          roll = bodyAngles[1];
+          // Read roll directly from the chassis orientation matrix to avoid Euler branch flips.
+          roll = Modelica.Math.atan2(vehicle.chassis.cgFrame.R.T[2, 3], vehicle.chassis.cgFrame.R.T[3, 3]);
 
           // Note that .tau is the reaction by Newton's 3rd law. Negate for applied torque.
           handwheelTorque = -1*vehicle.steerFlange.tau;
@@ -1069,12 +1040,6 @@ def render_vehicle_sim(variant: VehicleVariant) -> str:
 
           connect(cgFreeMotion.frame_b, vehicle.cgFrame) annotation(
             Line(points = {{{{90, 90}}, {{70, 90}}, {{70, 20}}, {{46, 20}}}}, color = {{95, 95, 95}}));
-
-          connect(world.frame_b, sprungAngles.frame_a) annotation(
-            Line(points = {{{{-120, -110}}, {{70, -110}}, {{70, -80}}}}, color = {{95, 95, 95}}));
-
-          connect(vehicle.cgFrame, sprungAngles.frame_b) annotation(
-            Line(points = {{{{46, 20}}, {{70, 20}}, {{70, -60}}}}, color = {{95, 95, 95}}));
 
           annotation(
             Diagram(coordinateSystem(extent = {{{{-140, -120}}, {{140, 120}}}})),
@@ -1199,26 +1164,44 @@ def generate_all(
 # =============================================================================
 
 
+def generate_active_package(*, overwrite: bool = True) -> None:
+    from build_common import (
+        active_vehicle_variant,
+        boblib_root,
+        load_yaml,
+        record_name_from_yaml,
+        vehicle_model_name,
+        vehicle_yaml_path,
+    )
+    from build_four_post_sim import build_four_post_sim
+    from build_vehicle_sim import build_vehicle_sim
+
+    source_yaml = vehicle_yaml_path()
+    data = load_yaml(source_yaml)
+    variant = active_vehicle_variant(data, source_yaml)
+    record_name = record_name_from_yaml(data, source_yaml)
+    vehicle_model = vehicle_model_name(data, record_name)
+    vehicle_root = boblib_root(data)
+    record_path = vehicle_root / "Resources" / "VehicleDefn" / f"{record_name}.mo"
+    vehicle_model_path = vehicle_root / "Vehicle" / f"{vehicle_model}.mo"
+
+    vehicle_sim_path = build_vehicle_sim(source_yaml=source_yaml, overwrite=overwrite)
+    four_post_record_path, four_post_model_path = build_four_post_sim(
+        source_yaml=source_yaml,
+        overwrite=overwrite,
+    )
+
+    print(f"\nGenerated active BobLib package from {source_yaml}")
+    print(f"  Active topology:     {variant.variant_name}")
+    print(f"  Vehicle record:      {record_path}")
+    print(f"  Vehicle model:       {vehicle_model_path}")
+    print(f"  VehicleSim:          {vehicle_sim_path}")
+    print(f"  FourPostEval record: {four_post_record_path}")
+    print(f"  FourPostSim:         {four_post_model_path}")
+
+
 def main() -> None:
-    """
-    Default behavior:
-
-      - Generate all 9 structural topology combinations.
-      - Overwrite existing generated files.
-      - Use Generation/Builds and Generation/Results.
-      - Assume package.mo lives one level above Generation/.
-      - Do not generate README files.
-      - Do not generate .mos scripts.
-    """
-    outputs = generate_all(overwrite=True)
-
-    print("\nGenerated BobLib vehicle builds:")
-    for output in outputs:
-        print(f"  {output.build_dir.name}")
-        print(f"    Build dir:     {output.build_dir}")
-        print(f"    Results dir:   {output.results_dir}")
-        print(f"    Vehicle model: {output.vehicle_model_path}")
-        print(f"    VehicleSim:    {output.sim_model_path}")
+    generate_active_package(overwrite=True)
 
 
 if __name__ == "__main__":

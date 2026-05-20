@@ -20,7 +20,7 @@ BobLib declares compatibility with:
 
 - `Modelica 3.2.3`
 
-A Modelica toolchain with OpenModelica scripting support is recommended if you want to use the provided build scripts in `Standards/`.
+A Modelica toolchain with OpenModelica scripting support is recommended if you want to use the provided build scripts in `Generation/scripts/`.
 
 ## Repository Layout
 
@@ -31,6 +31,7 @@ BobLib/
 ├── Standards/      # Standard simulation models and build scripts
 ├── Utilities/      # Shared math and multibody helpers
 ├── Tests/          # Validation and development test models
+├── Generation/     # Active YAML/templates and generator scripts
 └── package.mo      # Root package definition
 ```
 
@@ -74,18 +75,13 @@ Contains standardized simulation models and automation scripts.
 Key models:
 
 - `Standards.VehicleSim`
-- `Standards.VehicleFMI`
-- `Standards.StandardSim.SteadyStateEval`
-- `Standards.StandardSim.TransientEval`
-- `Standards.StandardSim.FrKnC`
-- `Standards.StandardSim.RrKnC`
-- `Standards.StandardSim.Templates.KnC`
+- `Standards.FourPostSim`
 
 Build scripts:
 
-- `Standards/BuildVehicleModel.mos`
-- `Standards/BuildVehicleFMI.mos`
-- `Standards/StandardSim/BuildKnC.mos`
+- `Generation/generate_vehicle_model.py`
+- `Generation/scripts/build_vehicle_sim.py`
+- `Generation/scripts/build_four_post_sim.py`
 
 ### `Utilities`
 
@@ -133,10 +129,7 @@ If you prefer to keep the library in the default OpenModelica library directory,
 Start with one of these entry points:
 
 - `BobLib.Standards.VehicleSim`
-- `BobLib.Standards.VehicleFMI`
-- `BobLib.Standards.StandardSim.SteadyStateEval`
-- `BobLib.Standards.StandardSim.FrKnC`
-- `BobLib.Standards.StandardSim.RrKnC`
+- `BobLib.Standards.FourPostSim`
 
 ## Building and Running
 
@@ -146,13 +139,9 @@ The repository includes OpenModelica script files for common workflows.
 
 Run `Standards/BuildVehicleModel.mos` to build the configured vehicle simulation target.
 
-### Build an FMU
+### FourPost workflow
 
-Run `Standards/BuildVehicleFMI.mos` to export `BobLib.Standards.VehicleFMI` as an FMU.
-
-### Kinematics and compliance workflow
-
-Run `Standards/StandardSim/BuildKnC.mos` for the standard K&C build flow.
+Run `Standards/FourPostSim.mo` as the active FourPost simulation model.
 
 ## Model Structure
 
