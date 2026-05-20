@@ -1,15 +1,10 @@
 from __future__ import annotations
 
 from pathlib import Path
-import sys
 
 import pytest
 
-GENERATION_DIR = Path(__file__).resolve().parents[1]
-if str(GENERATION_DIR) not in sys.path:
-    sys.path.insert(0, str(GENERATION_DIR))
-
-from generate_vehicle_model import (
+from _0_Utils.external.BobLib.Generation.generate_vehicle_model import (
     TOPOLOGIES,
     generate_one,
     parse_variant,
@@ -139,18 +134,17 @@ def test_generate_one_creates_expected_files(tmp_path: Path) -> None:
 
     assert output.build_dir.exists()
     assert output.results_dir.exists()
+    assert output.source_vehicle_path.exists()
     assert output.vehicle_model_path.exists()
     assert output.sim_model_path.exists()
-    assert output.build_script_path.exists()
-    assert output.readme_path.exists()
     assert (output.results_dir / ".gitkeep").exists()
 
     assert output.build_dir.name == "DWBCStabar_DWDirect"
     assert output.results_dir.name == "DWBCStabar_DWDirect"
+    assert output.source_vehicle_path.name == "Vehicle_DWBCStabar_DWDirect.mo"
 
     assert output.vehicle_model_path.name == "Vehicle_DWBCStabar_DWDirect.mo"
     assert output.sim_model_path.name == "VehicleSim.mo"
-    assert output.build_script_path.name == "Build.mos"
 
 
 def test_generate_one_refuses_to_overwrite_without_flag(tmp_path: Path) -> None:

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from textwrap import dedent
+from typing import cast
 
 from build_common import (
     axle_model_name,
@@ -452,8 +453,8 @@ def _rod_attach_expr(axle_fields: dict[str, object], *, mirrored: bool) -> str:
 
 def _rod_attach_is_zero(axle_fields: dict[str, object]) -> bool:
     attach_key = "lower_o" if bool(axle_fields["rodToLower"]) else "upper_o"
-    rod_mount = axle_fields["rodMount"]
-    attach = axle_fields[attach_key]
+    rod_mount = cast(tuple[float, float, float], axle_fields["rodMount"])
+    attach = cast(tuple[float, float, float], axle_fields[attach_key])
     return max(abs(float(a) - float(b)) for a, b in zip(rod_mount, attach)) < 1e-12
 
 
@@ -483,17 +484,17 @@ def _role_expr(role: str, *, mirrored: bool) -> str:
 
 def _pickup_exprs(axle_fields: dict[str, object], *, mirrored: bool) -> dict[int, str]:
     exprs = {
-        int(axle_fields["rodPickup"]): _role_expr("rod", mirrored=mirrored),
-        int(axle_fields["shockPickup"]): _role_expr("shock", mirrored=mirrored),
-        int(axle_fields["stabarPickup"]): _role_expr("stabar", mirrored=mirrored),
+        int(cast(int, axle_fields["rodPickup"])): _role_expr("rod", mirrored=mirrored),
+        int(cast(int, axle_fields["shockPickup"])): _role_expr("shock", mirrored=mirrored),
+        int(cast(int, axle_fields["stabarPickup"])): _role_expr("stabar", mirrored=mirrored),
     }
     return exprs
 
 
 def _pickup_exprs_two(axle_fields: dict[str, object], *, mirrored: bool) -> dict[int, str]:
     exprs = {
-        int(axle_fields["rodPickup"]): _role_expr("rod", mirrored=mirrored),
-        int(axle_fields["shockPickup"]): _role_expr("shock", mirrored=mirrored),
+        int(cast(int, axle_fields["rodPickup"])): _role_expr("rod", mirrored=mirrored),
+        int(cast(int, axle_fields["shockPickup"])): _role_expr("shock", mirrored=mirrored),
     }
     return exprs
 
@@ -556,8 +557,8 @@ def _render_bellcrank_axle_model(
     prefix: str,
     axle_fields: dict[str, object],
 ) -> str:
-    rod_idx = int(axle_fields["rodPickup"])
-    shock_idx = int(axle_fields["shockPickup"])
+    rod_idx = int(cast(int, axle_fields["rodPickup"]))
+    shock_idx = int(cast(int, axle_fields["shockPickup"]))
     if rod_idx == shock_idx:
         raise ValueError("Bellcrank rod and shock pickups must be distinct.")
     if {rod_idx, shock_idx} != {1, 2}:
