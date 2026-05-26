@@ -31,7 +31,7 @@ record DWBCStabar_DWBCStabarRecord
   parameter Stabar.StabarRecord pFrStabar(
       leftArmEnd = {-0.03682914, 0.2667, 0.11597939},
       leftBarEnd = {-0.10664664, 0.2667, 0.11811},
-      barRate = 1);
+      barRate = 257.62483055);
 
   parameter Wheel.Templates.PartialWheelRecord pFrPartialWheel(
       R0 = 0.2045,
@@ -99,7 +99,7 @@ record DWBCStabar_DWBCStabarRecord
   parameter Stabar.StabarRecord pRrStabar(
       leftArmEnd = {-1.43001283, 0.3032125, 0.4054766},
       leftBarEnd = {-1.3925183, 0.3032125, 0.41224196},
-      barRate = 1);
+      barRate = 535.473018735);
 
   parameter Wheel.Templates.PartialWheelRecord pRrPartialWheel(
       R0 = 0.2045,
@@ -165,8 +165,8 @@ record DWBCStabar_DWBCStabarRecord
   parameter Aero.CFDAeroMapRecord pAero(
       referenceSpeed = 15.0,
       aeroRef = {1, 0, 0},
-      FL_RideHeightRef = {0, 0.606110767456, 0.199898},
-      RL_RideHeightRef = {-1.5494, 0.60611077, 0.199898},
+      FL_RideHeightRef = {0.0127, 0.226314, 0.08001},
+      RL_RideHeightRef = {-1.4070203, 0.2834894, 0.0870458},
       frontRideHeightGrid = {0.03556, 0.05334, 0.07112, 0.0889, 0.10668},
       rearRideHeightGrid = {0.04191, 0.0635, 0.08382, 0.10414, 0.12573},
       dragTable = {{161.5972, 161.9498, 163.687, 159.2334, 154.50145}, {164.547, 164.7349, 172.3558, 172.1838, 170.2062}, {159.2388, 167.52, 172.4602, 176.457, 180.1312}, {156.3824, 162.2704, 169.104, 174.6198, 178.8624}, {155.6694, 157.0208, 165.7478, 169.332, 174.9112}},
