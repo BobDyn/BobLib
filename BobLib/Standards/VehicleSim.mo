@@ -49,6 +49,70 @@ model VehicleSim
     "Gain-scheduling strength for the feedforward steer ratio"
     annotation(Evaluate = false, Dialog(enable = openLoopAy));
 
+  parameter SIunits.AngularVelocity handwheelRampRate = 0.14
+    "Open-loop handwheel ramp rate"
+    annotation(Evaluate = false, Dialog(enable = openLoopAy));
+
+  parameter SIunits.Time handwheelRampStopDuration = 0.18
+    "Duration used to smoothly roll handwheel rate to zero after the load limit"
+    annotation(Evaluate = false, Dialog(enable = openLoopAy));
+
+  parameter Boolean enableCurvatureSteerLimiter = true
+    "Back off open-loop steer when measured curvature exceeds the commanded ramp"
+    annotation(Evaluate = false, Dialog(enable = openLoopAy));
+
+  parameter Real steerCurvatureLimitGain = 12.0
+    "Handwheel radians removed per 1/m of curvature overshoot"
+    annotation(Evaluate = false, Dialog(enable = openLoopAy));
+
+  parameter Real steerCurvatureLimitDeadbandFraction = 0.03
+    "Fractional curvature overshoot allowed before steer limiting"
+    annotation(Evaluate = false, Dialog(enable = openLoopAy));
+
+  parameter Boolean enableNormalLoadSteerLimiter = true
+    "End the open-loop handwheel ramp when any tire reaches the load floor"
+    annotation(Evaluate = false, Dialog(enable = openLoopAy));
+
+  parameter SIunits.Force tireNormalLoadMin = 200.0
+    "Immediate tire normal-load floor where the handwheel ramp ends"
+    annotation(Evaluate = false, Dialog(enable = openLoopAy));
+
+  parameter Real steerNormalLoadLimitGain = 0.008
+    "Legacy unused normal-load feedback gain"
+    annotation(Evaluate = false, Dialog(enable = openLoopAy));
+
+  parameter Boolean terminateOnTireLift = true
+    "Terminate the maneuver if a tire reaches the lift threshold"
+    annotation(Evaluate = false, Dialog(enable = openLoopAy));
+
+  parameter SIunits.Force tireLiftTerminateLoad = 75.0
+    "Tire normal load threshold used for hard lift termination"
+    annotation(Evaluate = false, Dialog(enable = openLoopAy));
+
+  parameter Boolean enableLinearityTermination = true
+    "Terminate the open-loop ramp when steering response leaves the linear region"
+    annotation(Evaluate = false, Dialog(enable = openLoopAy));
+
+  parameter Real linearityNonlinearityFraction = 0.20
+    "Fractional local lateral-gain loss that ends the ramp"
+    annotation(Evaluate = false, Dialog(enable = openLoopAy));
+
+  parameter SIunits.Acceleration linearityReferenceAy = 4.0
+    "Measured lateral acceleration used to latch the linear local lateral gain"
+    annotation(Evaluate = false, Dialog(enable = openLoopAy));
+
+  parameter SIunits.Acceleration linearityEvaluationAyMargin = 0.75
+    "Additional measured lateral acceleration beyond the reference before nonlinearity is evaluated"
+    annotation(Evaluate = false, Dialog(enable = openLoopAy));
+
+  parameter SIunits.Time linearitySlopeSamplePeriod = 0.10
+    "Sample period for the finite-difference local lateral-gain monitor"
+    annotation(Evaluate = false, Dialog(enable = openLoopAy));
+
+  parameter SIunits.Time linearityHoldDuration = 0.05
+    "Duration that the nonlinearity threshold must remain true before termination"
+    annotation(Evaluate = false, Dialog(enable = openLoopAy));
+
   parameter SIunits.Time ayRampDuration = 3.0
     "Open-loop ramp duration"
     annotation(Evaluate = false, Dialog(enable = openLoopAy));
@@ -110,6 +174,40 @@ model VehicleSim
   Real targetRoadwheelCmd;
   Real steerRatioEstimate;
   Real steerFeedforward;
+  SIunits.Angle handwheelRampCmd(start = 0, fixed = true);
+  SIunits.AngularVelocity handwheelRateCmd;
+  Real handwheelRampDirection;
+  Real curvatureCommandSign;
+  Real curvatureOvershoot;
+  Real curvatureOvershootDeadband;
+  Real steerLimiterReduction;
+  Real steerLimiterRawScale;
+  Real steerLimiterScale;
+  Real steerLimitedFeedforward;
+  Real steerFeedforwardMag;
+  Real minTireNormalLoad;
+  Real tireNormalLoadDeficit;
+  Real rampEndingFlag;
+  Real tireNormalLoadStopXi(start = 0, fixed = true);
+  Real tireNormalLoadRateXi;
+  Real tireNormalLoadRateScale;
+  Real steerNormalLoadReduction;
+  Real steerCurvatureReduction;
+  Real linearitySampleValidFlag;
+  Real linearityReferenceValidFlag;
+  discrete Real linearityReferenceAyMeasured(start = 0, fixed = true);
+  discrete Real linearityReferenceHandwheel(start = 0, fixed = true);
+  discrete Real linearityReferenceLateralGain(start = 0, fixed = true);
+  discrete Real linearitySampleAy(start = 0, fixed = true);
+  discrete Real linearitySampleHandwheel(start = 0, fixed = true);
+  discrete Real linearityLocalLateralGain(start = 0, fixed = true);
+  Real linearityGainRatio;
+  Real linearityGainLossFraction;
+  Real linearityGainLossPct;
+  Real handwheelLinearityGradient;
+  Real linearHandwheelEstimate;
+  Real steeringNonlinearityFraction;
+  Real steeringNonlinearityPct;
   Real roadwheelMag;
 
   Real rampXi;
@@ -201,8 +299,13 @@ model VehicleSim
     pVehicle.pFrDW.wheelCenter[1] - pVehicle.pRrDW.wheelCenter[1]);
 
 protected
-  discrete Real t_qss_hit(start = -1);
-  discrete Real t_yawVel_hit(start = -1);
+  discrete Boolean rampEnding(start = false, fixed = true);
+  discrete Boolean linearitySampleValid(start = false, fixed = true);
+  discrete Boolean linearityReferenceValid(start = false, fixed = true);
+  discrete Real t_qss_hit(start = -1, fixed = true);
+  discrete Real t_ramp_end_hit(start = -1, fixed = true);
+  discrete Real t_linearity_limit_hit(start = -1, fixed = true);
+  discrete Real t_yawVel_hit(start = -1, fixed = true);
 
   Real leftWheelVector[3];
   Real rightWheelVector[3];
@@ -377,23 +480,202 @@ equation
     else
       steerRatioEstimateStart;
 
-  steerFeedforward =
+  curvatureCommandSign =
+    if noEvent(targetCurvatureCmd >= 0) then 1 else -1;
+
+  curvatureOvershoot =
     if useMode == 0 and noEvent(time >= steerStart) then
-      steerRatioEstimate * targetRoadwheelCmd
+      noEvent(curvatureCommandSign * curvature - abs(targetCurvatureCmd))
     else
       0;
 
-  // Open-loop QSS detection: the vehicle has settled when yaw rate and
-  // steering rate are both flat for long enough after the ramp ends.
+  curvatureOvershootDeadband =
+    if useMode == 0 and noEvent(time >= steerStart) then
+      noEvent(
+        max(0, steerCurvatureLimitDeadbandFraction) *
+        max(abs(targetCurvatureCmd), 1e-6)
+      )
+    else
+      0;
+
+  minTireNormalLoad =
+    noEvent(min(min(Fz_FL, Fz_FR), min(Fz_RL, Fz_RR)));
+
+  tireNormalLoadDeficit =
+    if useMode == 0 and noEvent(time >= steerStart) then
+      noEvent(max(0, tireNormalLoadMin - minTireNormalLoad))
+    else
+      0;
+
+  rampEndingFlag =
+    if rampEnding then 1 else 0;
+
+  der(tireNormalLoadStopXi) =
+    if useMode == 0
+       and enableNormalLoadSteerLimiter
+       and rampEnding
+       and noEvent(tireNormalLoadStopXi < 1) then
+      1 / max(handwheelRampStopDuration, 1e-6)
+    else
+      0;
+
+  tireNormalLoadRateXi =
+    noEvent(min(1, max(0, tireNormalLoadStopXi)));
+
+  tireNormalLoadRateScale =
+    noEvent(1 - (3*tireNormalLoadRateXi^2 - 2*tireNormalLoadRateXi^3));
+
+  handwheelRampDirection =
+    if noEvent(targetAy >= 0) then 1 else -1;
+
+  handwheelRateCmd =
+    if useMode == 0
+       and noEvent(time >= steerStart) then
+      handwheelRampDirection * handwheelRampRate * tireNormalLoadRateScale
+    else
+      0;
+
+  der(handwheelRampCmd) = handwheelRateCmd;
+
+  steerFeedforward =
+    if useMode == 0 and noEvent(time >= steerStart) then
+      handwheelRampCmd
+    else
+      0;
+
+  steerLimitedFeedforward =
+    if useMode == 0 and noEvent(time >= steerStart) then
+      handwheelRampCmd
+    else
+      0;
+
+  steerCurvatureReduction = 0;
+  steerNormalLoadReduction =
+    noEvent(handwheelRampRate * (1 - tireNormalLoadRateScale));
+  steerLimiterReduction = steerNormalLoadReduction;
+  steerFeedforwardMag = sqrt(steerFeedforward*steerFeedforward + 1e-8);
+  steerLimiterRawScale = tireNormalLoadRateScale;
+  steerLimiterScale = tireNormalLoadRateScale;
+
+  linearitySampleValidFlag =
+    if linearitySampleValid then 1 else 0;
+
+  linearityReferenceValidFlag =
+    if linearityReferenceValid then 1 else 0;
+
+  handwheelLinearityGradient =
+    if linearityReferenceValid then
+      noEvent(1 / max(abs(linearityReferenceLateralGain), 1e-6))
+    else
+      0;
+
+  linearHandwheelEstimate =
+    handwheelLinearityGradient * accY;
+
+  linearityGainRatio =
+    if linearityReferenceValid then
+      noEvent(
+        abs(linearityLocalLateralGain) /
+        max(abs(linearityReferenceLateralGain), 1e-6)
+      )
+    else
+      1;
+
+  linearityGainLossFraction =
+    if useMode == 0
+       and enableLinearityTermination
+       and linearityReferenceValid
+       and noEvent(abs(accY) >= linearityReferenceAy + max(0, linearityEvaluationAyMargin)) then
+      noEvent(max(0, 1 - linearityGainRatio))
+    else
+      0;
+
+  linearityGainLossPct = 100 * linearityGainLossFraction;
+  steeringNonlinearityFraction = linearityGainLossFraction;
+  steeringNonlinearityPct = 100 * steeringNonlinearityFraction;
+
+  when sample(steerStart, linearitySlopeSamplePeriod) then
+    if useMode == 0 and enableLinearityTermination and time >= steerStart then
+      if pre(linearitySampleValid)
+         and abs(handwheelAngle - pre(linearitySampleHandwheel)) > 1e-6 then
+        linearityLocalLateralGain =
+          (accY - pre(linearitySampleAy)) /
+          (handwheelAngle - pre(linearitySampleHandwheel));
+      else
+        linearityLocalLateralGain = pre(linearityLocalLateralGain);
+      end if;
+
+      if not pre(linearityReferenceValid)
+         and pre(linearitySampleValid)
+         and abs(accY) >= linearityReferenceAy
+         and abs(linearityLocalLateralGain) > 1e-6 then
+        linearityReferenceValid = true;
+        linearityReferenceAyMeasured = accY;
+        linearityReferenceHandwheel = handwheelAngle;
+        linearityReferenceLateralGain = linearityLocalLateralGain;
+      else
+        linearityReferenceValid = pre(linearityReferenceValid);
+        linearityReferenceAyMeasured = pre(linearityReferenceAyMeasured);
+        linearityReferenceHandwheel = pre(linearityReferenceHandwheel);
+        linearityReferenceLateralGain = pre(linearityReferenceLateralGain);
+      end if;
+
+      linearitySampleValid = true;
+      linearitySampleAy = accY;
+      linearitySampleHandwheel = handwheelAngle;
+    else
+      linearitySampleValid = pre(linearitySampleValid);
+      linearitySampleAy = pre(linearitySampleAy);
+      linearitySampleHandwheel = pre(linearitySampleHandwheel);
+      linearityLocalLateralGain = pre(linearityLocalLateralGain);
+      linearityReferenceValid = pre(linearityReferenceValid);
+      linearityReferenceAyMeasured = pre(linearityReferenceAyMeasured);
+      linearityReferenceHandwheel = pre(linearityReferenceHandwheel);
+      linearityReferenceLateralGain = pre(linearityReferenceLateralGain);
+    end if;
+  end when;
+
   when useMode == 0
-     and time > steerStart + ayRampDuration
+     and enableLinearityTermination
+     and linearityReferenceValid
+     and linearityGainLossFraction >= linearityNonlinearityFraction
+     and pre(t_linearity_limit_hit) < 0 then
+    t_linearity_limit_hit = time;
+
+  elsewhen useMode == 0
+     and enableLinearityTermination
+     and linearityReferenceValid
+     and linearityGainLossFraction < linearityNonlinearityFraction then
+    t_linearity_limit_hit = -1;
+  end when;
+
+  when useMode == 0
+     and enableLinearityTermination
+     and t_linearity_limit_hit > 0
+     and time > t_linearity_limit_hit + linearityHoldDuration then
+    terminate("Reached steering lateral-gain loss threshold");
+  end when;
+
+  when useMode == 0
+     and time > steerStart
+     and enableNormalLoadSteerLimiter
+     and minTireNormalLoad <= tireNormalLoadMin
+     and not pre(rampEnding) then
+    rampEnding = true;
+    t_ramp_end_hit = time;
+  end when;
+
+  // Open-loop QSS detection starts after the normal-load floor ends the
+  // handwheel ramp, then waits for yaw and steering rates to flatten.
+  when useMode == 0
+     and rampEnding
      and abs(der(yawVel)) < der_yawVelTol
      and abs(der(handwheelAngle)) < handwheelRateTol
      and pre(t_qss_hit) < 0 then
     t_qss_hit = time;
 
   elsewhen useMode == 0
-     and time > steerStart + ayRampDuration
+     and rampEnding
      and (abs(der(yawVel)) >= der_yawVelTol
           or abs(der(handwheelAngle)) >= handwheelRateTol) then
     t_qss_hit = -1;
@@ -406,8 +688,16 @@ equation
   end when;
 
   when useMode == 0
-     and time > steerStart + ayRampDuration + settleTimeout then
+     and rampEnding
+     and time > t_ramp_end_hit + handwheelRampStopDuration + settleTimeout then
     terminate("Open-loop ramp steer did not reach QSS plateau before timeout");
+  end when;
+
+  when useMode == 0
+     and terminateOnTireLift
+     and time > steerStart
+     and minTireNormalLoad <= tireLiftTerminateLoad then
+    terminate("Tire normal load reached lift threshold");
   end when;
 
   when useMode == 2
@@ -439,10 +729,11 @@ equation
     else
       0;
 
-  // Open-loop feedforward provides the nominal handwheel command.
+  // Open-loop mode uses a constant handwheel rate until any tire reaches
+  // tireNormalLoadMin. After that event, the rate smoothly rolls to zero.
   frSteerCmd =
     if useMode == 0 and noEvent(time >= steerStart) then
-      steerFeedforward
+      steerLimitedFeedforward
     elseif useMode == 1 then
       steerSine
     elseif useMode == 2 then
