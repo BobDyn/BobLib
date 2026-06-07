@@ -7,6 +7,9 @@ record MF52Record
   SetupRecord setup
     "Global tire setup parameters (nominal load, radius, etc.)";
 
+  RelaxationRecord relaxation
+    "Relaxation coefficients used to parameterize transient slip";
+
   // Longitudinal force (Fx)
   PureSlip.FxPureRecord fxPure
     "Pure slip longitudinal force parameters";

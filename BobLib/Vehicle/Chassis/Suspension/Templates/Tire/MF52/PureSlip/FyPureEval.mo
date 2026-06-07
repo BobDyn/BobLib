@@ -56,6 +56,7 @@ algorithm
     E := (p.PEY1 + p.PEY2 * dfz) *
          (1 - (p.PEY3 + p.PEY4 * IA_y) * sign(SA)) *
          p.LEY;
+    E := min(E, 1);
 
     Fy := D * sin(C * atan(B * SA - E * (B * SA - atan(B * SA)))) + Sv;
 

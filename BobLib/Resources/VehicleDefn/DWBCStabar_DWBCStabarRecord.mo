@@ -78,6 +78,7 @@ record DWBCStabar_DWBCStabarRecord
       myPure = TireModel.PureSlip.MyPureRecord(QSY1 = 0.0, QSY2 = 0.0, QSY3 = 0.0, QSY4 = 0.0, Vref = 12.0, LMY = 1.0),
       mzCombined = TireModel.CombinedSlip.MzCombinedRecord(SSZ1 = 0.0, SSZ2 = 0.0, SSZ3 = 0.0, SSZ4 = 0.0, RVY1 = 0.0, RVY2 = 0.0, RVY3 = 0.0, RVY4 = 0.0, RVY5 = 0.0, RVY6 = 0.0, LS = 1.0, LVYKA = 1.0),
       mzPure = TireModel.PureSlip.MzPureRecord(QBZ1 = 8.22843, QBZ2 = 2.98676, QBZ3 = -3.57739, QBZ4 = -0.429117, QBZ5 = 0.433125, QCZ1 = 1.41359, QDZ1 = 0.152526, QDZ2 = -0.0381101, QDZ3 = 0.387762, QDZ4 = -3.95699, QEZ1 = -0.239731, QEZ2 = 1.29253, QEZ3 = -1.21298, QEZ4 = 0.0, QEZ5 = 0.0, QHZ1 = 0.0, QHZ2 = 0.0, QHZ3 = 0.0, QHZ4 = 0.0, QBZ9 = 0.0, QBZ10 = -1.72926, QDZ6 = 0.00604966, QDZ7 = -0.000116241, QDZ8 = -2.33359, QDZ9 = -0.0379755, LTR = 1.0, LRES = 1.0, LKY = 1.0, LMUY = 1.0, LGAZ = 1.0),
+      relaxation = TireModel.RelaxationRecord(FNOMIN = 650.0, UNLOADED_RADIUS = pFrPartialWheel.R0, LFZO = 1.0, PTX1 = 0.0, PTX2 = 0.0, PTX3 = 0.0, PTY1 = 0.0, PTY2 = 0.0, PKY3 = 1.36502, LSGKP = 1.0, LSGAL = 1.0),
       setup = TireModel.SetupRecord(FNOMIN = 650.0, FZMIN = 100.0, FZMAX = 1800.0, UNLOADED_RADIUS = pFrPartialWheel.R0));
 
   parameter Axle.AxleDW_BC_StabarRecord pRrAxleDW(
@@ -146,6 +147,7 @@ record DWBCStabar_DWBCStabarRecord
       myPure = TireModel.PureSlip.MyPureRecord(QSY1 = 0.0, QSY2 = 0.0, QSY3 = 0.0, QSY4 = 0.0, Vref = 12.0, LMY = 1.0),
       mzCombined = TireModel.CombinedSlip.MzCombinedRecord(SSZ1 = 0.0, SSZ2 = 0.0, SSZ3 = 0.0, SSZ4 = 0.0, RVY1 = 0.0, RVY2 = 0.0, RVY3 = 0.0, RVY4 = 0.0, RVY5 = 0.0, RVY6 = 0.0, LS = 1.0, LVYKA = 1.0),
       mzPure = TireModel.PureSlip.MzPureRecord(QBZ1 = 8.22843, QBZ2 = 2.98676, QBZ3 = -3.57739, QBZ4 = -0.429117, QBZ5 = 0.433125, QCZ1 = 1.41359, QDZ1 = 0.152526, QDZ2 = -0.0381101, QDZ3 = 0.387762, QDZ4 = -3.95699, QEZ1 = -0.239731, QEZ2 = 1.29253, QEZ3 = -1.21298, QEZ4 = 0.0, QEZ5 = 0.0, QHZ1 = 0.0, QHZ2 = 0.0, QHZ3 = 0.0, QHZ4 = 0.0, QBZ9 = 0.0, QBZ10 = -1.72926, QDZ6 = 0.00604966, QDZ7 = -0.000116241, QDZ8 = -2.33359, QDZ9 = -0.0379755, LTR = 1.0, LRES = 1.0, LKY = 1.0, LMUY = 1.0, LGAZ = 1.0),
+      relaxation = TireModel.RelaxationRecord(FNOMIN = 650.0, UNLOADED_RADIUS = pRrPartialWheel.R0, LFZO = 1.0, PTX1 = 0.0, PTX2 = 0.0, PTX3 = 0.0, PTY1 = 0.0, PTY2 = 0.0, PKY3 = 1.36502, LSGKP = 1.0, LSGAL = 1.0),
       setup = TireModel.SetupRecord(FNOMIN = 650.0, FZMIN = 100.0, FZMAX = 1800.0, UNLOADED_RADIUS = pRrPartialWheel.R0));
 
   parameter MassRecord pBaseSprungMass(

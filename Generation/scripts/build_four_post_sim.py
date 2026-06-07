@@ -67,12 +67,13 @@ FOUR_POST_TIMING_RE = re.compile(
 # FourPost uses a 5 s pose cadence; the load pulse is short and the tail is left to settle.
 FOUR_POST_POSE_STEP_S = 5
 FOUR_POST_HEAVE_START_S = 2
-FOUR_POST_HEAVE_MEASURED_COUNT = 10
+FOUR_POST_HEAVE_MEASURED_COUNT = 11
 FOUR_POST_HEAVE_BUFFER_START_S = FOUR_POST_HEAVE_START_S + FOUR_POST_POSE_STEP_S * FOUR_POST_HEAVE_MEASURED_COUNT
 FOUR_POST_HEAVE_END_S = FOUR_POST_HEAVE_BUFFER_START_S + FOUR_POST_POSE_STEP_S
 FOUR_POST_ROLL_START_S = FOUR_POST_HEAVE_END_S + 1
 FOUR_POST_ROLL_COUNT = 11
 FOUR_POST_ROLL_END_S = FOUR_POST_ROLL_START_S + FOUR_POST_POSE_STEP_S * FOUR_POST_ROLL_COUNT
+FOUR_POST_STOP_TIME_S = FOUR_POST_ROLL_END_S
 
 
 def _indent_block(text: str, indent: int = 2) -> str:
@@ -278,6 +279,12 @@ def render_four_post_sim(data: dict[str, object], yaml_path: Path) -> str:
     source_path = boblib_root(data) / "Standards" / "FourPostSim.mo"
     text = source_path.read_text(encoding="utf-8")
     text = FOUR_POST_TIMING_RE.sub(_render_timing_block(), text, count=1)
+    text = re.sub(
+        r"experiment\(StartTime = 0, StopTime = [0-9.]+,",
+        f"experiment(StartTime = 0, StopTime = {FOUR_POST_STOP_TIME_S},",
+        text,
+        count=1,
+    )
     arch = require_mapping(data, "architecture", yaml_path)  # type: ignore[arg-type]
     front_topology = norm_arch(str(arch.get("front")))
     rear_topology = norm_arch(str(arch.get("rear")))

@@ -4,6 +4,7 @@ function MyCombinedEval
   import Modelica.SIunits;
 
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.MyPureRecord;
+  import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.FxPureRecord;
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.CombinedSlip.MyCombinedRecord;
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.SetupRecord;
 
@@ -14,6 +15,7 @@ function MyCombinedEval
   input SIunits.Velocity Vx;
 
   input MyPureRecord pPure;
+  input FxPureRecord pFx;
   input MyCombinedRecord pComb;
   input SetupRecord setup;
 
@@ -21,7 +23,7 @@ function MyCombinedEval
 
 algorithm
   if Fz > 1e-3 then
-    My := MyPureEval(Fz, Fx, Vx, pPure, setup);
+    My := MyPureEval(Fz, Fx, Vx, pPure, pFx, setup);
   else
     My := 0;
   end if;

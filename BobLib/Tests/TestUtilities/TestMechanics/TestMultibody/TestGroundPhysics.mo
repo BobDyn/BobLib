@@ -16,7 +16,7 @@ protected
     Placement(transformation(origin = {0, -70}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
   
   // Define ground
-  Vehicle.GroundPhysics ground annotation(
+  BobLib.Utilities.Mechanics.Multibody.GroundPhysics ground annotation(
     Placement(transformation(origin = {0, -30},extent = {{-10, -10}, {10, 10}}, rotation = 90)));
   
   // Define mass above ground

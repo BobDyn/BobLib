@@ -5,15 +5,16 @@ model TestRackAndPinion
   
   parameter DWBCStabar_DWBCStabarRecord pVehicle;
   
-  parameter Real linkDiameter = 0.020;
+  inner parameter Real linkDiameter = 0.020;
+  inner parameter Boolean enableAnimation = false;
   
   inner Modelica.Mechanics.MultiBody.World world(n = {0, 0, -1})  annotation(
     Placement(transformation(origin = {-90, -90}, extent = {{-10, -10}, {10, 10}})));
   
   // Rack definition
-  Modelica.Mechanics.MultiBody.Parts.Fixed rackFixed(r = {pVehicle.pRack.leftPickup[1], 0, pVehicle.pRack.leftPickup[3]}, animation = false)  annotation(
+  Modelica.Mechanics.MultiBody.Parts.Fixed rackFixed(r = {pVehicle.pFrRack.leftPickup[1], 0, pVehicle.pFrRack.leftPickup[3]}, animation = false)  annotation(
     Placement(transformation(origin = {0, -30}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
-  BobLib.Vehicle.Chassis.Suspension.Templates.SteeringRack.RackAndPinion rackAndPinion(pRack = pVehicle.pRack, linkDiameter = linkDiameter)  annotation(
+  BobLib.Vehicle.Chassis.Suspension.Templates.SteeringRack.RackAndPinion rackAndPinion(pRack = pVehicle.pFrRack, linkDiameter = linkDiameter)  annotation(
     Placement(transformation(extent = {{-20, -20}, {20, 20}})));
   
   // Pinion input
@@ -23,7 +24,7 @@ model TestRackAndPinion
     Placement(transformation(origin = {-20, 30}, extent = {{-10, -10}, {10, 10}})));
   
   // Torque feedback
-  Modelica.Mechanics.MultiBody.Parts.Fixed springSupport(r = {pVehicle.pRack.leftPickup[1], pVehicle.pRack.leftPickup[2] + 0.5, pVehicle.pRack.leftPickup[3]}, animation = false)  annotation(
+  Modelica.Mechanics.MultiBody.Parts.Fixed springSupport(r = {pVehicle.pFrRack.leftPickup[1], pVehicle.pFrRack.leftPickup[2] + 0.5, pVehicle.pFrRack.leftPickup[3]}, animation = false)  annotation(
     Placement(transformation(origin = {-80, 0}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.MultiBody.Forces.Spring spring(c = 1e6, s_unstretched = 0.5, width = linkDiameter*2)  annotation(
     Placement(transformation(origin = {-50, 0}, extent = {{-10, -10}, {10, 10}})));

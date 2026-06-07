@@ -10,6 +10,7 @@ model RackAndPinion "Rack and pinion"
   // Visual parameters
   parameter SIunits.Length linkDiameter annotation(
     Evaluate = true, Dialog(tab="Animation"));
+  outer parameter Boolean enableAnimation;
   // Frames
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a mountFrame annotation(
     Placement(transformation(origin = {0, -100}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {0, -20}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
@@ -20,13 +21,13 @@ model RackAndPinion "Rack and pinion"
   // Rack axis
   Modelica.Mechanics.MultiBody.Joints.Prismatic rackAxis(n = {0, 1, 0},
                                                          useAxisFlange = true,
-                                                         animation = false,
+                                                         animation = enableAnimation,
                                                          s(nominal=0.01))  annotation(
     Placement(transformation(origin = {0, -50}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
   
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation fromLeft(r = {0, -pRack.leftPickup[2], 0}, width = linkDiameter, height = linkDiameter)  annotation(
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation fromLeft(r = {0, -pRack.leftPickup[2], 0}, width = linkDiameter, height = linkDiameter, animation = enableAnimation)  annotation(
     Placement(transformation(origin = {-30, 0}, extent = {{-10, -10}, {10, 10}}, rotation = -0)));
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRight(r = {0, -pRack.leftPickup[2], 0}, width = linkDiameter, height = linkDiameter)  annotation(
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRight(r = {0, -pRack.leftPickup[2], 0}, width = linkDiameter, height = linkDiameter, animation = enableAnimation)  annotation(
     Placement(transformation(origin = {30, 0}, extent = {{-10, -10}, {10, 10}})));
   
   Modelica.Mechanics.Rotational.Interfaces.Flange_a pinionFlange annotation(
@@ -34,9 +35,9 @@ model RackAndPinion "Rack and pinion"
   Modelica.Mechanics.MultiBody.Parts.Mounting1D mounting1D annotation(
     Placement(transformation(origin = {50, -70}, extent = {{10, -10}, {-10, 10}}, rotation = -90)));
   // Visualization
-  Modelica.Mechanics.MultiBody.Visualizers.FixedShape pinionVisualizer(length = 2*pRack.cFactor/(2*Modelica.Constants.pi), width = 1.25*pRack.cFactor/(2*Modelica.Constants.pi), shapeType = "cylinder", lengthDirection = {0, 0, 1}, height = 1.25*pRack.cFactor/(2*Modelica.Constants.pi), color = {255, 255, 255})  annotation(
+  Modelica.Mechanics.MultiBody.Visualizers.FixedShape pinionVisualizer(length = 2*pRack.cFactor/(2*Modelica.Constants.pi), width = 1.25*pRack.cFactor/(2*Modelica.Constants.pi), shapeType = "cylinder", lengthDirection = {0, 0, 1}, height = 1.25*pRack.cFactor/(2*Modelica.Constants.pi), color = {255, 255, 255}, animation = enableAnimation)  annotation(
     Placement(transformation(origin = {-30, -70}, extent = {{10, -10}, {-10, 10}})));
-  Modelica.Mechanics.MultiBody.Visualizers.FixedShape travelVisualizer(shapeType = "cylinder", lengthDirection = {0, 1, 0}, widthDirection = {0, 0, 1}, length = linkDiameter, width = linkDiameter*1.1, height = linkDiameter*1.1, color = {0, 0, 0}, r_shape = {0, -linkDiameter/2, 0})  annotation(
+  Modelica.Mechanics.MultiBody.Visualizers.FixedShape travelVisualizer(shapeType = "cylinder", lengthDirection = {0, 1, 0}, widthDirection = {0, 0, 1}, length = linkDiameter, width = linkDiameter*1.1, height = linkDiameter*1.1, color = {0, 0, 0}, r_shape = {0, -linkDiameter/2, 0}, animation = enableAnimation)  annotation(
     Placement(transformation(origin = {30, -30}, extent = {{-10, -10}, {10, 10}}, rotation = -0)));
   Modelica.Mechanics.Translational.Components.IdealGearR2T idealGearR2T(useSupportR = true, useSupportT = true, ratio = 2*Modelica.Constants.pi/pRack.cFactor)  annotation(
     Placement(transformation(origin = {35, 35}, extent = {{15, -15}, {-15, 15}})));

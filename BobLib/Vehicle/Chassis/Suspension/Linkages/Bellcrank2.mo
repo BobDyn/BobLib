@@ -19,6 +19,7 @@ model Bellcrank2
     Dialog(tab = "Animation", group = "Sizing"));
   parameter SIunits.Length jointDiameter annotation(
     Dialog(tab = "Animation", group = "Sizing"));
+  outer parameter Boolean enableAnimation;
   
   // Frames
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a mountFrame annotation(
@@ -28,14 +29,14 @@ model Bellcrank2
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b pickupFrame2 annotation(
     Placement(transformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}})));
   // Rotational DOF
-  Modelica.Mechanics.MultiBody.Joints.Revolute revolute(n = Vectors.normalize(pivotAxis), animation = true, cylinderLength = jointDiameter, cylinderDiameter = jointDiameter, stateSelect = StateSelect.always, phi(nominal = 0.05), w(start = 0, nominal = 1)) annotation(
+  Modelica.Mechanics.MultiBody.Joints.Revolute revolute(n = Vectors.normalize(pivotAxis), animation = enableAnimation, cylinderLength = jointDiameter, cylinderDiameter = jointDiameter, stateSelect = StateSelect.always, phi(nominal = 0.05), w(start = 0, nominal = 1)) annotation(
     Placement(transformation(origin = {-70, 0}, extent = {{-10, -10}, {10, 10}})));
   // Visualization
-  Modelica.Mechanics.MultiBody.Visualizers.FixedShape side_1(lengthDirection = Vectors.normalize(pickup_1 - pivot), length = Vectors.norm(pickup_1 - pivot), width = linkDiameter*0.75, height = linkDiameter*0.75, widthDirection = Vectors.normalize(pivotAxis), shapeType = "cylinder") annotation(
+  Modelica.Mechanics.MultiBody.Visualizers.FixedShape side_1(lengthDirection = Vectors.normalize(pickup_1 - pivot), length = Vectors.norm(pickup_1 - pivot), width = linkDiameter*0.75, height = linkDiameter*0.75, widthDirection = Vectors.normalize(pivotAxis), shapeType = "cylinder", animation = enableAnimation) annotation(
     Placement(transformation(origin = {-30, 20}, extent = {{-10, -10}, {10, 10}})));
-  Modelica.Mechanics.MultiBody.Visualizers.FixedShape side_2(lengthDirection = Vectors.normalize(pickup_2 - pickup_1), widthDirection = Vectors.normalize(pivotAxis), length = Vectors.norm(pickup_2 - pickup_1), width = linkDiameter*0.75, height = linkDiameter*0.75, shapeType = "cylinder") annotation(
+  Modelica.Mechanics.MultiBody.Visualizers.FixedShape side_2(lengthDirection = Vectors.normalize(pickup_2 - pickup_1), widthDirection = Vectors.normalize(pivotAxis), length = Vectors.norm(pickup_2 - pickup_1), width = linkDiameter*0.75, height = linkDiameter*0.75, shapeType = "cylinder", animation = enableAnimation) annotation(
     Placement(transformation(origin = {-20, -30}, extent = {{10, -10}, {-10, 10}}, rotation = -0)));
-  Modelica.Mechanics.MultiBody.Visualizers.FixedShape side_3(lengthDirection = Vectors.normalize(pivot - pickup_2), length = Vectors.norm(pivot - pickup_2), width = linkDiameter*0.75, height = linkDiameter*0.75, widthDirection = Vectors.normalize(pivotAxis), shapeType = "cylinder") annotation(
+  Modelica.Mechanics.MultiBody.Visualizers.FixedShape side_3(lengthDirection = Vectors.normalize(pivot - pickup_2), length = Vectors.norm(pivot - pickup_2), width = linkDiameter*0.75, height = linkDiameter*0.75, widthDirection = Vectors.normalize(pivotAxis), shapeType = "cylinder", animation = enableAnimation) annotation(
     Placement(transformation(origin = {70, 20}, extent = {{-10, -10}, {10, 10}})));
 
 

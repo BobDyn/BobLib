@@ -9,6 +9,7 @@ model BaseTire
 
   // Record parameters
   parameter PartialWheelRecord pPartialWheel;
+  outer parameter Boolean enableAnimation;
     
   // Frames
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a cpFrame annotation(
@@ -47,7 +48,7 @@ model BaseTire
     Placement(transformation(origin = {-90, 40}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Blocks.Sources.RealExpression realExpressionMz(y = 0) annotation(
     Placement(transformation(origin = {-90, 26}, extent = {{-10, -10}, {10, 10}})));
-  Modelica.Mechanics.MultiBody.Forces.WorldForceAndTorque forceAndTorque(resolveInFrame = Modelica.Mechanics.MultiBody.Types.ResolveInFrameB.frame_b, animation = true) annotation(
+  Modelica.Mechanics.MultiBody.Forces.WorldForceAndTorque forceAndTorque(resolveInFrame = Modelica.Mechanics.MultiBody.Types.ResolveInFrameB.frame_b, animation = enableAnimation) annotation(
     Placement(transformation(origin = {-30, -50}, extent = {{-10, -10}, {10, 10}})));
 
 protected
@@ -66,7 +67,7 @@ protected
 
 equation
   // Normal load
-  Fz = max(0, cpFrame.f[3]);
+  Fz = noEvent(max(0, cpFrame.f[3]));
   
   // World basis (from cpFrame)
   e_xw = Modelica.Mechanics.MultiBody.Frames.resolve1(cpFrame.R, {1, 0, 0});
@@ -79,7 +80,7 @@ equation
   e_yg = normalize({e_yw[1], e_yw[2], 0});
   
   // Inclination angle
-  gamma = Modelica.Math.asin(max(-1.0, min(1.0, e_zw[2])));
+  gamma = Modelica.Math.asin(noEvent(max(-1.0, min(1.0, e_zw[2]))));
   
   // Contact patch velocity
   v_cp = wheelModel.wheelVelSensor.v;
@@ -92,6 +93,8 @@ equation
   slipModel.Vy = Vy;
   slipModel.omega = wheelModel.wheelRotSpeedSensor.w;
   slipModel.R0 = wheelModel.radiusSensor.s_rel;
+  slipModel.Fz = Fz;
+  slipModel.gamma = gamma;
   alpha = slipModel.alpha;
   kappa = slipModel.kappa;
   

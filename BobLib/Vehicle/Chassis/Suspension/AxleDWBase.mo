@@ -45,6 +45,7 @@ partial model AxleDWBase
     Dialog(tab = "Animation", group = "Sizing"));
   outer parameter SIunits.Length jointDiameter annotation(
     Dialog(tab = "Animation", group = "Sizing"));
+  outer parameter Boolean enableAnimation;
   // Effective center for internal calculations
   final parameter SIunits.Position[3] effectiveCenter = {pLeftDW.wheelCenter[1], 0, pLeftDW.wheelCenter[3]};
 
@@ -88,14 +89,14 @@ protected
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRack(r = {pRack.leftPickup[1], 0, pRack.leftPickup[3]} - effectiveCenter, animation = false) annotation(
     Placement(transformation(origin = {0, 90}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
   
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation leftTieConnection(r = pLeftDW.lower_o - pLeftDW.tie_o) annotation(
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation leftTieConnection(r = pLeftDW.lower_o - pLeftDW.tie_o, animation = false) annotation(
     Placement(transformation(origin = {-100, 70}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation rightTieConnection(r = pRightDW.lower_o - pRightDW.tie_o) annotation(
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation rightTieConnection(r = pRightDW.lower_o - pRightDW.tie_o, animation = false) annotation(
     Placement(transformation(origin = {100, 70}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
   
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toLeftWheelCenter(r = pLeftDW.wheelCenter - pLeftDW.lower_o) annotation(
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toLeftWheelCenter(r = pLeftDW.wheelCenter - pLeftDW.lower_o, animation = false) annotation(
     Placement(transformation(origin = {-120, 30}, extent = {{10, -10}, {-10, 10}})));
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRightWheelCenter(r = pRightDW.wheelCenter - pRightDW.lower_o) annotation(
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRightWheelCenter(r = pRightDW.wheelCenter - pRightDW.lower_o, animation = false) annotation(
     Placement(transformation(origin = {120, 30}, extent = {{-10, -10}, {10, 10}})));
   // Fixed geometry from effective center to nodes
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation toLeftUpper_i(r = (pLeftDW.upperFore_i + pLeftDW.upperAft_i)/2 - effectiveCenter, animation = false) annotation(

@@ -1,0 +1,48 @@
+name: BobLib CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  python:
+    name: Python Generation Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install test dependencies
+        run: python -m pip install --upgrade pip PyYAML pytest ruff
+
+      - name: Lint generation scripts
+        run: make lint
+
+      - name: Run generation unit tests
+        run: make test-python
+
+  modelica:
+    name: OpenModelica Regression
+    runs-on: ubuntu-latest
+    container: openmodelica/openmodelica:v1.26.3-ompython
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Python test dependency
+        run: python3 -m pip install --upgrade pip pytest
+
+      - name: Translate standards and test fixtures
+        run: make modelica-translation
+
+      - name: Check Modelica initialization baselines
+        run: make modelica-initialization
+
+      - name: Run signal-level regression model
+        run: make modelica-regression

@@ -14,6 +14,7 @@ partial model FrameBase
     Placement(visible = false, transformation(origin = {nan, nan}, extent = {{nan, nan}, {nan, nan}})));
   outer parameter SIunits.Length jointDiameter annotation(
     Placement(visible = false, transformation(origin = {nan, nan}, extent = {{nan, nan}, {nan, nan}})));
+  outer parameter Boolean enableAnimation;
   
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a frontFrame annotation(
     Placement(transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}})));

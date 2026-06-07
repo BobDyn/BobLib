@@ -8,6 +8,7 @@ model TestFrAxleDW
   parameter DWBCStabar_DWBCStabarRecord pVehicle;
   inner parameter Real linkDiameter = 0.020;
   inner parameter Real jointDiameter = 0.030;
+  inner parameter Boolean enableAnimation = false;
   parameter Real leftCPInit[3] = pVehicle.pFrDW.wheelCenter + Frames.resolve1(Frames.axesRotations({1, 2, 3}, {pVehicle.pFrPartialWheel.staticGamma*pi/180, 0, pVehicle.pFrPartialWheel.staticAlpha*pi/180}, {0, 0, 0}), {0, 0, -pVehicle.pFrPartialWheel.R0});
   parameter Real rightCPInit[3] = Vector.mirrorXZ(leftCPInit);
   inner Modelica.Mechanics.MultiBody.World world(n = {0, 0, -1}) annotation(

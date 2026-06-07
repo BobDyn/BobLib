@@ -5,8 +5,9 @@ model TestDoubleWishbone
   
   parameter DWBCStabar_DWBCStabarRecord pVehicle;
   
-  parameter Real linkDiameter = 0.020;
-  parameter Real jointDiameter = 0.030;
+  inner parameter Real linkDiameter = 0.020;
+  inner parameter Real jointDiameter = 0.030;
+  inner parameter Boolean enableAnimation = false;
   
   inner Modelica.Mechanics.MultiBody.World world(n = {0, 0, -1}) annotation(
     Placement(transformation(origin = {-90, -90}, extent = {{-10, -10}, {10, 10}})));

@@ -101,7 +101,7 @@ algorithm
 
   My := MyCombinedEval(
     FzEval, Fx, Vx,
-    pMyPure, pMyComb, setup
+    pMyPure, pFxPure, pMyComb, setup
   );
 
   (Mz, t, s) := MzCombinedEval(

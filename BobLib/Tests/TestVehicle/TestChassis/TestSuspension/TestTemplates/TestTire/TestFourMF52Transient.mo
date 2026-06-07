@@ -14,6 +14,7 @@ model TestFourMF52Transient
   
   inner parameter SIunits.Length linkDiameter = 0.020;
   inner parameter SIunits.Length jointDiameter = 0.030;
+  inner parameter Boolean enableAnimation = false;
 
 // Outputs
   Real body_accels[3];

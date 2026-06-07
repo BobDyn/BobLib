@@ -13,16 +13,26 @@ model VehicleSim
 
   inner parameter SIunits.Length linkDiameter = 0.020;
   inner parameter SIunits.Length jointDiameter = 0.030;
+  inner parameter Boolean enableAnimation = false
+    "Enable MultiBody animation geometry"
+    annotation(Evaluate = true, Dialog(tab = "Animation"));
 
   parameter DWBCStabar_DWBCStabarRecord pVehicle;
 
-  parameter Integer useMode = 0
-    "0 - open-loop ramp steer; 1 - open-loop sinusoidal steer; 2 - step steer; 3 - chirp steer"
+  constant Integer MODE_OPEN_LOOP_RAMP = 0;
+  constant Integer MODE_OPEN_LOOP_SINE = 1;
+  constant Integer MODE_STEP_STEER = 2;
+
+  parameter Integer useMode = MODE_OPEN_LOOP_RAMP
+    "0 - open-loop ramp steer; 1 - open-loop sinusoidal steer; 2 - step steer"
     annotation(Evaluate = false);
 
   // Toggle controllers
-  final parameter Boolean openLoopAy = useMode == 0;
-  final parameter Boolean closedLoopVelocity = useMode == 0 or useMode == 1 or useMode == 2 or useMode == 3;
+  final parameter Boolean openLoopAy = useMode == MODE_OPEN_LOOP_RAMP;
+  final parameter Boolean closedLoopVelocity =
+    useMode == MODE_OPEN_LOOP_RAMP or
+    useMode == MODE_OPEN_LOOP_SINE or
+    useMode == MODE_STEP_STEER;
 
   parameter Modelica.SIunits.Time steerStart = 2.0
     "Start time"
@@ -30,7 +40,7 @@ model VehicleSim
 
   // Open-loop ramp-steer parameters
   parameter SIunits.Acceleration targetAy = 18
-    "Nominal target lateral acceleration used to size the open-loop ramp"
+    "Lateral-acceleration sign used to choose open-loop handwheel ramp direction"
     annotation(Evaluate = false, Dialog(enable = openLoopAy));
 
   parameter SIunits.Velocity targetVel = 15
@@ -41,14 +51,6 @@ model VehicleSim
     "Initial velocity"
     annotation(Evaluate = false);
 
-  parameter Real steerRatioEstimateStart = 17.5
-    "Geometry-based bootstrap for handwheel-to-roadwheel ratio"
-    annotation(Evaluate = false, Dialog(enable = openLoopAy));
-
-  parameter Real steerRatioEstimateDecay = 15.5
-    "Gain-scheduling strength for the feedforward steer ratio"
-    annotation(Evaluate = false, Dialog(enable = openLoopAy));
-
   parameter SIunits.AngularVelocity handwheelRampRate = 0.14
     "Open-loop handwheel ramp rate"
     annotation(Evaluate = false, Dialog(enable = openLoopAy));
@@ -57,28 +59,12 @@ model VehicleSim
     "Duration used to smoothly roll handwheel rate to zero after the load limit"
     annotation(Evaluate = false, Dialog(enable = openLoopAy));
 
-  parameter Boolean enableCurvatureSteerLimiter = true
-    "Back off open-loop steer when measured curvature exceeds the commanded ramp"
-    annotation(Evaluate = false, Dialog(enable = openLoopAy));
-
-  parameter Real steerCurvatureLimitGain = 12.0
-    "Handwheel radians removed per 1/m of curvature overshoot"
-    annotation(Evaluate = false, Dialog(enable = openLoopAy));
-
-  parameter Real steerCurvatureLimitDeadbandFraction = 0.03
-    "Fractional curvature overshoot allowed before steer limiting"
-    annotation(Evaluate = false, Dialog(enable = openLoopAy));
-
   parameter Boolean enableNormalLoadSteerLimiter = true
     "End the open-loop handwheel ramp when any tire reaches the load floor"
     annotation(Evaluate = false, Dialog(enable = openLoopAy));
 
   parameter SIunits.Force tireNormalLoadMin = 200.0
     "Immediate tire normal-load floor where the handwheel ramp ends"
-    annotation(Evaluate = false, Dialog(enable = openLoopAy));
-
-  parameter Real steerNormalLoadLimitGain = 0.008
-    "Legacy unused normal-load feedback gain"
     annotation(Evaluate = false, Dialog(enable = openLoopAy));
 
   parameter Boolean terminateOnTireLift = true
@@ -111,10 +97,6 @@ model VehicleSim
 
   parameter SIunits.Time linearityHoldDuration = 0.05
     "Duration that the nonlinearity threshold must remain true before termination"
-    annotation(Evaluate = false, Dialog(enable = openLoopAy));
-
-  parameter SIunits.Time ayRampDuration = 3.0
-    "Open-loop ramp duration"
     annotation(Evaluate = false, Dialog(enable = openLoopAy));
 
   parameter SIunits.Time steadyHoldDuration = 0.1
@@ -166,35 +148,13 @@ model VehicleSim
 
   Real speed;
   Real curvature;
-  Real targetRad;
-  Real targetCurvature;
-  Real targetAyCmd;
-  Real targetCurvatureCmd;
-  Real targetRoadwheel;
-  Real targetRoadwheelCmd;
-  Real steerRatioEstimate;
-  Real steerFeedforward;
   SIunits.Angle handwheelRampCmd(start = 0, fixed = true);
   SIunits.AngularVelocity handwheelRateCmd;
   Real handwheelRampDirection;
-  Real curvatureCommandSign;
-  Real curvatureOvershoot;
-  Real curvatureOvershootDeadband;
-  Real steerLimiterReduction;
-  Real steerLimiterRawScale;
-  Real steerLimiterScale;
-  Real steerLimitedFeedforward;
-  Real steerFeedforwardMag;
   Real minTireNormalLoad;
-  Real tireNormalLoadDeficit;
-  Real rampEndingFlag;
   Real tireNormalLoadStopXi(start = 0, fixed = true);
   Real tireNormalLoadRateXi;
   Real tireNormalLoadRateScale;
-  Real steerNormalLoadReduction;
-  Real steerCurvatureReduction;
-  Real linearitySampleValidFlag;
-  Real linearityReferenceValidFlag;
   discrete Real linearityReferenceAyMeasured(start = 0, fixed = true);
   discrete Real linearityReferenceHandwheel(start = 0, fixed = true);
   discrete Real linearityReferenceLateralGain(start = 0, fixed = true);
@@ -203,22 +163,6 @@ model VehicleSim
   discrete Real linearityLocalLateralGain(start = 0, fixed = true);
   Real linearityGainRatio;
   Real linearityGainLossFraction;
-  Real linearityGainLossPct;
-  Real handwheelLinearityGradient;
-  Real linearHandwheelEstimate;
-  Real steeringNonlinearityFraction;
-  Real steeringNonlinearityPct;
-  Real roadwheelMag;
-
-  Real rampXi;
-  Real ayRampFactor;
-  Real ayErrorRaw;
-  Real ayError;
-  Real curvatureErrorRaw;
-  Real curvatureError;
-
-  Real radError;
-  Real velError;
   Real steerSine;
   Real steerStep;
 
@@ -241,7 +185,7 @@ model VehicleSim
   SIunits.Velocity velY;
   SIunits.AngularVelocity yawVel;
 
-  inner Modelica.Mechanics.MultiBody.World world(n = {0, 0, -1}) annotation(
+  inner Modelica.Mechanics.MultiBody.World world(n = {0, 0, -1}, enableAnimation = enableAnimation) annotation(
     Placement(transformation(origin = {-130, -110}, extent = {{-10, -10}, {10, 10}})));
 
   BobLib.Vehicle.Vehicle_DWBCStabar_DWBCStabar vehicle(
@@ -262,7 +206,7 @@ model VehicleSim
 
   Modelica.Mechanics.Rotational.Sources.Position frSteerPosition(
     exact = true,
-    w(start = 0, fixed = true)) annotation(
+    w(start = 0)) annotation(
     Placement(transformation(origin = {-30, 110}, extent = {{-10, -10}, {10, 10}}, rotation = -0)));
 
   final parameter Real cpInitFL[3] =
@@ -339,21 +283,21 @@ protected
     Placement(transformation(origin = {-100, 10}, extent = {{-10, -10}, {10, 10}})));
 
   BobLib.Utilities.Mechanics.Multibody.GroundPhysics groundFR annotation(
-    Placement(transformation(origin = {100, 10}, extent = {{10, -10}, {10, 10}})));
+    Placement(transformation(origin = {100, 10}, extent = {{10, -10}, {-10, 10}})));
 
   BobLib.Utilities.Mechanics.Multibody.GroundPhysics groundRL annotation(
     Placement(transformation(origin = {-100, -50}, extent = {{-10, -10}, {10, 10}})));
 
   BobLib.Utilities.Mechanics.Multibody.GroundPhysics groundRR annotation(
-    Placement(transformation(origin = {100, -50}, extent = {{10, -10}, {10, 10}})));
+    Placement(transformation(origin = {100, -50}, extent = {{10, -10}, {-10, 10}})));
 
   Modelica.Blocks.Sources.RealExpression velSetpointExpression(
     y = targetVel) annotation(
-    Placement(transformation(origin = {-70, -30}, extent = {{-10, -10}, {10, 10}})));
+    Placement(transformation(origin = {-70, -50}, extent = {{-10, -10}, {10, 10}})));
 
   Modelica.Blocks.Sources.RealExpression velMeasurementExpression(
     y = speed) annotation(
-    Placement(transformation(origin = {-70, -10}, extent = {{-10, -10}, {10, 10}})));
+    Placement(transformation(origin = {-70, -80}, extent = {{-10, -10}, {10, 10}})));
 
   Modelica.Blocks.Continuous.LimPID speedPI(
     controllerType = Modelica.Blocks.Types.SimpleController.PI,
@@ -380,138 +324,20 @@ initial equation
     initialVel / pVehicle.pRrPartialWheel.R0;
 
 equation
-  targetRad =
-    if abs(targetAy) > 1e-6 then
-      noEvent(
-        (if targetAy >= 0 then 1 else -1) *
-        targetVel * targetVel / abs(targetAy)
-      )
-    else
-      1e9;
-
-  targetCurvature = noEvent(targetAy / max(targetVel * targetVel, 1e-6));
-  targetRoadwheel = noEvent(atan(wheelbase * targetCurvature));
+  assert(
+    useMode == MODE_OPEN_LOOP_RAMP or
+    useMode == MODE_OPEN_LOOP_SINE or
+    useMode == MODE_STEP_STEER,
+    "VehicleSim.useMode must be 0 (open-loop ramp), 1 (open-loop sine), or 2 (step steer).");
 
   curvature =
     bodyAngularVels[3] / max(speed, 0.1);
 
-  radError =
-    if abs(targetAy) > 1e-6 then
-      abs(curvature - targetCurvature) /
-      max(abs(targetCurvature), 1e-6) *
-      abs(targetRad)
-    else
-      0;
-
-  // Cubic smoothstep ramp for target Ay.
-  // With steerStart = 2.0 and ayRampDuration = 3.0,
-  // the target finishes ramping at t = 5.0 s.
-  rampXi =
-    if useMode == 0 then
-      noEvent(
-        if time <= steerStart then
-          0
-        elseif time >= steerStart + ayRampDuration then
-          1
-        else
-          (time - steerStart) / ayRampDuration
-      )
-    else
-      0;
-
-  ayRampFactor =
-    if useMode == 0 then
-      noEvent(3*rampXi^2 - 2*rampXi^3)
-    else
-      0;
-
-  targetAyCmd =
-    if useMode == 0 and noEvent(time >= steerStart) then
-      ayRampFactor * targetAy
-    else
-      0;
-
-  targetCurvatureCmd =
-    if useMode == 0 and noEvent(time >= steerStart) then
-      ayRampFactor * targetCurvature
-    else
-      0;
-
-  targetRoadwheelCmd =
-    if useMode == 0 and noEvent(time >= steerStart) then
-      ayRampFactor * targetRoadwheel
-    else
-      0;
-
-  ayErrorRaw =
-    if useMode == 0 and noEvent(time >= steerStart) then
-      targetAy - accY
-    else
-      0;
-
-  ayError =
-    if useMode == 0 and noEvent(time >= steerStart) then
-      targetAyCmd - accY
-    else
-      0;
-
-  curvatureErrorRaw =
-    if useMode == 0 and noEvent(time >= steerStart) then
-      targetCurvature - curvature
-    else
-      0;
-
-  curvatureError =
-    if useMode == 0 and noEvent(time >= steerStart) then
-      targetCurvatureCmd - curvature
-    else
-      0;
-
-  roadwheelMag =
-    if useMode == 0 and noEvent(time >= steerStart) then
-      sqrt(targetRoadwheelCmd*targetRoadwheelCmd + 1e-6)
-    else
-      0;
-
-  steerRatioEstimate =
-    if useMode == 0 and noEvent(time >= steerStart) then
-      steerRatioEstimateStart /
-      (1 + steerRatioEstimateDecay*roadwheelMag)
-    else
-      steerRatioEstimateStart;
-
-  curvatureCommandSign =
-    if noEvent(targetCurvatureCmd >= 0) then 1 else -1;
-
-  curvatureOvershoot =
-    if useMode == 0 and noEvent(time >= steerStart) then
-      noEvent(curvatureCommandSign * curvature - abs(targetCurvatureCmd))
-    else
-      0;
-
-  curvatureOvershootDeadband =
-    if useMode == 0 and noEvent(time >= steerStart) then
-      noEvent(
-        max(0, steerCurvatureLimitDeadbandFraction) *
-        max(abs(targetCurvatureCmd), 1e-6)
-      )
-    else
-      0;
-
   minTireNormalLoad =
     noEvent(min(min(Fz_FL, Fz_FR), min(Fz_RL, Fz_RR)));
 
-  tireNormalLoadDeficit =
-    if useMode == 0 and noEvent(time >= steerStart) then
-      noEvent(max(0, tireNormalLoadMin - minTireNormalLoad))
-    else
-      0;
-
-  rampEndingFlag =
-    if rampEnding then 1 else 0;
-
   der(tireNormalLoadStopXi) =
-    if useMode == 0
+    if useMode == MODE_OPEN_LOOP_RAMP
        and enableNormalLoadSteerLimiter
        and rampEnding
        and noEvent(tireNormalLoadStopXi < 1) then
@@ -529,48 +355,13 @@ equation
     if noEvent(targetAy >= 0) then 1 else -1;
 
   handwheelRateCmd =
-    if useMode == 0
+    if useMode == MODE_OPEN_LOOP_RAMP
        and noEvent(time >= steerStart) then
       handwheelRampDirection * handwheelRampRate * tireNormalLoadRateScale
     else
       0;
 
   der(handwheelRampCmd) = handwheelRateCmd;
-
-  steerFeedforward =
-    if useMode == 0 and noEvent(time >= steerStart) then
-      handwheelRampCmd
-    else
-      0;
-
-  steerLimitedFeedforward =
-    if useMode == 0 and noEvent(time >= steerStart) then
-      handwheelRampCmd
-    else
-      0;
-
-  steerCurvatureReduction = 0;
-  steerNormalLoadReduction =
-    noEvent(handwheelRampRate * (1 - tireNormalLoadRateScale));
-  steerLimiterReduction = steerNormalLoadReduction;
-  steerFeedforwardMag = sqrt(steerFeedforward*steerFeedforward + 1e-8);
-  steerLimiterRawScale = tireNormalLoadRateScale;
-  steerLimiterScale = tireNormalLoadRateScale;
-
-  linearitySampleValidFlag =
-    if linearitySampleValid then 1 else 0;
-
-  linearityReferenceValidFlag =
-    if linearityReferenceValid then 1 else 0;
-
-  handwheelLinearityGradient =
-    if linearityReferenceValid then
-      noEvent(1 / max(abs(linearityReferenceLateralGain), 1e-6))
-    else
-      0;
-
-  linearHandwheelEstimate =
-    handwheelLinearityGradient * accY;
 
   linearityGainRatio =
     if linearityReferenceValid then
@@ -582,7 +373,7 @@ equation
       1;
 
   linearityGainLossFraction =
-    if useMode == 0
+    if useMode == MODE_OPEN_LOOP_RAMP
        and enableLinearityTermination
        and linearityReferenceValid
        and noEvent(abs(accY) >= linearityReferenceAy + max(0, linearityEvaluationAyMargin)) then
@@ -590,12 +381,8 @@ equation
     else
       0;
 
-  linearityGainLossPct = 100 * linearityGainLossFraction;
-  steeringNonlinearityFraction = linearityGainLossFraction;
-  steeringNonlinearityPct = 100 * steeringNonlinearityFraction;
-
   when sample(steerStart, linearitySlopeSamplePeriod) then
-    if useMode == 0 and enableLinearityTermination and time >= steerStart then
+    if useMode == MODE_OPEN_LOOP_RAMP and enableLinearityTermination and time >= steerStart then
       if pre(linearitySampleValid)
          and abs(handwheelAngle - pre(linearitySampleHandwheel)) > 1e-6 then
         linearityLocalLateralGain =
@@ -635,28 +422,28 @@ equation
     end if;
   end when;
 
-  when useMode == 0
+  when useMode == MODE_OPEN_LOOP_RAMP
      and enableLinearityTermination
      and linearityReferenceValid
      and linearityGainLossFraction >= linearityNonlinearityFraction
      and pre(t_linearity_limit_hit) < 0 then
     t_linearity_limit_hit = time;
 
-  elsewhen useMode == 0
+  elsewhen useMode == MODE_OPEN_LOOP_RAMP
      and enableLinearityTermination
      and linearityReferenceValid
      and linearityGainLossFraction < linearityNonlinearityFraction then
     t_linearity_limit_hit = -1;
   end when;
 
-  when useMode == 0
+  when useMode == MODE_OPEN_LOOP_RAMP
      and enableLinearityTermination
      and t_linearity_limit_hit > 0
      and time > t_linearity_limit_hit + linearityHoldDuration then
     terminate("Reached steering lateral-gain loss threshold");
   end when;
 
-  when useMode == 0
+  when useMode == MODE_OPEN_LOOP_RAMP
      and time > steerStart
      and enableNormalLoadSteerLimiter
      and minTireNormalLoad <= tireNormalLoadMin
@@ -667,58 +454,58 @@ equation
 
   // Open-loop QSS detection starts after the normal-load floor ends the
   // handwheel ramp, then waits for yaw and steering rates to flatten.
-  when useMode == 0
+  when useMode == MODE_OPEN_LOOP_RAMP
      and rampEnding
      and abs(der(yawVel)) < der_yawVelTol
      and abs(der(handwheelAngle)) < handwheelRateTol
      and pre(t_qss_hit) < 0 then
     t_qss_hit = time;
 
-  elsewhen useMode == 0
+  elsewhen useMode == MODE_OPEN_LOOP_RAMP
      and rampEnding
      and (abs(der(yawVel)) >= der_yawVelTol
           or abs(der(handwheelAngle)) >= handwheelRateTol) then
     t_qss_hit = -1;
   end when;
 
-  when useMode == 0
+  when useMode == MODE_OPEN_LOOP_RAMP
      and t_qss_hit > 0
      and time > t_qss_hit + steadyHoldDuration then
     terminate("Reached open-loop ramp-steer QSS plateau");
   end when;
 
-  when useMode == 0
+  when useMode == MODE_OPEN_LOOP_RAMP
      and rampEnding
      and time > t_ramp_end_hit + handwheelRampStopDuration + settleTimeout then
     terminate("Open-loop ramp steer did not reach QSS plateau before timeout");
   end when;
 
-  when useMode == 0
+  when useMode == MODE_OPEN_LOOP_RAMP
      and terminateOnTireLift
      and time > steerStart
      and minTireNormalLoad <= tireLiftTerminateLoad then
     terminate("Tire normal load reached lift threshold");
   end when;
 
-  when useMode == 2
+  when useMode == MODE_STEP_STEER
      and time > steerStart
      and abs(der(yawVel)) < der_yawVelTol
      and pre(t_yawVel_hit) < 0 then
     t_yawVel_hit = time;
 
-  elsewhen useMode == 2
+  elsewhen useMode == MODE_STEP_STEER
      and abs(der(yawVel)) >= der_yawVelTol then
     t_yawVel_hit = -1;
   end when;
 
-  when useMode == 2
+  when useMode == MODE_STEP_STEER
      and t_yawVel_hit > 0
      and time > t_yawVel_hit + 0.1 then
     terminate("Reached open-loop step-steer steady-state: der(yawVel) below tolerance (held 0.1s)");
   end when;
 
   steerSine =
-    if noEvent(useMode == 1 and time > steerStart) then
+    if noEvent(useMode == MODE_OPEN_LOOP_SINE and time > steerStart) then
       steerAmp*sin(2*pi*steerFreq*(time - steerStart))
     else
       0;
@@ -732,17 +519,19 @@ equation
   // Open-loop mode uses a constant handwheel rate until any tire reaches
   // tireNormalLoadMin. After that event, the rate smoothly rolls to zero.
   frSteerCmd =
-    if useMode == 0 and noEvent(time >= steerStart) then
-      steerLimitedFeedforward
-    elseif useMode == 1 then
+    if useMode == MODE_OPEN_LOOP_RAMP and noEvent(time >= steerStart) then
+      handwheelRampCmd
+    elseif useMode == MODE_OPEN_LOOP_SINE then
       steerSine
-    elseif useMode == 2 then
+    elseif useMode == MODE_STEP_STEER then
       steerStep
     else
       0;
 
   driveTorqueCmd =
-    if useMode == 0 or useMode == 1 or useMode == 2 then
+    if useMode == MODE_OPEN_LOOP_RAMP or
+       useMode == MODE_OPEN_LOOP_SINE or
+       useMode == MODE_STEP_STEER then
       speedPI.y
     else
       0;
@@ -777,7 +566,6 @@ equation
   steerExcess = avgSteerAngle - wheelbase * curvature;
 
   speed = norm(bodyVels);
-  velError = targetVel - speed;
 
   velX = bodyVels[1];
   velY = bodyVels[2];
@@ -814,10 +602,10 @@ equation
     Line(points = {{120, -50}, {110, -50}}, color = {95, 95, 95}));
 
   connect(velSetpointExpression.y, speedPI.u_s) annotation(
-    Line(points = {{-59, -30}, {-42, -30}}, color = {0, 0, 127}));
+    Line(points = {{-59, -50}, {-42, -50}}, color = {0, 0, 127}));
 
   connect(velMeasurementExpression.y, speedPI.u_m) annotation(
-    Line(points = {{-59, -10}, {-42, -10}}, color = {0, 0, 127}));
+    Line(points = {{-59, -80}, {-30, -80}, {-30, -62}}, color = {0, 0, 127}));
 
   connect(vehicle.frameRL, groundRL.frame_b) annotation(
     Line(points = {{-44, -22}, {-100, -22}, {-100, -40}}, color = {95, 95, 95}));
@@ -832,7 +620,7 @@ equation
     Line(points = {{46, 38}, {100, 38}, {100, 20}}, color = {95, 95, 95}));
 
   connect(frSteerPosition.flange, vehicle.steerFlange) annotation(
-    Line(points = {{-20, 110}, {0, 110}, {0, 62}, {0, 62}}));
+    Line(points = {{-20, 110}, {0, 110}, {0, 62}}));
 
   connect(cgFreeMotion.frame_b, vehicle.cgFrame) annotation(
     Line(points = {{90, 90}, {70, 90}, {70, 20}, {46, 20}}, color = {95, 95, 95}));
@@ -843,6 +631,7 @@ equation
     experiment(StartTime = 0.0, StopTime = 10, Tolerance = 1e-06, Interval = 0.002),
     __OpenModelica_commandLineOptions = "--matchingAlgorithm=PFPlusExt --indexReductionMethod=dynamicStateSelection -d=initialization,NLSanalyticJacobian --maxSizeLinearTearing=5000",
     __OpenModelica_simulationFlags(
+      jacobian = "internalNumerical",
       lv = "LOG_STDOUT,LOG_ASSERT,LOG_STATS",
       noEquidistantTimeGrid = "()",
       noEventEmit = "()",

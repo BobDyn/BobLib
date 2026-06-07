@@ -28,6 +28,9 @@ protected
   Real K_y;
   Real B_y;
   Real K_x;
+  Real IA_y;
+  Real S_Hy;
+  Real S_Vy;
 
   Real IA_z;
   Real eps = 1e-8;
@@ -59,18 +62,26 @@ algorithm
     // ------------------------------------------------------------
     // Fy internals
     // ------------------------------------------------------------
+    IA_y := gamma * pFy.LGAY;
+
     C_y := pFy.PCY1 * pFy.LCY;
 
     mu_y := (pFy.PDY1 + pFy.PDY2 * dfz)
-            * (1 - pFy.PDY3 * (gamma * pFy.LGAY)^2)
+            * (1 - pFy.PDY3 * IA_y^2)
             * pFy.LMUY;
 
     K_y := pFy.PKY1 * setup.FNOMIN *
            sin(2 * atan(Fz / (pFy.PKY2 * setup.FNOMIN * pFy.LFZO))) *
-           (1 - pFy.PKY3 * abs(gamma * pFy.LGAY)) *
+           (1 - pFy.PKY3 * abs(IA_y)) *
            pFy.LFZO * pFy.LKY;
 
     B_y := K_y / (C_y * mu_y * Fz + eps);
+
+    S_Hy := (pFy.PHY1 + pFy.PHY2 * dfz) * pFy.LHY
+            + pFy.PHY3 * IA_y;
+
+    S_Vy := Fz * ((pFy.PVY1 + pFy.PVY2 * dfz) * pFy.LVY
+             + (pFy.PVY3 + pFy.PVY4 * dfz) * IA_y) * pFy.LMUY;
 
     // ------------------------------------------------------------
     // Fx stiffness
@@ -103,6 +114,7 @@ algorithm
     E_t := (p.QEZ1 + p.QEZ2 * dfz + p.QEZ3 * dfz^2)
            * (1 + (p.QEZ4 + p.QEZ5 * IA_z * p.LGAZ)
            * (2 / Modelica.Constants.pi) * atan(B_t * C_t * SA_t));
+    E_t := min(E_t, 1);
 
     SA_t_eq :=
       atan(sqrt((tan(SA_t))^2 + (K_x / (K_y + eps))^2 * kappa^2))
@@ -110,13 +122,12 @@ algorithm
 
     t := D_t
          * cos(C_t * atan(B_t * SA_t_eq - E_t * (B_t * SA_t_eq - atan(B_t * SA_t_eq))))
-         * cos(alpha)
-         * cos(gamma);
+         * cos(alpha);
 
     // ------------------------------------------------------------
     // Residual torque
     // ------------------------------------------------------------
-    SA_r := alpha;
+    SA_r := alpha + S_Hy + S_Vy / (K_y + eps);
 
     SA_r_eq :=
       atan(sqrt((tan(SA_r))^2 + (K_x / (K_y + eps))^2 * kappa^2))

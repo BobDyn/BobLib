@@ -14,8 +14,9 @@ model TestFourMF52Kinematic
   
   inner parameter SIunits.Length linkDiameter = 0.020;
   inner parameter SIunits.Length jointDiameter = 0.030;
+  inner parameter Boolean enableAnimation = false;
 
-  // Outputs
+// Outputs
   Real body_accels[3];
   Real normal_loads[4];
   Real long_LT;
@@ -33,7 +34,7 @@ model TestFourMF52Kinematic
 
   BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52Tire tireFL(pPartialWheel = pCar.pFrPartialWheel,
                                                                     pTireModel = pCar.pFrTireModel,
-                                                                    redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.TirePhysics.Wheel1DOF_Y wheelModel(partialWheelParams = pCar.pFrPartialWheel, wheel1DOF_YParams = pCar.pFrTireDOF),
+                                                                    redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.TirePhysics.Wheel1DOF_Y wheelModel(partialWheelParams = pCar.pFrPartialWheel, wheel1DOF_YParams = pCar.pFrTire1DOF_YParams),
                                                                     redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.SlipModel.KinematicSlip slipModel) annotation(
     Placement(transformation(origin = {-70, 80}, extent = {{10, -10}, {-10, 10}})));
   BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52Tire tireFR(pPartialWheel = PartialWheelRecord(R0 = pCar.pFrPartialWheel.R0,
@@ -47,12 +48,12 @@ model TestFourMF52Kinematic
                                                                                                                                                                                                           rimWidth = pCar.pFrPartialWheel.rimWidth,
                                                                                                                                                                                                           staticAlpha = -pCar.pFrPartialWheel.staticAlpha,
                                                                                                                                                                                                           staticGamma = -pCar.pFrPartialWheel.staticGamma),
-                                                                                                                                                                  wheel1DOF_YParams = pCar.pFrTireDOF),
+                                                                                                                                                                  wheel1DOF_YParams = pCar.pFrTire1DOF_YParams),
                                                                     redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.SlipModel.KinematicSlip slipModel) annotation(
     Placement(transformation(origin = {70, 80}, extent = {{-10, -10}, {10, 10}})));
   BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52Tire tireRL(pPartialWheel = pCar.pFrPartialWheel,
                                                                     pTireModel = pCar.pFrTireModel,
-                                                                    redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.TirePhysics.Wheel1DOF_Y wheelModel(partialWheelParams = pCar.pFrPartialWheel, wheel1DOF_YParams = pCar.pFrTireDOF), 
+                                                                    redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.TirePhysics.Wheel1DOF_Y wheelModel(partialWheelParams = pCar.pFrPartialWheel, wheel1DOF_YParams = pCar.pFrTire1DOF_YParams), 
                                                                     redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.SlipModel.KinematicSlip slipModel) annotation(
     Placement(transformation(origin = {-70, 0}, extent = {{10, -10}, {-10, 10}})));
   BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52Tire tireRR(pPartialWheel = PartialWheelRecord(R0 = pCar.pFrPartialWheel.R0,
@@ -66,7 +67,7 @@ model TestFourMF52Kinematic
                                                                                                                                                                                                           rimWidth = pCar.pFrPartialWheel.rimWidth,
                                                                                                                                                                                                           staticAlpha = -pCar.pFrPartialWheel.staticAlpha,
                                                                                                                                                                                                           staticGamma = -pCar.pFrPartialWheel.staticGamma),
-                                                                                                                                                                  wheel1DOF_YParams = pCar.pFrTireDOF),
+                                                                                                                                                                  wheel1DOF_YParams = pCar.pFrTire1DOF_YParams),
                                                                     redeclare BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.SlipModel.KinematicSlip slipModel) annotation(
     Placement(transformation(origin = {70, 0}, extent = {{-10, -10}, {10, 10}})));
   

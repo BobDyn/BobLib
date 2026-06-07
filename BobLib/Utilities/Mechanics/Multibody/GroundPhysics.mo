@@ -12,21 +12,25 @@ model GroundPhysics
   parameter Real c = 100000 "Vertical contact stiffness";
   parameter Real d = 750 "Vertical contact damping";
   parameter Real eps = 1e-6 "Smoothing length";
+  parameter Real forceEps = 1.0 "Smoothing force for normal-force clamp";
 
-  Real pen "Smooth penetration";
-  Real r_rel_z "Relative z displacement, positive when separated";
-  Real f_z "Normal force";
+  Real pen(nominal = 0.01) "Smooth penetration";
+  Real r_rel_z(nominal = 0.01) "Relative z displacement, positive when separated";
+  Real f_raw(nominal = 1000) "Unclamped normal force";
+  Real f_z(nominal = 1000) "Normal force";
 
 equation
   r_rel_z = frame_b.r_0[3] - frame_a.r_0[3];
 
   // Smooth unilateral penetration:
   // pen ~= max(-r_rel_z, 0)
-  pen = 0.5*(sqrt(r_rel_z*r_rel_z + eps*eps) - r_rel_z);
+  pen = smooth(1, 0.5*(sqrt(r_rel_z*r_rel_z + eps*eps) - r_rel_z));
 
   // Contact force. Damping uses penetration rate, avoiding sensors.
-  // Clamp to avoid tensile ground force.
-  f_z = max(0, c*pen + d*der(pen));
+  // Use a smooth positive part to avoid tensile ground force without
+  // introducing an initialization discontinuity.
+  f_raw = c*pen + d*der(pen);
+  f_z = smooth(1, 0.5*(sqrt(f_raw*f_raw + forceEps*forceEps) + f_raw));
 
   frame_a.f = {0, 0, f_z};
   frame_b.f = -frame_a.f;

@@ -12,6 +12,7 @@ partial model VehicleBase
   
   inner parameter SIunits.Length linkDiameter = 0.020;
   inner parameter SIunits.Length jointDiameter = 0.030;
+  outer parameter Boolean enableAnimation;
   
   parameter CFDAeroMapRecord pAero;
   parameter MassRecord pSprungMass;
@@ -112,19 +113,19 @@ partial model VehicleBase
   
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation toAeroFrame(r = pAero.aeroRef - pVehicleCG, animation = false) annotation(
     Placement(transformation(origin = {-30, 0}, extent = {{10, -10}, {-10, 10}})));
-  Modelica.Mechanics.MultiBody.Forces.WorldForceAndTorque aeroLoads(resolveInFrame = Modelica.Mechanics.MultiBody.Types.ResolveInFrameB.frame_b)  annotation(
+  Modelica.Mechanics.MultiBody.Forces.WorldForceAndTorque aeroLoads(resolveInFrame = Modelica.Mechanics.MultiBody.Types.ResolveInFrameB.frame_b, animation = enableAnimation)  annotation(
     Placement(transformation(origin = {-70, 0}, extent = {{-10, -10}, {10, 10}})));
   BobLib.Vehicle.Aero.CFDAeroMap aeroModel(pAero = pAero) annotation(
     Placement(transformation(origin = {-90, 90}, extent = {{-10, -10}, {10, 10}}, rotation = -0)));
   
   // Ride height references
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toFL_RH(r = pAero.FL_RideHeightRef - chassis.frAxleDW.effectiveCenter) annotation(
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toFL_RH(r = pAero.FL_RideHeightRef - chassis.frAxleDW.effectiveCenter, animation = false) annotation(
     Placement(transformation(origin = {-40, 70}, extent = {{10, -10}, {-10, 10}})));
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toFR_RH(r = mirrorXZ(pAero.FL_RideHeightRef - chassis.frAxleDW.effectiveCenter)) annotation(
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toFR_RH(r = mirrorXZ(pAero.FL_RideHeightRef - chassis.frAxleDW.effectiveCenter), animation = false) annotation(
     Placement(transformation(origin = {40, 70}, extent = {{-10, -10}, {10, 10}}, rotation = -0)));
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRL_RH(r = pAero.RL_RideHeightRef - chassis.rrAxleDW.effectiveCenter) annotation(
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRL_RH(r = pAero.RL_RideHeightRef - chassis.rrAxleDW.effectiveCenter, animation = false) annotation(
     Placement(transformation(origin = {-40, -70}, extent = {{10, -10}, {-10, 10}})));
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRR_RH(r = mirrorXZ(pAero.RL_RideHeightRef - chassis.rrAxleDW.effectiveCenter)) annotation(
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRR_RH(r = mirrorXZ(pAero.RL_RideHeightRef - chassis.rrAxleDW.effectiveCenter), animation = false) annotation(
     Placement(transformation(origin = {40, -70}, extent = {{-10, -10}, {10, 10}}, rotation = -0)));
 
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b frAxleFrame annotation(

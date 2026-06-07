@@ -7,6 +7,7 @@ partial model PartialWheel
   parameter PartialWheelRecord partialWheelParams;
   
   outer parameter Real linkDiameter;
+  outer parameter Boolean enableAnimation;
   
   // Frames
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a cpFrame annotation(
@@ -23,11 +24,11 @@ partial model PartialWheel
     Placement(transformation(origin = {-50, 0}, extent = {{-10, -10}, {10, 10}})));
 
   // Rotational physics (wheel rotation about the hub axis)
-  Modelica.Mechanics.MultiBody.Joints.Revolute hubAxis(n = {0, 1, 0}, useAxisFlange = true, animation = false, phi(start = 0, fixed = true, nominal = 0.1), w(start = 0, nominal = 100)) annotation(
+  Modelica.Mechanics.MultiBody.Joints.Revolute hubAxis(n = {0, 1, 0}, useAxisFlange = true, animation = enableAnimation, phi(start = 0, fixed = true, nominal = 0.1), w(start = 0, nominal = 100)) annotation(
     Placement(transformation(origin = {20, 0}, extent = {{-10, -10}, {10, 10}})));
 
   // Translational physics (wheel vertical deflection)
-  Modelica.Mechanics.MultiBody.Joints.Prismatic prismatic_z(useAxisFlange = true, n = {0, 0, -1}, animation = true, boxWidth = linkDiameter, boxHeight = linkDiameter) annotation(
+  Modelica.Mechanics.MultiBody.Joints.Prismatic prismatic_z(useAxisFlange = true, n = {0, 0, -1}, animation = enableAnimation, boxWidth = linkDiameter, boxHeight = linkDiameter) annotation(
     Placement(transformation(origin = {0, -40}, extent = {{10, -10}, {-10, 10}}, rotation = 90)));
 
   // Rotational dynamics
@@ -51,7 +52,7 @@ partial model PartialWheel
     Placement(transformation(origin = {90, -50}, extent = {{-10, -10}, {10, 10}})));
 
   // Visualizers
-  Modelica.Mechanics.MultiBody.Visualizers.VoluminousWheel voluminousWheel(rRim = partialWheelParams.rimR0, rTire = partialWheelParams.R0, width = partialWheelParams.rimWidth) annotation(
+  Modelica.Mechanics.MultiBody.Visualizers.VoluminousWheel voluminousWheel(rRim = partialWheelParams.rimR0, rTire = partialWheelParams.R0, width = partialWheelParams.rimWidth, animation = enableAnimation) annotation(
     Placement(transformation(origin = {70, 0}, extent = {{-10, -10}, {10, 10}}, rotation = -0)));
   
 equation

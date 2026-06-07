@@ -60,6 +60,7 @@ algorithm
     E := (p.PEX1 + p.PEX2 * dfz + p.PEX3 * dfz^2)
          * (1 - p.PEX4 * sign(SR_x))
          * p.LEX;
+    E := min(E, 1);
 
     // Magic Formula
     Fx := D * sin(C * atan(B * SR_x - E * (B * SR_x - atan(B * SR_x)))) + Sv;
