@@ -63,7 +63,7 @@ def default_package_root() -> Path:
 def render_mos(package_root: Path, check: ModelCheck) -> str:
     lines = [
         "clear();",
-        "loadModel(Modelica);",
+        'loadModel(Modelica, {"3.2.3"});',
         f'loadFile("{package_root.as_posix()}/package.mo");',
     ]
     lines.extend(

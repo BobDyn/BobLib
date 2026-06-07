@@ -100,7 +100,7 @@ def test_fixture_models(package_root: Path) -> tuple[str, ...]:
 def render_mos(package_root: Path, work_dir: Path, model: str, prefix: str) -> str:
     return f"""
 clear();
-loadModel(Modelica);
+loadModel(Modelica, {{"3.2.3"}});
 loadFile("{package_root.as_posix()}/package.mo");
 cd("{work_dir.as_posix()}");
 simulate(

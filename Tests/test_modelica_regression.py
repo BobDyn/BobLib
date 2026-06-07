@@ -74,7 +74,7 @@ def _render_mos(
     signal_filter = "time|" + "|".join(signals)
     return f"""
 clear();
-loadModel(Modelica);
+loadModel(Modelica, {{"3.2.3"}});
 loadFile("{package_root.as_posix()}/package.mo");
 cd("{work_dir.as_posix()}");
 simulate(
