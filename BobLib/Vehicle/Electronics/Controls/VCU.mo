@@ -1,4 +1,4 @@
-within BobLib.Vehicle.Powertrain.Electronics;
+within BobLib.Vehicle.Electronics.Controls;
 
 model VCU
   import Modelica.SIunits;
@@ -56,9 +56,12 @@ model VCU
 
   parameter SIunits.AngularVelocity w_eps = 1e-2
     "Small speed for launch protection";
+  parameter Real motorSpeedSign = 1
+    "Multiplier mapping sensed motor speed to drive-positive speed";
 
 protected
   SIunits.Torque tau_cmd_raw;
+  SIunits.AngularVelocity sens_motor_speed_drive;
   SIunits.AngularVelocity w_eff;
 
 equation
@@ -78,9 +81,14 @@ equation
   tau_cmd_limited = tau_cmd_raw;
 
   // Effective speed (avoid zero divide)
-  w_eff = if abs(sens_motor_speed) > w_eps
-          then sens_motor_speed
-          else w_eps * sign(sens_motor_speed + 1e-6);
+  sens_motor_speed_drive = motorSpeedSign*sens_motor_speed;
+  w_eff =
+    if noEvent(abs(sens_motor_speed_drive) > w_eps) then
+      sens_motor_speed_drive
+    elseif noEvent(tau_cmd_limited >= 0) then
+      w_eps
+    else
+      -w_eps;
 
   // Torque -> Power
   P_req = tau_cmd_limited * w_eff;

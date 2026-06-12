@@ -9,6 +9,7 @@ same ``Generation/scripts`` folder.
 
 from __future__ import annotations
 
+import math
 import re
 import sys
 from dataclasses import dataclass
@@ -71,6 +72,7 @@ DEFAULT_IMPORTS = [
 
 DEFAULT_ALIASES = {
     "Aero": "BobLib.Resources.VehicleRecord.Aero",
+    "Powertrain": "BobLib.Resources.VehicleRecord.Powertrain",
     "TireModel": "BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52",
     "Wheel": "BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire",
     "Rack": "BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.SteeringRack",
@@ -241,6 +243,27 @@ def repo_root() -> Path:
     return REPO_ROOT
 
 
+def _standalone_boblib_path(path: Path) -> Path | None:
+    parts = path.parts
+    prefix = ("_0_Utils", "external", "BobLib")
+    if parts[:len(prefix)] != prefix:
+        return None
+    return GENERATION_DIR.parent.joinpath(*parts[len(prefix):])
+
+
+def resolve_config_path(raw: Any) -> Path:
+    path = Path(str(raw))
+    if path.is_absolute():
+        return path
+    resolved = repo_root() / path
+    if resolved.exists():
+        return resolved
+    standalone = _standalone_boblib_path(path)
+    if standalone is not None and standalone.exists():
+        return standalone
+    return resolved
+
+
 def vehicle_yaml_path() -> Path:
     return GENERATION_DIR / "vehicle.yml"
 
@@ -350,8 +373,7 @@ def output_sim_package(data: dict[str, Any]) -> str:
 
 def boblib_root(data: dict[str, Any]) -> Path:
     raw = get_path(data, ["paths", "boblib"], "_0_Utils/external/BobLib/BobLib")
-    path = Path(str(raw))
-    return path if path.is_absolute() else repo_root() / path
+    return resolve_config_path(raw)
 
 
 def tire_templates_root(data: dict[str, Any]) -> Path:
@@ -360,8 +382,7 @@ def tire_templates_root(data: dict[str, Any]) -> Path:
         ["paths", "tire_templates"],
         "_0_Utils/external/BobLib/Generation/tire_templates",
     )
-    path = Path(str(raw))
-    return path if path.is_absolute() else repo_root() / path
+    return resolve_config_path(raw)
 
 
 def vehicle_templates_root(data: dict[str, Any]) -> Path:
@@ -370,8 +391,7 @@ def vehicle_templates_root(data: dict[str, Any]) -> Path:
         ["paths", "vehicle_templates"],
         "_0_Utils/external/BobLib/Generation/vehicle_templates",
     )
-    path = Path(str(raw))
-    return path if path.is_absolute() else repo_root() / path
+    return resolve_config_path(raw)
 
 
 def boblib_vehicledefn_dir(data: dict[str, Any]) -> Path:
@@ -537,6 +557,79 @@ def zero_mass_record() -> dict[str, Any]:
     })
 
 
+def powertrain_parameters(data: dict[str, Any]) -> tuple[str, str, dict[str, Any]]:
+    powertrain = require_mapping(data, "powertrain", vehicle_yaml_path())
+    battery = require_section(powertrain, "powertrain", "battery")
+    final_drive = require_section(powertrain, "powertrain", "final_drive")
+    vcu = require_section(powertrain, "powertrain", "vcu")
+    motor = require_section(powertrain, "powertrain", "motor")
+    inverter = require_section(powertrain, "powertrain", "inverter")
+    differential = require_section(powertrain, "powertrain", "differential")
+    lsd = require_section(differential, "powertrain.differential", "lsd")
+    halfshafts = require_section(powertrain, "powertrain", "halfshafts")
+    left_halfshaft = require_section(halfshafts, "powertrain.halfshafts", "left")
+    right_halfshaft = require_section(halfshafts, "powertrain.halfshafts", "right")
+    left_halfshaft_c = require_key(left_halfshaft, "powertrain.halfshafts.left", "torsional_stiffness_n_m_per_rad")
+    right_halfshaft_c = require_key(right_halfshaft, "powertrain.halfshafts.right", "torsional_stiffness_n_m_per_rad")
+    left_halfshaft_j = left_halfshaft.get("critical_damping_inertia_kg_m2", 0.02)
+    right_halfshaft_j = right_halfshaft.get("critical_damping_inertia_kg_m2", 0.02)
+
+    return ("pPowertrain", "Powertrain.PowertrainBatInvMotDiffRecord", {
+        "Ns": require_key(battery, "powertrain.battery", "series_cells"),
+        "Np": require_key(battery, "powertrain.battery", "parallel_cells"),
+        "SOC_start": require_key(battery, "powertrain.battery", "initial_soc"),
+        "finalDriveRatio": require_key(final_drive, "powertrain.final_drive", "ratio"),
+        "launch_w_eps": require_key(vcu, "powertrain.vcu", "launch_w_eps_rad_per_s"),
+        "vcuMotorSpeedSign": require_key(vcu, "powertrain.vcu", "motor_speed_sign"),
+        "drivetrainAxis": require_key(motor, "powertrain.motor", "rotor_axis"),
+        "rMotorRotor": require_key(motor, "powertrain.motor", "rotor_position_m"),
+        "rDiffInputRotor": require_key(differential, "powertrain.differential", "input_rotor_position_m"),
+        "rDifferential": require_key(differential, "powertrain.differential", "case_position_m"),
+        "motorRotorJ": require_key(motor, "powertrain.motor", "rotor_inertia_kg_m2"),
+        "diffInputRotorJ": require_key(differential, "powertrain.differential", "input_rotor_inertia_kg_m2"),
+        "tau_max": require_key(vcu, "powertrain.vcu", "torque_limit_nm"),
+        "regenTorqueLimit": require_key(vcu, "powertrain.vcu", "regen_torque_limit_nm"),
+        "diff_use_lsd": require_key(lsd, "powertrain.differential.lsd", "enabled"),
+        "diff_driveSideTorqueSign": require_key(lsd, "powertrain.differential.lsd", "drive_side_torque_sign"),
+        "diff_T_preload": require_key(lsd, "powertrain.differential.lsd", "preload_torque_nm"),
+        "diff_lockFractionAccel": require_key(lsd, "powertrain.differential.lsd", "lock_fraction_accel"),
+        "diff_lockFractionDecel": require_key(lsd, "powertrain.differential.lsd", "lock_fraction_decel"),
+        "diff_T_capacity_max": require_key(lsd, "powertrain.differential.lsd", "max_lock_capacity_nm"),
+        "diff_clutchEffectiveRadius": require_key(lsd, "powertrain.differential.lsd", "effective_clutch_radius_m"),
+        "diff_kineticFrictionRatio": require_key(lsd, "powertrain.differential.lsd", "kinetic_friction_ratio"),
+        "diff_w_transition": require_key(lsd, "powertrain.differential.lsd", "slip_transition_speed_rad_per_s"),
+        "diff_c_viscous": require_key(lsd, "powertrain.differential.lsd", "viscous_slip_damping_n_m_s_per_rad"),
+        "halfshaftLeftC": left_halfshaft_c,
+        "halfshaftLeftJEquivalent": left_halfshaft_j,
+        "halfshaftLeftD": left_halfshaft.get(
+            "torsional_damping_n_m_s_per_rad",
+            2*math.sqrt(left_halfshaft_c*left_halfshaft_j),
+        ),
+        "halfshaftRightC": right_halfshaft_c,
+        "halfshaftRightJEquivalent": right_halfshaft_j,
+        "halfshaftRightD": right_halfshaft.get(
+            "torsional_damping_n_m_s_per_rad",
+            2*math.sqrt(right_halfshaft_c*right_halfshaft_j),
+        ),
+        "motorVdcMax": require_key(motor, "powertrain.motor", "vdc_max_v"),
+        "motorRpmMaxPeak": require_key(motor, "powertrain.motor", "rpm_max_peak"),
+        "motorTPeak": require_key(motor, "powertrain.motor", "peak_torque_nm"),
+        "motorTCont": require_key(motor, "powertrain.motor", "continuous_torque_nm"),
+        "motorIPeak": require_key(motor, "powertrain.motor", "peak_current_arms"),
+        "motorICont": require_key(motor, "powertrain.motor", "continuous_current_arms"),
+        "motorKtNmPerA": require_key(motor, "powertrain.motor", "torque_constant_nm_per_arms"),
+        "motorPeakTime": require_key(motor, "powertrain.motor", "peak_time_s"),
+        "motorPMechPeak": require_key(motor, "powertrain.motor", "peak_power_w"),
+        "motorPContLow": require_key(motor, "powertrain.motor", "continuous_power_low_w"),
+        "motorPContHigh": require_key(motor, "powertrain.motor", "continuous_power_high_w"),
+        "motorEtaMot": require_key(motor, "powertrain.motor", "eta_mot"),
+        "motorEtaReg": require_key(motor, "powertrain.motor", "eta_reg"),
+        "inverterPMaxMot": require_key(inverter, "powertrain.inverter", "max_motoring_power_w"),
+        "inverterPMaxReg": require_key(inverter, "powertrain.inverter", "max_regen_power_w"),
+        "inverterVdcMax": require_key(inverter, "powertrain.inverter", "max_dc_voltage_v"),
+    })
+
+
 def side_parameters(
     data: dict[str, Any],
     side_name: str,
@@ -662,6 +755,7 @@ def parameter_sections(data: dict[str, Any]) -> list[tuple[str, str, dict[str, A
     params = []
     params.extend(side_parameters(data, "front", "Fr", front_topology))
     params.extend(side_parameters(data, "rear", "Rr", rear_topology))
+    params.append(powertrain_parameters(data))
 
     sprung = require_mapping(data, "sprung_mass", vehicle_yaml_path())
     params.append(("pBaseSprungMass", "MassRecord", {

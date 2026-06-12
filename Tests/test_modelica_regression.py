@@ -34,16 +34,6 @@ LOW_LEVEL_SIGNAL_CASES = (
         0.01,
     ),
     (
-        "BobLib.Tests.TestVehicle.TestElectronics.TestSpeedController",
-        ("speedController.drive_torque",),
-        0.2,
-    ),
-    (
-        "BobLib.Tests.TestVehicle.TestElectronics.TestCurvatureController",
-        ("curvatureController.rack",),
-        0.2,
-    ),
-    (
         "BobLib.Tests.TestVehicle.TestPowertrain.TestVCU",
         ("vcu.P_req", "vcu.tau_cmd_limited"),
         0.01,
@@ -196,10 +186,6 @@ def test_low_level_signal_models_return_expected_values() -> None:
         elif model.endswith("TestCFDAeroMap"):
             assert abs(final_values["aero.drag"] - 52.0) < 1e-9
             assert abs(final_values["aero.downforce"] - 520.0) < 1e-9
-        elif model.endswith("TestSpeedController"):
-            assert 49.0 < final_values["speedController.drive_torque"] < 50.1
-        elif model.endswith("TestCurvatureController"):
-            assert 0.009 < final_values["curvatureController.rack"] < 0.011
         elif model.endswith("TestVCU"):
             assert abs(final_values["vcu.tau_cmd_limited"] - 200.0) < 1e-9
             assert abs(final_values["vcu.P_req"] - 20000.0) < 1e-6

@@ -5,6 +5,8 @@ partial model PartialWheel
   
   // Record parameters
   parameter PartialWheelRecord partialWheelParams;
+  parameter Real longitudinalTorqueSign = -1
+    "Sign mapping contact-patch longitudinal force to wheel-axis torque";
   
   outer parameter Real linkDiameter;
   outer parameter Boolean enableAnimation;
@@ -38,7 +40,7 @@ partial model PartialWheel
     Placement(transformation(origin = {30, 60}, extent = {{10, -10}, {-10, 10}}, rotation = -180)));
 
   // Torque generation
-  Modelica.Blocks.Sources.RealExpression reactionFx(y = -cpFrame.f[1]) annotation(
+  Modelica.Blocks.Sources.RealExpression reactionFx(y = longitudinalTorqueSign*cpFrame.f[1]) annotation(
     Placement(transformation(origin = {-50, 54}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Blocks.Math.Product tireTorque annotation(
     Placement(transformation(origin = {-20, 60}, extent = {{-10, -10}, {10, 10}})));

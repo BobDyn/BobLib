@@ -377,7 +377,7 @@ def build_four_post_sim(
 ) -> tuple[Path, Path]:
     source_yaml = source_yaml or vehicle_yaml_path()
     build_vehicle_record(source_yaml=source_yaml, overwrite=overwrite)
-    record_path = build_four_post_eval_record(overwrite=overwrite)
+    record_path = build_four_post_eval_record(source_yaml=source_yaml, overwrite=overwrite)
     build_axle_models(source_yaml=source_yaml, overwrite=overwrite)
     data = load_yaml(source_yaml)
     record_name = record_name_from_yaml(data, source_yaml)

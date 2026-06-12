@@ -100,6 +100,14 @@ model VehicleSim
     useMode == MODE_OPEN_LOOP_SINE or
     useMode == MODE_STEP_STEER;
 
+  parameter Boolean enablePTNDriveSpeedControl = true
+    "Allow the speed controller to command rear-axle drive torque"
+    annotation(Evaluate = false, Dialog(enable = closedLoopVelocity));
+
+  parameter Boolean enablePTNRegenSpeedControl = false
+    "Allow the speed controller to command rear-axle regenerative braking"
+    annotation(Evaluate = false, Dialog(enable = closedLoopVelocity));
+
   parameter Modelica.SIunits.Time steerStart = 2.0
     "Start time"
     annotation(Evaluate = false);
@@ -140,6 +148,18 @@ model VehicleSim
   parameter SIunits.Force tireLiftTerminateLoad = 75.0
     "Tire normal load threshold used for hard lift termination"
     annotation(Evaluate = false, Dialog(enable = openLoopAy));
+
+  parameter Boolean terminateOnSpinout = true
+    "Terminate the open-loop ramp if body sideslip indicates loss of directional control"
+    annotation(Evaluate = false, Dialog(enable = openLoopAy));
+
+  parameter SIunits.Angle sideslipTerminate = 20*pi/180
+    "Absolute body sideslip threshold used for spinout termination"
+    annotation(Evaluate = false, Dialog(enable = openLoopAy and terminateOnSpinout));
+
+  parameter SIunits.Time spinoutHoldDuration = 0.02
+    "Duration the sideslip threshold must remain true before spinout termination"
+    annotation(Evaluate = false, Dialog(enable = openLoopAy and terminateOnSpinout));
 
   parameter Boolean enableLinearityTermination = true
     "Terminate the open-loop ramp when steering response leaves the linear region"
@@ -315,6 +335,7 @@ protected
   discrete Real t_qss_hit(start = -1, fixed = true);
   discrete Real t_ramp_end_hit(start = -1, fixed = true);
   discrete Real t_linearity_limit_hit(start = -1, fixed = true);
+  discrete Real t_spinout_hit(start = -1, fixed = true);
   discrete Real t_yawVel_hit(start = -1, fixed = true);
 
   Real leftWheelVector[3];
@@ -553,6 +574,26 @@ equation
     terminate("Tire normal load reached lift threshold");
   end when;
 
+  when useMode == MODE_OPEN_LOOP_RAMP
+     and terminateOnSpinout
+     and time > steerStart
+     and abs(sideslip) >= sideslipTerminate
+     and pre(t_spinout_hit) < 0 then
+    t_spinout_hit = time;
+
+  elsewhen useMode == MODE_OPEN_LOOP_RAMP
+     and terminateOnSpinout
+     and abs(sideslip) < sideslipTerminate then
+    t_spinout_hit = -1;
+  end when;
+
+  when useMode == MODE_OPEN_LOOP_RAMP
+     and terminateOnSpinout
+     and t_spinout_hit > 0
+     and time > t_spinout_hit + spinoutHoldDuration then
+    terminate("Body sideslip reached loss-of-control threshold");
+  end when;
+
   when useMode == MODE_STEP_STEER
      and time > steerStart
      and abs(der(yawVel)) < der_yawVelTol
@@ -598,12 +639,24 @@ equation
     if useMode == MODE_OPEN_LOOP_RAMP or
        useMode == MODE_OPEN_LOOP_SINE or
        useMode == MODE_STEP_STEER then
-      speedPI.y
+      if enablePTNDriveSpeedControl and enablePTNRegenSpeedControl then
+        speedPI.y
+      elseif enablePTNDriveSpeedControl then
+        noEvent(max(speedPI.y, 0))
+      elseif enablePTNRegenSpeedControl then
+        noEvent(min(speedPI.y, 0))
+      else
+        0
     else
       0;
 
   frSteerPosition.phi_ref = frSteerCmd;
   vehicle.uPTNTorque = driveTorqueCmd;
+  vehicle.uPTNRegenLimit =
+    if enablePTNRegenSpeedControl then
+      pVehicle.pPowertrain.regenTorqueLimit
+    else
+      0;
 
   bodyVels =
     Frames.resolve2(cgFreeMotion.frame_b.R, cgFreeMotion.v_rel_a);
@@ -636,7 +689,7 @@ equation
   velX = bodyVels[1];
   velY = bodyVels[2];
   yawVel = bodyAngularVels[3];
-  sideslip = atan(velY / velX);
+  sideslip = Modelica.Math.atan2(velY, velX);
 
   accX = bodyAccels[1];
   accY = bodyAccels[2];

@@ -7,12 +7,12 @@ from build_common import (
     DEFAULT_ALIASES,
     DEFAULT_IMPORTS,
     ModelicaFileBuilder,
+    boblib_root,
     boblib_vehicledefn_dir,
     load_yaml,
     output_record_package,
     parameter_sections,
     prune_vehicle_records,
-    repo_root,
     render_parameter,
     record_name_from_yaml,
     vehicle_yaml_path,
@@ -41,17 +41,12 @@ def render_record(data: dict[str, object], yaml_path: Path) -> str:
     return builder.render()
 
 
-def render_four_post_eval_record() -> str:
-    source_path = (
-        repo_root()
-        / "_0_Utils"
-        / "external"
-        / "BobLib"
-        / "BobLib"
-        / "Resources"
-        / "StandardRecord"
-        / "FourPostEvalRecord.mo"
-    )
+def four_post_eval_record_path(data: dict[str, object]) -> Path:
+    return boblib_root(data) / "Resources" / "StandardRecord" / "FourPostEvalRecord.mo"  # type: ignore[arg-type]
+
+
+def render_four_post_eval_record(data: dict[str, object]) -> str:
+    source_path = four_post_eval_record_path(data)
     text = source_path.read_text(encoding="utf-8")
     return text
 
@@ -68,20 +63,11 @@ def build_vehicle_record(*, source_yaml: Path | None = None, overwrite: bool = T
 
 def build_four_post_eval_record(*, source_yaml: Path | None = None, overwrite: bool = True) -> Path:
     source_yaml = source_yaml or vehicle_yaml_path()
-    record_path = (
-        repo_root()
-        / "_0_Utils"
-        / "external"
-        / "BobLib"
-        / "BobLib"
-        / "Resources"
-        / "StandardRecord"
-        / "FourPostEvalRecord.mo"
-    )
-    record_path.parent.mkdir(parents=True, exist_ok=True)
-    write_text_file(record_path, render_four_post_eval_record(), overwrite)
-    # Keep the record package minimal and ensure the package order is coherent.
     data = load_yaml(source_yaml)
+    record_path = four_post_eval_record_path(data)
+    record_path.parent.mkdir(parents=True, exist_ok=True)
+    write_text_file(record_path, render_four_post_eval_record(data), overwrite)
+    # Keep the record package minimal and ensure the package order is coherent.
     prune_vehicle_records(data, source_yaml)
     return record_path
 

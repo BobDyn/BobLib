@@ -341,24 +341,13 @@ tests = ["BobLib.Tests.TestVehicle.TestChassis.TestSuspension.TestTemplates.Test
 reason = "Dedicated wheel-physics fixture instantiates the lateral and vertical compliance variant."
 
 [[model_tests]]
-model = "BobLib.Vehicle.Electronics.Controllers.CurvatureController"
-status = "direct"
-tests = ["BobLib.Tests.TestVehicle.TestElectronics.TestCurvatureController"]
-reason = "Dedicated signal fixture checks curvature error to rack command behavior."
-
-[[model_tests]]
-model = "BobLib.Vehicle.Electronics.Controllers.SpeedController"
-status = "direct"
-tests = ["BobLib.Tests.TestVehicle.TestElectronics.TestSpeedController"]
-reason = "Dedicated signal fixture checks speed error to torque response."
-
-[[model_tests]]
 model = "BobLib.Vehicle.Powertrain.Battery.BatteryPack"
 status = "direct"
 tests = [
   "BobLib.Tests.TestVehicle.TestPowertrain.TestBatteryPack",
   "BobLib.Tests.TestVehicle.TestPowertrain.TestBatteryInverter",
   "BobLib.Tests.TestVehicle.TestPowertrain.TestPowertrain",
+  "BobLib.Tests.TestVehicle.TestPowertrain.TestPowertrainBatInvMotDiff",
 ]
 reason = "Battery pack has a dedicated load fixture and is used by powertrain wrappers."
 
@@ -371,8 +360,11 @@ reason = "Covered through BatteryPack."
 [[model_tests]]
 model = "BobLib.Vehicle.Powertrain.Drivetrain.Differential"
 status = "direct"
-tests = ["BobLib.Tests.TestVehicle.TestPowertrain.TestPowertrain"]
-reason = "Powertrain wrapper exercises the differential with left/right wheel speed sinks."
+tests = [
+  "BobLib.Tests.TestVehicle.TestPowertrain.TestPowertrain",
+  "BobLib.Tests.TestVehicle.TestPowertrain.TestPowertrainBatInvMotDiff",
+]
+reason = "Powertrain wrappers exercise the differential with left/right wheel speed sinks and the MBD mount frame."
 
 [[model_tests]]
 model = "BobLib.Vehicle.Powertrain.Drivetrain.Motor"
@@ -380,30 +372,53 @@ status = "direct"
 tests = [
   "BobLib.Tests.TestVehicle.TestPowertrain.TestBatteryInverterMotor",
   "BobLib.Tests.TestVehicle.TestPowertrain.TestPowertrain",
+  "BobLib.Tests.TestVehicle.TestPowertrain.TestPowertrainBatInvMotDiff",
 ]
 reason = "Motor is exercised by inverter-motor and full powertrain wrappers."
 
 [[model_tests]]
-model = "BobLib.Vehicle.Powertrain.Electronics.InverterDC"
+model = "BobLib.Vehicle.Electronics.ElectronicsBase"
+status = "partial"
+tests = ["BobLib.Tests.TestVehicle.TestPowertrain.TestPowertrainBatInvMotDiff"]
+reason = "Covered through ElectronicsAssembly, which implements the replaceable ELC contract."
+
+[[model_tests]]
+model = "BobLib.Vehicle.Electronics.ElectronicsAssembly"
+status = "direct"
+tests = ["BobLib.Tests.TestVehicle.TestPowertrain.TestPowertrainBatInvMotDiff"]
+reason = "Full powertrain fixture instantiates the vehicle-level ELC assembly with VCU, inverter, HV bus, and motor-power interface."
+
+[[model_tests]]
+model = "BobLib.Vehicle.Electronics.PowerElectronics.InverterDC"
 status = "direct"
 tests = [
   "BobLib.Tests.TestVehicle.TestPowertrain.TestBatteryInverter",
   "BobLib.Tests.TestVehicle.TestPowertrain.TestBatteryInverterMotor",
   "BobLib.Tests.TestVehicle.TestPowertrain.TestPowertrain",
+  "BobLib.Tests.TestVehicle.TestPowertrain.TestPowertrainBatInvMotDiff",
 ]
 reason = "Inverter is exercised by battery-inverter and powertrain wrappers."
 
 [[model_tests]]
-model = "BobLib.Vehicle.Powertrain.Electronics.VCU"
+model = "BobLib.Vehicle.Electronics.Controls.VCU"
 status = "direct"
-tests = ["BobLib.Tests.TestVehicle.TestPowertrain.TestVCU"]
-reason = "Dedicated signal fixture asserts enable, torque limiting, and power request behavior."
+tests = [
+  "BobLib.Tests.TestVehicle.TestPowertrain.TestVCU",
+  "BobLib.Tests.TestVehicle.TestPowertrain.TestPowertrainBatInvMotDiff",
+]
+reason = "Dedicated signal fixture asserts VCU behavior; the ELC assembly fixture exercises it with motor-speed and internal HV-bus sensors."
+
+[[model_tests]]
+model = "BobLib.Vehicle.Powertrain.PowertrainBatInvMotDiff"
+status = "direct"
+tests = ["BobLib.Tests.TestVehicle.TestPowertrain.TestPowertrainBatInvMotDiff"]
+reason = "Dedicated assembly fixture drives the battery, motor, final drive, differential, MBD mount, and halfshaft outputs from an external ELC assembly."
 
 [[model_tests]]
 model = "BobLib.Vehicle.Powertrain.PTNPlaceholder"
-status = "parent"
-tests = ["BobLib.Tests.Regression.VehicleSimAnimationOn"]
-reason = "Vehicle_DWBCStabar_DWBCStabar instantiates the placeholder powertrain in the full vehicle fixture."
+status = "direct"
+tests = ["BobLib.Tests.TestVehicle.TestPowertrain.TestPTNPlaceholder"]
+reason = "Retained compatibility shim is covered by a dedicated mount-frame and split-torque fixture now that generated vehicles use PowertrainBatInvMotDiff."
 
 [[model_tests]]
 model = "BobLib.Vehicle.VehicleBase"

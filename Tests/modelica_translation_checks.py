@@ -16,11 +16,11 @@ class ModelCheck:
 
 
 DEFAULT_CHECKS = (
-    ModelCheck("BobLib.Standards.VehicleSim", expected_equations=17687),
+    ModelCheck("BobLib.Standards.VehicleSim", expected_equations=18170),
     ModelCheck("BobLib.Standards.FourPostSim", expected_equations=18674),
     ModelCheck(
         "BobLib.Tests.Regression.VehicleSimAnimationOn",
-        expected_equations=25269,
+        expected_equations=25752,
     ),
     ModelCheck(
         "BobLib.Tests.Regression.MF52PureSlipSmoke",

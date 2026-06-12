@@ -6,7 +6,7 @@ model TestBatteryInverter
   BobLib.Vehicle.Powertrain.Battery.BatteryPack batt(Ns = 140, Np = 4, SOC_start = 1.0) annotation(
     Placement(transformation(origin = {0, -10}, extent = {{-10, -10}, {10, 10}})));
   // Inverter
-  BobLib.Vehicle.Powertrain.Electronics.InverterDC inv annotation(
+  BobLib.Vehicle.Electronics.PowerElectronics.InverterDC inv annotation(
     Placement(transformation(origin = {0, 40}, extent = {{-10, -10}, {10, 10}})));
   // Power command
   Modelica.Blocks.Sources.Step P_step(height = 80e3,  // 80 kW

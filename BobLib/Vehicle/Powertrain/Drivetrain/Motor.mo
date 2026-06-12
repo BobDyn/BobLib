@@ -13,21 +13,21 @@ model Motor
     Placement(transformation(origin={100, 0}, extent={{-10, -10}, {10, 10}}), iconTransformation(origin = {100, 0}, extent = {{-10, -10}, {10, 10}})));
 
   // Datasheet specs
-  parameter SIunits.Voltage Vdc_max = 670 "Max battery voltage (datasheet) [Vdc]";
+  parameter SIunits.Voltage Vdc_max = 630 "Max battery voltage (EMRAX 228 MV) [Vdc]";
   parameter Real rpm_fullLoad_ref = 5300 "Full-load RPM at Vdc_max (datasheet)";
   parameter Real rpm_noLoad_ref = 6500 "No-load RPM at Vdc_max (datasheet)";
   parameter Real rpm_max_cont = 5500 "Max continuous rotation speed (datasheet) [rpm]";
   parameter Real rpm_max_peak = 6500 "Max peak speed for a few seconds (datasheet) [rpm]";
-  parameter SIunits.Torque T_peak = 240 "Peak torque for a few seconds [Nm]";
-  parameter SIunits.Torque T_cont = 125 "Continuous torque [Nm]";
-  parameter SIunits.Current I_peak_2min = 240 "Max motor current for ~2 min if cooled [Arms]";
-  parameter SIunits.Current I_cont = 115 "Continuous motor current [Arms]";
-  parameter Real Kt_Nm_per_A = 1.1 "Torque per phase current (datasheet) [Nm/A]";
-  parameter SIunits.Power P_mech_peak = 100e3 "Peak motor mechanical power capability [W] (datasheet)";
-  parameter SIunits.Power P_cont_low = 28e3 "Low end continuous power band (datasheet) [W]";
-  parameter SIunits.Power P_cont_high = 42e3 "High end continuous power band (datasheet) [W]";
-  parameter Real eta_mot = 0.95 "Motoring efficiency placeholder (swap to 2D map later)";
-  parameter Real eta_reg = 0.93 "Regen efficiency placeholder";
+  parameter SIunits.Torque T_peak = 220 "Peak torque for a few seconds [Nm]";
+  parameter SIunits.Torque T_cont = 130 "Continuous torque [Nm]";
+  parameter SIunits.Current I_peak_2min = 360 "Max motor current for ~2 min if cooled [Arms]";
+  parameter SIunits.Current I_cont = 180 "Continuous motor current [Arms]";
+  parameter Real Kt_Nm_per_A = 0.61 "Torque per phase current (datasheet) [Nm/A]";
+  parameter SIunits.Power P_mech_peak = 124e3 "Peak motor mechanical power capability [W]";
+  parameter SIunits.Power P_cont_low = 75e3 "Low end continuous power band [W]";
+  parameter SIunits.Power P_cont_high = 75e3 "High end continuous power band [W]";
+  parameter Real eta_mot = 0.96 "Motoring efficiency placeholder (swap to 2D map later)";
+  parameter Real eta_reg = 0.95 "Regen efficiency placeholder";
   parameter Real lossTable[:,2] = [
     0,    0;
     1000, 200;
@@ -36,7 +36,7 @@ model Motor
     4000, 1750;
     5000, 2800
   ] "Free-run loss vs speed";
-  parameter SIunits.Time peakTime = 5 "How long peak limits are allowed (seconds)";
+  parameter SIunits.Time peakTime = 120 "How long peak limits are allowed (seconds)";
   parameter Boolean enablePeakTimer = true "If true, peak limits ramp down after peakTime";
   
   // Numerical params
@@ -97,9 +97,9 @@ equation
 
   // Continuous power envelope vs speed
   P_cont_env =
-    if rpm <= 3000 then
+    if noEvent(rpm <= 3000) then
       P_cont_low*(0.2 + 0.8*rpm/3000)   // mild floor at low rpm
-    elseif rpm <= 5000 then
+    elseif noEvent(rpm <= 5000) then
       P_cont_low + (P_cont_high - P_cont_low)*(rpm - 3000)/2000
     else
       P_cont_high;
@@ -108,10 +108,10 @@ equation
   // Motoring: electrical supplies mech + losses
   // Regen: mechanical produces electrical, losses reduce recovery
   P_mech_cmd =
-    if P_elec >= 0 then
-      max(0, P_elec*eta_mot - P_loss_free)
+    if noEvent(P_elec >= 0) then
+      noEvent(max(0, P_elec*eta_mot - P_loss_free))
     else
-      min(0, P_elec/eta_reg - P_loss_free);
+      noEvent(min(0, P_elec/eta_reg - P_loss_free));
 
   // Allowed mechanical power (peak vs continuous)
   P_allow =
@@ -120,7 +120,7 @@ equation
 
   // Enforce power envelope (symmetric for motoring/regen)
   P_mech_limited =
-    max(min(P_mech_cmd,  P_allow), -P_allow);
+    noEvent(max(min(P_mech_cmd,  P_allow), -P_allow));
 
   // Torque limits
   tau_lim_from_power   = P_allow / max(abs(w), w_eps);
@@ -128,13 +128,13 @@ equation
 
   // Combined torque limit
   tau_lim =
-    min(T_allow,
+    noEvent(min(T_allow,
         min(tau_lim_from_power,
-            tau_lim_from_current));
+            tau_lim_from_current)));
 
   // Convert limited mechanical power to torque
   w_eff = sqrt(w*w + w_eps*w_eps);
-  tau_cmd = max(min(P_mech_limited / w_eff, tau_lim), -tau_lim);
+  tau_cmd = noEvent(max(min(P_mech_limited / w_eff, tau_lim), -tau_lim));
 
   // Torque actuator dynamics
   der(tau_act) = (tau_cmd - tau_act)/tau_tau;

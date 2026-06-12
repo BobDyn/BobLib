@@ -5,6 +5,7 @@ record DWBCStabar_DWBCStabarRecord
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.MassRecord;
 
   import Aero = BobLib.Resources.VehicleRecord.Aero;
+  import Powertrain = BobLib.Resources.VehicleRecord.Powertrain;
   import TireModel = BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52;
   import Wheel = BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire;
   import Rack = BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.SteeringRack;
@@ -149,6 +150,54 @@ record DWBCStabar_DWBCStabarRecord
       mzPure = TireModel.PureSlip.MzPureRecord(QBZ1 = 8.22843, QBZ2 = 2.98676, QBZ3 = -3.57739, QBZ4 = -0.429117, QBZ5 = 0.433125, QCZ1 = 1.41359, QDZ1 = 0.152526, QDZ2 = -0.0381101, QDZ3 = 0.387762, QDZ4 = -3.95699, QEZ1 = -0.239731, QEZ2 = 1.29253, QEZ3 = -1.21298, QEZ4 = 0.0, QEZ5 = 0.0, QHZ1 = 0.0, QHZ2 = 0.0, QHZ3 = 0.0, QHZ4 = 0.0, QBZ9 = 0.0, QBZ10 = -1.72926, QDZ6 = 0.00604966, QDZ7 = -0.000116241, QDZ8 = -2.33359, QDZ9 = -0.0379755, LTR = 1.0, LRES = 1.0, LKY = 1.0, LMUY = 1.0, LGAZ = 1.0),
       relaxation = TireModel.RelaxationRecord(FNOMIN = 650.0, UNLOADED_RADIUS = pRrPartialWheel.R0, LFZO = 1.0, PTX1 = 0.0, PTX2 = 0.0, PTX3 = 0.0, PTY1 = 0.0, PTY2 = 0.0, PKY3 = 1.36502, LSGKP = 1.0, LSGAL = 1.0),
       setup = TireModel.SetupRecord(FNOMIN = 650.0, FZMIN = 100.0, FZMAX = 1800.0, UNLOADED_RADIUS = pRrPartialWheel.R0));
+
+  parameter Powertrain.PowertrainBatInvMotDiffRecord pPowertrain(
+      Ns = 140,
+      Np = 4,
+      SOC_start = 1.0,
+      finalDriveRatio = 3.31,
+      launch_w_eps = 1.0,
+      vcuMotorSpeedSign = 1,
+      drivetrainAxis = {1, 0, 0},
+      rMotorRotor = {0.2, 0, 0.1},
+      rDiffInputRotor = {0.05, 0, 0.05},
+      rDifferential = {0, 0, 0},
+      motorRotorJ = 0.02521,
+      diffInputRotorJ = 0.04,
+      tau_max = 220,
+      regenTorqueLimit = 220,
+      diff_use_lsd = true,
+      diff_driveSideTorqueSign = 1,
+      diff_T_preload = 20,
+      diff_lockFractionAccel = 0.35,
+      diff_lockFractionDecel = 0.15,
+      diff_T_capacity_max = 1000,
+      diff_clutchEffectiveRadius = 1.0,
+      diff_kineticFrictionRatio = 0.85,
+      diff_w_transition = 1.0,
+      diff_c_viscous = 0.05,
+      halfshaftLeftC = 15000,
+      halfshaftLeftJEquivalent = 0.02,
+      halfshaftLeftD = 34.64101615137755,
+      halfshaftRightC = 15000,
+      halfshaftRightJEquivalent = 0.02,
+      halfshaftRightD = 34.64101615137755,
+      motorVdcMax = 630,
+      motorRpmMaxPeak = 6500,
+      motorTPeak = 220,
+      motorTCont = 130,
+      motorIPeak = 360,
+      motorICont = 180,
+      motorKtNmPerA = 0.61,
+      motorPeakTime = 120,
+      motorPMechPeak = 124000,
+      motorPContLow = 75000,
+      motorPContHigh = 75000,
+      motorEtaMot = 0.96,
+      motorEtaReg = 0.95,
+      inverterPMaxMot = 124000,
+      inverterPMaxReg = 124000,
+      inverterVdcMax = 588);
 
   parameter MassRecord pBaseSprungMass(
       m = 160.64,

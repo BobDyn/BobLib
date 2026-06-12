@@ -27,6 +27,71 @@ driver_mass:
 body:
   torsional_stiff_n_m_per_rad: 500000
 
+powertrain:
+  reference: EMRAX 228 MV
+  battery:
+    series_cells: 140
+    parallel_cells: 4
+    initial_soc: 1.0
+  final_drive:
+    ratio: 3.31
+  vcu:
+    torque_limit_nm: 220
+    regen_torque_limit_nm: 220
+    launch_w_eps_rad_per_s: 1.0
+    motor_speed_sign: 1
+  motor:
+    vdc_max_v: 630
+    rpm_max_peak: 6500
+    peak_torque_nm: 220
+    continuous_torque_nm: 130
+    peak_power_w: 124000
+    continuous_power_low_w: 75000
+    continuous_power_high_w: 75000
+    eta_mot: 0.96
+    eta_reg: 0.95
+    peak_current_arms: 360
+    continuous_current_arms: 180
+    torque_constant_nm_per_arms: 0.61
+    peak_time_s: 120
+    rotor_inertia_kg_m2: 0.02521
+    rotor_axis: [1, 0, 0]
+    rotor_position_m: [0.20, 0, 0.10]
+  inverter:
+    max_motoring_power_w: 124000
+    max_regen_power_w: 124000
+    max_dc_voltage_v: 588
+  differential:
+    type: limited_slip
+    reference: Drexler limited-slip differential
+    input_rotor_inertia_kg_m2: 0.04
+    input_rotor_position_m: [0.05, 0, 0.05]
+    case_position_m: [0, 0, 0]
+    lsd:
+      enabled: true
+      model: plate_ramp_clutch
+      drive_side_torque_sign: 1
+      preload_torque_nm: 20
+      lock_fraction_accel: 0.35
+      lock_fraction_decel: 0.15
+      max_lock_capacity_nm: 1000
+      effective_clutch_radius_m: 1.0
+      kinetic_friction_ratio: 0.85
+      slip_transition_speed_rad_per_s: 1.0
+      viscous_slip_damping_n_m_s_per_rad: 0.05
+  halfshafts:
+    reference: steel baseline
+    left:
+      material: steel
+      torsional_stiffness_n_m_per_rad: 15000
+      critical_damping_inertia_kg_m2: 0.02
+      torsional_damping_n_m_s_per_rad: 34.64101615137755
+    right:
+      material: steel
+      torsional_stiffness_n_m_per_rad: 15000
+      critical_damping_inertia_kg_m2: 0.02
+      torsional_damping_n_m_s_per_rad: 34.64101615137755
+
 front:
   wheel:
     radius_m: 0.2045

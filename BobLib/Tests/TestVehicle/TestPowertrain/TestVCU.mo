@@ -1,7 +1,7 @@
 within BobLib.Tests.TestVehicle.TestPowertrain;
 
 model TestVCU
-  BobLib.Vehicle.Powertrain.Electronics.VCU vcu(
+  BobLib.Vehicle.Electronics.Controls.VCU vcu(
     tau_max = 200,
     w_eps = 0.1) annotation(
     Placement(transformation(extent = {{-10, -10}, {10, 10}})));

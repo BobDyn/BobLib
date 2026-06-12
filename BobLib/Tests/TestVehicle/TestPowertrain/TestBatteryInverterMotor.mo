@@ -5,7 +5,7 @@ model TestBatteryInverterMotor
   BobLib.Vehicle.Powertrain.Battery.BatteryPack batt(Ns = 140, Np = 4, SOC_start = 1.0, E_cell = 38880) annotation(
     Placement(transformation(origin = {-50, -10}, extent = {{-10, -10}, {10, 10}})));
   // Inverter
-  BobLib.Vehicle.Powertrain.Electronics.InverterDC inv annotation(
+  BobLib.Vehicle.Electronics.PowerElectronics.InverterDC inv annotation(
     Placement(transformation(origin = {-50, 40}, extent = {{-10, -10}, {10, 10}})));
   // Power command
   // Electrical reference
