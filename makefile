@@ -2,7 +2,6 @@ PYTHON ?= python3
 PACKAGE_ROOT ?= BobLib
 
 PYTHON_TESTS := \
-	Tests/test_generate_vehicle_model.py \
 	Tests/test_vehicle_test_coverage.py
 
 MODELICA_REGRESSION_TESTS := \
@@ -24,7 +23,7 @@ help:
 		'  make ci                   Run the full local CI suite'
 
 lint:
-	$(PYTHON) -m ruff check Generation Tests
+	$(PYTHON) -m ruff check Tests
 
 test: test-python test-modelica
 

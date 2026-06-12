@@ -17,7 +17,7 @@ class ModelCheck:
 
 DEFAULT_CHECKS = (
     ModelCheck("BobLib.Standards.VehicleSim", expected_equations=18170),
-    ModelCheck("BobLib.Standards.FourPostSim", expected_equations=18674),
+    ModelCheck("BobLib.Standards.FourPostSim", expected_equations=18680),
     ModelCheck(
         "BobLib.Tests.Regression.VehicleSimAnimationOn",
         expected_equations=25752,
