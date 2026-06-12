@@ -40,6 +40,15 @@ LOW_LEVEL_SIGNAL_CASES = (
     ),
 )
 
+MODELICA_VERSION = "4.1.0"
+OMC_COMMAND_LINE_OPTIONS = (
+    "--matchingAlgorithm=PFPlusExt "
+    "--indexReductionMethod=dynamicStateSelection "
+    "-d=initialization,NLSanalyticJacobian "
+    "--maxSizeLinearTearing=5000 "
+    "--generateDynamicJacobian=none"
+)
+
 
 def _package_root() -> Path:
     cwd = Path.cwd()
@@ -64,7 +73,8 @@ def _render_mos(
     signal_filter = "time|" + "|".join(signals)
     return f"""
 clear();
-loadModel(Modelica, {{"3.2.3"}});
+setCommandLineOptions("{OMC_COMMAND_LINE_OPTIONS}");
+loadModel(Modelica, {{"{MODELICA_VERSION}"}});
 loadFile("{package_root.as_posix()}/package.mo");
 cd("{work_dir.as_posix()}");
 simulate(

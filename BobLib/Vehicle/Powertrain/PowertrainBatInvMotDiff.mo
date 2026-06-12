@@ -2,7 +2,9 @@ within BobLib.Vehicle.Powertrain;
 
 model PowertrainBatInvMotDiff
   "Battery-motor-final-drive-differential plant for an external ELC assembly"
-  import Modelica.SIunits;
+  extends BobLib.Resources.Icons.PowertrainBatInvMotDiffIcon;
+
+  import SI = Modelica.Units.SI;
 
   parameter Integer Ns(min = 1) = 140 "Battery cells in series";
   parameter Integer Np(min = 1) = 4 "Battery cells in parallel";
@@ -10,75 +12,75 @@ model PowertrainBatInvMotDiff
     "Initial battery state of charge";
   parameter Real finalDriveRatio = 3.31
     "Motor speed divided by differential input speed";
-  parameter SIunits.AngularVelocity launch_w_eps = 1.0
+  parameter SI.AngularVelocity launch_w_eps = 1.0
     "Motor low-speed regularization for power-to-torque conversion";
   parameter Modelica.Mechanics.MultiBody.Types.Axis drivetrainAxis = {1, 0, 0}
     "Rotor axis resolved in mountFrame";
-  parameter SIunits.Position rMotorRotor[3] = {0.20, 0, 0.10}
+  parameter SI.Position rMotorRotor[3] = {0.20, 0, 0.10}
     "Vector from mountFrame to motor rotor frame, resolved in mountFrame";
-  parameter SIunits.Position rDiffInputRotor[3] = {0.05, 0, 0.05}
+  parameter SI.Position rDiffInputRotor[3] = {0.05, 0, 0.05}
     "Vector from mountFrame to differential input rotor frame, resolved in mountFrame";
-  parameter SIunits.Position rDifferential[3] = {0, 0, 0}
+  parameter SI.Position rDifferential[3] = {0, 0, 0}
     "Vector from mountFrame to differential case frame, resolved in mountFrame";
-  parameter SIunits.Inertia motorRotorJ = 0.02521
+  parameter SI.Inertia motorRotorJ = 0.02521
     "Motor rotor inertia used for 3D gyroscopic effects";
-  parameter SIunits.Inertia diffInputRotorJ = 0.04
+  parameter SI.Inertia diffInputRotorJ = 0.04
     "Differential input/ring rotating inertia used for 3D gyroscopic effects";
   parameter Boolean diff_use_lsd = true
     "Enable differential limited-slip locking torque";
   parameter Real diff_driveSideTorqueSign = 1
     "Sign of differential input torque corresponding to drive-side ramp loading";
-  parameter SIunits.Torque diff_T_preload(min = 0) = 20
+  parameter SI.Torque diff_T_preload(min = 0) = 20
     "Differential LSD static preload breakaway torque";
   parameter Real diff_lockFractionAccel(unit = "1", min = 0, max = 1) = 0.35
     "Differential drive-side locking value";
   parameter Real diff_lockFractionDecel(unit = "1", min = 0, max = 1) = 0.15
     "Differential coast-side locking value";
-  parameter SIunits.Torque diff_T_capacity_max(min = 0) = 1000
+  parameter SI.Torque diff_T_capacity_max(min = 0) = 1000
     "Differential maximum static lock capacity";
-  parameter SIunits.Length diff_clutchEffectiveRadius(min = 1e-6) = 1.0
+  parameter SI.Length diff_clutchEffectiveRadius(min = 1e-6) = 1.0
     "Differential LSD effective clutch torque arm";
   parameter Real diff_kineticFrictionRatio(unit = "1", min = 1e-6, max = 1) = 0.85
     "Differential sliding clutch capacity divided by static capacity";
-  parameter SIunits.AngularVelocity diff_w_transition = 1.0
+  parameter SI.AngularVelocity diff_w_transition = 1.0
     "Differential LSD regularized clutch slip transition speed";
-  parameter SIunits.RotationalDampingConstant diff_c_viscous(min = 0) = 0.05
+  parameter SI.RotationalDampingConstant diff_c_viscous(min = 0) = 0.05
     "Differential small viscous slip damping included in capped lock torque";
-  parameter SIunits.RotationalSpringConstant halfshaftLeftC(min = 0) = 15000
+  parameter SI.RotationalSpringConstant halfshaftLeftC(min = 0) = 15000
     "Left halfshaft torsional stiffness";
-  parameter SIunits.Inertia halfshaftLeftJEquivalent(min = 0) = 0.02
+  parameter SI.Inertia halfshaftLeftJEquivalent(min = 0) = 0.02
     "Effective reflected inertia used to estimate left halfshaft critical damping";
-  parameter SIunits.RotationalDampingConstant halfshaftLeftD(min = 0) =
+  parameter SI.RotationalDampingConstant halfshaftLeftD(min = 0) =
     2*sqrt(halfshaftLeftC*halfshaftLeftJEquivalent)
     "Left halfshaft torsional damping";
-  parameter SIunits.RotationalSpringConstant halfshaftRightC(min = 0) = 15000
+  parameter SI.RotationalSpringConstant halfshaftRightC(min = 0) = 15000
     "Right halfshaft torsional stiffness";
-  parameter SIunits.Inertia halfshaftRightJEquivalent(min = 0) = 0.02
+  parameter SI.Inertia halfshaftRightJEquivalent(min = 0) = 0.02
     "Effective reflected inertia used to estimate right halfshaft critical damping";
-  parameter SIunits.RotationalDampingConstant halfshaftRightD(min = 0) =
+  parameter SI.RotationalDampingConstant halfshaftRightD(min = 0) =
     2*sqrt(halfshaftRightC*halfshaftRightJEquivalent)
     "Right halfshaft torsional damping";
-  parameter SIunits.Voltage motorVdcMax = 630
+  parameter SI.Voltage motorVdcMax = 630
     "Motor maximum DC voltage reference";
   parameter Real motorRpmMaxPeak = 6500
     "Motor peak speed reference";
-  parameter SIunits.Torque motorTPeak = 220
+  parameter SI.Torque motorTPeak = 220
     "Motor peak torque";
-  parameter SIunits.Torque motorTCont = 130
+  parameter SI.Torque motorTCont = 130
     "Motor continuous torque";
-  parameter SIunits.Current motorIPeak = 360
+  parameter SI.Current motorIPeak = 360
     "Motor peak current";
-  parameter SIunits.Current motorICont = 180
+  parameter SI.Current motorICont = 180
     "Motor continuous current";
   parameter Real motorKtNmPerA = 0.61
     "Motor torque constant";
-  parameter SIunits.Time motorPeakTime = 120
+  parameter SI.Time motorPeakTime = 120
     "Peak torque/current allowance duration";
-  parameter SIunits.Power motorPMechPeak = 124e3
+  parameter SI.Power motorPMechPeak = 124e3
     "Motor peak mechanical power";
-  parameter SIunits.Power motorPContLow = 75e3
+  parameter SI.Power motorPContLow = 75e3
     "Motor continuous power envelope low-speed anchor";
-  parameter SIunits.Power motorPContHigh = 75e3
+  parameter SI.Power motorPContHigh = 75e3
     "Motor continuous power envelope high-speed anchor";
   parameter Real motorEtaMot(unit = "1") = 0.96
     "Motor motoring efficiency reference";
@@ -201,21 +203,21 @@ model PowertrainBatInvMotDiff
 
   output Real SOC(unit = "1") "Battery state of charge";
   output Real SOE(unit = "1") "Battery state of energy";
-  output SIunits.Energy E_remaining "Estimated remaining pack energy";
-  output SIunits.Voltage V_dc "HV bus voltage";
-  output SIunits.Current I_dc "HV bus current, positive while discharging";
-  output SIunits.AngularVelocity motorSpeed "Motor shaft speed";
-  output SIunits.AngularVelocity diffInputSpeed "Differential input speed";
-  output SIunits.Torque diffLockTorque "Differential lock torque";
-  output SIunits.Torque diffLockCapacity "Differential static lock capacity";
-  output SIunits.Torque diffLockKineticCapacity "Differential sliding lock capacity";
+  output SI.Energy E_remaining "Estimated remaining pack energy";
+  output SI.Voltage V_dc "HV bus voltage";
+  output SI.Current I_dc "HV bus current, positive while discharging";
+  output SI.AngularVelocity motorSpeed "Motor shaft speed";
+  output SI.AngularVelocity diffInputSpeed "Differential input speed";
+  output SI.Torque diffLockTorque "Differential lock torque";
+  output SI.Torque diffLockCapacity "Differential static lock capacity";
+  output SI.Torque diffLockKineticCapacity "Differential sliding lock capacity";
   output Real diffLockingValue(unit = "1") "Actual differential locking value";
   output Real diffTorqueBiasRatio(unit = "1") "Actual differential torque bias ratio";
   output Boolean diffLocked "True when the LSD is inside the near-stick slip band";
-  output SIunits.Angle leftHalfshaftTwist "Left halfshaft relative twist";
-  output SIunits.Angle rightHalfshaftTwist "Right halfshaft relative twist";
-  output SIunits.Torque leftHalfshaftTorque "Left halfshaft transmitted torque";
-  output SIunits.Torque rightHalfshaftTorque "Right halfshaft transmitted torque";
+  output SI.Angle leftHalfshaftTwist "Left halfshaft relative twist";
+  output SI.Angle rightHalfshaftTwist "Right halfshaft relative twist";
+  output SI.Torque leftHalfshaftTorque "Left halfshaft transmitted torque";
+  output SI.Torque rightHalfshaftTorque "Right halfshaft transmitted torque";
 
 initial equation
   leftHalfshaft.phi_rel = 0;
@@ -280,21 +282,13 @@ equation
   connect(toDifferential.frame_b, differential.mountFrame) annotation(
     Line(points = {{106, 64}, {106, 10}}, color = {95, 95, 95}));
 
-  annotation(
-    experiment(StartTime = 0, StopTime = 5, Tolerance = 1e-06, Interval = 0.002),
+  annotation(experiment(StartTime = 0, StopTime = 5, Tolerance = 1e-06, Interval = 0.002),
     __OpenModelica_commandLineOptions = "--matchingAlgorithm=PFPlusExt --indexReductionMethod=dynamicStateSelection -d=initialization,NLSanalyticJacobian",
     __OpenModelica_simulationFlags(lv = "LOG_STDOUT,LOG_ASSERT,LOG_STATS", s = "dassl", variableFilter = ".*"),
     Diagram(coordinateSystem(extent = {{-120, -120}, {140, 120}})),
-    Icon(coordinateSystem(extent = {{-100, -100}, {100, 100}}), graphics = {
-      Rectangle(extent = {{-86, 56}, {-44, 18}}, lineColor = {35, 35, 35}, fillColor = {235, 245, 239}, fillPattern = FillPattern.Solid),
-      Rectangle(extent = {{-34, 56}, {8, 18}}, lineColor = {35, 35, 35}, fillColor = {240, 243, 248}, fillPattern = FillPattern.Solid),
-      Ellipse(extent = {{18, 50}, {58, 10}}, lineColor = {35, 35, 35}, fillColor = {230, 235, 240}, fillPattern = FillPattern.Solid),
-      Ellipse(extent = {{36, -14}, {76, -54}}, lineColor = {35, 35, 35}, fillColor = {238, 238, 238}, fillPattern = FillPattern.Solid),
+    Icon(graphics = {
       Line(points = {{58, -34}, {100, -40}}, color = {95, 95, 95}, thickness = 1),
       Line(points = {{36, -34}, {-100, -40}}, color = {95, 95, 95}, thickness = 1),
-      Line(points = {{0, 100}, {56, -14}}, color = {95, 95, 95}, thickness = 1),
-      Line(points = {{-44, 36}, {-34, 36}}, color = {0, 0, 255}),
-      Line(points = {{8, 36}, {18, 30}}, color = {0, 0, 127}),
-      Line(points = {{58, 30}, {56, -14}}, color = {95, 95, 95}, thickness = 1),
-      Text(extent = {{-90, 88}, {90, 62}}, textString = "%name", lineColor = {32, 32, 32})}));
+      Line(points = {{0, 100}, {56, -14}}, color = {95, 95, 95}, thickness = 1)
+    }));
 end PowertrainBatInvMotDiff;

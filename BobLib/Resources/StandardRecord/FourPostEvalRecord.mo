@@ -1,33 +1,33 @@
 within BobLib.Resources.StandardRecord;
 
 record FourPostEvalRecord
-  import Modelica.SIunits;
+  import SI = Modelica.Units.SI;
 
-  SIunits.Length heave "Sprung mass heave";
-  SIunits.Angle roll "Body roll angle [rad]";
-  SIunits.Force fx "Total applied longitudinal force";
-  SIunits.Force fy "Total applied lateral force";
+  SI.Length heave "Sprung mass heave";
+  SI.Angle roll "Body roll angle [rad]";
+  SI.Force fx "Total applied longitudinal force";
+  SI.Force fy "Total applied lateral force";
 
   // Left wheel
-  SIunits.Length leftSpringLength "Left spring length";
-  SIunits.Angle leftGamma "Camber";
-  SIunits.Angle leftToe "Toe";
-  SIunits.Angle leftCaster "Caster";
-  SIunits.Angle leftKpi "Kingpin inclination";
-  SIunits.Length leftMechTrail "Mechanical trail";
-  SIunits.Length leftMechScrub "Mechanical scrub radius";
+  SI.Length leftSpringLength "Left spring length";
+  SI.Angle leftGamma "Camber";
+  SI.Angle leftToe "Toe";
+  SI.Angle leftCaster "Caster";
+  SI.Angle leftKpi "Kingpin inclination";
+  SI.Length leftMechTrail "Mechanical trail";
+  SI.Length leftMechScrub "Mechanical scrub radius";
 
   // Right wheel
-  SIunits.Length rightSpringLength "Left spring length";
-  SIunits.Angle rightGamma "Camber";
-  SIunits.Angle rightToe "Toe";
-  SIunits.Angle rightCaster "Caster";
-  SIunits.Angle rightKpi "Kingpin inclination";
-  SIunits.Length rightMechTrail "Mechanical trail";
-  SIunits.Length rightMechScrub "Mechanical scrub radius";
+  SI.Length rightSpringLength "Left spring length";
+  SI.Angle rightGamma "Camber";
+  SI.Angle rightToe "Toe";
+  SI.Angle rightCaster "Caster";
+  SI.Angle rightKpi "Kingpin inclination";
+  SI.Length rightMechTrail "Mechanical trail";
+  SI.Length rightMechScrub "Mechanical scrub radius";
 
   // Axle-level
-  SIunits.Force jackingForce "Total axle jacking force";
-  SIunits.Angle stabarAngle "Angular deflection of torsion bar";
-  
+  SI.Force jackingForce "Total axle jacking force";
+  SI.Angle stabarAngle "Angular deflection of torsion bar";
+
 end FourPostEvalRecord;

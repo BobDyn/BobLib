@@ -1,7 +1,7 @@
 within BobLib.Vehicle.Chassis.Suspension;
 
 model RrAxleDW_Direct "Double wishbone axle with direct-acting suspension"
-  import Modelica.SIunits;
+  import SI = Modelica.Units.SI;
   import Modelica.Math.Vectors;
   import BobLib.Utilities.Math.Vector.mirrorXZ;
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.AxleDW_DirectRecord;
@@ -50,8 +50,8 @@ protected
     r = mirrorXZ(pAxle.shockMount) - effectiveCenter,
     animation = false) annotation(
     Placement(transformation(origin = {20, -70}, extent = {{-10, -10}, {10, 10}})));
-  
-  
+
+
 
 equation
   connect(leftShockLinkage.frame_a, leftWishboneUprightLoop.lowerFrame_o);
@@ -66,8 +66,8 @@ equation
     Line(points = {{0, 114}, {0, 140}}));
   connect(toRightShock.frame_a, axleFrame) annotation(
     Line(points = {{10, -70}, {0, -70}, {0, 0}}, color = {95, 95, 95}));
-  
-  
+
+
   annotation(
     experiment(StartTime = 0, StopTime = 1, Tolerance = 1e-06, Interval = 0.002),
     Diagram(coordinateSystem(extent = {{-180, -140}, {180, 140}}, preserveAspectRatio = true), graphics),

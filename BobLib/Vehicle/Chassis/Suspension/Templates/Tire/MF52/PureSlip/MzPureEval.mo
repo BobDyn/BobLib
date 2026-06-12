@@ -1,25 +1,25 @@
 within BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.PureSlip;
 
 function MzPureEval
-  import Modelica.SIunits;
+  import SI = Modelica.Units.SI;
 
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.MzPureRecord;
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.FyPureRecord;
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.FxPureRecord;
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.SetupRecord;
 
-  input SIunits.Force Fz;
-  input SIunits.Force Fy;
-  input SIunits.Angle alpha;
-  input SIunits.DimensionlessRatio kappa;
-  input SIunits.Angle gamma;
+  input SI.Force Fz;
+  input SI.Force Fy;
+  input SI.Angle alpha;
+  input SI.DimensionlessRatio kappa;
+  input SI.Angle gamma;
 
   input FyPureRecord pFy;
   input FxPureRecord pFx;
   input MzPureRecord p;
   input SetupRecord setup;
 
-  output SIunits.Torque Mz_pure;
+  output SI.Torque Mz_pure;
 
 protected
   Real dfz;

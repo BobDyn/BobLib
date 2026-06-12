@@ -4,18 +4,18 @@ model TestBatteryPack
 
   import Modelica.Electrical.Analog.Basic.*;
   import Modelica.Electrical.Analog.Sensors.*;
-  import Modelica.SIunits;
+  import SI = Modelica.Units.SI;
 
   // Device under test
   BobLib.Vehicle.Powertrain.Battery.BatteryPack batt(Ns = 140,
                                                           Np = 4,
                                                           SOC_start = 1.0, R_cell = 0.020, E_cell = 3.888e4) annotation(
     Placement(transformation(origin = {-50, -30}, extent = {{-10, -10}, {10, 10}})));
-  
+
   // Load
   Modelica.Electrical.Analog.Basic.Resistor load(R = 4.3) "Electrical load" annotation(
     Placement(transformation(origin = {30, -30}, extent = {{10, -10}, {-10, 10}})));
-  
+
   // Sensors
   Modelica.Electrical.Analog.Sensors.VoltageSensor V_batt annotation(
     Placement(transformation(origin = {-50, 0}, extent = {{10, -10}, {-10, 10}}, rotation = -180)));

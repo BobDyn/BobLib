@@ -1,7 +1,7 @@
 within BobLib.Vehicle.Chassis.Suspension;
 
 model FrAxleDW_Direct "Double wishbone axle with direct-acting suspension"
-  import Modelica.SIunits;
+  import SI = Modelica.Units.SI;
   import Modelica.Math.Vectors;
   import BobLib.Utilities.Math.Vector.mirrorXZ;
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.AxleDW_DirectRecord;

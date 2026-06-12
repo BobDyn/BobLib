@@ -39,7 +39,6 @@ equation
   connect(gain.y, rightTorque.tau) annotation(
     Line(points = {{0, -20}, {30, -20}, {30, -14}}, color = {0, 0, 127}));
 
-annotation(
-    Diagram(coordinateSystem(extent = {{-60, -40}, {60, 40}})),
-  Icon(coordinateSystem(extent = {{-100, -20}, {100, 20}}), graphics = {Line(points = {{0, -20}, {0, 20}}), Line(points = {{-100, 0}, {100, 0}})}));
+annotation(Diagram(coordinateSystem(extent = {{-60, -40}, {60, 40}})),
+    Icon(coordinateSystem(extent = {{-100, -20}, {100, 20}}), graphics = {Line(points = {{0, -20}, {0, 20}}), Line(points = {{-100, 0}, {100, 0}})}));
 end PTNPlaceholder;

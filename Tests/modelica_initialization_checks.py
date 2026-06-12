@@ -24,6 +24,15 @@ BASELINE_COLUMNS = (
     "values_sha256",
 )
 
+MODELICA_VERSION = "4.1.0"
+OMC_COMMAND_LINE_OPTIONS = (
+    "--matchingAlgorithm=PFPlusExt "
+    "--indexReductionMethod=dynamicStateSelection "
+    "-d=initialization,NLSanalyticJacobian "
+    "--maxSizeLinearTearing=5000 "
+    "--generateDynamicJacobian=none"
+)
+
 
 @dataclass(frozen=True)
 class InitializationMetrics:
@@ -100,7 +109,8 @@ def test_fixture_models(package_root: Path) -> tuple[str, ...]:
 def render_mos(package_root: Path, work_dir: Path, model: str, prefix: str) -> str:
     return f"""
 clear();
-loadModel(Modelica, {{"3.2.3"}});
+setCommandLineOptions("{OMC_COMMAND_LINE_OPTIONS}");
+loadModel(Modelica, {{"{MODELICA_VERSION}"}});
 loadFile("{package_root.as_posix()}/package.mo");
 cd("{work_dir.as_posix()}");
 simulate(
@@ -224,7 +234,7 @@ def read_baseline(path: Path) -> dict[str, InitializationMetrics]:
 def write_baseline(path: Path, metrics: list[InitializationMetrics]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=BASELINE_COLUMNS)
+        writer = csv.DictWriter(handle, fieldnames=BASELINE_COLUMNS, lineterminator="\n")
         writer.writeheader()
         for metric in sorted(metrics, key=lambda item: item.model):
             writer.writerow(metric.as_row())

@@ -1,6 +1,8 @@
 within BobLib.Utilities.Mechanics.Multibody;
 
 model GroundPhysics
+  extends BobLib.Resources.Icons.GroundPhysicsIcon;
+
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a frame_a annotation(
     Placement(transformation(origin={-100,0}, extent={{-16,-16},{16,16}}),
     iconTransformation(origin={-100,0}, extent={{-16,-16},{16,16}})));
@@ -38,15 +40,5 @@ equation
   frame_a.t = zeros(3);
   frame_b.t = zeros(3);
 
-  annotation(
-    Icon(
-      coordinateSystem(extent={{-100,-100},{100,100}}),
-      graphics={
-        Text(extent={{-120,-160},{120,-120}}, textString="%name", fontSize=14,
-          horizontalAlignment=TextAlignment.Center),
-        Rectangle(extent={{-100,-100},{100,25}}, fillPattern=FillPattern.Solid,
-          fillColor={150,100,50}, lineThickness=2),
-        Rectangle(extent={{-100,25},{100,100}}, fillPattern=FillPattern.Solid,
-          fillColor={95,200,70}, lineThickness=2)
-      }));
+
 end GroundPhysics;

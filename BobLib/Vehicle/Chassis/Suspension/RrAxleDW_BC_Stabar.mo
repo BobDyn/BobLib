@@ -1,7 +1,7 @@
 within BobLib.Vehicle.Chassis.Suspension;
 
 model RrAxleDW_BC_Stabar "Double wishbone axle with bellcranks mounting to shock, push/pullrod, and stabar"
-  import Modelica.SIunits;
+  import SI = Modelica.Units.SI;
   import Modelica.Math.Vectors;
   import BobLib.Utilities.Math.Vector.mirrorXZ;
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.AxleDW_BC_StabarRecord;
@@ -12,6 +12,7 @@ model RrAxleDW_BC_Stabar "Double wishbone axle with bellcranks mounting to shock
   parameter StabarRecord pStabar;
 
   extends BobLib.Vehicle.Chassis.Suspension.AxleDWBase;
+  extends BobLib.Resources.Icons.SteeringWheelOverlayIcon;
 
   // Left bellcrank
   BobLib.Vehicle.Chassis.Suspension.Linkages.Bellcrank3 leftBellcrank(
@@ -172,8 +173,9 @@ equation
     Line(points = {{-100, -10}, {-150, -10}, {-150, -30}, {-140, -30}}, color = {95, 95, 95}));
   connect(toRightApex.frame_b, rightPushrod.frame_b) annotation(
     Line(points = {{100, -10}, {150, -10}, {150, -30}, {140, -30}}, color = {95, 95, 95}));
-  annotation(
-    experiment(StartTime = 0, StopTime = 1, Tolerance = 1e-06, Interval = 0.002),
+  annotation(experiment(StartTime = 0, StopTime = 1, Tolerance = 1e-06, Interval = 0.002),
     Diagram(coordinateSystem(extent = {{-180, -140}, {180, 140}}, preserveAspectRatio = true), graphics),
-    Icon(coordinateSystem(extent = {{-180, -20}, {180, 140}}, preserveAspectRatio = true), graphics = {Line(origin = {0, 67}, points = {{0, -33}, {0, 33}}, thickness = 5), Ellipse(origin = {0, 100}, lineThickness = 5, extent = {{-26, 26}, {26, -26}}), Line(origin = {-10, 110}, points = {{10, -10}, {-14, -2}}, thickness = 5), Line(origin = {10, 110}, points = {{-10, -10}, {14, -2}}, thickness = 5), Ellipse(origin = {0, 100}, lineColor = {255, 255, 255}, lineThickness = 1, extent = {{-28, 28}, {28, -28}})}));
+    Icon(graphics = {
+      Line(origin = {0, 67}, points = {{0, -33}, {0, 33}}, thickness = 5)
+    }));
 end RrAxleDW_BC_Stabar;

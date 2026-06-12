@@ -1,30 +1,32 @@
 within BobLib.Vehicle.Chassis.Suspension.Linkages;
 
 model Bellcrank3
-  import Modelica.SIunits;
+  extends BobLib.Resources.Icons.Bellcrank3Icon;
+
+  import SI = Modelica.Units.SI;
 
   import Modelica.Math.Vectors;
 
   // Geometry parameters
-  parameter SIunits.Position pivot[3] "Pivot coordinates" annotation(
+  parameter SI.Position pivot[3] "Pivot coordinates" annotation(
     Dialog(group = "Geometry"));
-  parameter SIunits.Position pivotAxis[3] "Pivot rotational axis" annotation(
+  parameter SI.Position pivotAxis[3] "Pivot rotational axis" annotation(
     Dialog(group = "Geometry"));
-  parameter SIunits.Position pickup_1[3] "First pickup coordinates" annotation(
+  parameter SI.Position pickup_1[3] "First pickup coordinates" annotation(
     Dialog(group = "Geometry"));
-  parameter SIunits.Position pickup_2[3] "Second pickup coordinates" annotation(
+  parameter SI.Position pickup_2[3] "Second pickup coordinates" annotation(
     Dialog(group = "Geometry"));
-  parameter SIunits.Position pickup_3[3] "Third pickup coordinates" annotation(
+  parameter SI.Position pickup_3[3] "Third pickup coordinates" annotation(
     Dialog(group = "Geometry"));
-  
+
   // Visual parameters
-  parameter SIunits.Length linkDiameter annotation(
+  parameter SI.Length linkDiameter annotation(
     Dialog(tab = "Animation", group = "Sizing"));
-  parameter SIunits.Length jointDiameter annotation(
+  parameter SI.Length jointDiameter annotation(
     Dialog(tab = "Animation", group = "Sizing"));
   outer parameter Boolean enableAnimation;
 
-  // Frames  
+  // Frames
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a mountFrame annotation(
     Placement(transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}, rotation = 0)));
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b pickupFrame1 annotation(
@@ -33,12 +35,12 @@ model Bellcrank3
     Placement(transformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}})));
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b pickupFrame3 annotation(
     Placement(transformation(origin = {0, 100}, extent = {{-16, -16}, {16, 16}}, rotation = 90), iconTransformation(origin = {0, 100}, extent = {{-16, -16}, {16, 16}}, rotation = 90)));
-  
+
   // Rotational DOF
   Modelica.Mechanics.MultiBody.Joints.Revolute revolute(n = Vectors.normalize(pivotAxis), animation = enableAnimation, cylinderLength = jointDiameter, cylinderDiameter = jointDiameter, stateSelect = StateSelect.always, phi(nominal=0.05), w(start = 0, nominal = 1)) annotation(
     Placement(transformation(origin = {-70, 0}, extent = {{-10, -10}, {10, 10}})));
 
-  // Visualization  
+  // Visualization
   Modelica.Mechanics.MultiBody.Visualizers.FixedShape side_1(lengthDirection = Vectors.normalize(pickup_1 - pivot), length = Vectors.norm(pickup_1 - pivot), width = linkDiameter*0.75, height = linkDiameter*0.75, widthDirection = Vectors.normalize(pivotAxis), shapeType = "cylinder", animation = enableAnimation) annotation(
     Placement(transformation(origin = {-30, -20}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.MultiBody.Visualizers.FixedShape side_2(lengthDirection = Vectors.normalize(pickup_2 - pickup_1), widthDirection = Vectors.normalize(pivotAxis), length = Vectors.norm(pickup_2 - pickup_1), width = linkDiameter*0.75, height = linkDiameter*0.75, shapeType = "cylinder", animation = enableAnimation) annotation(
@@ -80,7 +82,11 @@ equation
     Line(points = {{40, -20}, {30, -20}, {30, 0}}, color = {95, 95, 95}));
   connect(side_4.frame_a, toThirdPickup.frame_b) annotation(
     Line(points = {{50, 60}, {60, 60}, {60, 0}, {50, 0}}, color = {95, 95, 95}));
-  annotation(
-    Diagram(graphics),
-    Icon(graphics = {Line(points = {{-80, 0}, {0, -80}, {80, 0}, {0, 80}, {-80, 0}}, thickness = 3), Line(origin = {-90, 0}, points = {{10, 0}, {-10, 0}}), Ellipse(origin = {-80, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, lineThickness = 2, extent = {{-10, 10}, {10, -10}}), Line(origin = {0, -90}, points = {{0, 10}, {0, -10}}), Line(origin = {90, 0}, points = {{-10, 0}, {10, 0}}), Line(origin = {0, 90}, points = {{0, -10}, {0, 10}}), Text(origin = {-40, -80}, extent = {{-20, -20}, {20, 20}}, textString = "P1"), Text(origin = {80, -40}, extent = {{-20, -20}, {20, 20}}, textString = "P2"), Text(origin = {40, 80}, extent = {{-20, -20}, {20, 20}}, textString = "P3")}));
+  annotation(Diagram(graphics),
+    Icon(graphics = {
+      Line(origin = {-90, 0}, points = {{10, 0}, {-10, 0}}),
+      Line(origin = {0, -90}, points = {{0, 10}, {0, -10}}),
+      Line(origin = {90, 0}, points = {{-10, 0}, {10, 0}}),
+      Line(origin = {0, 90}, points = {{0, -10}, {0, 10}})
+    }));
 end Bellcrank3;

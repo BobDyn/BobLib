@@ -110,7 +110,6 @@ model Vehicle_DWBCStabar_DWBCStabar
         pSprungMass = pVehicle.pSprungMass,
         torsionalStiff = pVehicle.pTorsionalStiff)
     ));
-
   Powertrain.PowertrainBatInvMotDiff ptn(
     Ns = pVehicle.pPowertrain.Ns,
     Np = pVehicle.pPowertrain.Np,
@@ -218,9 +217,8 @@ equation
   connect(elc.n, ptn.hv_n) annotation(
     Line(points = {{-68, -86}, {-84, -86}, {-84, -68}, {-20, -68}}, color = {0, 0, 255}));
 
-annotation(
-  Diagram(graphics),
-  Icon(graphics = {
+annotation(Diagram(graphics),
+    Icon(graphics = {
     Line(origin = {-130, 120}, points = {{-10, 0}, {-50, 0}}, pattern = LinePattern.Dash, thickness = 1),
     Line(origin = {190, 120}, points = {{-10, 0}, {-50, 0}}, pattern = LinePattern.Dash, thickness = 1),
     Line(origin = {-130, -120}, points = {{-10, 0}, {-30, 0}}, pattern = LinePattern.Dash, thickness = 1),

@@ -1,12 +1,12 @@
 within BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52;
 
 record RelaxationRecord
-  import Modelica.SIunits;
+  import SI = Modelica.Units.SI;
 
-  SIunits.Force FNOMIN = 650
+  SI.Force FNOMIN = 650
     "Nominal vertical load Fz0 for PAC2002 relaxation";
 
-  SIunits.Length UNLOADED_RADIUS = 0.2
+  SI.Length UNLOADED_RADIUS = 0.2
     "Unloaded tire radius R0 for PAC2002 relaxation";
 
   Real LFZO = 1

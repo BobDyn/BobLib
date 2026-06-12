@@ -1,23 +1,23 @@
 within BobLib.Resources.StandardRecord;
 
 record TransientEvalRecord
-  import Modelica.SIunits;
-  
+  import SI = Modelica.Units.SI;
+
   // Inputs
-  Modelica.SIunits.Angle handwheelAngle "Steering wheel angle";
+  Modelica.Units.SI.Angle handwheelAngle "Steering wheel angle";
 
   // Kinematics
-  Modelica.SIunits.Velocity velX "Longitudinal velocity";
-  Modelica.SIunits.Velocity velY "Lateral velocity";
-  Modelica.SIunits.AngularVelocity yawVel "Yaw velocity";
-  Modelica.SIunits.Angle sideslip "Sideslip angle";
-  
+  Modelica.Units.SI.Velocity velX "Longitudinal velocity";
+  Modelica.Units.SI.Velocity velY "Lateral velocity";
+  Modelica.Units.SI.AngularVelocity yawVel "Yaw velocity";
+  Modelica.Units.SI.Angle sideslip "Sideslip angle";
+
   // Accelerations
-  Modelica.SIunits.Acceleration accX "Longitudinal acceleration";
-  Modelica.SIunits.Acceleration accY "Lateral acceleration";
-  
+  Modelica.Units.SI.Acceleration accX "Longitudinal acceleration";
+  Modelica.Units.SI.Acceleration accY "Lateral acceleration";
+
   // Vehicle response
-  Modelica.SIunits.Angle roll "Vehicle roll angle";
-  Modelica.SIunits.Torque handwheelTorque "Steering wheel torque";
-  
+  Modelica.Units.SI.Angle roll "Vehicle roll angle";
+  Modelica.Units.SI.Torque handwheelTorque "Steering wheel torque";
+
 end TransientEvalRecord;

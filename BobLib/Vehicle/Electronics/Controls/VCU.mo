@@ -1,7 +1,7 @@
 within BobLib.Vehicle.Electronics.Controls;
 
 model VCU
-  import Modelica.SIunits;
+  import SI = Modelica.Units.SI;
 
   /**********************
    * Inputs (Commands)
@@ -51,18 +51,18 @@ model VCU
   /**********************
    * Parameters
    **********************/
-  parameter SIunits.Torque tau_max = 240
+  parameter SI.Torque tau_max = 240
     "Max motoring torque [Nm]";
 
-  parameter SIunits.AngularVelocity w_eps = 1e-2
+  parameter SI.AngularVelocity w_eps = 1e-2
     "Small speed for launch protection";
   parameter Real motorSpeedSign = 1
     "Multiplier mapping sensed motor speed to drive-positive speed";
 
 protected
-  SIunits.Torque tau_cmd_raw;
-  SIunits.AngularVelocity sens_motor_speed_drive;
-  SIunits.AngularVelocity w_eff;
+  SI.Torque tau_cmd_raw;
+  SI.AngularVelocity sens_motor_speed_drive;
+  SI.AngularVelocity w_eff;
 
 equation
   // Safety / enable

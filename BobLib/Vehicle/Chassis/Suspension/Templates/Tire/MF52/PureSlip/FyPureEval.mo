@@ -1,19 +1,19 @@
 within BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.PureSlip;
 
 function FyPureEval
-  import Modelica.SIunits;
-  
+  import SI = Modelica.Units.SI;
+
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.FyPureRecord;
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.SetupRecord;
 
-  input SIunits.Force Fz;
-  input SIunits.Angle alpha;
-  input SIunits.Angle gamma;
+  input SI.Force Fz;
+  input SI.Angle alpha;
+  input SI.Angle gamma;
 
   input FyPureRecord p;
   input SetupRecord setup;
 
-  output SIunits.Force Fy;
+  output SI.Force Fy;
 
 protected
   Real IA_y;

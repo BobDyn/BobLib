@@ -1,7 +1,7 @@
 within BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.CombinedSlip;
 
 function MzCombinedEval
-  import Modelica.SIunits;
+  import SI = Modelica.Units.SI;
 
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.MzPureRecord;
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.CombinedSlip.MzCombinedRecord;
@@ -11,12 +11,12 @@ function MzCombinedEval
 
   import BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.PureSlip.MzPureEval;
 
-  input SIunits.Force Fz;
-  input SIunits.Force Fx;
-  input SIunits.Force Fy;
-  input SIunits.Angle alpha;
-  input SIunits.DimensionlessRatio kappa;
-  input SIunits.Angle gamma;
+  input SI.Force Fz;
+  input SI.Force Fx;
+  input SI.Force Fy;
+  input SI.Angle alpha;
+  input SI.DimensionlessRatio kappa;
+  input SI.Angle gamma;
 
   input FyPureRecord pFy;
   input FxPureRecord pFx;
@@ -24,9 +24,9 @@ function MzCombinedEval
   input MzCombinedRecord pComb;
   input SetupRecord setup;
 
-  output SIunits.Torque Mz;
-  output SIunits.Length t;
-  output SIunits.Length s;
+  output SI.Torque Mz;
+  output SI.Length t;
+  output SI.Length s;
 
 protected
   Real dfz;

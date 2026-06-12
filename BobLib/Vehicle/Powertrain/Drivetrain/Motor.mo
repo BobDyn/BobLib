@@ -1,31 +1,31 @@
 within BobLib.Vehicle.Powertrain.Drivetrain;
 
 model Motor
-  import Modelica.SIunits;
+  import SI = Modelica.Units.SI;
   import Modelica.Constants.pi;
 
   // Power command
   Modelica.Blocks.Interfaces.RealInput P_elec "Electrical power into motor [W] (+motoring, −regen)  (connect from inverter P_out)" annotation(
     Placement(transformation(origin = {-120, 0}, extent = {{-20, -20}, {20, 20}}), iconTransformation(origin = {-120, 0}, extent = {{-20, -20}, {20, 20}})));
-  
+
   // Torque output
   Modelica.Mechanics.Rotational.Interfaces.Flange_b shaft annotation(
     Placement(transformation(origin={100, 0}, extent={{-10, -10}, {10, 10}}), iconTransformation(origin = {100, 0}, extent = {{-10, -10}, {10, 10}})));
 
   // Datasheet specs
-  parameter SIunits.Voltage Vdc_max = 630 "Max battery voltage (EMRAX 228 MV) [Vdc]";
+  parameter SI.Voltage Vdc_max = 630 "Max battery voltage (EMRAX 228 MV) [Vdc]";
   parameter Real rpm_fullLoad_ref = 5300 "Full-load RPM at Vdc_max (datasheet)";
   parameter Real rpm_noLoad_ref = 6500 "No-load RPM at Vdc_max (datasheet)";
   parameter Real rpm_max_cont = 5500 "Max continuous rotation speed (datasheet) [rpm]";
   parameter Real rpm_max_peak = 6500 "Max peak speed for a few seconds (datasheet) [rpm]";
-  parameter SIunits.Torque T_peak = 220 "Peak torque for a few seconds [Nm]";
-  parameter SIunits.Torque T_cont = 130 "Continuous torque [Nm]";
-  parameter SIunits.Current I_peak_2min = 360 "Max motor current for ~2 min if cooled [Arms]";
-  parameter SIunits.Current I_cont = 180 "Continuous motor current [Arms]";
+  parameter SI.Torque T_peak = 220 "Peak torque for a few seconds [Nm]";
+  parameter SI.Torque T_cont = 130 "Continuous torque [Nm]";
+  parameter SI.Current I_peak_2min = 360 "Max motor current for ~2 min if cooled [Arms]";
+  parameter SI.Current I_cont = 180 "Continuous motor current [Arms]";
   parameter Real Kt_Nm_per_A = 0.61 "Torque per phase current (datasheet) [Nm/A]";
-  parameter SIunits.Power P_mech_peak = 124e3 "Peak motor mechanical power capability [W]";
-  parameter SIunits.Power P_cont_low = 75e3 "Low end continuous power band [W]";
-  parameter SIunits.Power P_cont_high = 75e3 "High end continuous power band [W]";
+  parameter SI.Power P_mech_peak = 124e3 "Peak motor mechanical power capability [W]";
+  parameter SI.Power P_cont_low = 75e3 "Low end continuous power band [W]";
+  parameter SI.Power P_cont_high = 75e3 "High end continuous power band [W]";
   parameter Real eta_mot = 0.96 "Motoring efficiency placeholder (swap to 2D map later)";
   parameter Real eta_reg = 0.95 "Regen efficiency placeholder";
   parameter Real lossTable[:,2] = [
@@ -36,23 +36,23 @@ model Motor
     4000, 1750;
     5000, 2800
   ] "Free-run loss vs speed";
-  parameter SIunits.Time peakTime = 120 "How long peak limits are allowed (seconds)";
+  parameter SI.Time peakTime = 120 "How long peak limits are allowed (seconds)";
   parameter Boolean enablePeakTimer = true "If true, peak limits ramp down after peakTime";
-  
+
   // Numerical params
-  parameter SIunits.AngularVelocity w_eps = 1e-3 "Small omega";
-  
+  parameter SI.AngularVelocity w_eps = 1e-3 "Small omega";
+
   // Diagnostics
-  SIunits.AngularVelocity w "Shaft speed [rad/s]";
+  SI.AngularVelocity w "Shaft speed [rad/s]";
   Real rpm "Shaft speed [rpm]";
-  SIunits.Power P_loss_free "Free-run losses [W]";
-  SIunits.Power P_mech_cmd "Commanded mechanical power after eff/loss [W]";
-  SIunits.Power P_mech "Actual mechanical power at shaft [W]";
-  SIunits.Torque tau_cmd "Commanded torque [Nm]";
-  SIunits.Torque tau_lim "Active torque limit [Nm]";
-  SIunits.Torque tau_lim_from_power "Torque limit from peak power [Nm]";
-  SIunits.Torque tau_lim_from_current "Torque limit from current [Nm]";
-  SIunits.Power P_cont_env "Continuous power envelope [W]";
+  SI.Power P_loss_free "Free-run losses [W]";
+  SI.Power P_mech_cmd "Commanded mechanical power after eff/loss [W]";
+  SI.Power P_mech "Actual mechanical power at shaft [W]";
+  SI.Torque tau_cmd "Commanded torque [Nm]";
+  SI.Torque tau_lim "Active torque limit [Nm]";
+  SI.Torque tau_lim_from_power "Torque limit from peak power [Nm]";
+  SI.Torque tau_lim_from_current "Torque limit from current [Nm]";
+  SI.Power P_cont_env "Continuous power envelope [W]";
   Modelica.Mechanics.Rotational.Sources.Torque torque annotation(
     Placement(transformation(extent = {{-10, -10}, {10, 10}})));
 
@@ -66,15 +66,15 @@ protected
   end interp1;
 
   Real peakFactor "1 -> allow peak, 0 -> only continuous";
-  SIunits.Torque T_allow;
-  SIunits.Current I_allow;
-  
+  SI.Torque T_allow;
+  SI.Current I_allow;
+
   Real P_allow;
   Real P_mech_limited;
   Real tau_act;
-  SIunits.AngularVelocity w_eff "Effective omega for smooth power->torque conversion";
+  SI.AngularVelocity w_eff "Effective omega for smooth power->torque conversion";
 
-  parameter SIunits.Time tau_tau = 0.002 "Torque actuator time constant";
+  parameter SI.Time tau_tau = 0.002 "Torque actuator time constant";
 
 
 equation

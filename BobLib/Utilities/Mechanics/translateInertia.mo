@@ -1,12 +1,12 @@
 within BobLib.Utilities.Mechanics;
 
 function translateInertia
-  import Modelica.SIunits;
+  import SI = Modelica.Units.SI;
 
-  input SIunits.Inertia inertia[3, 3] "Inertia about the body's local CG";
-  input SIunits.Mass mass "Body mass";
-  input SIunits.Position delta[3] "Vector from target reference point to the body's CG";
-  output SIunits.Inertia translated[3, 3] "Inertia translated to the target reference point";
+  input SI.Inertia inertia[3, 3] "Inertia about the body's local CG";
+  input SI.Mass mass "Body mass";
+  input SI.Position delta[3] "Vector from target reference point to the body's CG";
+  output SI.Inertia translated[3, 3] "Inertia translated to the target reference point";
 algorithm
   translated := inertia + mass * {
     {

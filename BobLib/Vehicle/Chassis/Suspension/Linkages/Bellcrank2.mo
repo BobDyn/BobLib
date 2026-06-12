@@ -1,26 +1,28 @@
 within BobLib.Vehicle.Chassis.Suspension.Linkages;
 
 model Bellcrank2
-  import Modelica.SIunits;
+  extends BobLib.Resources.Icons.Bellcrank2Icon;
+
+  import SI = Modelica.Units.SI;
   import Modelica.Math.Vectors;
-  
+
   // Geometry parameters
-  parameter SIunits.Position pivot[3] "Pivot coordinates" annotation(
+  parameter SI.Position pivot[3] "Pivot coordinates" annotation(
     Dialog(group = "Geometry"));
-  parameter SIunits.Position pivotAxis[3] "Pivot rotational axis" annotation(
+  parameter SI.Position pivotAxis[3] "Pivot rotational axis" annotation(
     Dialog(group = "Geometry"));
-  parameter SIunits.Position pickup_1[3] "First pickup coordinates" annotation(
+  parameter SI.Position pickup_1[3] "First pickup coordinates" annotation(
     Dialog(group = "Geometry"));
-  parameter SIunits.Position pickup_2[3] "Second pickup coordinates" annotation(
+  parameter SI.Position pickup_2[3] "Second pickup coordinates" annotation(
     Dialog(group = "Geometry"));
 
   // Visual parameters
-  parameter SIunits.Length linkDiameter annotation(
+  parameter SI.Length linkDiameter annotation(
     Dialog(tab = "Animation", group = "Sizing"));
-  parameter SIunits.Length jointDiameter annotation(
+  parameter SI.Length jointDiameter annotation(
     Dialog(tab = "Animation", group = "Sizing"));
   outer parameter Boolean enableAnimation;
-  
+
   // Frames
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a mountFrame annotation(
     Placement(transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}, rotation = 0)));
@@ -64,7 +66,10 @@ equation
     Line(points = {{-20, 0}, {0, 0}, {0, -100}}, color = {95, 95, 95}));
   connect(side_2.frame_a, toFirstPickup.frame_b) annotation(
     Line(points = {{-10, -30}, {0, -30}, {0, 0}, {-20, 0}}, color = {95, 95, 95}));
-  annotation(
-    Diagram(graphics),
-    Icon(graphics = {Line(points = {{-80, 0}, {0, -80}, {80, 0}, {2, 0}, {-80, 0}}, thickness = 3), Line(origin = {-90, 0}, points = {{10, 0}, {-10, 0}}), Ellipse(origin = {-80, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, lineThickness = 2, extent = {{-10, 10}, {10, -10}}), Line(origin = {0, -90}, points = {{0, 10}, {0, -10}}), Line(origin = {90, 0}, points = {{-10, 0}, {10, 0}}), Text(origin = {-40, -80}, extent = {{-20, -20}, {20, 20}}, textString = "P1"), Text(origin = {80, -40}, extent = {{-20, -20}, {20, 20}}, textString = "P2")}));
+  annotation(Diagram(graphics),
+    Icon(graphics = {
+      Line(origin = {-90, 0}, points = {{10, 0}, {-10, 0}}),
+      Line(origin = {0, -90}, points = {{0, 10}, {0, -10}}),
+      Line(origin = {90, 0}, points = {{-10, 0}, {10, 0}})
+    }));
 end Bellcrank2;

@@ -1,21 +1,21 @@
 within BobLib.Utilities.Mechanics.Multibody;
 
 model TranslationalJoint
-  import Modelica.SIunits;
-  
+  import SI = Modelica.Units.SI;
+
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a frame_a annotation(
     Placement(transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {0, -100}, extent = {{-16, -16}, {16, 16}}, rotation = 90)));
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b frame_b annotation(
     Placement(transformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {0, 100}, extent = {{-16, -16}, {16, 16}}, rotation = 90)));
-  
-  parameter SIunits.Length x0=0 "Initial x-position" annotation(Dialog(group="Initialization"));
-  parameter SIunits.Length y0=0 "Initial y-position" annotation(Dialog(group="Initialization"));
-  parameter SIunits.Length z0=0 "Initial z-position" annotation(Dialog(group="Initialization"));
-  
-  parameter SIunits.Velocity vx0=0 "Initial x-velocity" annotation(Dialog(group="Initialization"));
-  parameter SIunits.Velocity vy0=0 "Initial y-velocity" annotation(Dialog(group="Initialization"));
-  parameter SIunits.Velocity vz0=0 "Initial z-velocity" annotation(Dialog(group="Initialization"));
-  
+
+  parameter SI.Length x0=0 "Initial x-position" annotation(Dialog(group="Initialization"));
+  parameter SI.Length y0=0 "Initial y-position" annotation(Dialog(group="Initialization"));
+  parameter SI.Length z0=0 "Initial z-position" annotation(Dialog(group="Initialization"));
+
+  parameter SI.Velocity vx0=0 "Initial x-velocity" annotation(Dialog(group="Initialization"));
+  parameter SI.Velocity vy0=0 "Initial y-velocity" annotation(Dialog(group="Initialization"));
+  parameter SI.Velocity vz0=0 "Initial z-velocity" annotation(Dialog(group="Initialization"));
+
   // Prismatic joints in each DOF
   Modelica.Mechanics.MultiBody.Joints.Prismatic FreeX(n = {1, 0, 0}, s(start = x0, fixed = true), v(start = vx0, fixed = true))  annotation(
     Placement(transformation(origin = {-50, 0}, extent = {{-10, -10}, {10, 10}})));

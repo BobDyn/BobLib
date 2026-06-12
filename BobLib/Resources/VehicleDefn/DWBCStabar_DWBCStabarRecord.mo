@@ -209,7 +209,7 @@ record DWBCStabar_DWBCStabarRecord
       rCM = {-0.541837, 6e-06, 0.395782},
       inertia = {{2.241988, 0.000284, -1.975938}, {0.000284, 7.621387, -5.3e-05}, {-1.975938, -5.3e-05, 6.749042}});
 
-  parameter Modelica.SIunits.RotationalSpringConstant pTorsionalStiff = 300000;
+  parameter Modelica.Units.SI.RotationalSpringConstant pTorsionalStiff = 300000;
 
   parameter MassRecord pSprungMass = BobLib.Utilities.Mechanics.combineMassRecords({pBaseSprungMass, pDriverMass});
 

@@ -1,7 +1,9 @@
 within BobLib.Vehicle.Powertrain.Drivetrain;
 
 model Differential "Parameterized limited-slip differential with regularized bounded clutch lockup"
-  import Modelica.SIunits;
+  extends BobLib.Resources.Icons.DifferentialIcon;
+
+  import SI = Modelica.Units.SI;
   import Modelica.Math.exp;
   import Modelica.Math.tanh;
 
@@ -32,40 +34,40 @@ model Differential "Parameterized limited-slip differential with regularized bou
     annotation(Evaluate = false);
   parameter Real driveSideTorqueSign = 1
     "Sign of T_in corresponding to drive-side ramp loading";
-  parameter SIunits.Torque T_preload(min = 0) = 20
+  parameter SI.Torque T_preload(min = 0) = 20
     "Static preload breakaway torque";
   parameter Real lockFractionAccel(unit = "1", min = 0, max = 1) = 0.35
     "Drive-side locking value S = |T_left - T_right|/|T_in|";
   parameter Real lockFractionDecel(unit = "1", min = 0, max = 1) = 0.15
     "Coast-side locking value S = |T_left - T_right|/|T_in|";
-  parameter SIunits.Torque T_capacity_max(min = 0) = 1000
+  parameter SI.Torque T_capacity_max(min = 0) = 1000
     "Numerical cap on static clutch lock capacity";
-  parameter SIunits.Length clutchEffectiveRadius(min = 1e-6) = 1.0
+  parameter SI.Length clutchEffectiveRadius(min = 1e-6) = 1.0
     "Effective clutch torque arm used to map normal force to lock torque";
   parameter Real kineticFrictionRatio(unit = "1", min = 1e-6, max = 1) = 0.85
     "Sliding clutch capacity divided by static breakaway capacity";
-  parameter SIunits.AngularVelocity w_transition(min = 1e-6) = 1.0
+  parameter SI.AngularVelocity w_transition(min = 1e-6) = 1.0
     "Slip speed used by the regularized plate-friction transition";
-  parameter SIunits.RotationalDampingConstant c_viscous(min = 0) = 0.05
+  parameter SI.RotationalDampingConstant c_viscous(min = 0) = 0.05
     "Small viscous slip damping included in the capped lock torque";
 
   // Diagnostics
-  SIunits.AngularVelocity w_in;
-  SIunits.AngularVelocity w_l;
-  SIunits.AngularVelocity w_r;
-  SIunits.AngularVelocity dw;
-  SIunits.Torque T_in;
-  SIunits.Torque T_open;
+  SI.AngularVelocity w_in;
+  SI.AngularVelocity w_l;
+  SI.AngularVelocity w_r;
+  SI.AngularVelocity dw;
+  SI.Torque T_in;
+  SI.Torque T_open;
   Real lockFraction(unit = "1");
-  SIunits.Torque T_lock_capacity_raw;
-  SIunits.Torque T_lock_capacity;
-  SIunits.Torque T_lock_kinetic_capacity;
-  SIunits.Torque T_lock_friction_capacity;
-  SIunits.Torque T_lock_viscous;
-  SIunits.Torque T_lock;
-  SIunits.Torque T_left_drive;
-  SIunits.Torque T_right_drive;
-  SIunits.Force clutchNormalForceEquivalent
+  SI.Torque T_lock_capacity_raw;
+  SI.Torque T_lock_capacity;
+  SI.Torque T_lock_kinetic_capacity;
+  SI.Torque T_lock_friction_capacity;
+  SI.Torque T_lock_viscous;
+  SI.Torque T_lock;
+  SI.Torque T_left_drive;
+  SI.Torque T_right_drive;
+  SI.Force clutchNormalForceEquivalent
     "Equivalent clutch normal force implied by capacity and effective radius";
   Real lockingValue(unit = "1") "Actual locking value |T_left - T_right|/|T_in|";
   Real torqueBiasRatio(unit = "1") "Approximate high/low output torque ratio";
@@ -151,18 +153,13 @@ equation
     Line(points = {{0, 100}, {0, 76}}, color = {95, 95, 95}));
   connect(support, mounting1D.flange_b) annotation(
     Line(points = {{0, 0}, {0, 56}}));
-annotation(
-    experiment(StartTime = 0, StopTime = 1, Tolerance = 1e-06, Interval = 0.002),
+annotation(experiment(StartTime = 0, StopTime = 1, Tolerance = 1e-06, Interval = 0.002),
     __OpenModelica_commandLineOptions = "--matchingAlgorithm=PFPlusExt --indexReductionMethod=dynamicStateSelection -d=initialization,NLSanalyticJacobian",
     __OpenModelica_simulationFlags(lv = "LOG_STDOUT,LOG_ASSERT,LOG_STATS", s = "dassl", variableFilter = ".*"),
-    Icon(coordinateSystem(extent = {{-100, -100}, {100, 100}}), graphics = {
-      Ellipse(extent = {{-42, 42}, {42, -42}}, lineColor = {45, 45, 45}, fillColor = {238, 238, 238}, fillPattern = FillPattern.Solid),
-      Ellipse(extent = {{-16, 16}, {16, -16}}, lineColor = {45, 45, 45}, fillColor = {210, 215, 220}, fillPattern = FillPattern.Solid),
+    Icon(graphics = {
       Line(points = {{-100, 0}, {-42, 0}}, color = {95, 95, 95}, thickness = 1),
       Line(points = {{16, 16}, {100, 38}}, color = {95, 95, 95}, thickness = 1),
       Line(points = {{16, -16}, {100, -38}}, color = {95, 95, 95}, thickness = 1),
-      Line(points = {{0, 100}, {0, 42}}, color = {95, 95, 95}, thickness = 1),
-      Line(points = {{-28, 0}, {28, 0}}, color = {45, 45, 45}, thickness = 1),
-      Line(points = {{0, -28}, {0, 28}}, color = {45, 45, 45}, thickness = 1),
-      Text(extent = {{-70, 78}, {70, 50}}, textString = "%name", lineColor = {32, 32, 32})}));
+      Line(points = {{0, 100}, {0, 42}}, color = {95, 95, 95}, thickness = 1)
+    }));
 end Differential;

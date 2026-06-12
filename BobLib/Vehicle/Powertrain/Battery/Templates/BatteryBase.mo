@@ -1,6 +1,6 @@
 within BobLib.Vehicle.Powertrain.Battery.Templates;
 partial model BatteryBase
-  import Modelica.SIunits;
+  import SI = Modelica.Units.SI;
 
   // Electrical terminals
   Modelica.Electrical.Analog.Interfaces.PositivePin p "Positive DC terminal" annotation(
@@ -21,10 +21,10 @@ partial model BatteryBase
   Real SOE(unit="1", min=0, max=1) "Pack state of energy";
 
   // Internal electrical quantities (NOT outputs)
-  SIunits.Voltage v "Terminal voltage (p.v - n.v)";
-  SIunits.Current i "Battery current (positive -> discharge)";
-  SIunits.Power   P "Electrical power (i * v)";
-  SIunits.Energy E_remaining "Estimated remaining pack energy";
+  SI.Voltage v "Terminal voltage (p.v - n.v)";
+  SI.Current i "Battery current (positive -> discharge)";
+  SI.Power   P "Electrical power (i * v)";
+  SI.Energy E_remaining "Estimated remaining pack energy";
 
 equation
   // Kirchhoff-consistent relations

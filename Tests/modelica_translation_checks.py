@@ -16,11 +16,11 @@ class ModelCheck:
 
 
 DEFAULT_CHECKS = (
-    ModelCheck("BobLib.Standards.VehicleSim", expected_equations=18170),
-    ModelCheck("BobLib.Standards.FourPostSim", expected_equations=18680),
+    ModelCheck("BobLib.Standards.VehicleSim", expected_equations=18130),
+    ModelCheck("BobLib.Standards.FourPostSim", expected_equations=18622),
     ModelCheck(
         "BobLib.Tests.Regression.VehicleSimAnimationOn",
-        expected_equations=25752,
+        expected_equations=24772,
     ),
     ModelCheck(
         "BobLib.Tests.Regression.MF52PureSlipSmoke",
@@ -63,7 +63,7 @@ def default_package_root() -> Path:
 def render_mos(package_root: Path, check: ModelCheck) -> str:
     lines = [
         "clear();",
-        'loadModel(Modelica, {"3.2.3"});',
+        'loadModel(Modelica, {"4.1.0"});',
         f'loadFile("{package_root.as_posix()}/package.mo");',
     ]
     lines.extend(

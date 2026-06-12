@@ -1,6 +1,6 @@
 within BobLib.Tests.TestVehicle.TestPowertrain;
 model TestBatteryInverterMotor
-  import Modelica.SIunits;
+  import SI = Modelica.Units.SI;
   // Battery
   BobLib.Vehicle.Powertrain.Battery.BatteryPack batt(Ns = 140, Np = 4, SOC_start = 1.0, E_cell = 38880) annotation(
     Placement(transformation(origin = {-50, -10}, extent = {{-10, -10}, {10, 10}})));

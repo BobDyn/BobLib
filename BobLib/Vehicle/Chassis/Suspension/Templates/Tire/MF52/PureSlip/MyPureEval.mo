@@ -1,23 +1,23 @@
 within BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.PureSlip;
 
 function MyPureEval
-  import Modelica.SIunits;
+  import SI = Modelica.Units.SI;
 
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.MyPureRecord;
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.FxPureRecord;
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.SetupRecord;
 
   // Inputs
-  input SIunits.Force Fz "Normal force";
-  input SIunits.Force Fx "Longitudinal force";
-  input SIunits.Velocity Vx "Longitudinal velocity";
+  input SI.Force Fz "Normal force";
+  input SI.Force Fx "Longitudinal force";
+  input SI.Velocity Vx "Longitudinal velocity";
 
   input MyPureRecord p;
   input FxPureRecord pFx;
   input SetupRecord setup;
 
   // Output
-  output SIunits.Torque My;
+  output SI.Torque My;
 
 protected
   Real eps = 1e-8;

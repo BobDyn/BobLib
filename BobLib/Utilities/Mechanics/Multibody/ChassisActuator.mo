@@ -1,29 +1,29 @@
 within BobLib.Utilities.Mechanics.Multibody;
 
 model ChassisActuator
-  import Modelica.SIunits;
-  
-  parameter SIunits.Position axleRef[3] "Vector from origin to axle reference, resolved in world frame";
-  
+  import SI = Modelica.Units.SI;
+
+  parameter SI.Position axleRef[3] "Vector from origin to axle reference, resolved in world frame";
+
   // Chassis interface
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a chassisFrame annotation(
     Placement(transformation(origin = {70, 100}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {0, 80}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
-  
+
   // Ground reference
   Modelica.Mechanics.MultiBody.Parts.Fixed groundFixed (animation = false, r = {0, 0, 0}) annotation(Placement(transformation(origin = {-70, -70},extent={{-10,-10},{10,10}})));
-  
+
   // Heave actuation
   Modelica.Mechanics.MultiBody.Joints.Prismatic heaveDOF (n = {0, 0, 1}, useAxisFlange = true, animation = true) annotation(Placement(transformation(origin={50,50},extent={{10,-10},{-10,10}},rotation=180)));
   Modelica.Mechanics.Translational.Sources.Position heavePosition (exact = true, useSupport = true) annotation(Placement(transformation(origin={58,10},extent={{10,-10},{-10,10}},rotation=-90)));
   Modelica.Blocks.Interfaces.RealInput heaveInput(quantity = "Position", unit = "m") annotation(
     Placement(transformation(origin = {116, -20}, extent = {{16, -16}, {-16, 16}}), iconTransformation(origin = {-36, 60}, extent = {{-16, -16}, {16, 16}})));
-  
+
   // Roll actuation
   Modelica.Mechanics.MultiBody.Joints.Revolute rollDOF (n = {1, 0, 0}, useAxisFlange = true) annotation(Placement(transformation(origin={0,-30},extent={{-10,-10},{10,10}},rotation=90)));
   Modelica.Mechanics.Rotational.Sources.Position rollPosition (exact = true, useSupport = true) annotation(Placement(transformation(origin = {-50, -30},extent={{-10,-10},{10,10}})));
   Modelica.Blocks.Interfaces.RealInput rollInput(quantity = "Angle", unit = "rad") annotation(
     Placement(transformation(origin = {-116, -30}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-36, -60}, extent = {{-16, -16}, {16, 16}})));
-  
+
   // Instrumentation
   Modelica.Mechanics.MultiBody.Sensors.CutForce sprungLoads (animation = false) annotation(Placement(transformation(origin={-30,-70},extent={{-10,-10},{10,10}})));
   Modelica.Blocks.Interfaces.RealOutput jackingOutput(quantity = "Force", unit = "N") annotation(
@@ -57,7 +57,6 @@ equation
     Line(points = {{116, -20}, {58, -20}, {58, -2}}, color = {0, 0, 127}));
   connect(sprungLoads.force[3], jackingOutput) annotation(
     Line(points = {{-38, -80}, {-38, -116}}, color = {0, 0, 127}));
-annotation(
-    Icon(graphics = {Text(origin = {-80, 92}, extent = {{-40, 20}, {40, -20}}, textString = "Heave"), Text(origin = {-70, -28}, extent = {{-30, 20}, {30, -20}}, textString = "Roll"), Text(origin = {82, -20}, extent = {{-40, 20}, {40, -20}}, textString = "Jacking"), Rectangle( fillColor = {0, 170, 0}, fillPattern = FillPattern.Solid, extent = {{-20, 80}, {20, -80}})}),
-    Diagram(graphics));
+annotation(Diagram(graphics),
+    Icon(graphics = {Text(origin = {-80, 92}, extent = {{-40, 20}, {40, -20}}, textString = "Heave"), Text(origin = {-70, -28}, extent = {{-30, 20}, {30, -20}}, textString = "Roll"), Text(origin = {82, -20}, extent = {{-40, 20}, {40, -20}}, textString = "Jacking"), Rectangle( fillColor = {0, 170, 0}, fillPattern = FillPattern.Solid, extent = {{-20, 80}, {20, -80}})}));
 end ChassisActuator;

@@ -45,9 +45,8 @@ equation
     Line(points = {{-20, 0}, {18, 0}}, color = {0, 0, 127}));
   connect(leftFzSource.y, worldForce.force[3]) annotation(
     Line(points = {{-58, -30}, {0, -30}, {0, 0}, {18, 0}}, color = {0, 0, 127}));
-  connect(worldForce.frame_b, chassisFrame) annotation(
-    Line(points = {{40, 0}, {100, 0}}, color = {95, 95, 95}));
-
-annotation(
+  connect(worldForce.frame_b, chassisFrame) annotation(Line(points = {{40, 0}, {100, 0}}, color = {95, 95, 95}),
     Icon(graphics = {Text(origin = {0, 2},extent = {{-60, 40}, {60, -40}}, textString = "Fx, Fy, Fz"), Rectangle(lineThickness = 1, extent = {{-62, 20}, {62, -20}}), Text(origin = {0, -40}, extent = {{-100, 20}, {100, -20}}, textString = "%name"), Line(origin = {78, 0}, points = {{-16, 0}, {14, 0}}, thickness = 3, arrow = {Arrow.None, Arrow.Filled}, arrowSize = 10), Text(origin = {0, 40}, extent = {{-100, 20}, {100, -20}}, textString = "%forceMagnitude")}));
+
+
 end CP_ForceActuator;

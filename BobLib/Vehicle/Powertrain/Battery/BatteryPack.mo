@@ -1,83 +1,85 @@
 within BobLib.Vehicle.Powertrain.Battery;
 
 model BatteryPack "Table-driven Thevenin battery pack"
+  extends BobLib.Resources.Icons.BatteryPackIcon;
+
   extends BobLib.Vehicle.Powertrain.Battery.Templates.BatteryBase;
 
-  import Modelica.SIunits;
+  import SI = Modelica.Units.SI;
   import Modelica.Math.Vectors.interpolate;
 
   // Cell parameters. R_cell and E_cell are kept for compatibility with older
   // fixtures; the table defaults are derived from them.
-  parameter SIunits.Resistance R_cell = 0.003 "Nominal cell DC resistance";
-  parameter SIunits.Energy E_cell = 15e3 "Nominal cell energy";
-  parameter SIunits.Voltage V_cell_nominal = 3.7 "Nominal cell voltage used to derive charge capacity";
-  parameter SIunits.ElectricCharge Q_cell = E_cell/V_cell_nominal "Cell charge capacity";
+  parameter SI.Resistance R_cell = 0.003 "Nominal cell DC resistance";
+  parameter SI.Energy E_cell = 15e3 "Nominal cell energy";
+  parameter SI.Voltage V_cell_nominal = 3.7 "Nominal cell voltage used to derive charge capacity";
+  parameter SI.ElectricCharge Q_cell = E_cell/V_cell_nominal "Cell charge capacity";
   parameter Real eta_charge_coulombic(unit = "1", min = 0, max = 1) = 0.995 "Coulombic charge efficiency";
-  parameter SIunits.Voltage V_cell_min = 2.8 "Minimum loaded cell voltage";
-  parameter SIunits.Voltage V_cell_max = 4.2 "Maximum charge cell voltage";
+  parameter SI.Voltage V_cell_min = 2.8 "Minimum loaded cell voltage";
+  parameter SI.Voltage V_cell_max = 4.2 "Maximum charge cell voltage";
 
   // OCV curve (cell-level)
   parameter Real SOC_table[:] = {0, 0.1, 0.2, 0.4, 0.6, 0.8, 1.0};
   parameter Real SOE_table[:] = {0, 0.07, 0.16, 0.36, 0.57, 0.79, 1.0}
     "Remaining energy fraction at each SOC breakpoint";
-  parameter SIunits.Voltage V_ocv_cell_table[:] = {3.0, 3.3, 3.5, 3.7, 3.85, 4.0, 4.2};
-  parameter SIunits.Resistance R0_dis_cell_table[:] = {
+  parameter SI.Voltage V_ocv_cell_table[:] = {3.0, 3.3, 3.5, 3.7, 3.85, 4.0, 4.2};
+  parameter SI.Resistance R0_dis_cell_table[:] = {
     1.60*R_cell, 1.25*R_cell, 1.05*R_cell, R_cell, R_cell, 1.08*R_cell, 1.25*R_cell}
     "Ohmic discharge resistance vs SOC";
-  parameter SIunits.Resistance R0_chg_cell_table[:] = {
+  parameter SI.Resistance R0_chg_cell_table[:] = {
     1.80*R_cell, 1.35*R_cell, 1.10*R_cell, 1.03*R_cell, 1.05*R_cell, 1.18*R_cell, 1.45*R_cell}
     "Ohmic charge resistance vs SOC";
-  parameter SIunits.Resistance R1_dis_cell_table[:] = {
+  parameter SI.Resistance R1_dis_cell_table[:] = {
     0.90*R_cell, 0.70*R_cell, 0.55*R_cell, 0.45*R_cell, 0.45*R_cell, 0.55*R_cell, 0.75*R_cell}
     "Polarization discharge resistance vs SOC";
-  parameter SIunits.Resistance R1_chg_cell_table[:] = {
+  parameter SI.Resistance R1_chg_cell_table[:] = {
     1.00*R_cell, 0.80*R_cell, 0.60*R_cell, 0.50*R_cell, 0.52*R_cell, 0.68*R_cell, 0.90*R_cell}
     "Polarization charge resistance vs SOC";
-  parameter SIunits.Time tau1_dis_table[:] = {18, 15, 12, 10, 10, 12, 16}
+  parameter SI.Time tau1_dis_table[:] = {18, 15, 12, 10, 10, 12, 16}
     "Polarization discharge time constant vs SOC";
-  parameter SIunits.Time tau1_chg_table[:] = {22, 18, 14, 12, 12, 15, 20}
+  parameter SI.Time tau1_chg_table[:] = {22, 18, 14, 12, 12, 15, 20}
     "Polarization charge time constant vs SOC";
-  parameter SIunits.Current I_dis_cell_max_table[:] = {15, 35, 55, 75, 80, 70, 45}
+  parameter SI.Current I_dis_cell_max_table[:] = {15, 35, 55, 75, 80, 70, 45}
     "Cell discharge current limit vs SOC";
-  parameter SIunits.Current I_chg_cell_max_table[:] = {35, 45, 45, 40, 35, 25, 8}
+  parameter SI.Current I_chg_cell_max_table[:] = {35, 45, 45, 40, 35, 25, 8}
     "Cell charge current limit vs SOC";
 
-  final parameter SIunits.Resistance R_pack = (Ns/Np)*R_cell "Nominal pack resistance";
-  final parameter SIunits.Energy E_pack = Ns*Np*E_cell "Nominal pack energy";
-  final parameter SIunits.ElectricCharge Q_pack = Np*Q_cell "Pack charge capacity";
+  final parameter SI.Resistance R_pack = (Ns/Np)*R_cell "Nominal pack resistance";
+  final parameter SI.Energy E_pack = Ns*Np*E_cell "Nominal pack energy";
+  final parameter SI.ElectricCharge Q_pack = Np*Q_cell "Pack charge capacity";
 
   Modelica.Electrical.Analog.Sources.SignalVoltage terminalVoltage annotation(
     Placement(transformation(origin = {0, 0}, extent = {{-10, -10}, {10, 10}})));
 
   // Diagnostics and limit estimates
-  SIunits.Voltage v_oc_cell "Cell open-circuit voltage";
-  SIunits.Voltage v_oc_pack "Pack open-circuit voltage";
-  SIunits.Voltage v_rc(start = 0, fixed = true) "Polarization voltage drop";
-  SIunits.Resistance R0_pack "Active pack ohmic resistance";
-  SIunits.Resistance R1_pack "Active pack polarization resistance";
-  SIunits.Current I_dis_max "Available discharge current limit";
-  SIunits.Current I_chg_max "Available charge current limit as positive magnitude";
-  SIunits.Power P_dis_max "Estimated available discharge power";
-  SIunits.Power P_chg_max "Estimated available charge power as positive magnitude";
-  SIunits.Power P_loss_ohmic "Ohmic heat generation";
-  SIunits.Power P_loss_polarization "Polarization heat generation";
-  SIunits.Power P_loss "Total estimated cell electrical loss";
-  SIunits.Power P_chemical "Open-circuit chemical power draw";
+  SI.Voltage v_oc_cell "Cell open-circuit voltage";
+  SI.Voltage v_oc_pack "Pack open-circuit voltage";
+  SI.Voltage v_rc(start = 0, fixed = true) "Polarization voltage drop";
+  SI.Resistance R0_pack "Active pack ohmic resistance";
+  SI.Resistance R1_pack "Active pack polarization resistance";
+  SI.Current I_dis_max "Available discharge current limit";
+  SI.Current I_chg_max "Available charge current limit as positive magnitude";
+  SI.Power P_dis_max "Estimated available discharge power";
+  SI.Power P_chg_max "Estimated available charge power as positive magnitude";
+  SI.Power P_loss_ohmic "Ohmic heat generation";
+  SI.Power P_loss_polarization "Polarization heat generation";
+  SI.Power P_loss "Total estimated cell electrical loss";
+  SI.Power P_chemical "Open-circuit chemical power draw";
 
 protected
-  parameter SIunits.Resistance R_eps = 1e-6 "Resistance floor";
-  parameter SIunits.Time tau_eps = 1e-6 "Time-constant floor";
+  parameter SI.Resistance R_eps = 1e-6 "Resistance floor";
+  parameter SI.Time tau_eps = 1e-6 "Time-constant floor";
   Real SOC_lookup(unit = "1");
-  SIunits.Resistance R0_cell;
-  SIunits.Resistance R1_cell;
-  SIunits.Time tau1;
-  SIunits.Voltage V_pack_min;
-  SIunits.Voltage V_pack_max;
-  SIunits.Current I_dis_table_limit;
-  SIunits.Current I_chg_table_limit;
-  SIunits.Current I_dis_voltage_limit;
-  SIunits.Current I_chg_voltage_limit;
-  SIunits.Current i_soc;
+  SI.Resistance R0_cell;
+  SI.Resistance R1_cell;
+  SI.Time tau1;
+  SI.Voltage V_pack_min;
+  SI.Voltage V_pack_max;
+  SI.Current I_dis_table_limit;
+  SI.Current I_chg_table_limit;
+  SI.Current I_dis_voltage_limit;
+  SI.Current I_chg_voltage_limit;
+  SI.Current i_soc;
 
 equation
   assert(Ns > 0 and Np > 0, "BatteryPack: Ns and Np must be >= 1");
@@ -153,12 +155,5 @@ equation
   annotation(
     experiment(StartTime = 0, StopTime = 1, Tolerance = 1e-06, Interval = 0.002),
     __OpenModelica_commandLineOptions = "--matchingAlgorithm=PFPlusExt --indexReductionMethod=dynamicStateSelection -d=initialization,NLSanalyticJacobian",
-    __OpenModelica_simulationFlags(lv = "LOG_STDOUT,LOG_ASSERT,LOG_STATS", s = "dassl", variableFilter = ".*"),
-    Icon(coordinateSystem(extent = {{-100, -60}, {100, 60}}), graphics = {
-      Rectangle(extent = {{-74, 34}, {74, -34}}, lineColor = {32, 32, 32}, fillColor = {235, 245, 239}, fillPattern = FillPattern.Solid),
-      Rectangle(extent = {{74, 16}, {88, -16}}, lineColor = {32, 32, 32}, fillColor = {235, 245, 239}, fillPattern = FillPattern.Solid),
-      Line(points = {{-48, 0}, {-22, 0}}, color = {40, 120, 70}, thickness = 1),
-      Line(points = {{-35, 13}, {-35, -13}}, color = {40, 120, 70}, thickness = 1),
-      Line(points = {{18, 0}, {48, 0}}, color = {40, 120, 70}, thickness = 1),
-      Text(extent = {{-62, 54}, {62, 34}}, textString = "%name", lineColor = {32, 32, 32})}));
+    __OpenModelica_simulationFlags(lv = "LOG_STDOUT,LOG_ASSERT,LOG_STATS", s = "dassl", variableFilter = ".*"));
 end BatteryPack;

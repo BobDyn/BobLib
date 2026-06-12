@@ -1,7 +1,7 @@
 within BobLib.Standards.Templates;
 
 partial model BaseVehicleSim
-  import Modelica.SIunits;
+  import SI = Modelica.Units.SI;
   import Modelica.Constants.pi;
   import Modelica.Math.Vectors.norm;
   import Modelica.Mechanics.MultiBody.Frames;
@@ -10,8 +10,8 @@ partial model BaseVehicleSim
   // Import vehicle records
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.Templates.PartialWheelRecord;
 
-  inner parameter SIunits.Length linkDiameter = 0.020;
-  inner parameter SIunits.Length jointDiameter = 0.030;
+  inner parameter SI.Length linkDiameter = 0.020;
+  inner parameter SI.Length jointDiameter = 0.030;
   inner parameter Boolean enableAnimation = false
     "Enable MultiBody animation geometry"
     annotation(Evaluate = true, Dialog(tab = "Animation"));
@@ -44,28 +44,28 @@ partial model BaseVehicleSim
     "Allow the speed controller to command rear-axle regenerative braking"
     annotation(Evaluate = false, Dialog(enable = closedLoopVelocity));
 
-  parameter Modelica.SIunits.Time steerStart = 2.0
+  parameter Modelica.Units.SI.Time steerStart = 2.0
     "Start time"
     annotation(Evaluate = false);
 
   // Open-loop ramp-steer parameters
-  parameter SIunits.Acceleration targetAy = 18
+  parameter SI.Acceleration targetAy = 18
     "Lateral-acceleration sign used to choose open-loop handwheel ramp direction"
     annotation(Evaluate = false, Dialog(enable = openLoopAy));
 
-  parameter SIunits.Velocity targetVel = 15
+  parameter SI.Velocity targetVel = 15
     "Target maneuver velocity"
     annotation(Evaluate = false, Dialog(enable = closedLoopVelocity));
 
-  parameter SIunits.Velocity initialVel = targetVel
+  parameter SI.Velocity initialVel = targetVel
     "Initial velocity"
     annotation(Evaluate = false);
 
-  parameter SIunits.AngularVelocity handwheelRampRate = 0.14
+  parameter SI.AngularVelocity handwheelRampRate = 0.14
     "Open-loop handwheel ramp rate"
     annotation(Evaluate = false, Dialog(enable = openLoopAy));
 
-  parameter SIunits.Time handwheelRampStopDuration = 0.18
+  parameter SI.Time handwheelRampStopDuration = 0.18
     "Duration used to smoothly roll handwheel rate to zero after the load limit"
     annotation(Evaluate = false, Dialog(enable = openLoopAy));
 
@@ -73,7 +73,7 @@ partial model BaseVehicleSim
     "End the open-loop handwheel ramp when any tire reaches the load floor"
     annotation(Evaluate = false, Dialog(enable = openLoopAy));
 
-  parameter SIunits.Force tireNormalLoadMin = 200.0
+  parameter SI.Force tireNormalLoadMin = 200.0
     "Immediate tire normal-load floor where the handwheel ramp ends"
     annotation(Evaluate = false, Dialog(enable = openLoopAy));
 
@@ -81,7 +81,7 @@ partial model BaseVehicleSim
     "Terminate the maneuver if a tire reaches the lift threshold"
     annotation(Evaluate = false, Dialog(enable = openLoopAy));
 
-  parameter SIunits.Force tireLiftTerminateLoad = 75.0
+  parameter SI.Force tireLiftTerminateLoad = 75.0
     "Tire normal load threshold used for hard lift termination"
     annotation(Evaluate = false, Dialog(enable = openLoopAy));
 
@@ -89,11 +89,11 @@ partial model BaseVehicleSim
     "Terminate the open-loop ramp if body sideslip indicates loss of directional control"
     annotation(Evaluate = false, Dialog(enable = openLoopAy));
 
-  parameter SIunits.Angle sideslipTerminate = 20*pi/180
+  parameter SI.Angle sideslipTerminate = 20*pi/180
     "Absolute body sideslip threshold used for spinout termination"
     annotation(Evaluate = false, Dialog(enable = openLoopAy and terminateOnSpinout));
 
-  parameter SIunits.Time spinoutHoldDuration = 0.02
+  parameter SI.Time spinoutHoldDuration = 0.02
     "Duration the sideslip threshold must remain true before spinout termination"
     annotation(Evaluate = false, Dialog(enable = openLoopAy and terminateOnSpinout));
 
@@ -105,23 +105,23 @@ partial model BaseVehicleSim
     "Fractional local lateral-gain loss that ends the ramp"
     annotation(Evaluate = false, Dialog(enable = openLoopAy));
 
-  parameter SIunits.Acceleration linearityReferenceAy = 4.0
+  parameter SI.Acceleration linearityReferenceAy = 4.0
     "Measured lateral acceleration used to latch the linear local lateral gain"
     annotation(Evaluate = false, Dialog(enable = openLoopAy));
 
-  parameter SIunits.Acceleration linearityEvaluationAyMargin = 0.75
+  parameter SI.Acceleration linearityEvaluationAyMargin = 0.75
     "Additional measured lateral acceleration beyond the reference before nonlinearity is evaluated"
     annotation(Evaluate = false, Dialog(enable = openLoopAy));
 
-  parameter SIunits.Time linearitySlopeSamplePeriod = 0.10
+  parameter SI.Time linearitySlopeSamplePeriod = 0.10
     "Sample period for the finite-difference local lateral-gain monitor"
     annotation(Evaluate = false, Dialog(enable = openLoopAy));
 
-  parameter SIunits.Time linearityHoldDuration = 0.05
+  parameter SI.Time linearityHoldDuration = 0.05
     "Duration that the nonlinearity threshold must remain true before termination"
     annotation(Evaluate = false, Dialog(enable = openLoopAy));
 
-  parameter SIunits.Time steadyHoldDuration = 0.1
+  parameter SI.Time steadyHoldDuration = 0.1
     "Duration that the QSS plateau conditions must remain true before termination"
     annotation(Evaluate = false, Dialog(enable = openLoopAy));
 
@@ -139,25 +139,25 @@ partial model BaseVehicleSim
   parameter Real handwheelRateTol = 0.01
     "Handwheel-rate derivative tolerance for open-loop QSS detection";
 
-  parameter SIunits.Time settleTimeout = 3.0
+  parameter SI.Time settleTimeout = 3.0
     "Fail-fast timeout after the ramp ends if QSS is never reached";
 
   // Ramp-steer parameters
-  parameter SIunits.Angle frRampSteerHeight = 5*pi/180
+  parameter SI.Angle frRampSteerHeight = 5*pi/180
     "Ramp steer target angle";
 
-  parameter SIunits.Time frRampSteerDuration = 0.001
+  parameter SI.Time frRampSteerDuration = 0.001
     "Ramp steer duration";
 
-  parameter SIunits.Time stepDuration = frRampSteerDuration
+  parameter SI.Time stepDuration = frRampSteerDuration
     "Step steer duration";
 
   // Frequency response parameters
-  parameter SIunits.Angle steerAmp = 6*pi/180
+  parameter SI.Angle steerAmp = 6*pi/180
     "Amplitude"
     annotation(Evaluate = false);
 
-  parameter SIunits.Frequency steerFreq = 1.0
+  parameter SI.Frequency steerFreq = 1.0
     "Frequency (Hz)"
     annotation(Evaluate = false);
 
@@ -170,8 +170,8 @@ partial model BaseVehicleSim
 
   Real speed;
   Real curvature;
-  SIunits.Angle handwheelRampCmd(start = 0, fixed = true);
-  SIunits.AngularVelocity handwheelRateCmd;
+  SI.Angle handwheelRampCmd(start = 0, fixed = true);
+  SI.AngularVelocity handwheelRateCmd;
   Real handwheelRampDirection;
   Real minTireNormalLoad;
   Real tireNormalLoadStopXi(start = 0, fixed = true);
@@ -189,23 +189,23 @@ partial model BaseVehicleSim
   Real steerStep;
 
   // Standard outputs
-  SIunits.Acceleration accX;
-  SIunits.Acceleration accY;
-  SIunits.Angle handwheelAngle;
-  SIunits.Angle steerExcess;
-  SIunits.Torque handwheelTorque;
-  SIunits.Force Fz_FL;
-  SIunits.Force Fz_FR;
-  SIunits.Force Fz_RL;
-  SIunits.Force Fz_RR;
-  SIunits.Angle leftSteerAngle;
-  SIunits.Angle rightSteerAngle;
-  SIunits.Angle avgSteerAngle;
-  SIunits.Angle roll;
-  SIunits.Angle sideslip;
-  SIunits.Velocity velX;
-  SIunits.Velocity velY;
-  SIunits.AngularVelocity yawVel;
+  SI.Acceleration accX;
+  SI.Acceleration accY;
+  SI.Angle handwheelAngle;
+  SI.Angle steerExcess;
+  SI.Torque handwheelTorque;
+  SI.Force Fz_FL;
+  SI.Force Fz_FR;
+  SI.Force Fz_RL;
+  SI.Force Fz_RR;
+  SI.Angle leftSteerAngle;
+  SI.Angle rightSteerAngle;
+  SI.Angle avgSteerAngle;
+  SI.Angle roll;
+  SI.Angle sideslip;
+  SI.Velocity velX;
+  SI.Velocity velY;
+  SI.AngularVelocity yawVel;
 
   inner Modelica.Mechanics.MultiBody.World world(n = {0, 0, -1}, enableAnimation = enableAnimation) annotation(
     Placement(transformation(origin = {-130, -110}, extent = {{-10, -10}, {10, 10}})));
@@ -261,7 +261,7 @@ partial model BaseVehicleSim
 
   final parameter Real cpInitRR[3] = Vector.mirrorXZ(cpInitRL);
 
-  final parameter SIunits.Length wheelbase = abs(
+  final parameter SI.Length wheelbase = abs(
     pVehicle.pFrDW.wheelCenter[1] - pVehicle.pRrDW.wheelCenter[1]);
 
 protected
@@ -329,7 +329,7 @@ protected
     yMax = 5000,
     yMin = -5000,
     Ni = 0.9,
-    initType = Modelica.Blocks.Types.InitPID.InitialOutput,
+    initType = Modelica.Blocks.Types.Init.InitialOutput,
     y_start = 0) annotation(
     Placement(transformation(origin = {-30, -50}, extent = {{-10, -10}, {10, 10}})));
 

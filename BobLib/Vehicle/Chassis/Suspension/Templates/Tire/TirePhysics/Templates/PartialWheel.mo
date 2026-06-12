@@ -1,25 +1,27 @@
 within BobLib.Vehicle.Chassis.Suspension.Templates.Tire.TirePhysics.Templates;
 
 partial model PartialWheel
+  extends BobLib.Resources.Icons.PartialWheelIcon;
+
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.Templates.PartialWheelRecord;
-  
+
   // Record parameters
   parameter PartialWheelRecord partialWheelParams;
   parameter Real longitudinalTorqueSign = -1
     "Sign mapping contact-patch longitudinal force to wheel-axis torque";
-  
+
   outer parameter Real linkDiameter;
   outer parameter Boolean enableAnimation;
-  
+
   // Frames
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a cpFrame annotation(
     Placement(transformation(origin = {0, -100}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {0, -100}, extent = {{-16, -16}, {16, 16}}, rotation = 90)));
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b chassisFrame annotation(
     Placement(transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}, rotation = 0)));
-  
+
   Modelica.Mechanics.Rotational.Interfaces.Flange_b hubFlange annotation(
     Placement(transformation(origin = {-100, 40}, extent = {{-10, -10}, {10, 10}}), iconTransformation(extent = {{-10, -10}, {10, 10}})));
-  
+
   // Tire attitude
   Modelica.Mechanics.MultiBody.Parts.FixedRotation toHub(rotationType = Modelica.Mechanics.MultiBody.Types.RotationTypes.PlanarRotationSequence,
                                                          sequence = {1, 2, 3}, angles = {partialWheelParams.staticGamma, 0, partialWheelParams.staticAlpha})  annotation(
@@ -56,7 +58,7 @@ partial model PartialWheel
   // Visualizers
   Modelica.Mechanics.MultiBody.Visualizers.VoluminousWheel voluminousWheel(rRim = partialWheelParams.rimR0, rTire = partialWheelParams.R0, width = partialWheelParams.rimWidth, animation = enableAnimation) annotation(
     Placement(transformation(origin = {70, 0}, extent = {{-10, -10}, {10, 10}}, rotation = -0)));
-  
+
 equation
   connect(hubAxis.axis, inertia.flange_a) annotation(
     Line(points = {{20, 10}, {20, 30}, {30, 30}}));
@@ -88,8 +90,10 @@ equation
     Line(points = {{-100, 0}, {-60, 0}}));
   connect(toHub.frame_b, hubAxis.frame_a) annotation(
     Line(points = {{-40, 0}, {10, 0}}, color = {95, 95, 95}));
-  annotation(
-    experiment(StartTime = 0, StopTime = 1, Tolerance = 1e-06, Interval = 0.002),
+  annotation(experiment(StartTime = 0, StopTime = 1, Tolerance = 1e-06, Interval = 0.002),
     Diagram(graphics),
-    Icon(graphics = {Ellipse(fillColor = {40, 40, 40}, fillPattern = FillPattern.Solid, lineThickness = 3, extent = {{-60, -60}, {60, 60}}), Ellipse(fillColor = {200, 200, 200}, fillPattern = FillPattern.Solid, lineThickness = 2, extent = {{-39, -39}, {39, 39}}), Ellipse(fillColor = {0, 170, 0}, fillPattern = FillPattern.Solid, lineThickness = 2, extent = {{-15, -15}, {15, 15}}), Line(points = {{0, 14}, {0, 39}}, thickness = 2), Line(points = {{0, -14}, {0, -39}}, thickness = 2), Line(points = {{14, 0}, {39, 0}}, thickness = 2), Line(points = {{-14, 0}, {-39, 0}}, thickness = 2), Line(points = {{10, 10}, {28, 28}}, thickness = 2), Line(points = {{-10, -10}, {-28, -28}}, thickness = 2), Line(origin = {-2, 2}, points = {{12, -12}, {28, -30}}, thickness = 2), Line(points = {{-10, 10}, {-28, 28}}, thickness = 2), Line(origin = {-63, 0}, points = {{-37, 0}, {63, 0}}, thickness = 5), Ellipse(fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}), Line(origin = {0, -86}, points = {{0, -14}, {0, 24}}, color = {0, 170, 0}, thickness = 5)}));
+    Icon(graphics = {
+      Line(origin = {-63, 0}, points = {{-37, 0}, {63, 0}}, thickness = 5),
+      Line(origin = {0, -86}, points = {{0, -14}, {0, 24}}, color = {0, 170, 0}, thickness = 5)
+    }));
 end PartialWheel;

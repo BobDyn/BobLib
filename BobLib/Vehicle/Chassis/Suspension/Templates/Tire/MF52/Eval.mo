@@ -1,7 +1,7 @@
 within BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52;
 
 function Eval
-  import Modelica.SIunits;
+  import SI = Modelica.Units.SI;
 
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.*;
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.*;
@@ -11,23 +11,23 @@ function Eval
   import BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.CombinedSlip.*;
 
   // Inputs
-  input SIunits.Force Fz;
-  input SIunits.Angle alpha;
-  input SIunits.DimensionlessRatio kappa;
-  input SIunits.Angle gamma;
-  input SIunits.Velocity Vx;
+  input SI.Force Fz;
+  input SI.Angle alpha;
+  input SI.DimensionlessRatio kappa;
+  input SI.Angle gamma;
+  input SI.Velocity Vx;
 
   input MF52Record tire;
 
   // Outputs
-  output SIunits.Force Fx;
-  output SIunits.Force Fy;
-  output SIunits.Torque Mx;
-  output SIunits.Torque My;
-  output SIunits.Torque Mz;
-  
-  output SIunits.Length t;
-  output SIunits.Length s;
+  output SI.Force Fx;
+  output SI.Force Fy;
+  output SI.Torque Mx;
+  output SI.Torque My;
+  output SI.Torque Mz;
+
+  output SI.Length t;
+  output SI.Length s;
 
 protected
   // Unpacked records
@@ -48,7 +48,7 @@ protected
 
   SetupRecord setup;
 
-  SIunits.Force FzEval;
+  SI.Force FzEval;
   Real loadScale;
 
 algorithm
@@ -111,10 +111,10 @@ algorithm
     alpha,
     kappa,
     gamma,
-  
+
     pFyPure,
     pFxPure,
-  
+
     pMzPure,
     pMzComb,
     setup
@@ -125,7 +125,7 @@ algorithm
   Mx := loadScale * Mx;
   My := loadScale * My;
   Mz := loadScale * Mz;
-  
+
   // Z-up transform (apply at boundary)
   Fy := -Fy;
   My := -My;

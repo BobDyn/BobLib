@@ -1,15 +1,17 @@
 within BobLib.Vehicle.Chassis.Suspension;
 
 partial model AxleDWBase
-  import Modelica.SIunits;
-  
+  extends BobLib.Resources.Icons.AxleDWBaseIcon;
+
+  import SI = Modelica.Units.SI;
+
   import BobLib.Utilities.Math.Vector;
   import BobLib.Utilities.Math.Tensor;
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.Templates.PartialWheelRecord;
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.SteeringRack.RackAndPinionRecord;
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.DoubleWishbone.WishboneUprightLoopRecord;
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.AxleMassRecord;
-  
+
   // Record parameters
   parameter PartialWheelRecord pLeftPartialWheel;
   parameter PartialWheelRecord pRightPartialWheel(R0 = pLeftPartialWheel.R0,
@@ -41,31 +43,31 @@ partial model AxleDWBase
                                                   rCM = Vector.mirrorXZ(pLeftAxleMass.tieMass.rCM),
                                                   inertia = Tensor.mirrorXZ(pLeftAxleMass.tieMass.inertia)));
   // Visual parameters
-  outer parameter SIunits.Length linkDiameter annotation(
+  outer parameter SI.Length linkDiameter annotation(
     Dialog(tab = "Animation", group = "Sizing"));
-  outer parameter SIunits.Length jointDiameter annotation(
+  outer parameter SI.Length jointDiameter annotation(
     Dialog(tab = "Animation", group = "Sizing"));
   outer parameter Boolean enableAnimation;
   // Effective center for internal calculations
-  final parameter SIunits.Position[3] effectiveCenter = {pLeftDW.wheelCenter[1], 0, pLeftDW.wheelCenter[3]};
+  final parameter SI.Position[3] effectiveCenter = {pLeftDW.wheelCenter[1], 0, pLeftDW.wheelCenter[3]};
 
 // Interface frames
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a axleFrame annotation(
-    Placement(transformation( extent = {{16, -16}, {-16, 16}}, rotation = -90), 
+    Placement(transformation( extent = {{16, -16}, {-16, 16}}, rotation = -90),
     iconTransformation(origin = {0, 50}, extent = {{-16, -16}, {16, 16}}, rotation = 90)));
-  
+
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b leftCP annotation(
-    Placement(transformation(origin = {-160, 0}, extent = {{16, -16}, {-16, 16}}, rotation = -90), 
+    Placement(transformation(origin = {-160, 0}, extent = {{16, -16}, {-16, 16}}, rotation = -90),
     iconTransformation(origin = {-180, 0}, extent = {{-16, -16}, {16, 16}})));
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b rightCP annotation(
-    Placement(transformation(origin = {160, 0}, extent = {{16, -16}, {-16, 16}}, rotation = -90), 
+    Placement(transformation(origin = {160, 0}, extent = {{16, -16}, {-16, 16}}, rotation = -90),
     iconTransformation(origin = {180, 0}, extent = {{-16, -16}, {16, 16}})));
   // Wheel torque inputs
   Modelica.Mechanics.Rotational.Interfaces.Flange_b leftTorque annotation(
-    Placement(transformation(origin = {-180, 50}, extent = {{-10, -10}, {10, 10}}), 
+    Placement(transformation(origin = {-180, 50}, extent = {{-10, -10}, {10, 10}}),
     iconTransformation(origin = {-180, 50}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.Rotational.Interfaces.Flange_b rightTorque annotation(
-    Placement(transformation(origin = {180, 50}, extent = {{-10, -10}, {10, 10}}), 
+    Placement(transformation(origin = {180, 50}, extent = {{-10, -10}, {10, 10}}),
     iconTransformation(origin = {180, 50}, extent = {{-10, -10}, {10, 10}})));
   // Tires
   replaceable BobLib.Vehicle.Chassis.Suspension.Templates.Tire.BaseTire leftTire(pPartialWheel = pLeftPartialWheel) annotation(
@@ -88,12 +90,12 @@ partial model AxleDWBase
 protected
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRack(r = {pRack.leftPickup[1], 0, pRack.leftPickup[3]} - effectiveCenter, animation = false) annotation(
     Placement(transformation(origin = {0, 90}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
-  
+
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation leftTieConnection(r = pLeftDW.lower_o - pLeftDW.tie_o, animation = false) annotation(
     Placement(transformation(origin = {-100, 70}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation rightTieConnection(r = pRightDW.lower_o - pRightDW.tie_o, animation = false) annotation(
     Placement(transformation(origin = {100, 70}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
-  
+
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation toLeftWheelCenter(r = pLeftDW.wheelCenter - pLeftDW.lower_o, animation = false) annotation(
     Placement(transformation(origin = {-120, 30}, extent = {{10, -10}, {-10, 10}})));
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRightWheelCenter(r = pRightDW.wheelCenter - pRightDW.lower_o, animation = false) annotation(
@@ -103,7 +105,7 @@ protected
     Placement(transformation(origin = {-20, 70}, extent = {{10, -10}, {-10, 10}})));
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation toLeftLower_i(r = (pLeftDW.lowerFore_i + pLeftDW.lowerAft_i)/2 - effectiveCenter, animation = false) annotation(
     Placement(transformation(origin = {-20, 30}, extent = {{10, -10}, {-10, 10}})));
-    
+
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRightUpper_i(r = (pRightDW.upperFore_i + pRightDW.upperAft_i)/2 - effectiveCenter, animation = false) annotation(
     Placement(transformation(origin = {20, 70}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRightLower_i(r = (pRightDW.lowerFore_i + pRightDW.lowerAft_i)/2 - effectiveCenter, animation = false) annotation(
@@ -244,7 +246,12 @@ equation
     Line(points = {{-160, 80}, {-140, 80}, {-140, 50}, {-150, 50}}, color = {95, 95, 95}));
   connect(rightUnsprungBody.frame_a, rightTire.chassisFrame) annotation(
     Line(points = {{160, 80}, {140, 80}, {140, 50}, {152, 50}}, color = {95, 95, 95}));
-  annotation(
-    Diagram(coordinateSystem(extent = {{-180, -60}, {180, 140}}, preserveAspectRatio = true, grid = {2, 2})),
-    Icon(coordinateSystem(extent = {{-180, -20}, {180, 140}}, preserveAspectRatio = true, grid = {4, 2}), graphics = {Line(origin = {-25, 35}, points = {{-35, -15}, {25, 15}}), Line(origin = {-30, 65}, points = {{-30, -9}, {30, -15}}), Line(origin = {-82, 24}, points = {{22, -4}, {-24, 4}}, thickness = 5), Line(origin = {-82, 60}, points = {{22, -4}, {-22, 6}}, thickness = 5), Ellipse(origin = {-60, 20}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}), Ellipse(origin = {-60, 56}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}), Line(origin = {-30, 65}, points = {{90, -9}, {30, -15}}), Line(origin = {35, -5}, points = {{-35, 55}, {25, 25}}), Line(origin = {84, 16}, points = {{22, 12}, {-24, 4}}, thickness = 5, arrowSize = 2), Line(origin = {81, 61}, points = {{-21, -5}, {23, 5}}, thickness = 5), Ellipse(origin = {60, 56}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}), Ellipse(origin = {60, 20}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}), Line(origin = {-160, 4}, points = {{-20, -4}, {40, -4}, {40, 6}}), Line(origin = {160, 4}, points = {{20, -4}, {-40, -4}, {-40, 6}}), Line(origin = {-130, 50}, points = {{-10, 0}, {-50, 0}}, pattern = LinePattern.Dash, thickness = 1), Line(origin = {190, 50}, points = {{-10, 0}, {-50, 0}}, pattern = LinePattern.Dash, thickness = 1), Line(origin = {-80, 36}, points = {{20, -6}, {-22, 6}}, thickness = 5), Ellipse(origin = {-60, 30}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}), Rectangle(origin = {-120, 50}, fillColor = {71, 71, 71}, fillPattern = FillPattern.Solid, extent = {{-20, 40}, {20, -40}}, radius = 5), Line(origin = {40, 36}, points = {{20, -6}, {64, 6}}, thickness = 5), Ellipse(origin = {60, 30}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}), Rectangle(origin = {120, 50}, fillColor = {71, 71, 71}, fillPattern = FillPattern.Solid, extent = {{-20, 40}, {20, -40}}, radius = 5), Line(origin = {-25, 35}, points = {{-35, -15}, {25, 15}}), Line(origin = {35, -5}, points = {{-35, 55}, {25, 25}}), Line(origin = {-10, 30}, points = {{-36, 0}, {56, 0}}, thickness = 8), Line(origin = {-50, 30}, points = {{4, 0}, {-4, 0}}, color = {255, 0, 0}, thickness = 5), Line(origin = {50, 30}, points = {{4, 0}, {-4, 0}}, color = {255, 0, 0}, thickness = 5), Line(origin = {0, 46}, points = {{0, 4}, {0, -12}})}));
+  annotation(Diagram(coordinateSystem(extent = {{-180, -60}, {180, 140}}, preserveAspectRatio = true, grid = {2, 2})),
+    Icon(graphics = {
+      Line(origin = {-160, 4}, points = {{-20, -4}, {40, -4}, {40, 6}}),
+      Line(origin = {160, 4}, points = {{20, -4}, {-40, -4}, {-40, 6}}),
+      Line(origin = {-130, 50}, points = {{-10, 0}, {-50, 0}}, pattern = LinePattern.Dash, thickness = 1),
+      Line(origin = {190, 50}, points = {{-10, 0}, {-50, 0}}, pattern = LinePattern.Dash, thickness = 1),
+      Line(origin = {0, 46}, points = {{0, 4}, {0, -12}})
+    }));
 end AxleDWBase;

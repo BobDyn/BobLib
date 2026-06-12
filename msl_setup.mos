@@ -1,1 +1,1 @@
-installPackage(Modelica, "3.2.3+maint.om", exactMatch=true)
+installPackage(Modelica, "4.1.0", exactMatch=true)

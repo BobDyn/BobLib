@@ -3,12 +3,12 @@ within BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.SlipModel;
 model TransientSlip
   extends BaseSlipModel;
 
-  import Modelica.SIunits;
+  import SI = Modelica.Units.SI;
 
-  parameter SIunits.Force FNOMIN = 650
+  parameter SI.Force FNOMIN = 650
     "Nominal vertical load";
 
-  parameter SIunits.Length UNLOADED_RADIUS = 0.2
+  parameter SI.Length UNLOADED_RADIUS = 0.2
     "Unloaded tire radius used for PAC2002 relaxation";
 
   parameter Real LFZO = 1
@@ -38,10 +38,10 @@ model TransientSlip
   parameter Real LSGAL = 1
     "Scale factor of lateral relaxation length [-]";
 
-  parameter SIunits.Length sigma_kappa_default = 0.5
+  parameter SI.Length sigma_kappa_default = 0.5
     "Fallback longitudinal relaxation length";
 
-  parameter SIunits.Length sigma_alpha_default = 0.5
+  parameter SI.Length sigma_alpha_default = 0.5
     "Fallback lateral relaxation length";
 
   parameter Real V_min = 0.5
@@ -53,25 +53,25 @@ model TransientSlip
   parameter Real alpha_max = 1.2
     "Clamp for slip angle [rad]";
 
-  SIunits.Length u(nominal=0.1)
+  SI.Length u(nominal=0.1)
     "Longitudinal deformation state";
 
-  SIunits.Length v(nominal=0.1)
+  SI.Length v(nominal=0.1)
     "Lateral deformation state";
 
-  SIunits.Length sigma_kappa
+  SI.Length sigma_kappa
     "PAC2002 longitudinal relaxation length";
 
-  SIunits.Length sigma_alpha
+  SI.Length sigma_alpha
     "PAC2002 lateral relaxation length";
 
 protected
-  SIunits.Velocity Vsx;
-  SIunits.Velocity Vsy;
-  SIunits.Velocity Vx_abs_eff;
-  SIunits.Force Fz_eff;
-  SIunits.Force Fz0;
-  SIunits.Force Fz0_scaled;
+  SI.Velocity Vsx;
+  SI.Velocity Vsy;
+  SI.Velocity Vx_abs_eff;
+  SI.Force Fz_eff;
+  SI.Force Fz0;
+  SI.Force Fz0_scaled;
 
   Real kappa_raw;
   Real alpha_raw;

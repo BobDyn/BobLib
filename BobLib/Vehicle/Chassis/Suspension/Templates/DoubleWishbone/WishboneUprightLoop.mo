@@ -1,17 +1,19 @@
 within BobLib.Vehicle.Chassis.Suspension.Templates.DoubleWishbone;
 
 model WishboneUprightLoop "Kinematic loop consisting of upright, lower wishbone, and upper wishbone"
-  import Modelica.SIunits;
+  extends BobLib.Resources.Icons.WishboneUprightLoopIcon;
+
+  import SI = Modelica.Units.SI;
   import Modelica.Math.Vectors;
   import Modelica.Mechanics.MultiBody.Frames;
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.DoubleWishbone.WishboneUprightLoopRecord;
   // Record parameters
   parameter WishboneUprightLoopRecord pDW;
   // Visual parameters
-  parameter SIunits.Length linkDiameter annotation(
+  parameter SI.Length linkDiameter annotation(
     Evaluate = true,
     Dialog(tab = "Animation"));
-  parameter SIunits.Length jointDiameter annotation(
+  parameter SI.Length jointDiameter annotation(
     Evaluate = true,
     Dialog(tab = "Animation"));
   outer parameter Boolean enableAnimation;
@@ -42,17 +44,17 @@ model WishboneUprightLoop "Kinematic loop consisting of upright, lower wishbone,
     Placement(transformation(origin = {-70, 90}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation upperFrameToAft(r = (pDW.upperAft_i - pDW.upperFore_i)/2, animation = false) annotation(
     Placement(transformation(origin = {-70, 30}, extent = {{-10, -10}, {10, 10}})));
-  
+
   Modelica.Mechanics.MultiBody.Visualizers.FixedShape upperForeRod(shapeType = "cylinder", lengthDirection = Frames.resolve2(upperFrameToFore.frame_b.R, upperForeLinkDirection), length = upperForeLinkLength, width = linkDiameter, height = linkDiameter, color = {0, 0, 0}, animation = enableAnimation) annotation(
     Placement(transformation(origin = {-40, 90}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.MultiBody.Visualizers.FixedShape upperAftRod(shapeType = "cylinder", lengthDirection = Frames.resolve2(upperFrameToAft.frame_b.R, upperAftLinkDirection), length = upperAftLinkLength, width = linkDiameter, height = linkDiameter, color = {0, 0, 0}, animation = enableAnimation) annotation(
     Placement(transformation(origin = {-40, 30}, extent = {{-10, -10}, {10, 10}})));
-  
+
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation lowerFrameToFore(r = (pDW.lowerFore_i - pDW.lowerAft_i)/2, animation = false) annotation(
     Placement(transformation(origin = {-70, -30}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation lowerFrameToAft(r = (pDW.lowerAft_i - pDW.lowerFore_i)/2, animation = false) annotation(
     Placement(transformation(origin = {-70, -90}, extent = {{-10, -10}, {10, 10}})));
-  
+
   Modelica.Mechanics.MultiBody.Visualizers.FixedShape lowerForeRod(shapeType = "cylinder", lengthDirection = Frames.resolve2(lowerFrameToFore.frame_b.R, lowerForeLinkDirection), length = lowerForeLinkLength, width = linkDiameter, height = linkDiameter, color = {0, 0, 0}, animation = enableAnimation) annotation(
     Placement(transformation(origin = {-40, -30}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.MultiBody.Visualizers.FixedShape lowerAftRod(shapeType = "cylinder", lengthDirection = Frames.resolve2(lowerFrameToAft.frame_b.R, lowerAftLinkDirection), length = lowerAftLinkLength, width = linkDiameter, height = linkDiameter, color = {0, 0, 0}, animation = enableAnimation) annotation(
@@ -108,6 +110,5 @@ equation
   connect(lowerAftRod.frame_a, lowerFrameToAft.frame_b) annotation(
     Line(points = {{-50, -90}, {-60, -90}}, color = {95, 95, 95}));
   annotation(
-    Icon(graphics = {Line(origin = {-45.8, 73.2}, points = {{-42.2, -3.2}, {45.8, -3.2}, {45.8, -3.2}}, thickness = 5), Line(origin = {-43.8, -66.8}, points = {{-44.2, -3.2}, {45.8, -3.2}, {45.8, -3.2}}, thickness = 5), Ellipse(origin = {0, -2}, lineThickness = 5, extent = {{-20, 20}, {20, -20}}), Ellipse(origin = {0, 70}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}), Ellipse(origin = {0, -70}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}), Line(origin = {-0.08, 0}, points = {{-21.9178, 0}, {-9.9178, 60}, {10.0822, 60}, {22.0822, 0}, {10.0822, -60}, {-9.9178, -60}, {-21.9178, 0}, {-21.9178, 0}}, thickness = 5), Line(origin = {6, -87}, points = {{-6, -13}, {-6, 13}, {-6, 13}}), Line(origin = {0, 87}, points = {{0, 13}, {0, -13}, {0, -13}}), Line(origin = {50, -65}, points = {{50, -5}, {-10, -5}, {-10, 5}, {-50, 5}, {-50, 5}}), Ellipse(origin = {-88, -70}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}), Ellipse(origin = {-88, 70}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}), Line(points = {{0, 60}, {0, -60}, {0, -60}}, pattern = LinePattern.Dash)}),
     Diagram(graphics));
 end WishboneUprightLoop;

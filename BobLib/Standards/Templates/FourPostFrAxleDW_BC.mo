@@ -1,7 +1,7 @@
 within BobLib.Standards.Templates;
 
 model FourPostFrAxleDW_BC
-  import Modelica.SIunits;
+  import SI = Modelica.Units.SI;
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Stabar.StabarRecord;
 
   extends BobLib.Vehicle.Chassis.Suspension.FrAxleDW_BC;
@@ -10,9 +10,9 @@ model FourPostFrAxleDW_BC
     leftArmEnd = {0, 0, 0},
     leftBarEnd = {0, 0, 0},
     barRate = 0);
-  SIunits.Length leftSpringLength;
-  SIunits.Length rightSpringLength;
-  SIunits.Angle stabarAngle;
+  SI.Length leftSpringLength;
+  SI.Length rightSpringLength;
+  SI.Angle stabarAngle;
 
 equation
   leftSpringLength = leftShockLinkage.lineForceWithMass.s;

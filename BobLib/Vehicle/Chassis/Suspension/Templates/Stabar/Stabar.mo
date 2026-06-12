@@ -1,16 +1,18 @@
 within BobLib.Vehicle.Chassis.Suspension.Templates.Stabar;
 
 model Stabar "Stabar with rigid arms and compliant torsion bar"
-  import Modelica.SIunits;
+  extends BobLib.Resources.Icons.StabarIcon;
+
+  import SI = Modelica.Units.SI;
   import BobLib.Utilities.Math.Vector;
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Stabar.StabarRecord;
   // Record parameters
   parameter StabarRecord pStabar;
   // Visual parameters
-  parameter SIunits.Length jointDiameter annotation(
+  parameter SI.Length jointDiameter annotation(
     Evaluate = true,
     Dialog(tab = "Animation"));
-  parameter SIunits.Length linkDiameter annotation(
+  parameter SI.Length linkDiameter annotation(
     Placement(visible = false, transformation(origin = {nan, nan}, extent = {{nan, nan}, {nan, nan}})));
   outer parameter Boolean enableAnimation;
   // Frames
@@ -61,8 +63,11 @@ equation
     Line(points = {{70, 20}, {70, 0}, {100, 0}}, color = {95, 95, 95}));
   connect(spring.flange_a, stabarAxis.axis) annotation(
     Line(points = {{-44, -20}, {-44, -10}, {-30, -10}}));
-  annotation(
-    experiment(StartTime = 0, StopTime = 1, Tolerance = 1e-06, Interval = 0.002),
+  annotation(experiment(StartTime = 0, StopTime = 1, Tolerance = 1e-06, Interval = 0.002),
     Diagram(graphics),
-    Icon(graphics = {Line(origin = {0, -10}, points = {{-80, 0}, {80, 0}}, thickness = 5), Line(origin = {-80, 20}, points = {{0, -30}, {0, 0}}, thickness = 5), Line(origin = {80, 20}, points = {{0, -30}, {0, 0}}, thickness = 5), Ellipse(origin = {-80, 20}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}), Ellipse(origin = {80, 20}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}), Ellipse(origin = {-80, -10}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}), Ellipse(origin = {80, -10}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}), Line(origin = {-92, 20}, points = {{-8, 0}, {8, 0}}), Line(origin = {92, 20}, points = {{-8, 0}, {8, 0}}), Line(origin = {0, -31}, points = {{0, 1}, {0, 17}}), Line(origin = {5, -10}, points = {{-11, 0}, {1, 0}}, color = {255, 0, 0}, thickness = 10)}));
+    Icon(graphics = {
+      Line(origin = {-92, 20}, points = {{-8, 0}, {8, 0}}),
+      Line(origin = {92, 20}, points = {{-8, 0}, {8, 0}}),
+      Line(origin = {0, -31}, points = {{0, 1}, {0, 17}})
+    }));
 end Stabar;

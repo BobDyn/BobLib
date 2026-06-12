@@ -1,7 +1,7 @@
 within BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.CombinedSlip;
 
 function MyCombinedEval
-  import Modelica.SIunits;
+  import SI = Modelica.Units.SI;
 
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.MyPureRecord;
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.FxPureRecord;
@@ -10,16 +10,16 @@ function MyCombinedEval
 
   import BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.PureSlip.MyPureEval;
 
-  input SIunits.Force Fz;
-  input SIunits.Force Fx;
-  input SIunits.Velocity Vx;
+  input SI.Force Fz;
+  input SI.Force Fx;
+  input SI.Velocity Vx;
 
   input MyPureRecord pPure;
   input FxPureRecord pFx;
   input MyCombinedRecord pComb;
   input SetupRecord setup;
 
-  output SIunits.Torque My;
+  output SI.Torque My;
 
 algorithm
   if Fz > 1e-3 then

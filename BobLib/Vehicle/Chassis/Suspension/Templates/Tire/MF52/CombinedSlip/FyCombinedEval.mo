@@ -1,27 +1,27 @@
 within BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.CombinedSlip;
 
 function FyCombinedEval
-  import Modelica.SIunits;
-  
+  import SI = Modelica.Units.SI;
+
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.FyPureRecord;
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.CombinedSlip.FyCombinedRecord;
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.SetupRecord;
 
   import BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.PureSlip.FyPureEval;
 
-  input SIunits.Force Fz;
-  input SIunits.Angle alpha;
-  input SIunits.DimensionlessRatio kappa;
-  input SIunits.Angle gamma;
+  input SI.Force Fz;
+  input SI.Angle alpha;
+  input SI.DimensionlessRatio kappa;
+  input SI.Angle gamma;
 
   input FyPureRecord pPure;
   input FyCombinedRecord pComb;
   input SetupRecord setup;
 
-  output SIunits.Force Fy;
+  output SI.Force Fy;
 
 protected
-  SIunits.Force Fy_pure;
+  SI.Force Fy_pure;
 
   Real dfz;
 

@@ -1,14 +1,16 @@
 within BobLib.Vehicle.Chassis.Suspension.Templates.SteeringRack;
 
 model RackAndPinion "Rack and pinion"
-  import Modelica.SIunits;
-  
+  extends BobLib.Resources.Icons.RackAndPinionIcon;
+
+  import SI = Modelica.Units.SI;
+
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.SteeringRack.RackAndPinionRecord;
   // Record parameters
   parameter RackAndPinionRecord pRack;
 
   // Visual parameters
-  parameter SIunits.Length linkDiameter annotation(
+  parameter SI.Length linkDiameter annotation(
     Evaluate = true, Dialog(tab="Animation"));
   outer parameter Boolean enableAnimation;
   // Frames
@@ -24,12 +26,12 @@ model RackAndPinion "Rack and pinion"
                                                          animation = enableAnimation,
                                                          s(nominal=0.01))  annotation(
     Placement(transformation(origin = {0, -50}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
-  
+
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation fromLeft(r = {0, -pRack.leftPickup[2], 0}, width = linkDiameter, height = linkDiameter, animation = enableAnimation)  annotation(
     Placement(transformation(origin = {-30, 0}, extent = {{-10, -10}, {10, 10}}, rotation = -0)));
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRight(r = {0, -pRack.leftPickup[2], 0}, width = linkDiameter, height = linkDiameter, animation = enableAnimation)  annotation(
     Placement(transformation(origin = {30, 0}, extent = {{-10, -10}, {10, 10}})));
-  
+
   Modelica.Mechanics.Rotational.Interfaces.Flange_a pinionFlange annotation(
     Placement(transformation(origin = {0, 100}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {0, 20}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.MultiBody.Parts.Mounting1D mounting1D annotation(
@@ -66,7 +68,9 @@ equation
     Line(points = {{20, 20}, {-60, 20}, {-60, -54}, {-6, -54}}, color = {0, 127, 0}));
   connect(idealGearR2T.flangeT, rackAxis.axis) annotation(
     Line(points = {{20, 35}, {-70, 35}, {-70, -42}, {-6, -42}}, color = {0, 127, 0}));
-  annotation(
-    Diagram(graphics),
-    Icon(graphics = {Line(origin = {-25.8, 3.2}, points = {{-54.2, -3.2}, {25.8, -3.2}, {105.8, -3.2}}, thickness = 15), Line(origin = {-80, 0}, points = {{0, 0}, {-10, 0}, {-10, 0}}, color = {255, 0, 0}, thickness = 10), Line(origin = {100, 0}, points = {{-10, 0}, {-10, 0}, {-20, 0}}, color = {255, 0, 0}, thickness = 10)}));
+  annotation(Diagram(graphics),
+    Icon(graphics = {
+      Line(origin = {-80, 0}, points = {{0, 0}, {-10, 0}, {-10, 0}}, color = {255, 0, 0}, thickness = 10),
+      Line(origin = {100, 0}, points = {{-10, 0}, {-10, 0}, {-20, 0}}, color = {255, 0, 0}, thickness = 10)
+    }));
 end RackAndPinion;

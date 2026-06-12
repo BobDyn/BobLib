@@ -1,26 +1,26 @@
 within BobLib.Tests.Regression;
 
 model MF52PureSlipSmoke
-  import Modelica.SIunits;
+  import SI = Modelica.Units.SI;
   import Tire = BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52;
   import Vehicle = BobLib.Resources.VehicleDefn;
 
   parameter Vehicle.DWBCStabar_DWBCStabarRecord car;
 
-  parameter SIunits.Force Fz = 654;
-  parameter SIunits.Angle alpha = 0.08;
+  parameter SI.Force Fz = 654;
+  parameter SI.Angle alpha = 0.08;
   parameter Real kappa = 0;
-  parameter SIunits.Angle gamma = 0;
-  parameter SIunits.Velocity Vx = 10;
+  parameter SI.Angle gamma = 0;
+  parameter SI.Velocity Vx = 10;
 
-  discrete SIunits.Force Fx;
-  discrete SIunits.Force Fy;
-  discrete SIunits.Torque Mx;
-  discrete SIunits.Torque My;
-  discrete SIunits.Torque Mz;
-  discrete SIunits.Length pneumaticTrail;
-  discrete SIunits.Length residualScrub;
-  discrete SIunits.Torque MzReconstructed;
+  discrete SI.Force Fx;
+  discrete SI.Force Fy;
+  discrete SI.Torque Mx;
+  discrete SI.Torque My;
+  discrete SI.Torque Mz;
+  discrete SI.Length pneumaticTrail;
+  discrete SI.Length residualScrub;
+  discrete SI.Torque MzReconstructed;
 
 algorithm
   when initial() then

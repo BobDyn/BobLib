@@ -1,13 +1,13 @@
 within BobLib.Utilities.Mechanics.Multibody;
 
 model ContactPatchFixture
-  import Modelica.SIunits;
-  
-  parameter SIunits.Position CP_init[3] "Vector from origin to initial contact patch location, resolved in world frame";
-  
+  import SI = Modelica.Units.SI;
+
+  parameter SI.Position CP_init[3] "Vector from origin to initial contact patch location, resolved in world frame";
+
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a frame_a annotation(
     Placement(transformation(origin = {70, 100}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {0, 20}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
-  
+
   Modelica.Mechanics.MultiBody.Parts.Fixed CP_Fixed(r = CP_init, animation = false) annotation(
     Placement(transformation(origin = {-70, -50}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
   Modelica.Mechanics.MultiBody.Joints.Prismatic DOF_x(animation = false, n = {1, 0, 0}) annotation(
@@ -35,8 +35,7 @@ equation
     Line(points = {{40, 30}, {50, 30}, {50, 10}}));
   connect(Revolute.support, AngleOffset.flange_a) annotation(
     Line(points = {{44, 10}, {10, 10}, {10, 30}, {20, 30}}));
-  connect(frame_a, DOF_xyz.frame_b) annotation(
-    Line(points = {{70, 100}, {70, 60}}));
-annotation(
+  connect(frame_a, DOF_xyz.frame_b) annotation(Line(points = {{70, 100}, {70, 60}}),
     Icon(graphics = {Line(origin = {0, -20}, points = {{-20, 0}, {20, 0}}, thickness = 1), Line(origin = {-18, -23}, points = {{-2, -3}, {2, 3}}, thickness = 1), Line(origin = {-10, -23}, points = {{-2, -3}, {2, 3}}, thickness = 1), Line(origin = {-2, -23}, points = {{-2, -3}, {2, 3}}, thickness = 1), Line(origin = {6, -23}, points = {{-2, -3}, {2, 3}}, thickness = 1), Line(origin = {14, -23}, points = {{-2, -3}, {2, 3}}, thickness = 1), Line(points = {{0, -20}, {0, 20}}), Text(origin = {0, -40}, extent = {{-100, 20}, {100, -20}}, textString = "%name")}));
+
 end ContactPatchFixture;

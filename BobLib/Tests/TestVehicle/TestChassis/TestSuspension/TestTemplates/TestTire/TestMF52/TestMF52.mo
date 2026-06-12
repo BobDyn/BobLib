@@ -1,7 +1,7 @@
 within BobLib.Tests.TestVehicle.TestChassis.TestSuspension.TestTemplates.TestTire.TestMF52;
 
 model TestMF52
-  import Modelica.SIunits;
+  import SI = Modelica.Units.SI;
 
   import Tire = BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52;
   import Vehicle = BobLib.Resources.VehicleDefn;
@@ -10,43 +10,43 @@ model TestMF52
   parameter Vehicle.DWBCStabar_DWBCStabarRecord car;
 
   // Operating Conditions
-  parameter SIunits.Force Fz = 654;
-  parameter SIunits.Angle gamma = 0;
-  parameter SIunits.Velocity Vx = 10;
+  parameter SI.Force Fz = 654;
+  parameter SI.Angle gamma = 0;
+  parameter SI.Velocity Vx = 10;
 
   // Sweep Definition
   parameter Integer nAlpha = 41;
   parameter Integer nKappa = 41;
 
-  parameter SIunits.Angle alphaMin = -0.25;
-  parameter SIunits.Angle alphaMax =  0.25;
+  parameter SI.Angle alphaMin = -0.25;
+  parameter SI.Angle alphaMax =  0.25;
 
   parameter Real kappaMin = -0.25;
   parameter Real kappaMax =  0.25;
 
   // Grids
-  SIunits.Angle alphaGrid[nAlpha];
+  SI.Angle alphaGrid[nAlpha];
   Real kappaGrid[nKappa];
 
   // Outputs (full grid)
-  discrete SIunits.Force Fx[nAlpha, nKappa];
-  discrete SIunits.Force Fy[nAlpha, nKappa];
+  discrete SI.Force Fx[nAlpha, nKappa];
+  discrete SI.Force Fy[nAlpha, nKappa];
 
-  discrete SIunits.Torque Mx[nAlpha, nKappa];
-  discrete SIunits.Torque My[nAlpha, nKappa];
-  discrete SIunits.Torque Mz[nAlpha, nKappa];
+  discrete SI.Torque Mx[nAlpha, nKappa];
+  discrete SI.Torque My[nAlpha, nKappa];
+  discrete SI.Torque Mz[nAlpha, nKappa];
 
-  discrete SIunits.Length t[nAlpha, nKappa];
-  discrete SIunits.Length s[nAlpha, nKappa];
+  discrete SI.Length t[nAlpha, nKappa];
+  discrete SI.Length s[nAlpha, nKappa];
 
   // Useful slices (pure slip)
-  discrete SIunits.Force Fy_alpha[nAlpha];
-  discrete SIunits.Torque Mz_alpha[nAlpha];
-  discrete SIunits.Length t_alpha[nAlpha];
-  discrete SIunits.Length s_alpha[nAlpha];
+  discrete SI.Force Fy_alpha[nAlpha];
+  discrete SI.Torque Mz_alpha[nAlpha];
+  discrete SI.Length t_alpha[nAlpha];
+  discrete SI.Length s_alpha[nAlpha];
 
-  discrete SIunits.Force Fx_kappa[nKappa];
-  discrete SIunits.Length t_kappa[nKappa];
+  discrete SI.Force Fx_kappa[nKappa];
+  discrete SI.Length t_kappa[nKappa];
 
   // Validation
   discrete Real Mz_reconstructed[nAlpha, nKappa];
@@ -60,7 +60,7 @@ algorithm
     // Mid indices
     midAlpha := integer((nAlpha + 1) / 2);
     midKappa := integer((nKappa + 1) / 2);
-    
+
     // Build grids
     for i in 1:nAlpha loop
       alphaGrid[i] :=
@@ -101,7 +101,7 @@ algorithm
       t_alpha[i]  := t[i, midKappa];
       s_alpha[i]  := s[i, midKappa];
     end for;
-    
+
     // Pure longitudinal (alpha = 0)
     for j in 1:nKappa loop
       Fx_kappa[j] := Fx[midAlpha, j];

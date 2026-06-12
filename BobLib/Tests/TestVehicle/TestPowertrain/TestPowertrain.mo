@@ -1,7 +1,7 @@
 within BobLib.Tests.TestVehicle.TestPowertrain;
 
 model TestPowertrain
-  import Modelica.SIunits;
+  import SI = Modelica.Units.SI;
   inner Modelica.Mechanics.MultiBody.World world(n = {0, 0, -1}) annotation(
     Placement(transformation(origin = {120, 50}, extent = {{-10, -10}, {10, 10}})));
   // Battery
@@ -41,7 +41,7 @@ model TestPowertrain
     Placement(transformation(origin = {20, 42}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
   Modelica.Mechanics.Rotational.Components.IdealGear idealGear(ratio = 3.31, useSupport = false)  annotation(
     Placement(transformation(origin = {-10, 0}, extent = {{-10, -10}, {10, 10}})));
-  
+
   Modelica.Mechanics.Rotational.Sensors.TorqueSensor torqueSensor1 annotation(
     Placement(transformation(origin = {60, -20}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.Rotational.Components.Inertia rightWheelInertia(
