@@ -1,1 +1,2 @@
-installPackage(Modelica, "4.1.0", exactMatch=true)
+installPackage(Modelica, "4.1.0", exactMatch=true);
+installPackage(VehicleInterfaces, "2.0.2", exactMatch=true);
