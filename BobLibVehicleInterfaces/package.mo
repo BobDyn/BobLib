@@ -38,11 +38,13 @@ mounts, and helper functions live in nested packages below those domains.
 </p>
 <p>
 Subsystem domains include <code>Chassis</code>, <code>Drivelines</code>,
-<code>EnergyStorage</code>, <code>ElectricDrives</code>,
-<code>Controllers</code>, <code>PowerElectronics</code>, and
-<code>Aero</code>. Regression and component tests are kept in the sibling
-library <code>BobLibVehicleInterfacesTests</code>. Shared mechanics helpers are
-kept under <code>Utilities.Mechanics</code>.
+<code>EnergyStorage</code>, <code>ElectricDrives</code>, <code>Engines</code>,
+<code>Transmissions</code>, <code>Controllers</code>,
+<code>DriverEnvironments</code>, <code>PowerElectronics</code>,
+<code>Atmospheres</code>, and <code>Aero</code>.
+Regression and component tests are kept in the sibling library
+<code>BobLibVehicleInterfacesTests</code>. Shared mechanics helpers are kept
+under <code>Utilities.Mechanics</code>.
 </p>
 </html>"));
 end BobLibVehicleInterfaces;

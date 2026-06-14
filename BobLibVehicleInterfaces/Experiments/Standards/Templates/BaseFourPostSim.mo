@@ -89,11 +89,11 @@ partial model BaseFourPostSim
     Placement(transformation(origin = {-0.285728, -49.8887}, extent = {{-36.5715, -14.2222}, {36.5715, 14.2222}})));
   // Front chassis actuator
   BobLibVehicleInterfaces.Utilities.Mechanics.MultiBody.Actuators.ChassisActuator frChassisActuator(axleRef = frAxleDW.effectiveCenter)  annotation(
-    Placement(transformation(origin = {0, 30}, extent = {{10, -10}, {-10, 10}})));
+    Placement(transformation(origin = {0, 24}, extent = {{10, -10}, {-10, 10}})));
 
   // Rear chassis actuator
   BobLibVehicleInterfaces.Utilities.Mechanics.MultiBody.Actuators.ChassisActuator rrChassisActuator(axleRef = rrAxleDW.effectiveCenter)  annotation(
-    Placement(transformation(origin = {0, -70}, extent = {{10, -10}, {-10, 10}})));
+    Placement(transformation(origin = {0, -76}, extent = {{10, -10}, {-10, 10}})));
 
   // Front steer input
   Modelica.Mechanics.Rotational.Sources.Position steerPosition(exact = true)  annotation(
@@ -268,11 +268,11 @@ equation
   connect(steerExpression.y, steerPosition.phi_ref) annotation(
     Line(points = {{-59, 80}, {-42, 80}}, color = {0, 0, 127}));
   connect(frAxleDW.axleFrame, frChassisActuator.chassisFrame) annotation(
-    Line(points = {{0, 50}, {0, 38}}, color = {95, 95, 95}));
+    Line(points = {{0, 50}, {0, 32}}, color = {95, 95, 95}));
   connect(heaveCommand.y, frChassisActuator.heaveInput) annotation(
-    Line(points = {{114.5, 58}, {112, 58}, {112, 18}, {4, 18}, {4, 36}}, color = {0, 0, 127}));
+    Line(points = {{114.5, 58}, {112, 58}, {112, 18}, {4, 18}, {4, 30}}, color = {0, 0, 127}));
   connect(rollCommand.y, frChassisActuator.rollInput) annotation(
-    Line(points = {{114.5, 30}, {104, 30}, {104, 12}, {4, 12}, {4, 24}}, color = {0, 0, 127}));
+    Line(points = {{114.5, 30}, {104, 30}, {104, 12}, {4, 12}, {4, 18}}, color = {0, 0, 127}));
   connect(steerPosition.flange, frAxleDW.steerFlange) annotation(
     Line(points = {{-20, 80}, {0, 80}, {0, 60}}));
   connect(FL_ForceActuator.chassisFrame, frAxleDW.leftCP) annotation(
@@ -292,11 +292,11 @@ equation
   connect(RR_ForceActuator.chassisFrame, rrAxleDW.rightCP) annotation(
     Line(points = {{60, -70}, {36, -70}, {36, -60}}, color = {95, 95, 95}));
   connect(rrChassisActuator.chassisFrame, rrAxleDW.axleFrame) annotation(
-    Line(points = {{0, -62}, {0, -50}}, color = {95, 95, 95}));
+    Line(points = {{0, -68}, {0, -50}}, color = {95, 95, 95}));
   connect(heaveCommand.y, rrChassisActuator.heaveInput) annotation(
-    Line(points = {{114.5, 58}, {112, 58}, {112, -92}, {4, -92}, {4, -64}}, color = {0, 0, 127}));
+    Line(points = {{114.5, 58}, {112, 58}, {112, -92}, {4, -92}, {4, -70}}, color = {0, 0, 127}));
   connect(rollCommand.y, rrChassisActuator.rollInput) annotation(
-    Line(points = {{114.5, 30}, {104, 30}, {104, -100}, {4, -100}, {4, -76}}, color = {0, 0, 127}));
+    Line(points = {{114.5, 30}, {104, 30}, {104, -100}, {4, -100}, {4, -82}}, color = {0, 0, 127}));
 
   annotation(
     Diagram(coordinateSystem(extent = {{-120, -110}, {170, 100}})),

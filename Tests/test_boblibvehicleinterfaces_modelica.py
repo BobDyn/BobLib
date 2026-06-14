@@ -20,8 +20,16 @@ OMC_COMMAND_LINE_OPTIONS = (
 )
 
 CHECK_MODELS = (
+    "BobLibVehicleInterfaces.Experiments.Standards.Architectures.BatteryElectricRearDrive",
+    "BobLibVehicleInterfaces.Experiments.Standards.Architectures.ConventionalRearDrive",
     "BobLibVehicleInterfaces.Experiments.Standards.VehicleSim",
     "BobLibVehicleInterfaces.Experiments.Standards.FourPostSim",
+    "BobLibVehicleInterfaces.Engines.SimpleICEngine",
+    "BobLibVehicleInterfaces.Engines.ICEnginePlaceholder",
+    "BobLibVehicleInterfaces.Transmissions.FixedRatioTransmission",
+    "BobLibVehicleInterfaces.Atmospheres.ConstantAtmosphere",
+    "BobLibVehicleInterfaces.DriverEnvironments.AutomaticDriveByWire",
+    "BobLibVehicleInterfaces.DriverEnvironments.EVDriveByWire",
     "BobLibVehicleInterfacesTests.TestVehicle.TestAero.TestCFDAeroMap",
     "BobLibVehicleInterfacesTests.TestVehicle.TestPowertrain.TestPowertrain",
     "BobLibVehicleInterfacesTests.TestVehicle.TestChassis.TestSuspension.TestTemplates.TestTire.TestFourMF52Kinematic",

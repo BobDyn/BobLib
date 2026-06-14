@@ -13,14 +13,25 @@ the VehicleInterfaces 2.0.2 contract were the starting point. Public models
 should extend VehicleInterfaces subsystem interfaces first, then place BobLib
 physics and data beneath those boundaries.
 </p>
+<p>
+The package is a model-development layer, not a complete workflow layer. Use
+BobSim for repeatable study execution, signal extraction, metrics, plots,
+reports, envelope maps, and sensitivity studies. Use this package directly when
+you are developing, replacing, or inspecting the underlying Modelica subsystem
+models.
+</p>
 <h4>Public structure</h4>
 <p>
 Use <code>Chassis</code> for suspension, tire, body, and chassis models;
 <code>Drivelines</code> for final-drive, differential, and halfshaft
 assemblies; <code>EnergyStorage</code> for battery systems;
-<code>ElectricDrives</code> for motor-side models; <code>PowerElectronics</code>
-for inverter models; and <code>Controllers</code> for VCU/controller models.
-Those packages are the intended public entry points.
+<code>ElectricDrives</code> for motor-side models; <code>Engines</code> for
+internal-combustion reference and future engine models;
+<code>Transmissions</code> for fixed-ratio, gearbox, clutch, and launch-device
+models; <code>DriverEnvironments</code> for driver and EV command adapters;
+<code>PowerElectronics</code> for inverter models; <code>Atmospheres</code> for
+ambient-condition models; and <code>Controllers</code> for VCU/controller
+models. Those packages are the intended public entry points.
 </p>
 <p>
 Within each public subsystem domain, models directly under the package are the
@@ -38,8 +49,27 @@ VehicleInterfaces defines a canonical chassis/driveline/brakes split using four
 <code>FlangeWithBearing</code> wheel hubs and expandable control buses. The
 primary <code>Experiments.Standards.VehicleSim</code> follows that topology and
 explicitly redeclares the detailed BobLib chassis, energy storage, controller,
-power electronics, electric drive, driveline, VI brakes, driver environment,
-road, atmosphere, and world into one replaceable stack.
+power electronics, electric drive, transmission, driveline, VI brakes, driver
+commands, road, atmosphere, and world into one replaceable stack.
+</p>
+<p>
+Standard full-vehicle simulations are autonomous by default: the vehicle
+template owns steering, accelerator, brake, gear, gearbox-mode, ignition,
+torque, regen-limit, and inverter-enable command sources. Driver-level commands
+are wired directly to the VCU, and the same brake/driver intent is published on
+the VehicleInterfaces driver bus for subsystems such as mechanical brakes.
+Optional driver-environment adapters are available when a derived model needs
+an explicit driver interface. BobLib atmosphere models preserve the
+VehicleInterfaces function contract while exposing signal outputs so density
+and other ambient quantities can be drawn into aero models directly in the
+diagram view.
+</p>
+<p>
+Architecture-specific redeclare stacks live in
+<code>Experiments.Standards.Architectures</code>. The current runnable benchmark
+extends <code>BatteryElectricRearDrive</code>; conventional IC layout references
+belong there as complete vehicle assemblies, while engine implementation
+details belong under <code>Engines</code> and <code>Engines.Internal</code>.
 </p>
 <p>
 The aero model receives ride heights from the chassis and atmospheric
@@ -51,6 +81,15 @@ airspeed in the body frame, and connects those signals into the aero subsystem.
 Simulation templates use <code>headless=false</code> by default so examples open
 with MultiBody animation geometry visible. Set <code>headless=true</code> for
 batch runs where visualization geometry is not needed.
+</p>
+<h4>Validation expectation</h4>
+<p>
+Treat the included experiments as regression-tested baselines, not as validated
+models of any specific vehicle. Before using outputs for design decisions,
+validate the relevant records and subsystems against measured corner weights,
+inertias, suspension kinematics, damper curves, tire data, aero maps,
+drivetrain limits, controller behavior, and track-test signals. Keep
+<code>make ci</code> passing as records or subsystem models are adapted.
 </p>
 </html>"));
 end UsersGuide;

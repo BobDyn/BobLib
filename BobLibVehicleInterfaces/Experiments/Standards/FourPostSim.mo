@@ -2,6 +2,8 @@ within BobLibVehicleInterfaces.Experiments.Standards;
 
 model FourPostSim
   extends Templates.FourPostSim_DWBCStabar_DWBCStabar;
+  extends BobLibVehicleInterfaces.Icons.SimulationIcon;
+
   annotation(
     experiment(StartTime = 0, StopTime = 118, Tolerance = 1e-06, Interval = 1),
     __OpenModelica_commandLineOptions = "--matchingAlgorithm=PFPlusExt --indexReductionMethod=dynamicStateSelection -d=initialization,NLSanalyticJacobian --maxSizeLinearTearing=5000 --generateDynamicJacobian=none",

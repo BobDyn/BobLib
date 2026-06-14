@@ -273,8 +273,16 @@ partial model BaseVehicleSim
       Dialog(group = "Plant Models"),
       Placement(transformation(extent = {{-42, -44}, {-12, -14}})));
 
+  replaceable BobLibVehicleInterfaces.Transmissions.FixedRatioTransmission transmission(
+    gearRatio = pVehicle.pDriveline.finalDriveRatio)
+    constrainedby VehicleInterfaces.Transmissions.Interfaces.BaseAutomaticTransmission
+    "Transmission subsystem" annotation(
+      choicesAllMatching = true,
+      Dialog(group = "Plant Models"),
+      Placement(transformation(extent = {{-10, -40}, {10, -10}})));
+
   replaceable BobLibVehicleInterfaces.Drivelines.RearFinalDriveDifferential driveline(
-    finalDriveRatio = pVehicle.pDriveline.finalDriveRatio,
+    finalDriveRatio = 1,
     diffInputRotorJ = pVehicle.pDriveline.diffInputRotorJ,
     diff_use_lsd = pVehicle.pDriveline.diff_use_lsd,
     diff_driveSideTorqueSign = pVehicle.pDriveline.diff_driveSideTorqueSign,
@@ -294,7 +302,7 @@ partial model BaseVehicleSim
     "Driveline subsystem" annotation(
       choicesAllMatching = true,
       Dialog(group = "Plant Models"),
-      Placement(transformation(extent = {{12, -40}, {42, -10}})));
+      Placement(transformation(extent = {{14, -40}, {44, -10}})));
 
   replaceable VehicleInterfaces.Brakes.MinimalBrakes brakes(
     maxTorque = 1500)
@@ -304,19 +312,6 @@ partial model BaseVehicleSim
       Dialog(group = "Plant Models"),
       Placement(transformation(extent = {{120, -40}, {150, -10}})));
 
-  replaceable VehicleInterfaces.DriverEnvironments.DriveByWireAutomatic driverEnvironment(
-    initialAccelRequest = 0,
-    finalAccelRequest = 0,
-    accelTime = 0.1,
-    initialBrakeRequest = 0,
-    finalBrakeRequest = 0,
-    brakeTime = 100)
-    constrainedby VehicleInterfaces.DriverEnvironments.Interfaces.BaseAutomaticTransmission
-    "Driver environment" annotation(
-      choicesAllMatching = true,
-      Dialog(group = "Driver Models"),
-      Placement(transformation(extent = {{20, 50}, {50, 80}})));
-
   inner replaceable VehicleInterfaces.Roads.FlatRoad road
     constrainedby VehicleInterfaces.Roads.Interfaces.Base
     "Road model" annotation(
@@ -324,7 +319,7 @@ partial model BaseVehicleSim
       Dialog(group = "Conditions"),
       Placement(transformation(extent = {{-120, -140}, {-80, -120}})));
 
-  inner replaceable VehicleInterfaces.Atmospheres.ConstantAtmosphere atmosphere
+  inner replaceable BobLibVehicleInterfaces.Atmospheres.ConstantAtmosphere atmosphere
     constrainedby VehicleInterfaces.Atmospheres.Interfaces.Base
     "Atmospheric model" annotation(
       choicesAllMatching = true,
@@ -363,11 +358,6 @@ public
     w_rel_a_start = {0, 0, 0},
     v_rel_a(start = {initialVel, 0, 0}, each fixed = true)) annotation(
     Placement(transformation(origin = {132, -90}, extent = {{10, -10}, {-10, 10}})));
-
-  Modelica.Mechanics.Rotational.Sources.Position frSteerPosition(
-    exact = true,
-    w(start = 0)) annotation(
-    Placement(transformation(origin = {60, 80}, extent = {{-10, -10}, {10, 10}}, rotation = -0)));
 
   final parameter SI.Length wheelbase = abs(
     pVehicle.pFrDW.wheelCenter[1] - pVehicle.pRrDW.wheelCenter[1]);
@@ -434,6 +424,10 @@ protected
     animation = false) annotation(
     Placement(transformation(origin = {162, -90}, extent = {{10, -10}, {-10, 10}})));
 
+  VehicleInterfaces.Interfaces.DriverBus driverBus
+    "Autonomous driver-command bus populated by the simulation template" annotation(
+    Placement(transformation(extent = {{-136, 74}, {-116, 94}})));
+
   Modelica.Blocks.Sources.RealExpression velSetpointExpression(
     y = targetVel) annotation(
     Placement(transformation(origin = {-110, -66}, extent = {{-10, -10}, {10, 10}})));
@@ -456,6 +450,38 @@ protected
   Modelica.Blocks.Sources.RealExpression steerCommand(
     y = frSteerCmd) annotation(
       Placement(transformation(origin = {30, 100}, extent = {{-10, -10}, {10, 10}})));
+
+  Modelica.Mechanics.Rotational.Sources.Position frSteerPosition(
+    exact = true,
+    w(start = 0)) annotation(
+      Placement(transformation(origin = {74, 72}, extent = {{-10, -10}, {10, 10}})));
+
+  Modelica.Blocks.Sources.RealExpression acceleratorPedalCommand(
+    y = noEvent(min(1, max(0, driveTorqueCmd / max(pVehicle.pVCU.tau_max, 1e-6)))))
+    "Autonomous accelerator command published to the VehicleInterfaces driver bus" annotation(
+      Placement(transformation(origin = {-154, 90}, extent = {{-5, -2}, {5, 2}})));
+
+  Modelica.Blocks.Sources.RealExpression brakePedalCommand(
+    y =
+      if enablePTNRegenSpeedControl then
+        noEvent(min(1, max(0, -driveTorqueCmd / max(pVehicle.pVCU.regenTorqueLimit, 1e-6))))
+      else
+        0) "Autonomous brake command published to the VehicleInterfaces driver bus" annotation(
+      Placement(transformation(origin = {-154, 84}, extent = {{-5, -2}, {5, 2}})));
+
+  Modelica.Blocks.Sources.IntegerConstant requestedGearCommand(
+    k = 0) "Requested automatic-transmission gear" annotation(
+      Placement(transformation(origin = {-154, 78}, extent = {{-5, -2}, {5, 2}})));
+
+  Modelica.Blocks.Sources.IntegerConstant gearboxModeCommand(
+    k = VehicleInterfaces.Types.GearMode.Drive)
+    "Requested automatic-transmission mode" annotation(
+      Placement(transformation(origin = {-154, 72}, extent = {{-5, -2}, {5, 2}})));
+
+  Modelica.Blocks.Sources.IntegerConstant ignitionCommand(
+    k = VehicleInterfaces.Types.IgnitionSetting.On)
+    "Ignition command published to the VehicleInterfaces driver bus" annotation(
+      Placement(transformation(origin = {-154, 66}, extent = {{-5, -2}, {5, 2}})));
 
   Modelica.Blocks.Sources.RealExpression motorTorqueCmd(
     y = driveTorqueCmd / pVehicle.pDriveline.finalDriveRatio) annotation(
@@ -491,10 +517,6 @@ protected
   Modelica.Blocks.Sources.RealExpression aeroRelativeAirSpeed(
     y = relativeAirSpeed) annotation(
       Placement(transformation(origin = {36, -78}, extent = {{-5, -2}, {5, 2}})));
-
-  Modelica.Blocks.Sources.RealExpression aeroAirDensity(
-    y = airDensity) annotation(
-      Placement(transformation(origin = {36, -86}, extent = {{-5, -2}, {5, 2}})));
 
   BobLibVehicleInterfaces.Aero.CFDAeroMap aeroModel(
     pAero = pVehicle.pAero,
@@ -746,7 +768,7 @@ equation
     Frames.resolve2(cgFreeMotion.frame_b.R, cgFreeMotion.v_rel_a);
 
   windVelocityWorld =
-    atmosphere.windVelocity(r = cgFreeMotion.frame_b.r_0);
+    atmosphere.windVelocityWorld;
 
   windVelocityBody =
     Frames.resolve2(cgFreeMotion.frame_b.R, windVelocityWorld);
@@ -758,7 +780,7 @@ equation
     norm(relativeAirVelocity);
 
   airDensity =
-    atmosphere.density(r = cgFreeMotion.frame_b.r_0);
+    atmosphere.airDensity;
 
   bodyAngularVels =
     Frames.angularVelocity2(cgFreeMotion.frame_b.R);
@@ -795,11 +817,11 @@ equation
   handwheelTorque = -1*chassis.steeringWheel.tau;
 
   connect(chassis.wheelHub_2, driveline.wheelHub_2) annotation(Line(
-    points = {{57.125, -10}, {57.125, 5}, {18, 5}, {18, -10}},
+    points = {{57.125, -10}, {57.125, 5}, {20, 5}, {20, -10}},
     color = {135, 135, 135},
     thickness = 0.5));
   connect(driveline.wheelHub_4, chassis.wheelHub_4) annotation(Line(
-    points = {{36, -10}, {36, 0}, {90.875, 0}, {90.875, -10}},
+    points = {{38, -10}, {38, 0}, {90.875, 0}, {90.875, -10}},
     color = {135, 135, 135},
     thickness = 0.5));
   connect(chassis.wheelHub_4, brakes.wheelHub_4) annotation(Line(
@@ -811,11 +833,11 @@ equation
     color = {135, 135, 135},
     thickness = 0.5));
   connect(driveline.wheelHub_3, chassis.wheelHub_3) annotation(Line(
-    points = {{36, -40}, {36, -60}, {90.875, -60}, {90.875, -50}},
+    points = {{38, -40}, {38, -60}, {90.875, -60}, {90.875, -50}},
     color = {135, 135, 135},
     thickness = 0.5));
   connect(chassis.wheelHub_1, driveline.wheelHub_1) annotation(Line(
-    points = {{57.125, -50}, {57.125, -65}, {18, -65}, {18, -40}},
+    points = {{57.125, -50}, {57.125, -65}, {20, -65}, {20, -40}},
     color = {135, 135, 135},
     thickness = 0.5));
   connect(chassis.wheelHub_3, brakes.wheelHub_3) annotation(Line(
@@ -827,7 +849,11 @@ equation
     color = {135, 135, 135},
     thickness = 0.5));
   connect(controlBus, driveline.controlBus) annotation(Line(
-    points = {{-150, 30}, {4, 30}, {4, -16}, {12, -16}},
+    points = {{-150, 30}, {6, 30}, {6, -16}, {14, -16}},
+    color = {255, 204, 51},
+    thickness = 0.5));
+  connect(controlBus, transmission.controlBus) annotation(Line(
+    points = {{-150, 30}, {-18, 30}, {-18, -16}, {-10, -16}},
     color = {255, 204, 51},
     thickness = 0.5));
   connect(battery.controlBus, controlBus.batteryBus) annotation(Line(
@@ -843,26 +869,27 @@ equation
     color = {255, 204, 51},
     thickness = 0.5));
   connect(controlBus, chassis.controlBus) annotation(Line(
-    points = {{-150, 30}, {40, 30}, {40, -18}, {44.375, -18}},
+    points = {{-150, 30}, {108, 30}, {108, -8}, {44.375, -8}, {44.375, -18}},
     color = {255, 204, 51},
     thickness = 0.5));
   connect(controlBus, brakes.controlBus) annotation(Line(
     points = {{-150, 30}, {115, 30}, {115, -16}, {120, -16}},
     color = {255, 204, 51},
     thickness = 0.5));
-  connect(controlBus, driverEnvironment.controlBus) annotation(Line(
-    points = {{-150, 30}, {80, 30}, {80, 74}, {50, 74}},
+  connect(controlBus.driverBus, driverBus) annotation(Line(
+    points = {{-150, 30}, {-126, 30}, {-126, 84}},
     color = {255, 204, 51},
     thickness = 0.5));
-  connect(driverEnvironment.brakePedal, brakes.brakePedal) annotation(Line(
-    points = {{41, 50}, {41, 44}, {135, 44}, {135, -10}},
-    color = {0, 127, 0}));
-  connect(driverEnvironment.steeringWheel, chassis.steeringWheel) annotation(Line(
-    points = {{50, 65}, {74, 65}, {74, -10}}));
-  connect(driverEnvironment.chassisFrame, chassis.chassisFrame) annotation(Line(
-    points = {{47, 50}, {47, 40}, {31, 40}, {31, -44}, {44, -44}},
-    color = {95, 95, 95},
-    thickness = 0.5));
+  connect(acceleratorPedalCommand.y, driverBus.acceleratorPedalPosition) annotation(
+    Line(points = {{-148.5, 90}, {-126, 90}, {-126, 84}}, color = {0, 0, 127}));
+  connect(brakePedalCommand.y, driverBus.brakePedalPosition) annotation(
+    Line(points = {{-148.5, 84}, {-126, 84}}, color = {0, 0, 127}));
+  connect(requestedGearCommand.y, driverBus.requestedGear) annotation(
+    Line(points = {{-148.5, 78}, {-126, 78}, {-126, 84}}, color = {255, 127, 0}));
+  connect(gearboxModeCommand.y, driverBus.gearboxMode) annotation(
+    Line(points = {{-148.5, 72}, {-122, 72}, {-122, 84}}, color = {255, 127, 0}));
+  connect(ignitionCommand.y, driverBus.ignition) annotation(
+    Line(points = {{-148.5, 66}, {-118, 66}, {-118, 84}}, color = {255, 127, 0}));
   connect(aeroModel.sprungChassisFrame, chassis.chassisFrame) annotation(
     Line(points = {{66, -82}, {44, -82}, {44, -44}}, color = {95, 95, 95}));
   connect(aeroFrontRideHeight.y, aeroModel.frontRideHeight) annotation(
@@ -871,8 +898,8 @@ equation
     Line(points = {{41.5, -70}, {70, -70}}, color = {0, 0, 127}));
   connect(aeroRelativeAirSpeed.y, aeroModel.relativeAirSpeed) annotation(
     Line(points = {{41.5, -78}, {74, -78}, {74, -70}}, color = {0, 0, 127}));
-  connect(aeroAirDensity.y, aeroModel.airDensity) annotation(
-    Line(points = {{41.5, -86}, {78, -86}, {78, -70}}, color = {0, 0, 127}));
+  connect(atmosphere.airDensity, aeroModel.airDensity) annotation(
+    Line(points = {{-30, -130}, {78, -130}, {78, -70}}, color = {0, 0, 127}));
 
   connect(cgFixed.frame_b, cgFreeMotion.frame_a) annotation(
     Line(points = {{152, -90}, {142, -90}}, color = {95, 95, 95}));
@@ -893,10 +920,28 @@ equation
     Line(points = {{-126.5, 57}, {-107, 57}}, color = {0, 0, 127}));
 
   connect(regenLimitCmd.y, vcu.cmd_regen_limit) annotation(
-    Line(points = {{-126.5, 45}, {-107, 45}}, color = {0, 0, 127}));
+    Line(points = {{-126.5, 45}, {-116, 45}, {-116, 45}, {-107, 45}}, color = {0, 0, 127}));
 
   connect(inverterEnable.y, vcu.cmd_inverter_enable) annotation(
     Line(points = {{-126.5, 51}, {-107, 51}}, color = {255, 0, 255}));
+
+  connect(steerCommand.y, vcu.cmd_steering_angle) annotation(
+    Line(points = {{41, 100}, {48, 100}, {48, 82}, {-112, 82}, {-112, 69}, {-107, 69}}, color = {0, 0, 127}));
+
+  connect(acceleratorPedalCommand.y, vcu.cmd_accelerator_pedal) annotation(
+    Line(points = {{-148.5, 90}, {-112, 90}, {-112, 64.2}, {-107, 64.2}}, color = {0, 0, 127}));
+
+  connect(brakePedalCommand.y, vcu.cmd_brake_pedal) annotation(
+    Line(points = {{-148.5, 84}, {-116, 84}, {-116, 59.4}, {-107, 59.4}}, color = {0, 0, 127}));
+
+  connect(requestedGearCommand.y, vcu.cmd_requested_gear) annotation(
+    Line(points = {{-148.5, 78}, {-120, 78}, {-120, 47.4}, {-107, 47.4}}, color = {255, 127, 0}));
+
+  connect(gearboxModeCommand.y, vcu.cmd_gearbox_mode) annotation(
+    Line(points = {{-148.5, 72}, {-124, 72}, {-124, 42.6}, {-107, 42.6}}, color = {255, 127, 0}));
+
+  connect(ignitionCommand.y, vcu.cmd_ignition) annotation(
+    Line(points = {{-148.5, 66}, {-128, 66}, {-128, 37.8}, {-107, 37.8}}, color = {255, 127, 0}));
 
   connect(motorSpeed.y, vcu.sens_motor_speed) annotation(
     Line(points = {{-126.5, 63}, {-107, 63}}, color = {0, 0, 127}));
@@ -913,21 +958,23 @@ equation
   connect(inverter.P_out, motor.P_elec) annotation(
     Line(points = {{-69, -49}, {-50, -49}, {-50, -29}, {-45, -29}}, color = {0, 0, 127}));
 
-  connect(motor.shaft_b, driveline.transmissionFlange) annotation(
-    Line(points = {{-12, -29}, {0, -29}, {0, -25}, {12, -25}}, color = {135, 135, 135}, thickness = 0.5));
+  connect(motor.shaft_b, transmission.engineFlange) annotation(
+    Line(points = {{-12, -29}, {-10, -29}, {-10, -25}}, color = {135, 135, 135}, thickness = 0.5));
+
+  connect(transmission.drivelineFlange, driveline.transmissionFlange) annotation(
+    Line(points = {{10, -25}, {14, -25}}, color = {135, 135, 135}, thickness = 0.5));
 
   connect(steerCommand.y, frSteerPosition.phi_ref) annotation(
-    Line(points = {{41, 100}, {50, 100}, {50, 80}}, color = {0, 0, 127}));
+    Line(points = {{41, 100}, {56, 100}, {56, 72}, {62, 72}}, color = {0, 0, 127}));
 
   connect(frSteerPosition.flange, chassis.steeringWheel) annotation(
-    Line(points = {{70, 80}, {74, 80}, {74, -10}}));
+    Line(points = {{84, 72}, {100, 72}, {100, 4}, {74, 4}, {74, -10}}));
 
   connect(cgFreeMotion.frame_b, chassis.chassisFrame) annotation(
-    Line(points = {{122, -90}, {44, -90}, {44, -44}}, color = {95, 95, 95}));
+    Line(points = {{122, -90}, {112, -90}, {112, -110}, {44, -110}, {44, -44}}, color = {95, 95, 95}));
 
   annotation(
     Diagram(coordinateSystem(extent = {{-160, -150}, {175, 110}})),
-    Icon(coordinateSystem(extent = {{-160, -150}, {175, 110}})),
     experiment(StartTime = 0.0, StopTime = 10, Tolerance = 1e-06, Interval = 0.002),
     __OpenModelica_commandLineOptions = "--matchingAlgorithm=PFPlusExt --indexReductionMethod=dynamicStateSelection -d=initialization,NLSanalyticJacobian --maxSizeLinearTearing=5000 --generateDynamicJacobian=none",
     __OpenModelica_simulationFlags(
@@ -942,7 +989,14 @@ equation
 Partial model <code>BaseVehicleSim</code> is the shared full-vehicle simulation template.
 </p>
 <p>
-It exposes the complete replaceable vehicle stack: chassis, brakes, driveline, electric drive, power electronics, energy storage, VCU, driver environment, road, atmosphere, aero, and world. It also contains the maneuver modes and termination monitors used by front-facing VehicleSim variants.
+It exposes the complete replaceable vehicle stack: chassis, brakes, driveline,
+transmission, electric drive, power electronics, energy storage, VCU, road,
+atmosphere, aero, and world. The template is autonomous by default: it owns the
+driver-level steering, accelerator, brake, gear, gearbox-mode, and ignition
+commands, sends them directly to the VCU, and publishes the same brake and
+pedal commands on the VehicleInterfaces driver bus for subsystems such as
+mechanical brakes. Users can still insert a driver-environment adapter in a
+derived model when an explicit driver interface is desired.
 </p>
 </html>"));
 

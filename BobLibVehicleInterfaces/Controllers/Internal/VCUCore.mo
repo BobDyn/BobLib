@@ -10,6 +10,22 @@ model VCUCore
     "Requested motor torque [Nm]" annotation(
       Placement(transformation(origin={-120,40}, extent={{-20,-20},{20,20}})));
 
+  Modelica.Blocks.Interfaces.RealInput cmd_steering_angle(
+    quantity = "Angle",
+    unit = "rad")
+    "Driver steering-wheel command [rad]" annotation(
+      Placement(transformation(origin={-120,120}, extent={{-20,-20},{20,20}})));
+
+  Modelica.Blocks.Interfaces.RealInput cmd_accelerator_pedal(
+    unit = "1")
+    "Driver accelerator-pedal command" annotation(
+      Placement(transformation(origin={-120,96}, extent={{-20,-20},{20,20}})));
+
+  Modelica.Blocks.Interfaces.RealInput cmd_brake_pedal(
+    unit = "1")
+    "Driver brake-pedal command" annotation(
+      Placement(transformation(origin={-120,72}, extent={{-20,-20},{20,20}})));
+
   Modelica.Blocks.Interfaces.RealInput cmd_regen_limit
     "Max allowed regen torque (positive magnitude) [Nm]" annotation(
       Placement(transformation(origin={-120,-40}, extent={{-20,-20},{20,20}})));
@@ -17,6 +33,18 @@ model VCUCore
   Modelica.Blocks.Interfaces.BooleanInput cmd_inverter_enable
     "Inverter enable / R2D" annotation(
       Placement(transformation(origin={-120,0}, extent={{-20,-20},{20,20}})));
+
+  Modelica.Blocks.Interfaces.IntegerInput cmd_requested_gear
+    "Driver requested gear" annotation(
+      Placement(transformation(origin={-120,-64}, extent={{-20,-20},{20,20}})));
+
+  Modelica.Blocks.Interfaces.IntegerInput cmd_gearbox_mode
+    "Driver requested gearbox mode" annotation(
+      Placement(transformation(origin={-120,-88}, extent={{-20,-20},{20,20}})));
+
+  Modelica.Blocks.Interfaces.IntegerInput cmd_ignition
+    "Driver ignition command" annotation(
+      Placement(transformation(origin={-120,-112}, extent={{-20,-20},{20,20}})));
 
   /**********************
    * Inputs (Sensors)
@@ -27,11 +55,11 @@ model VCUCore
 
   Modelica.Blocks.Interfaces.RealInput sens_hv_bus_voltage
     "HV bus voltage [V]" annotation(
-      Placement(transformation(origin={-120,-80}, extent={{-20,-20},{20,20}})));
+      Placement(transformation(origin={-120,-144}, extent={{-20,-20},{20,20}})));
 
   Modelica.Blocks.Interfaces.RealInput sens_hv_bus_current
     "HV bus current [A]" annotation(
-      Placement(transformation(origin={-120,-120}, extent={{-20,-20},{20,20}})));
+      Placement(transformation(origin={-120,-168}, extent={{-20,-20},{20,20}})));
 
   /**********************
    * Outputs
@@ -100,6 +128,10 @@ Model <code>VCUCore</code> implements the BobLib VCU torque and power request lo
 </p>
 <p>
 It limits motoring and regenerative torque, handles inverter enable state, protects launch behavior near zero speed, and outputs the power request consumed by the inverter path.
+Driver-level steering, accelerator, brake, gear, gearbox-mode, and ignition
+commands are explicit inputs so higher-level VCU logic can add launch control,
+gear scheduling, and regen blending without changing the vehicle assembly
+interface.
 </p>
 </html>"));
 end VCUCore;

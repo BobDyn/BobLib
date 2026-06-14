@@ -122,13 +122,13 @@ equation
   connect(controlBus.drivelineBus, drivelineBus) annotation(
     Line(points = {{-100, 60}, {-80, 60}, {-80, 20}}, color = {255, 204, 51}, thickness = 0.5));
   connect(motorSideSpeedBusSignal, drivelineBus.motorSideSpeed) annotation(
-    Line(points = {{0, 0}, {-80, 20}}, color = {0, 0, 127}));
+    Line(points = {{0, 0}, {0, 44}, {-80, 44}, {-80, 20}}, color = {0, 0, 127}));
   connect(diffInputSpeedBusSignal, drivelineBus.diffInputSpeed) annotation(
-    Line(points = {{0, 0}, {-80, 20}}, color = {0, 0, 127}));
+    Line(points = {{0, 0}, {0, 38}, {-80, 38}, {-80, 20}}, color = {0, 0, 127}));
   connect(leftHalfshaftTorqueBusSignal, drivelineBus.leftHalfshaftTorque) annotation(
-    Line(points = {{0, 0}, {-80, 20}}, color = {0, 0, 127}));
+    Line(points = {{0, 0}, {0, 32}, {-80, 32}, {-80, 20}}, color = {0, 0, 127}));
   connect(rightHalfshaftTorqueBusSignal, drivelineBus.rightHalfshaftTorque) annotation(
-    Line(points = {{0, 0}, {-80, 20}}, color = {0, 0, 127}));
+    Line(points = {{0, 0}, {0, 26}, {-80, 26}, {-80, 20}}, color = {0, 0, 127}));
 
   connect(transmissionFlange.flange, finalDrive.flange_a) annotation(
     Line(points = {{-100, 0}, {-54, 0}}));

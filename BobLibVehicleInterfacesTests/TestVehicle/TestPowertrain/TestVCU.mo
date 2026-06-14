@@ -7,6 +7,12 @@ model TestVCU
     Placement(transformation(extent = {{-10, -10}, {10, 10}})));
 
 equation
+  vcu.cmd_steering_angle = 0;
+  vcu.cmd_accelerator_pedal = 0;
+  vcu.cmd_brake_pedal = 0;
+  vcu.cmd_requested_gear = 0;
+  vcu.cmd_gearbox_mode = VehicleInterfaces.Types.GearMode.Drive;
+  vcu.cmd_ignition = VehicleInterfaces.Types.IgnitionSetting.On;
   vcu.cmd_torque_motor = 250;
   vcu.cmd_regen_limit = 50;
   vcu.cmd_inverter_enable = true;
