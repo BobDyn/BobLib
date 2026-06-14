@@ -5,7 +5,8 @@ PYTHON_TESTS := \
 	Tests/test_vehicle_test_coverage.py
 
 MODELICA_REGRESSION_TESTS := \
-	Tests/test_modelica_regression.py
+	Tests/test_modelica_regression.py \
+	Tests/test_boblibvehicleinterfaces_modelica.py
 
 .PHONY: help lint test test-python test-modelica modelica-deps modelica-translation modelica-initialization modelica-regression ci check
 
@@ -18,7 +19,7 @@ help:
 		'  make modelica-deps        Install OpenModelica library dependencies' \
 		'  make modelica-translation Translate standards and all BobLib.Tests fixtures' \
 		'  make modelica-initialization Initialize all BobLib.Tests fixtures and compare baselines' \
-		'  make modelica-regression  Simulate signal-level Modelica regressions' \
+		'  make modelica-regression  Simulate signal-level regressions and smoke-check BobLibVehicleInterfaces' \
 		'  make test-modelica        Run all Modelica checks' \
 		'  make ci                   Run the full local CI suite'
 

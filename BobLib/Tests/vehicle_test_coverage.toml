@@ -67,6 +67,18 @@ tests = ["BobLib.Tests.TestVehicle.TestChassis.TestSuspension.TestFrAxleDW"]
 reason = "Dedicated front axle wrapper exercises jounce and steer inputs."
 
 [[model_tests]]
+model = "BobLib.Vehicle.Chassis.Suspension.FrAxleDW_BC"
+status = "parent"
+tests = ["BobLib.Tests.TestVehicle.TestChassis.TestSuspension.TestFrAxleDW"]
+reason = "The dedicated front axle fixture covers the shared front axle contract; this non-stabar architecture variant is also wired by the standards templates."
+
+[[model_tests]]
+model = "BobLib.Vehicle.Chassis.Suspension.FrAxleDW_Direct"
+status = "parent"
+tests = ["BobLib.Tests.TestVehicle.TestChassis.TestSuspension.TestFrAxleDW"]
+reason = "The dedicated front axle fixture covers the shared front axle contract; this direct-actuated architecture variant is also wired by the standards templates."
+
+[[model_tests]]
 model = "BobLib.Vehicle.Chassis.Suspension.Linkages.Bellcrank2"
 status = "direct"
 tests = ["BobLib.Tests.TestVehicle.TestChassis.TestSuspension.TestLinkages.TestBellcrank2"]
@@ -143,6 +155,18 @@ model = "BobLib.Vehicle.Chassis.Suspension.RrAxleDW_BC_Stabar"
 status = "direct"
 tests = ["BobLib.Tests.TestVehicle.TestChassis.TestSuspension.TestRrAxleDW"]
 reason = "Dedicated rear axle wrapper exercises jounce and steer inputs."
+
+[[model_tests]]
+model = "BobLib.Vehicle.Chassis.Suspension.RrAxleDW_BC"
+status = "parent"
+tests = ["BobLib.Tests.TestVehicle.TestChassis.TestSuspension.TestRrAxleDW"]
+reason = "The dedicated rear axle fixture covers the shared rear axle contract; this non-stabar architecture variant is also wired by the standards templates."
+
+[[model_tests]]
+model = "BobLib.Vehicle.Chassis.Suspension.RrAxleDW_Direct"
+status = "parent"
+tests = ["BobLib.Tests.TestVehicle.TestChassis.TestSuspension.TestRrAxleDW"]
+reason = "The dedicated rear axle fixture covers the shared rear axle contract; this direct-actuated architecture variant is also wired by the standards templates."
 
 [[model_tests]]
 model = "BobLib.Vehicle.Chassis.Suspension.Templates.DoubleWishbone.WishboneUprightLoop"
@@ -431,3 +455,51 @@ model = "BobLib.Vehicle.Vehicle_DWBCStabar_DWBCStabar"
 status = "direct"
 tests = ["BobLib.Tests.Regression.VehicleSimAnimationOn"]
 reason = "Vehicle-level regression fixture translates the concrete vehicle assembly with animation enabled."
+
+[[model_tests]]
+model = "BobLib.Vehicle.Vehicle_DWBCStabar_DWBC"
+status = "parent"
+tests = ["BobLib.Tests.Regression.VehicleSimAnimationOn"]
+reason = "The full vehicle regression covers the shared replaceable vehicle architecture contract; this concrete architecture is exposed through the standards templates."
+
+[[model_tests]]
+model = "BobLib.Vehicle.Vehicle_DWBCStabar_DWDirect"
+status = "parent"
+tests = ["BobLib.Tests.Regression.VehicleSimAnimationOn"]
+reason = "The full vehicle regression covers the shared replaceable vehicle architecture contract; this concrete architecture is exposed through the standards templates."
+
+[[model_tests]]
+model = "BobLib.Vehicle.Vehicle_DWBC_DWBC"
+status = "parent"
+tests = ["BobLib.Tests.Regression.VehicleSimAnimationOn"]
+reason = "The full vehicle regression covers the shared replaceable vehicle architecture contract; this concrete architecture is exposed through the standards templates."
+
+[[model_tests]]
+model = "BobLib.Vehicle.Vehicle_DWBC_DWBCStabar"
+status = "parent"
+tests = ["BobLib.Tests.Regression.VehicleSimAnimationOn"]
+reason = "The full vehicle regression covers the shared replaceable vehicle architecture contract; this concrete architecture is exposed through the standards templates."
+
+[[model_tests]]
+model = "BobLib.Vehicle.Vehicle_DWBC_DWDirect"
+status = "parent"
+tests = ["BobLib.Tests.Regression.VehicleSimAnimationOn"]
+reason = "The full vehicle regression covers the shared replaceable vehicle architecture contract; this concrete architecture is exposed through the standards templates."
+
+[[model_tests]]
+model = "BobLib.Vehicle.Vehicle_DWDirect_DWBC"
+status = "parent"
+tests = ["BobLib.Tests.Regression.VehicleSimAnimationOn"]
+reason = "The full vehicle regression covers the shared replaceable vehicle architecture contract; this concrete architecture is exposed through the standards templates."
+
+[[model_tests]]
+model = "BobLib.Vehicle.Vehicle_DWDirect_DWBCStabar"
+status = "parent"
+tests = ["BobLib.Tests.Regression.VehicleSimAnimationOn"]
+reason = "The full vehicle regression covers the shared replaceable vehicle architecture contract; this concrete architecture is exposed through the standards templates."
+
+[[model_tests]]
+model = "BobLib.Vehicle.Vehicle_DWDirect_DWDirect"
+status = "parent"
+tests = ["BobLib.Tests.Regression.VehicleSimAnimationOn"]
+reason = "The full vehicle regression covers the shared replaceable vehicle architecture contract; this concrete architecture is exposed through the standards templates."

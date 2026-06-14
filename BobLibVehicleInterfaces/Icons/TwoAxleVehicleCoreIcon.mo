@@ -1,0 +1,73 @@
+within BobLibVehicleInterfaces.Icons;
+
+partial model TwoAxleVehicleCoreIcon "Reusable two-axle vehicle core icon"
+  annotation(
+    Icon(graphics = {
+      Line(origin = {-25, 105}, points = {{-35, -15}, {25, 15}}),
+      Line(origin = {-30, 135}, points = {{-30, -9}, {30, -15}}),
+      Line(origin = {-82, 94}, points = {{22, -4}, {-24, 4}}, thickness = 5),
+      Line(origin = {-82, 130}, points = {{22, -4}, {-22, 6}}, thickness = 5),
+      Ellipse(origin = {-60, 90}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}),
+      Ellipse(origin = {-60, 126}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}),
+      Line(origin = {-30, 135}, points = {{90, -9}, {30, -15}}),
+      Line(origin = {35, 65}, points = {{-35, 55}, {25, 25}}),
+      Line(origin = {84, 86}, points = {{22, 12}, {-24, 4}}, thickness = 5, arrowSize = 2),
+      Line(origin = {81, 131}, points = {{-21, -5}, {23, 5}}, thickness = 5),
+      Ellipse(origin = {60, 126}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}),
+      Ellipse(origin = {60, 90}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}),
+      Line(origin = {-80, 106}, points = {{20, -6}, {-22, 6}}, thickness = 5),
+      Ellipse(origin = {-60, 100}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}),
+      Rectangle(origin = {-120, 120}, fillColor = {71, 71, 71}, fillPattern = FillPattern.Solid, extent = {{-20, 40}, {20, -40}}, radius = 5),
+      Line(origin = {40, 106}, points = {{20, -6}, {64, 6}}, thickness = 5),
+      Ellipse(origin = {60, 100}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}),
+      Rectangle(origin = {120, 120}, fillColor = {71, 71, 71}, fillPattern = FillPattern.Solid, extent = {{-20, 40}, {20, -40}}, radius = 5),
+      Line(origin = {-25, 105}, points = {{-35, -15}, {25, 15}}),
+      Line(origin = {35, 65}, points = {{-35, 55}, {25, 25}}),
+      Line(origin = {-10, 100}, points = {{-36, 0}, {56, 0}}, thickness = 8),
+      Line(origin = {-50, 100}, points = {{4, 0}, {-4, 0}}, color = {255, 0, 0}, thickness = 5),
+      Line(origin = {50, 100}, points = {{4, 0}, {-4, 0}}, color = {255, 0, 0}, thickness = 5),
+      Line(origin = {-25, -135}, points = {{-35, -15}, {25, 15}}),
+      Line(origin = {-30, -105}, points = {{-30, -9}, {30, -15}}),
+      Line(origin = {-82, -146}, points = {{22, -4}, {-24, 4}}, thickness = 5),
+      Line(origin = {-82, -110}, points = {{22, -4}, {-22, 6}}, thickness = 5),
+      Ellipse(origin = {-60, -150}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}),
+      Ellipse(origin = {-60, -114}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}),
+      Line(origin = {-30, -105}, points = {{90, -9}, {30, -15}}),
+      Line(origin = {35, -175}, points = {{-35, 55}, {25, 25}}),
+      Line(origin = {84, -154}, points = {{22, 12}, {-24, 4}}, thickness = 5, arrowSize = 2),
+      Line(origin = {81, -109}, points = {{-21, -5}, {23, 5}}, thickness = 5),
+      Ellipse(origin = {60, -114}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}),
+      Ellipse(origin = {60, -150}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}),
+      Line(origin = {-80, -134}, points = {{20, -6}, {-22, 6}}, thickness = 5),
+      Ellipse(origin = {-60, -140}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}),
+      Rectangle(origin = {-120, -120}, fillColor = {71, 71, 71}, fillPattern = FillPattern.Solid, extent = {{-20, 40}, {20, -40}}, radius = 5),
+      Line(origin = {40, -134}, points = {{20, -6}, {64, 6}}, thickness = 5),
+      Ellipse(origin = {60, -140}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-4, 4}, {4, -4}}),
+      Rectangle(origin = {120, -120}, fillColor = {71, 71, 71}, fillPattern = FillPattern.Solid, extent = {{-20, 40}, {20, -40}}, radius = 5),
+      Line(origin = {-25, -135}, points = {{-35, -15}, {25, 15}}),
+      Line(origin = {35, -175}, points = {{-35, 55}, {25, 25}}),
+      Line(origin = {-10, -140}, points = {{-44, 0}, {64, 0}}, thickness = 8),
+      Ellipse(origin = {0, 166}, lineThickness = 5, extent = {{-26, 26}, {26, -26}}),
+      Line(origin = {-10, 176}, points = {{10, -10}, {-14, -2}}, thickness = 5),
+      Line(origin = {10, 176}, points = {{-10, -10}, {14, -2}}, thickness = 5),
+      Ellipse(origin = {0, 166}, lineColor = {255, 255, 255}, lineThickness = 1, extent = {{-28, 28}, {28, -28}}),
+      Line(origin = {0, -80}, rotation = 90, points = {{-40, 0}, {60, 0}}, thickness = 5),
+      Line(origin = {0, 80}, rotation = -90, points = {{60, 0}, {-40, 0}}, thickness = 5),
+      Line(origin = {28, -24}, rotation = -90, points = {{-3, -28}, {-15, 36}}, thickness = 1),
+      Line(origin = {75, 36}, points = {{-15, -26}, {-75, -16}}, thickness = 1),
+      Ellipse(origin = {60, 0}, fillColor = {255, 255, 255}, fillPattern = FillPattern.Solid, lineThickness = 1, extent = {{-10, 10}, {10, -10}}),
+      Line(origin = {60, 0}, points = {{0, -10}, {0, 10}}),
+      Line(origin = {60, 0}, points = {{-10, 0}, {10, 0}}),
+      Polygon(origin = {65, 5}, fillPattern = FillPattern.Solid, points = {{-5, -5}, {-5, 5}, {-3, 5}, {1, 3}, {3, 1}, {5, -3}, {5, -5}, {-5, -5}}),
+      Polygon(origin = {55, -5}, rotation = 180, fillPattern = FillPattern.Solid, points = {{-5, -5}, {-5, 5}, {-3, 5}, {1, 3}, {3, 1}, {5, -3}, {5, -5}, {-5, -5}}),
+      Line(origin = {120, 0}, points = {{-60, 0}, {60, 0}})
+    }, coordinateSystem(extent = {{-180, -200}, {180, 200}})),
+    Documentation(info = "<html>
+<p>
+Partial model <code>TwoAxleVehicleCoreIcon</code> defines shared icon geometry for two-axle vehicle core icon.
+</p>
+<p>
+It contains only graphical annotation primitives. Component and package models extend it to share the BobLib visual language without duplicating icon geometry.
+</p>
+</html>"));
+end TwoAxleVehicleCoreIcon;
