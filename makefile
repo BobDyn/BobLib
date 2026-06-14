@@ -1,5 +1,6 @@
 PYTHON ?= python3
 PACKAGE_ROOT ?= BobLib
+MODELICA_INIT_TIMEOUT_S ?= 600
 
 PYTHON_TESTS := \
 	Tests/test_vehicle_test_coverage.py
@@ -19,6 +20,7 @@ help:
 		'  make modelica-deps        Install OpenModelica library dependencies' \
 		'  make modelica-translation Translate standards and all BobLib.Tests fixtures' \
 		'  make modelica-initialization Initialize all BobLib.Tests fixtures and compare baselines' \
+		'      MODELICA_INIT_TIMEOUT_S=600 controls the per-model OMC timeout' \
 		'  make modelica-regression  Simulate signal-level regressions and smoke-check BobLibVehicleInterfaces' \
 		'  make test-modelica        Run all Modelica checks' \
 		'  make ci                   Run the full local CI suite'
@@ -38,7 +40,7 @@ modelica-translation: modelica-deps
 	$(PYTHON) Tests/modelica_translation_checks.py --package-root $(PACKAGE_ROOT)
 
 modelica-initialization: modelica-deps
-	$(PYTHON) Tests/modelica_initialization_checks.py --package-root $(PACKAGE_ROOT)
+	$(PYTHON) Tests/modelica_initialization_checks.py --package-root $(PACKAGE_ROOT) --timeout-s $(MODELICA_INIT_TIMEOUT_S)
 
 modelica-regression: modelica-deps
 	$(PYTHON) -m pytest $(MODELICA_REGRESSION_TESTS)
