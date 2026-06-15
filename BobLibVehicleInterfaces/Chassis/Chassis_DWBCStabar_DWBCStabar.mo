@@ -6,9 +6,9 @@ model Chassis_DWBCStabar_DWBCStabar
   import Modelica.Mechanics.MultiBody.Frames;
   import BobLibVehicleInterfaces.Utilities.Math.Vector;
   import Tire = BobLibVehicleInterfaces.Chassis.Suspension.Tires;
-  import BobLibVehicleInterfaces.Records.VehicleDefn.DWBCStabar_DWBCStabarRecord;
+  import BobLibVehicleInterfaces.Records.VehicleDefn.EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord;
 
-  parameter DWBCStabar_DWBCStabarRecord pVehicle = DWBCStabar_DWBCStabarRecord()
+  parameter EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord pVehicle = EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord()
     "Vehicle parameter record";
 
   extends BobLibVehicleInterfaces.Chassis.Chassis_LockRrSteer(

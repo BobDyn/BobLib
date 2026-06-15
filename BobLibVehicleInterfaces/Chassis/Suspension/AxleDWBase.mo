@@ -11,6 +11,7 @@ partial model AxleDWBase
   import BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates.SteeringRack.RackAndPinionRecord;
   import BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates.DoubleWishbone.WishboneUprightLoopRecord;
   import BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates.AxleMassRecord;
+  import BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates.Stabar.StabarRecord;
 
   // Record parameters
   parameter PartialWheelRecord pLeftPartialWheel;
@@ -20,6 +21,10 @@ partial model AxleDWBase
                                                   staticAlpha = -pLeftPartialWheel.staticAlpha,
                                                   staticGamma = -pLeftPartialWheel.staticGamma);
   parameter RackAndPinionRecord pRack;
+  parameter StabarRecord pStabar(
+    leftArmEnd = {0, 0, 0},
+    leftBarEnd = {0, 0, 0},
+    barRate = 0);
   parameter WishboneUprightLoopRecord pLeftDW;
   parameter WishboneUprightLoopRecord pRightDW(upperFore_i = Vector.mirrorXZ(pLeftDW.upperFore_i),
                                                upperAft_i = Vector.mirrorXZ(pLeftDW.upperAft_i),
@@ -50,6 +55,9 @@ partial model AxleDWBase
   outer parameter Boolean headless;
   // Effective center for internal calculations
   final parameter SI.Position[3] effectiveCenter = {pLeftDW.wheelCenter[1], 0, pLeftDW.wheelCenter[3]};
+  SI.Length leftSpringLength "Left spring/damper length";
+  SI.Length rightSpringLength "Right spring/damper length";
+  SI.Angle stabarAngle "Stabilizer-bar angular deflection";
 
 // Interface frames
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a axleFrame annotation(

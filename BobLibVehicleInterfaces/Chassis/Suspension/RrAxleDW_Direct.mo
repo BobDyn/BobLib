@@ -54,6 +54,10 @@ protected
 
 
 equation
+  leftSpringLength = leftShockLinkage.lineForceWithMass.s;
+  rightSpringLength = rightShockLinkage.lineForceWithMass.s;
+  stabarAngle = 0;
+
   connect(leftShockLinkage.frame_a, leftWishboneUprightLoop.lowerFrame_o) annotation(
     Line(points = {{-50, -30}, {-68, -30}, {-68, 22}}, color = {95, 95, 95}));
   connect(rightShockLinkage.frame_a, rightWishboneUprightLoop.lowerFrame_o) annotation(

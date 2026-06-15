@@ -136,8 +136,10 @@ partial model VehicleBase
     Placement(transformation(origin = {20, -100}, extent = {{16, -16}, {-16, 16}}, rotation = 90), iconTransformation(origin = {0, -120}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
 
 equation
-  aeroModel.frontRideHeight = (toFL_RH.frame_b.r_0[3] + toFR_RH.frame_b.r_0[3]) / 2;
-  aeroModel.rearRideHeight = (toRL_RH.frame_b.r_0[3] + toRR_RH.frame_b.r_0[3]) / 2;
+  aeroModel.rideHeight_1 = toFL_RH.frame_b.r_0[3];
+  aeroModel.rideHeight_2 = toFR_RH.frame_b.r_0[3];
+  aeroModel.rideHeight_3 = toRL_RH.frame_b.r_0[3];
+  aeroModel.rideHeight_4 = toRR_RH.frame_b.r_0[3];
   aeroModel.speed = norm(chassis.spaceFrame.sprungBody.v_0);
   aeroLoads.force = aeroModel.force;
   aeroLoads.torque = aeroModel.torque;

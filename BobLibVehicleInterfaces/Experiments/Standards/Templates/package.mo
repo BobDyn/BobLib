@@ -5,10 +5,12 @@ package Templates
   annotation(
     Documentation(info = "<html>
 <p>
-Package <code>BobLibVehicleInterfaces.Experiments.Standards.Templates</code> contains experiment templates and architecture-specific specializations.
+Package <code>BobLibVehicleInterfaces.Experiments.Standards.Templates</code>
+groups standard experiment templates by simulation family.
 </p>
 <p>
-Templates expose all replaceable choices for the vehicle and four-post stacks. Front-facing experiments extend these templates with the desired redeclarations.
+Use <code>FourPost</code> for fixture-driven suspension studies and
+<code>Vehicle</code> for full-vehicle simulation templates.
 </p>
 </html>"));
 end Templates;

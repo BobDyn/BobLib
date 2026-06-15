@@ -5,11 +5,9 @@ model RrAxleDW_BC_Stabar "Double wishbone axle with bellcranks mounting to shock
   import Modelica.Math.Vectors;
   import BobLibVehicleInterfaces.Utilities.Math.Vector.mirrorXZ;
   import BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.AxleDW_BC_StabarRecord;
-  import BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates.Stabar.StabarRecord;
 
   // Record parameters
   parameter AxleDW_BC_StabarRecord pAxle;
-  parameter StabarRecord pStabar;
 
   extends BobLibVehicleInterfaces.Chassis.Suspension.AxleDWBase;
   extends BobLibVehicleInterfaces.Icons.SteeringWheelOverlayIcon;
@@ -132,6 +130,10 @@ public
     Placement(transformation(origin = {120, -30}, extent = {{-20, -20}, {20, 20}})));
 
 equation
+  leftSpringLength = leftShockLinkage.lineForceWithMass.s;
+  rightSpringLength = rightShockLinkage.lineForceWithMass.s;
+  stabarAngle = stabar.spring.phi_rel;
+
   connect(toLeftApex.frame_a, leftWishboneUprightLoop.upperFrame_o) annotation(
     Line(points = {{-70, -20}, {-68, -20}, {-68, 78}}, color = {95, 95, 95}));
   connect(toRightApex.frame_a, rightWishboneUprightLoop.upperFrame_o) annotation(

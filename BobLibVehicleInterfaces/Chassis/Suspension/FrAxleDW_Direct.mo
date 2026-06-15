@@ -60,6 +60,10 @@ protected
         Placement(transformation(origin = {90, -10}, extent = {{-10, -10}, {10, 10}})));
 
 equation
+  leftSpringLength = leftShockLinkage.lineForceWithMass.s;
+  rightSpringLength = rightShockLinkage.lineForceWithMass.s;
+  stabarAngle = 0;
+
   connect(toLeftApex.frame_a, leftWishboneUprightLoop.lowerFrame_o) annotation(
     Line(points = {{-70, -20}, {-68, -20}, {-68, 22}}, color = {95, 95, 95}));
   connect(toRightApex.frame_a, rightWishboneUprightLoop.lowerFrame_o) annotation(

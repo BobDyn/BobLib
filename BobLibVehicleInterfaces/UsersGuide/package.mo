@@ -65,11 +65,12 @@ and other ambient quantities can be drawn into aero models directly in the
 diagram view.
 </p>
 <p>
-Architecture-specific redeclare stacks live in
-<code>Experiments.Standards.Architectures</code>. The current runnable benchmark
-extends <code>BatteryElectricRearDrive</code>; conventional IC layout references
-belong there as complete vehicle assemblies, while engine implementation
-details belong under <code>Engines</code> and <code>Engines.Internal</code>.
+Reusable redeclare stacks for standard experiments live in
+<code>Experiments.Standards.Templates</code>. Full-vehicle EV
+battery-inverter-motor-differential simulations live under
+<code>Templates.Vehicle</code>; four-post suspension fixture simulations live
+under <code>Templates.FourPost</code> and remain PTN-agnostic at the model-name
+level.
 </p>
 <p>
 The aero model receives ride heights from the chassis and atmospheric

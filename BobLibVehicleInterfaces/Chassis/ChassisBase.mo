@@ -24,8 +24,10 @@ partial model ChassisBase
   output SI.Angle leftSteerAngle "Front-left road wheel steer angle";
   output SI.Angle rightSteerAngle "Front-right road wheel steer angle";
   output SI.Angle avgSteerAngle "Average front road wheel steer angle";
-  output SI.Length frontRideHeight "Average front aero ride height";
-  output SI.Length rearRideHeight "Average rear aero ride height";
+  output SI.Length rideHeight_1 "Front-left aero ride height";
+  output SI.Length rideHeight_2 "Front-right aero ride height";
+  output SI.Length rideHeight_3 "Rear-left aero ride height";
+  output SI.Length rideHeight_4 "Rear-right aero ride height";
 
 protected
   import Modelica.Mechanics.MultiBody.Frames;
@@ -140,8 +142,10 @@ equation
   rightSteerAngle = -1*atan(rightWheelVector[2] / rightWheelVector[1]);
   avgSteerAngle = (leftSteerAngle + rightSteerAngle) / 2;
 
-  frontRideHeight = (toRideHeight_1.frame_b.r_0[3] + toRideHeight_2.frame_b.r_0[3]) / 2;
-  rearRideHeight = (toRideHeight_3.frame_b.r_0[3] + toRideHeight_4.frame_b.r_0[3]) / 2;
+  rideHeight_1 = toRideHeight_1.frame_b.r_0[3];
+  rideHeight_2 = toRideHeight_2.frame_b.r_0[3];
+  rideHeight_3 = toRideHeight_3.frame_b.r_0[3];
+  rideHeight_4 = toRideHeight_4.frame_b.r_0[3];
 
   connect(controlBus.chassisBus, chassisBus) annotation(
     Line(points = {{-158, 60}, {-120, 60}, {-120, 40}}, color = {255, 204, 51}, thickness = 0.5));

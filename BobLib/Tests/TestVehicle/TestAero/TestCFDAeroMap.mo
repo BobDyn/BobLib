@@ -20,8 +20,10 @@ model TestCFDAeroMap
     Placement(transformation(extent = {{-10, -10}, {10, 10}})));
 
 equation
-  aero.frontRideHeight = 0.03;
-  aero.rearRideHeight = 0.03;
+  aero.rideHeight_1 = 0.03;
+  aero.rideHeight_2 = 0.03;
+  aero.rideHeight_3 = 0.03;
+  aero.rideHeight_4 = 0.03;
   aero.speed = 20;
 
   assert(abs(aero.drag - 52.0) < 1e-9, "CFDAeroMap drag interpolation changed");

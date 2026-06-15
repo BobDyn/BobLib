@@ -8,9 +8,10 @@ package VehicleDefn
 Package <code>BobLibVehicleInterfaces.Records.VehicleDefn</code> contains complete vehicle definition records.
 </p>
 <p>
-Each record binds front and rear suspension architecture, wheel and tire data,
-mass properties, aero maps, and the domain-owned energy-storage, controller,
-power-electronics, motor, and driveline records used by experiment templates.
+The <code>EVBatInvMotDiff</code> records bind the common EV battery, inverter,
+motor, VCU, and differential driveline configuration with a specific front and
+rear suspension architecture, wheel and tire data, mass properties, and aero
+map.
 </p>
 </html>"));
 end VehicleDefn;

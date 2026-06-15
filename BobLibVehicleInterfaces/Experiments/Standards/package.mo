@@ -10,9 +10,11 @@ Package <code>BobLibVehicleInterfaces.Experiments.Standards</code> contains stan
 The models here are the primary entry points for full-vehicle and four-post simulations assembled from one-level public subsystem models.
 </p>
 <p>
-Architecture-specific subsystem redeclare stacks live in <code>Architectures</code>.
-The public benchmark models extend those architecture models so new powertrain
-layouts can be added without duplicating the runnable experiment entrypoints.
+Reusable experiment assemblies live under <code>Templates</code>. The
+<code>Templates.Vehicle</code> package contains the EV battery-inverter-motor-differential
+vehicle simulation base and its nine suspension-configuration specializations.
+The <code>Templates.FourPost</code> package contains the PTN-agnostic four-post
+fixture base and its nine suspension-configuration specializations.
 </p>
 </html>"));
 end Standards;

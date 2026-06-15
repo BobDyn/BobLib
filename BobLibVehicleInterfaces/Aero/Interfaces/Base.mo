@@ -10,21 +10,31 @@ partial model Base
   parameter SI.Position mountOffset[3] = {0, 0, 0}
     "Offset from sprung chassis frame to aero load frame";
 
-  Modelica.Blocks.Interfaces.RealInput frontRideHeight(
+  Modelica.Blocks.Interfaces.RealInput rideHeight_1(
     quantity = "Length",
-    unit = "m") "Front ride height used by the aerodynamic model" annotation(
-      Placement(transformation(origin = {-96, 120}, extent = {{-12, -12}, {12, 12}}, rotation = -90),
-        iconTransformation(origin = {-96, 120}, extent = {{-12, -12}, {12, 12}}, rotation = -90)));
-  Modelica.Blocks.Interfaces.RealInput rearRideHeight(
+    unit = "m") "Front-left ride height used by the aerodynamic model" annotation(
+      Placement(transformation(origin = {-120, 120}, extent = {{-12, -12}, {12, 12}}, rotation = -90),
+        iconTransformation(origin = {-120, 120}, extent = {{-12, -12}, {12, 12}}, rotation = -90)));
+  Modelica.Blocks.Interfaces.RealInput rideHeight_2(
     quantity = "Length",
-    unit = "m") "Rear ride height used by the aerodynamic model" annotation(
-      Placement(transformation(origin = {-32, 120}, extent = {{-12, -12}, {12, 12}}, rotation = -90),
-        iconTransformation(origin = {-32, 120}, extent = {{-12, -12}, {12, 12}}, rotation = -90)));
+    unit = "m") "Front-right ride height used by the aerodynamic model" annotation(
+      Placement(transformation(origin = {-80, 120}, extent = {{-12, -12}, {12, 12}}, rotation = -90),
+        iconTransformation(origin = {-80, 120}, extent = {{-12, -12}, {12, 12}}, rotation = -90)));
+  Modelica.Blocks.Interfaces.RealInput rideHeight_3(
+    quantity = "Length",
+    unit = "m") "Rear-left ride height used by the aerodynamic model" annotation(
+      Placement(transformation(origin = {-40, 120}, extent = {{-12, -12}, {12, 12}}, rotation = -90),
+        iconTransformation(origin = {-40, 120}, extent = {{-12, -12}, {12, 12}}, rotation = -90)));
+  Modelica.Blocks.Interfaces.RealInput rideHeight_4(
+    quantity = "Length",
+    unit = "m") "Rear-right ride height used by the aerodynamic model" annotation(
+      Placement(transformation(origin = {0, 120}, extent = {{-12, -12}, {12, 12}}, rotation = -90),
+        iconTransformation(origin = {0, 120}, extent = {{-12, -12}, {12, 12}}, rotation = -90)));
   Modelica.Blocks.Interfaces.RealInput relativeAirSpeed(
     quantity = "Velocity",
     unit = "m/s") "Vehicle speed relative to the local air" annotation(
-      Placement(transformation(origin = {32, 120}, extent = {{-12, -12}, {12, 12}}, rotation = -90),
-        iconTransformation(origin = {32, 120}, extent = {{-12, -12}, {12, 12}}, rotation = -90)));
+      Placement(transformation(origin = {50, 120}, extent = {{-12, -12}, {12, 12}}, rotation = -90),
+        iconTransformation(origin = {50, 120}, extent = {{-12, -12}, {12, 12}}, rotation = -90)));
   Modelica.Blocks.Interfaces.RealInput airDensity(
     quantity = "Density",
     unit = "kg/m3") "Local air density" annotation(
@@ -71,8 +81,8 @@ equation
 <p>
 This partial model defines the basic interfaces required for an aerodynamic
 subsystem. Implementations provide <code>force</code> and <code>torque</code>
-from relative airspeed, local air density, and chassis-derived ride-height
-signals. The base interface applies those loads to
+from relative airspeed, local air density, and chassis-derived per-corner
+ride-height signals. The base interface applies those loads to
 <code>sprungChassisFrame</code> through a rigid aero mount.
 </p>
 </html>"));

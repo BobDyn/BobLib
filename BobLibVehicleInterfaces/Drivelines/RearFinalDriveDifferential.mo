@@ -63,7 +63,7 @@ model RearFinalDriveDifferential
     kineticFrictionRatio = diff_kineticFrictionRatio,
     w_transition = diff_w_transition,
     c_viscous = diff_c_viscous) annotation(
-      Placement(transformation(origin = {12, 0}, extent = {{-10, -10}, {10, 10}})));
+      Placement(transformation(origin = {10, 0}, extent = {{-10, -10}, {10, 10}})));
 
   Modelica.Mechanics.Rotational.Components.SpringDamper leftHalfshaft(
     c = halfshaftLeftC,
@@ -92,7 +92,7 @@ model RearFinalDriveDifferential
 
 protected
   VehicleInterfaces.Interfaces.DrivelineBus drivelineBus annotation(
-    Placement(transformation(extent = {{-90, 10}, {-70, 30}})));
+    Placement(transformation(extent = {{-90, 10}, {-70, 30}}), iconTransformation(extent = {{-90, 10}, {-70, 30}})));
 
   Modelica.Blocks.Interfaces.RealOutput motorSideSpeedBusSignal
     "Motor-side speed published to VehicleInterfaces driveline bus";
@@ -135,13 +135,13 @@ equation
   connect(finalDrive.flange_b, diffInputRotor.flange_a) annotation(
     Line(points = {{-34, 0}, {-26, 0}}));
   connect(diffInputRotor.flange_b, differential.shaft_in) annotation(
-    Line(points = {{-10, 0}, {2, 0}}));
+    Line(points = {{-10, 0}, {0, 0}}));
   connect(differential.shaft_left, leftHalfshaft.flange_a) annotation(
-    Line(points = {{22, 4}, {22, 24}, {26, 24}}));
+    Line(points = {{20, 4}, {20, 14}, {26, 14}, {26, 24}}));
   connect(leftHalfshaft.flange_b, wheelHub_3.flange) annotation(
     Line(points = {{42, 24}, {60, 24}, {60, -100}}));
   connect(differential.shaft_right, rightHalfshaft.flange_a) annotation(
-    Line(points = {{22, -4}, {22, -24}, {26, -24}}));
+    Line(points = {{20, -4}, {20, -14}, {26, -14}, {26, -24}}));
   connect(rightHalfshaft.flange_b, wheelHub_4.flange) annotation(
     Line(points = {{42, -24}, {60, -24}, {60, 100}}));
 
