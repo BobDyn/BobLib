@@ -24,6 +24,21 @@ model BatteryPack
   output SI.Current i "Battery current, positive while discharging";
   output SI.Power P "Electrical power, positive while discharging";
 
+protected
+  Modelica.Blocks.Interfaces.RealOutput voltageBusSignal(
+    quantity = "ElectricPotential",
+    unit = "V") "Terminal voltage published to batteryBus";
+  Modelica.Blocks.Interfaces.RealOutput currentBusSignal(
+    quantity = "ElectricCurrent",
+    unit = "A") "Terminal current published to batteryBus";
+  Modelica.Blocks.Interfaces.RealOutput powerBusSignal(
+    quantity = "Power",
+    unit = "W") "Terminal power published to batteryBus";
+  Modelica.Blocks.Interfaces.RealOutput stateOfChargeBusSignal(unit = "1")
+    "State of charge published to batteryBus";
+  Modelica.Blocks.Interfaces.RealOutput stateOfEnergyBusSignal(unit = "1")
+    "State of energy published to batteryBus";
+
 equation
   SOC = battery.SOC;
   SOE = battery.SOE;
@@ -31,6 +46,22 @@ equation
   v = battery.v;
   i = battery.i;
   P = battery.P;
+  voltageBusSignal = v;
+  currentBusSignal = i;
+  powerBusSignal = P;
+  stateOfChargeBusSignal = SOC;
+  stateOfEnergyBusSignal = SOE;
+
+  connect(voltageBusSignal, controlBus.batteryBus.voltage) annotation(
+    Line(points = {{0, 0}, {-118, 0}, {-118, -60}, {-100, -60}}, color = {0, 0, 127}));
+  connect(currentBusSignal, controlBus.batteryBus.current) annotation(
+    Line(points = {{0, 0}, {-116, 0}, {-116, -60}, {-100, -60}}, color = {0, 0, 127}));
+  connect(powerBusSignal, controlBus.batteryBus.power) annotation(
+    Line(points = {{0, 0}, {-114, 0}, {-114, -60}, {-100, -60}}, color = {0, 0, 127}));
+  connect(stateOfChargeBusSignal, controlBus.batteryBus.soc) annotation(
+    Line(points = {{0, 0}, {-112, 0}, {-112, -60}, {-100, -60}}, color = {0, 0, 127}));
+  connect(stateOfEnergyBusSignal, controlBus.batteryBus.soe) annotation(
+    Line(points = {{0, 0}, {-110, 0}, {-110, -60}, {-100, -60}}, color = {0, 0, 127}));
 
   connect(pin_p, battery.p) annotation(
     Line(points = {{100, 60}, {-40, 60}, {-40, 0}}, color = {0, 0, 255}));
@@ -42,7 +73,8 @@ equation
 VehicleInterfaces-facing battery pack backed by the internal Thevenin pack implementation.
 It inherits <code>VehicleInterfaces.EnergyStorage.Interfaces.Base</code> and
 connects the standard <code>pin_p</code>/<code>pin_n</code> terminals directly
-to the BobLib battery terminals.
+to the BobLib battery terminals. The pack publishes terminal voltage, current,
+power, SOC, and SOE measurements on <code>controlBus.batteryBus</code>.
 </p>
 </html>"));
 end BatteryPack;

@@ -1,6 +1,6 @@
 within BobLibVehicleInterfaces.Atmospheres;
 model ConstantAtmosphere
-  "Constant atmosphere with explicit signal outputs for aero wiring"
+  "Constant atmosphere that publishes measurements on an atmosphere bus"
   extends VehicleInterfaces.Icons.Atmosphere;
   extends VehicleInterfaces.Atmospheres.Interfaces.Base(
     redeclare function windVelocity = constantWindVelocity(windVelocity = v),
@@ -21,37 +21,28 @@ model ConstantAtmosphere
   constant Real R = 287.0512249529787
     "Gas constant for air";
 
-  Modelica.Blocks.Interfaces.RealOutput windVelocityWorld[3](
-    each quantity = "Velocity",
-    each unit = "m/s") "Wind velocity resolved in world frame" annotation(
-      Placement(transformation(origin = {220, 50}, extent = {{-20, -20}, {20, 20}}),
-        iconTransformation(origin = {220, 50}, extent = {{-20, -20}, {20, 20}})));
-
-  Modelica.Blocks.Interfaces.RealOutput airDensity(
-    quantity = "Density",
-    unit = "kg/m3") "Air density used by aerodynamic models" annotation(
-      Placement(transformation(origin = {220, 10}, extent = {{-20, -20}, {20, 20}}),
-        iconTransformation(origin = {220, 10}, extent = {{-20, -20}, {20, 20}})));
-
-  Modelica.Blocks.Interfaces.RealOutput airTemperature(
-    quantity = "ThermodynamicTemperature",
-    unit = "K") "Air temperature signal" annotation(
-      Placement(transformation(origin = {220, -30}, extent = {{-20, -20}, {20, 20}}),
-        iconTransformation(origin = {220, -30}, extent = {{-20, -20}, {20, 20}})));
-
-  Modelica.Blocks.Interfaces.RealOutput relativeHumidity(
-    unit = "1") "Relative humidity signal" annotation(
-      Placement(transformation(origin = {220, -70}, extent = {{-20, -20}, {20, 20}}),
-        iconTransformation(origin = {220, -70}, extent = {{-20, -20}, {20, 20}})));
-
-  Modelica.Blocks.Interfaces.RealOutput pressure(
-    quantity = "Pressure",
-    unit = "Pa") "Ambient pressure signal" annotation(
-      Placement(transformation(origin = {220, -110}, extent = {{-20, -20}, {20, 20}}),
-        iconTransformation(origin = {220, -110}, extent = {{-20, -20}, {20, 20}})));
+  BobLibVehicleInterfaces.Atmospheres.Interfaces.AtmosphereBus atmosphereBus
+    "Atmosphere signal bus" annotation(
+      Placement(transformation(origin = {-100, 60}, extent = {{-20, -20}, {20, 20}}, rotation = 90),
+        iconTransformation(origin = {-100, 60}, extent = {{-20, -20}, {20, 20}}, rotation = 90)));
 
 protected
   parameter SI.Density rho = ambientPressure/(R*T);
+
+  Modelica.Blocks.Interfaces.RealOutput windVelocityWorldBusSignal[3](
+    each quantity = "Velocity",
+    each unit = "m/s") "Wind velocity published to atmosphereBus";
+  Modelica.Blocks.Interfaces.RealOutput airDensityBusSignal(
+    quantity = "Density",
+    unit = "kg/m3") "Air density published to atmosphereBus";
+  Modelica.Blocks.Interfaces.RealOutput airTemperatureBusSignal(
+    quantity = "ThermodynamicTemperature",
+    unit = "K") "Air temperature published to atmosphereBus";
+  Modelica.Blocks.Interfaces.RealOutput relativeHumidityBusSignal(unit = "1")
+    "Relative humidity published to atmosphereBus";
+  Modelica.Blocks.Interfaces.RealOutput pressureBusSignal(
+    quantity = "Pressure",
+    unit = "Pa") "Ambient pressure published to atmosphereBus";
 
   function constantWindVelocity
     extends VehicleInterfaces.Atmospheres.Interfaces.windVelocityBase;
@@ -82,11 +73,17 @@ protected
   end constantHumidity;
 
 equation
-  windVelocityWorld = v;
-  airDensity = rho;
-  airTemperature = T;
-  relativeHumidity = h;
-  pressure = ambientPressure;
+  windVelocityWorldBusSignal = v;
+  airDensityBusSignal = rho;
+  airTemperatureBusSignal = T;
+  relativeHumidityBusSignal = h;
+  pressureBusSignal = ambientPressure;
+
+  connect(windVelocityWorldBusSignal, atmosphereBus.windVelocityWorld);
+  connect(airDensityBusSignal, atmosphereBus.airDensity);
+  connect(airTemperatureBusSignal, atmosphereBus.airTemperature);
+  connect(relativeHumidityBusSignal, atmosphereBus.relativeHumidity);
+  connect(pressureBusSignal, atmosphereBus.pressure);
 
   annotation(
     defaultComponentName = "atmosphere",
@@ -94,14 +91,17 @@ equation
     Documentation(info = "<html>
 <p>
 Model <code>ConstantAtmosphere</code> is a BobLib constant-atmosphere adapter.
-It preserves the VehicleInterfaces atmosphere function contract and exposes
-wind velocity, density, temperature, humidity, and pressure as explicit signal
-outputs for vehicle diagrams.
+It preserves the VehicleInterfaces atmosphere function contract and publishes
+wind velocity, density, temperature, humidity, and pressure on its
+<code>atmosphereBus</code> connector.
 </p>
 <p>
-The standard vehicle template wires <code>airDensity</code> directly into the
-aero subsystem and uses <code>windVelocityWorld</code> when computing relative
-airspeed at the chassis CG.
+The bus is the public signal surface for atmosphere-owned measurements. Aero
+models subscribe to it and combine atmosphere-owned wind with their chassis
+frame velocity to calculate relative airspeed locally. Although this
+implementation derives its values from parameters, the bus carries signals so
+future atmosphere models can vary pressure, temperature, density, humidity, or
+wind without changing aero wiring.
 </p>
 </html>"));
 end ConstantAtmosphere;

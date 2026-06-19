@@ -10,6 +10,7 @@ record FourPostEvalRecord
 
   // Left wheel
   SI.Length leftSpringLength "Left spring length";
+  SI.Force leftFz "Left contact-patch normal force";
   SI.Angle leftGamma "Camber";
   SI.Angle leftToe "Toe";
   SI.Angle leftCaster "Caster";
@@ -18,7 +19,8 @@ record FourPostEvalRecord
   SI.Length leftMechScrub "Mechanical scrub radius";
 
   // Right wheel
-  SI.Length rightSpringLength "Left spring length";
+  SI.Length rightSpringLength "Right spring length";
+  SI.Force rightFz "Right contact-patch normal force";
   SI.Angle rightGamma "Camber";
   SI.Angle rightToe "Toe";
   SI.Angle rightCaster "Caster";

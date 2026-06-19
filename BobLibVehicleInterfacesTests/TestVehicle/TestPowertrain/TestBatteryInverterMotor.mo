@@ -7,6 +7,10 @@ model TestBatteryInverterMotor
   // Inverter
   BobLibVehicleInterfaces.PowerElectronics.InverterDC inv annotation(
     Placement(transformation(origin = {-50, 40}, extent = {{-10, -10}, {10, 10}})));
+  VehicleInterfaces.Interfaces.ControlBus controlBus annotation(
+    Placement(transformation(origin = {-80, 40}, extent = {{-10, -10}, {10, 10}})));
+  VehicleInterfaces.Interfaces.ElectricMotorControlBus electricMotorControlBus annotation(
+    Placement(transformation(origin = {-80, 50}, extent = {{-10, -10}, {10, 10}})));
   // Power command
   // Electrical reference
   Modelica.Electrical.Analog.Basic.Ground g annotation(
@@ -4228,6 +4232,10 @@ model TestBatteryInverterMotor
   41.378845, 225.337500])  annotation(
     Placement(transformation(origin = {-70, 70}, extent = {{-10, -10}, {10, 10}})));
 equation
+  connect(controlBus, inv.controlBus) annotation(
+    Line(points = {{-80, 40}, {-60, 40}, {-60, 46}}, color = {255, 204, 51}, thickness = 0.5));
+  connect(controlBus.electricMotorControlBus, electricMotorControlBus) annotation(
+    Line(points = {{-80, 40}, {-80, 50}}, color = {255, 204, 51}, thickness = 0.5));
   connect(g.p, batt.p) annotation(
     Line(points = {{-80, -30}, {-80, -10}, {-60, -10}}, color = {0, 0, 255}));
   connect(inv.p, batt.p) annotation(
@@ -4240,8 +4248,8 @@ equation
     Line(points = {{10, 10}, {0, 10}}));
   connect(torqueSensor.flange_b, inertia.flange_a) annotation(
     Line(points = {{30, 10}, {40, 10}}));
-  connect(combiTimeTable.y[1], inv.P_req) annotation(
-    Line(points = {{-58, 70}, {-50, 70}, {-50, 52}}, color = {0, 0, 127}));
+  connect(combiTimeTable.y[1], electricMotorControlBus.powerRequest) annotation(
+    Line(points = {{-58, 70}, {-80, 70}, {-80, 50}}, color = {0, 0, 127}));
   annotation(
     experiment(StartTime = 0, StopTime = 10, Interval = 0.002, Tolerance = 1e-06),
     __OpenModelica_simulationFlags(s = "cvode", lv = "LOG_STDOUT,LOG_ASSERT,LOG_STATS", variableFilter = ".*"),

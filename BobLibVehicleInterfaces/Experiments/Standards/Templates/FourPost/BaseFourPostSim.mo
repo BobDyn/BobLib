@@ -44,7 +44,7 @@ partial model BaseFourPostSim
     Dialog(group = "Test Parameters"));
   parameter SI.Length heaveMagnitude = 1.5*0.0254 "Maximum heave magnitude" annotation(
     Dialog(group = "Test Parameters"));
-  parameter SI.Angle rollMagnitude = 2*Modelica.Constants.pi/180 "Maximum roll magnitude" annotation(
+  parameter SI.Angle rollMagnitude = 1.25*Modelica.Constants.pi/180 "Maximum roll magnitude" annotation(
     Dialog(group = "Test Parameters"));
   parameter SI.Force forceMagnitude = 1000
     "Maximum contact patch force"
@@ -211,7 +211,9 @@ equation
   frKnC.rightMechScrub = frRightGroundPoint[2] - frAxleDW.rightCP.r_0[2];
 
   frKnC.leftSpringLength = frAxleDW.leftSpringLength;
+  frKnC.leftFz = frAxleDW.leftTire.Fz;
   frKnC.rightSpringLength = frAxleDW.rightSpringLength;
+  frKnC.rightFz = frAxleDW.rightTire.Fz;
   frKnC.stabarAngle = frAxleDW.stabarAngle;
 
   frKnC.jackingForce = frChassisActuator.jackingOutput;
@@ -250,7 +252,9 @@ equation
   rrKnC.rightMechScrub = rrRightGroundPoint[2] - rrAxleDW.rightCP.r_0[2];
 
   rrKnC.leftSpringLength = rrAxleDW.leftSpringLength;
+  rrKnC.leftFz = rrAxleDW.leftTire.Fz;
   rrKnC.rightSpringLength = rrAxleDW.rightSpringLength;
+  rrKnC.rightFz = rrAxleDW.rightTire.Fz;
   rrKnC.stabarAngle = rrAxleDW.stabarAngle;
 
   rrKnC.jackingForce = rrChassisActuator.jackingOutput;

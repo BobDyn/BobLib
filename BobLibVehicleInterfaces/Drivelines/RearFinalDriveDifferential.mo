@@ -14,6 +14,10 @@ model RearFinalDriveDifferential
     "Motor speed divided by differential input speed";
   parameter SI.Inertia diffInputRotorJ = 0.04
     "Differential input/ring inertia";
+  parameter SI.AngularVelocity initialOutputAngularVelocity = 0
+    "Initial differential output and rear wheel angular speed";
+  parameter Boolean diff_lockedKinematics = false
+    "Use structural spool kinematics instead of open differential kinematics";
   parameter Boolean diff_use_lsd = true
     "Enable differential limited-slip locking torque";
   parameter Real diff_driveSideTorqueSign = 1
@@ -49,7 +53,8 @@ model RearFinalDriveDifferential
       Placement(transformation(origin = {-44, 0}, extent = {{-10, -10}, {10, 10}})));
 
   Modelica.Mechanics.Rotational.Components.Inertia diffInputRotor(
-    J = diffInputRotorJ) annotation(
+    J = diffInputRotorJ,
+    w(start = initialOutputAngularVelocity, fixed = true)) annotation(
       Placement(transformation(origin = {-18, 0}, extent = {{-8, -8}, {8, 8}})));
 
   BobLibVehicleInterfaces.Drivelines.Internal.Differential1D differential(
@@ -62,7 +67,11 @@ model RearFinalDriveDifferential
     clutchEffectiveRadius = diff_clutchEffectiveRadius,
     kineticFrictionRatio = diff_kineticFrictionRatio,
     w_transition = diff_w_transition,
-    c_viscous = diff_c_viscous) annotation(
+    c_viscous = diff_c_viscous) if not diff_lockedKinematics annotation(
+      Placement(transformation(origin = {10, 0}, extent = {{-10, -10}, {10, 10}})));
+
+  BobLibVehicleInterfaces.Drivelines.Internal.LockedDifferential1D lockedDifferential
+    if diff_lockedKinematics annotation(
       Placement(transformation(origin = {10, 0}, extent = {{-10, -10}, {10, 10}})));
 
   Modelica.Mechanics.Rotational.Components.SpringDamper leftHalfshaft(
@@ -109,8 +118,13 @@ initial equation
 
 equation
   motorSideSpeed = der(transmissionFlange.flange.phi);
-  diffInputSpeed = differential.w_in;
-  diffLockTorque = differential.T_lock;
+  if diff_lockedKinematics then
+    diffInputSpeed = lockedDifferential.w_in;
+    diffLockTorque = lockedDifferential.T_lock;
+  else
+    diffInputSpeed = differential.w_in;
+    diffLockTorque = differential.T_lock;
+  end if;
   leftHalfshaftTorque = leftHalfshaft.tau;
   rightHalfshaftTorque = rightHalfshaft.tau;
 
@@ -134,14 +148,23 @@ equation
     Line(points = {{-100, 0}, {-54, 0}}));
   connect(finalDrive.flange_b, diffInputRotor.flange_a) annotation(
     Line(points = {{-34, 0}, {-26, 0}}));
-  connect(diffInputRotor.flange_b, differential.shaft_in) annotation(
-    Line(points = {{-10, 0}, {0, 0}}));
-  connect(differential.shaft_left, leftHalfshaft.flange_a) annotation(
-    Line(points = {{20, 4}, {20, 14}, {26, 14}, {26, 24}}));
+  if diff_lockedKinematics then
+    connect(diffInputRotor.flange_b, lockedDifferential.shaft_in) annotation(
+      Line(points = {{-10, 0}, {0, 0}}));
+    connect(lockedDifferential.shaft_left, leftHalfshaft.flange_a) annotation(
+      Line(points = {{20, 4}, {20, 14}, {26, 14}, {26, 24}}));
+    connect(lockedDifferential.shaft_right, rightHalfshaft.flange_a) annotation(
+      Line(points = {{20, -4}, {20, -14}, {26, -14}, {26, -24}}));
+  else
+    connect(diffInputRotor.flange_b, differential.shaft_in) annotation(
+      Line(points = {{-10, 0}, {0, 0}}));
+    connect(differential.shaft_left, leftHalfshaft.flange_a) annotation(
+      Line(points = {{20, 4}, {20, 14}, {26, 14}, {26, 24}}));
+    connect(differential.shaft_right, rightHalfshaft.flange_a) annotation(
+      Line(points = {{20, -4}, {20, -14}, {26, -14}, {26, -24}}));
+  end if;
   connect(leftHalfshaft.flange_b, wheelHub_3.flange) annotation(
     Line(points = {{42, 24}, {60, 24}, {60, -100}}));
-  connect(differential.shaft_right, rightHalfshaft.flange_a) annotation(
-    Line(points = {{20, -4}, {20, -14}, {26, -14}, {26, -24}}));
   connect(rightHalfshaft.flange_b, wheelHub_4.flange) annotation(
     Line(points = {{42, -24}, {60, -24}, {60, 100}}));
 

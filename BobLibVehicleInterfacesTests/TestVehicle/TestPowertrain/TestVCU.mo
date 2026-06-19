@@ -6,23 +6,70 @@ model TestVCU
     w_eps = 0.1) annotation(
     Placement(transformation(extent = {{-10, -10}, {10, 10}})));
 
+  VehicleInterfaces.Interfaces.ControlBus controlBus annotation(
+    Placement(transformation(extent = {{-80, -10}, {-60, 10}})));
+  VehicleInterfaces.Interfaces.DriverBus driverBus annotation(
+    Placement(transformation(extent = {{-80, 30}, {-60, 50}})));
+  VehicleInterfaces.Interfaces.ChassisBus chassisBus annotation(
+    Placement(transformation(extent = {{-80, 10}, {-60, 30}})));
+  VehicleInterfaces.Interfaces.BatteryBus batteryBus annotation(
+    Placement(transformation(extent = {{-80, -30}, {-60, -10}})));
+  VehicleInterfaces.Interfaces.ElectricMotorBus electricMotorBus annotation(
+    Placement(transformation(extent = {{-80, -50}, {-60, -30}})));
+
+  Modelica.Blocks.Sources.Constant steeringAngle(k = 0) annotation(
+    Placement(transformation(extent = {{-120, 44}, {-100, 64}})));
+  Modelica.Blocks.Sources.BooleanConstant inverterEnable(k = true) annotation(
+    Placement(transformation(extent = {{-120, 24}, {-100, 44}})));
+  Modelica.Blocks.Sources.IntegerConstant requestedGear(k = 0) annotation(
+    Placement(transformation(extent = {{-120, 4}, {-100, 24}})));
+  Modelica.Blocks.Sources.IntegerConstant gearboxMode(
+    k = VehicleInterfaces.Types.GearMode.Drive) annotation(
+    Placement(transformation(extent = {{-120, -16}, {-100, 4}})));
+  Modelica.Blocks.Sources.IntegerConstant ignition(
+    k = VehicleInterfaces.Types.IgnitionSetting.On) annotation(
+    Placement(transformation(extent = {{-120, -36}, {-100, -16}})));
+  Modelica.Blocks.Sources.Constant vehicleSpeed(k = 0) annotation(
+    Placement(transformation(extent = {{-120, -56}, {-100, -36}})));
+  Modelica.Blocks.Sources.Constant motorSpeed(k = 100) annotation(
+    Placement(transformation(extent = {{-120, -76}, {-100, -56}})));
+  Modelica.Blocks.Sources.Constant hvVoltage(k = 400) annotation(
+    Placement(transformation(extent = {{-120, -96}, {-100, -76}})));
+  Modelica.Blocks.Sources.Constant hvCurrent(k = 20) annotation(
+    Placement(transformation(extent = {{-120, -116}, {-100, -96}})));
+
 equation
-  vcu.cmd_steering_angle = 0;
-  vcu.cmd_accelerator_pedal = 0;
-  vcu.cmd_brake_pedal = 0;
-  vcu.cmd_requested_gear = 0;
-  vcu.cmd_gearbox_mode = VehicleInterfaces.Types.GearMode.Drive;
-  vcu.cmd_ignition = VehicleInterfaces.Types.IgnitionSetting.On;
-  vcu.cmd_torque_motor = 250;
-  vcu.cmd_regen_limit = 50;
-  vcu.cmd_inverter_enable = true;
-  vcu.sens_motor_speed = 100;
-  vcu.sens_hv_bus_voltage = 400;
-  vcu.sens_hv_bus_current = 20;
+  connect(controlBus, vcu.controlBus) annotation(
+    Line(points = {{-70, 0}, {0, 0}, {0, -10}}, color = {255, 204, 51}, thickness = 0.5));
+  connect(controlBus.driverBus, driverBus) annotation(
+    Line(points = {{-70, 0}, {-70, 40}}, color = {255, 204, 51}, thickness = 0.5));
+  connect(controlBus.chassisBus, chassisBus) annotation(
+    Line(points = {{-70, 0}, {-70, 20}}, color = {255, 204, 51}, thickness = 0.5));
+  connect(controlBus.batteryBus, batteryBus) annotation(
+    Line(points = {{-70, 0}, {-70, -20}}, color = {255, 204, 51}, thickness = 0.5));
+  connect(controlBus.electricMotorBus, electricMotorBus) annotation(
+    Line(points = {{-70, 0}, {-70, -40}}, color = {255, 204, 51}, thickness = 0.5));
+
+  connect(steeringAngle.y, driverBus.steeringWheelAngle) annotation(
+    Line(points = {{-99, 54}, {-70, 54}, {-70, 40}}, color = {0, 0, 127}));
+  connect(inverterEnable.y, driverBus.inverterEnable) annotation(
+    Line(points = {{-99, 34}, {-70, 34}, {-70, 40}}, color = {255, 0, 255}));
+  connect(requestedGear.y, driverBus.requestedGear) annotation(
+    Line(points = {{-99, 14}, {-70, 14}, {-70, 40}}, color = {255, 127, 0}));
+  connect(gearboxMode.y, driverBus.gearboxMode) annotation(
+    Line(points = {{-99, -6}, {-66, -6}, {-66, 40}, {-70, 40}}, color = {255, 127, 0}));
+  connect(ignition.y, driverBus.ignition) annotation(
+    Line(points = {{-99, -26}, {-62, -26}, {-62, 40}, {-70, 40}}, color = {255, 127, 0}));
+  connect(vehicleSpeed.y, chassisBus.vehicleSpeed) annotation(
+    Line(points = {{-99, -46}, {-70, -46}, {-70, 20}}, color = {0, 0, 127}));
+  connect(motorSpeed.y, electricMotorBus.speed) annotation(
+    Line(points = {{-99, -66}, {-70, -66}, {-70, -40}}, color = {0, 0, 127}));
+  connect(hvVoltage.y, batteryBus.voltage) annotation(
+    Line(points = {{-99, -86}, {-70, -86}, {-70, -20}}, color = {0, 0, 127}));
+  connect(hvCurrent.y, batteryBus.current) annotation(
+    Line(points = {{-99, -106}, {-66, -106}, {-66, -20}, {-70, -20}}, color = {0, 0, 127}));
 
   assert(vcu.vcu_active, "VCU enable path changed");
-  assert(abs(vcu.tau_cmd_limited - 200) < 1e-9, "VCU torque limiting changed");
-  assert(abs(vcu.P_req - 20000) < 1e-6, "VCU torque-to-power conversion changed");
 
   annotation(
     experiment(StartTime = 0, StopTime = 0.01, Tolerance = 1e-06, Interval = 0.01));

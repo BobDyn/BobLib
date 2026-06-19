@@ -1,9 +1,9 @@
 within BobLibVehicleInterfaces.DriverEnvironments;
 model AutomaticDriveByWire
-  "Optional BobLib automatic driver-environment adapter"
+  "BobLib automatic driver-environment adapter"
   extends VehicleInterfaces.Icons.DriverEnvironment;
   extends VehicleInterfaces.DriverEnvironments.Interfaces.BaseAutomaticTransmission(
-    final includeDriverSeat = true,
+    final includeDriverSeat = false,
     final includeSteeringWheel = true,
     final includeAcceleratorPedal = false,
     final includeBrakePedal = false);
@@ -34,45 +34,45 @@ model AutomaticDriveByWire
       Placement(transformation(origin = {-120, -84}, extent = {{-20, -20}, {20, 20}})));
 
 protected
-  VehicleInterfaces.Interfaces.DriverBus driverBus annotation(
-    Placement(transformation(extent = {{48, 56}, {68, 76}})));
-
   Modelica.Mechanics.Rotational.Sources.Position steeringPosition(
     exact = true,
     w(start = 0)) annotation(
       Placement(transformation(origin = {58, 0}, extent = {{-10, -10}, {10, 10}})));
 
 equation
-  connect(controlBus.driverBus, driverBus) annotation(
-    Line(points = {{100, 60}, {76, 60}, {76, 66}, {58, 66}}, color = {255, 204, 51}, thickness = 0.5));
   connect(steeringAngleCommand, steeringPosition.phi_ref) annotation(
     Line(points = {{-120, 80}, {26, 80}, {26, 0}, {46, 0}}, color = {0, 0, 127}));
   connect(steeringPosition.flange, steeringWheel) annotation(
     Line(points = {{68, 0}, {100, 0}}));
-  connect(acceleratorPedalCommand, driverBus.acceleratorPedalPosition) annotation(
-    Line(points = {{-120, 48}, {58, 48}, {58, 66}}, color = {0, 0, 127}));
-  connect(brakePedalCommand, driverBus.brakePedalPosition) annotation(
-    Line(points = {{-120, 16}, {56, 16}, {56, 66}, {58, 66}}, color = {0, 0, 127}));
-  connect(requestedGearCommand, driverBus.requestedGear) annotation(
-    Line(points = {{-120, -20}, {62, -20}, {62, 66}}, color = {255, 127, 0}));
-  connect(gearboxModeCommand, driverBus.gearboxMode) annotation(
-    Line(points = {{-120, -52}, {64, -52}, {64, 66}}, color = {255, 127, 0}));
-  connect(ignitionCommand, driverBus.ignition) annotation(
-    Line(points = {{-120, -84}, {66, -84}, {66, 66}}, color = {255, 127, 0}));
+  connect(steeringAngleCommand, controlBus.driverBus.steeringWheelAngle) annotation(
+    Line(points = {{-120, 80}, {100, 80}, {100, 60}}, color = {0, 0, 127}));
+  connect(acceleratorPedalCommand, controlBus.driverBus.acceleratorPedalPosition) annotation(
+    Line(points = {{-120, 48}, {100, 48}, {100, 60}}, color = {0, 0, 127}));
+  connect(brakePedalCommand, controlBus.driverBus.brakePedalPosition) annotation(
+    Line(points = {{-120, 16}, {100, 16}, {100, 60}}, color = {0, 0, 127}));
+  connect(requestedGearCommand, controlBus.driverBus.requestedGear) annotation(
+    Line(points = {{-120, -20}, {100, -20}, {100, 60}}, color = {255, 127, 0}));
+  connect(gearboxModeCommand, controlBus.driverBus.gearboxMode) annotation(
+    Line(points = {{-120, -52}, {100, -52}, {100, 60}}, color = {255, 127, 0}));
+  connect(ignitionCommand, controlBus.driverBus.ignition) annotation(
+    Line(points = {{-120, -84}, {100, -84}, {100, 60}}, color = {255, 127, 0}));
 
   annotation(Documentation(info = "<html>
 <p>
-Model <code>AutomaticDriveByWire</code> is an optional BobLib
-driver-environment adapter. It does not define maneuver behavior itself.
+Model <code>AutomaticDriveByWire</code> is the BobLib adapter for an explicit
+driver-environment boundary. It does not define maneuver behavior itself.
 Instead, it receives external steering, accelerator, brake, gear, gearbox-mode,
 and ignition commands, publishes the standard VehicleInterfaces
 <code>driverBus</code> signals, and drives the standard steering-wheel flange.
+The steering command is also published as
+<code>controlBus.driverBus.steeringWheelAngle</code> for controller
+subscribers.
 </p>
 <p>
-Full-vehicle BobLib standard simulations are autonomous by default and can wire
-their command sources directly to the VCU and driver bus. Insert this adapter in
-a derived vehicle only when an explicit driver-environment block is useful for
-the diagram or for coupling an external driver model.
+Full-vehicle BobLib standard simulations are autonomous by default, but their
+maneuver sources still cross this driver-environment boundary before entering
+the shared <code>driverBus</code>. Derived vehicles can replace the command
+sources, this adapter, or both when coupling an external driver model.
 </p>
 </html>"));
 end AutomaticDriveByWire;

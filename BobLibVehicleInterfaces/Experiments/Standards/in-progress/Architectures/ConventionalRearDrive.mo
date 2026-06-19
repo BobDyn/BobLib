@@ -2,8 +2,6 @@ within BobLibVehicleInterfaces.Experiments.Standards.Architectures;
 model ConventionalRearDrive
   "Complete conventional IC rear-drive vehicle architecture"
   import SI = Modelica.Units.SI;
-  import Modelica.Math.Vectors.norm;
-  import Modelica.Mechanics.MultiBody.Frames;
 
   inner parameter SI.Length linkDiameter = 0.020;
   inner parameter SI.Length jointDiameter = 0.030;
@@ -57,6 +55,7 @@ model ConventionalRearDrive
   replaceable BobLibVehicleInterfaces.Drivelines.RearFinalDriveDifferential driveline(
     finalDriveRatio = 1,
     diffInputRotorJ = pVehicle.pDriveline.diffInputRotorJ,
+    diff_lockedKinematics = pVehicle.pDriveline.diff_lockedKinematics,
     diff_use_lsd = pVehicle.pDriveline.diff_use_lsd,
     diff_driveSideTorqueSign = pVehicle.pDriveline.diff_driveSideTorqueSign,
     diff_T_preload = pVehicle.pDriveline.diff_T_preload,
@@ -95,6 +94,10 @@ model ConventionalRearDrive
       Dialog(group = "Plant Models"),
       Placement(transformation(extent = {{120, -42}, {150, -12}})));
 
+  BobLibVehicleInterfaces.DriverEnvironments.AutomaticDriveByWire driverEnvironment
+    "Driver environment publishing driver intent onto the VehicleInterfaces driver bus" annotation(
+      Placement(transformation(extent = {{-20, 54}, {20, 94}})));
+
   inner replaceable VehicleInterfaces.Roads.FlatRoad road
     constrainedby VehicleInterfaces.Roads.Interfaces.Base
     "Road model" annotation(
@@ -124,46 +127,16 @@ public
     "VehicleInterfaces control bus" annotation(
       Placement(transformation(origin = {-150, 26}, extent = {{-20, -20}, {20, 20}}, rotation = 90)));
 
-  Modelica.Mechanics.MultiBody.Joints.FreeMotion cgFreeMotion(
-    animation = false,
-    r_rel_a(start = {0, 0, 0}, each fixed = true),
-    angles_fixed = true,
-    angles_start = {0, 0, 0},
-    enforceStates = true,
-    useQuaternions = false,
-    w_rel_a_fixed = true,
-    w_rel_a_start = {0, 0, 0},
-    v_rel_a(start = {initialVel, 0, 0}, each fixed = true)) annotation(
-      Placement(transformation(origin = {132, -90}, extent = {{10, -10}, {-10, 10}})));
-
-  final parameter SI.Position pVehicleCG[3] = pVehicle.pSprungMass.rCM
-    "Approximate sprung chassis CG used for the free-motion reference";
-
   Real bodyVels[3];
-  SI.Velocity windVelocityWorld[3];
-  SI.Velocity windVelocityBody[3];
-  SI.Velocity relativeAirVelocity[3];
-  SI.Velocity relativeAirSpeed;
   SI.Velocity speed;
-  SI.Density airDensity;
 
 protected
-  VehicleInterfaces.Interfaces.DriverBus driverBus annotation(
-    Placement(transformation(extent = {{-136, 74}, {-116, 94}})));
-
-  Modelica.Mechanics.MultiBody.Parts.Fixed cgFixed(
-    r = pVehicleCG,
-    animation = false) annotation(
-      Placement(transformation(origin = {162, -90}, extent = {{10, -10}, {-10, 10}})));
+  BobLibVehicleInterfaces.Atmospheres.Interfaces.AtmosphereBus atmosphereBus annotation(
+    Placement(transformation(extent = {{-136, -126}, {-116, -106}})));
 
   Modelica.Blocks.Sources.RealExpression steeringAngleSource(
     y = steeringAngleCommand) annotation(
       Placement(transformation(origin = {30, 92}, extent = {{-10, -10}, {10, 10}})));
-
-  Modelica.Mechanics.Rotational.Sources.Position steerPosition(
-    exact = true,
-    w(start = 0)) annotation(
-      Placement(transformation(origin = {74, 70}, extent = {{-10, -10}, {10, 10}})));
 
   Modelica.Blocks.Sources.RealExpression acceleratorPedalSource(
     y = acceleratorPedalCommand) annotation(
@@ -185,45 +158,15 @@ protected
     k = ignitionCommand) annotation(
       Placement(transformation(origin = {-154, 66}, extent = {{-5, -2}, {5, 2}})));
 
-  Modelica.Blocks.Sources.RealExpression aeroFrontRideHeight(
-    y = chassis.frontRideHeight) annotation(
-      Placement(transformation(origin = {36, -64}, extent = {{-5, -2}, {5, 2}})));
-
-  Modelica.Blocks.Sources.RealExpression aeroRearRideHeight(
-    y = chassis.rearRideHeight) annotation(
-      Placement(transformation(origin = {36, -72}, extent = {{-5, -2}, {5, 2}})));
-
-  Modelica.Blocks.Sources.RealExpression aeroRelativeAirSpeed(
-    y = relativeAirSpeed) annotation(
-      Placement(transformation(origin = {36, -80}, extent = {{-5, -2}, {5, 2}})));
-
   BobLibVehicleInterfaces.Aero.CFDAeroMap aeroModel(
     pAero = pVehicle.pAero,
-    mountOffset = pVehicle.pAero.aeroRef - pVehicleCG,
+    mountOffset = pVehicle.pAero.aeroRef - chassis.chassisReferencePosition,
     headless = headless) annotation(
       Placement(transformation(origin = {76, -84}, extent = {{-10, -10}, {10, 10}})));
 
 equation
-  bodyVels =
-    Frames.resolve2(cgFreeMotion.frame_b.R, cgFreeMotion.v_rel_a);
-
-  windVelocityWorld =
-    atmosphere.windVelocityWorld;
-
-  windVelocityBody =
-    Frames.resolve2(cgFreeMotion.frame_b.R, windVelocityWorld);
-
-  relativeAirVelocity =
-    bodyVels - windVelocityBody;
-
-  relativeAirSpeed =
-    norm(relativeAirVelocity);
-
-  airDensity =
-    atmosphere.airDensity;
-
-  speed =
-    norm(bodyVels);
+  bodyVels = chassis.bodyVelocity;
+  speed = chassis.vehicleSpeed;
 
   connect(accessories.engineFlange, engine.accessoryFlange) annotation(
     Line(points = {{-126, -30}, {-114, -30}, {-114, -27}}, color = {135, 135, 135}, thickness = 0.5));
@@ -285,46 +228,46 @@ equation
     points = {{-150, 26}, {108, 26}, {108, -10}, {44.375, -10}, {44.375, -20}},
     color = {255, 204, 51},
     thickness = 0.5));
+  connect(controlBus, aeroModel.controlBus) annotation(Line(
+    points = {{-150, 26}, {52, 26}, {52, -78}, {64, -78}},
+    color = {255, 204, 51},
+    thickness = 0.5));
+  connect(atmosphere.atmosphereBus, atmosphereBus) annotation(Line(
+    points = {{-70, -124}, {-126, -124}, {-126, -116}},
+    color = {255, 204, 51},
+    thickness = 0.5));
+  connect(atmosphereBus, aeroModel.atmosphereBus) annotation(Line(
+    points = {{-126, -116}, {48, -116}, {48, -82}, {64, -82}},
+    color = {255, 204, 51},
+    thickness = 0.5));
   connect(controlBus, brakes.controlBus) annotation(Line(
     points = {{-150, 26}, {115, 26}, {115, -18}, {120, -18}},
     color = {255, 204, 51},
     thickness = 0.5));
-  connect(controlBus.driverBus, driverBus) annotation(Line(
-    points = {{-150, 26}, {-126, 26}, {-126, 84}},
+  connect(controlBus, driverEnvironment.controlBus) annotation(Line(
+    points = {{-150, 26}, {-34, 26}, {-34, 86}, {20, 86}},
     color = {255, 204, 51},
     thickness = 0.5));
 
-  connect(acceleratorPedalSource.y, driverBus.acceleratorPedalPosition) annotation(
-    Line(points = {{-148.5, 90}, {-126, 90}, {-126, 84}}, color = {0, 0, 127}));
-  connect(brakePedalSource.y, driverBus.brakePedalPosition) annotation(
-    Line(points = {{-148.5, 84}, {-126, 84}}, color = {0, 0, 127}));
-  connect(requestedGearSource.y, driverBus.requestedGear) annotation(
-    Line(points = {{-148.5, 78}, {-126, 78}, {-126, 84}}, color = {255, 127, 0}));
-  connect(gearboxModeSource.y, driverBus.gearboxMode) annotation(
-    Line(points = {{-148.5, 72}, {-122, 72}, {-122, 84}}, color = {255, 127, 0}));
-  connect(ignitionSource.y, driverBus.ignition) annotation(
-    Line(points = {{-148.5, 66}, {-118, 66}, {-118, 84}}, color = {255, 127, 0}));
-
-  connect(steeringAngleSource.y, steerPosition.phi_ref) annotation(
-    Line(points = {{41, 92}, {56, 92}, {56, 70}, {62, 70}}, color = {0, 0, 127}));
-  connect(steerPosition.flange, chassis.steeringWheel) annotation(
-    Line(points = {{84, 70}, {100, 70}, {100, 2}, {74, 2}, {74, -12}}));
+  connect(steeringAngleSource.y, driverEnvironment.steeringAngleCommand) annotation(
+    Line(points = {{41, 92}, {44, 92}, {44, 100}, {-24, 100}, {-24, 90}}, color = {0, 0, 127}));
+  connect(acceleratorPedalSource.y, driverEnvironment.acceleratorPedalCommand) annotation(
+    Line(points = {{-148.5, 90}, {-30, 90}, {-30, 84}, {-24, 84}}, color = {0, 0, 127}));
+  connect(brakePedalSource.y, driverEnvironment.brakePedalCommand) annotation(
+    Line(points = {{-148.5, 84}, {-36, 84}, {-36, 78}, {-24, 78}}, color = {0, 0, 127}));
+  connect(requestedGearSource.y, driverEnvironment.requestedGearCommand) annotation(
+    Line(points = {{-148.5, 78}, {-42, 78}, {-42, 70}, {-24, 70}}, color = {255, 127, 0}));
+  connect(gearboxModeSource.y, driverEnvironment.gearboxModeCommand) annotation(
+    Line(points = {{-148.5, 72}, {-48, 72}, {-48, 64}, {-24, 64}}, color = {255, 127, 0}));
+  connect(ignitionSource.y, driverEnvironment.ignitionCommand) annotation(
+    Line(points = {{-148.5, 66}, {-54, 66}, {-54, 57}, {-24, 57}}, color = {255, 127, 0}));
+  connect(driverEnvironment.steeringWheel, chassis.steeringWheel) annotation(
+    Line(points = {{20, 74}, {74, 74}, {74, -12}}));
+  connect(driverEnvironment.chassisFrame, chassis.chassisFrame) annotation(
+    Line(points = {{16, 54}, {16, -46}, {44, -46}}, color = {95, 95, 95}, thickness = 0.5));
 
   connect(aeroModel.sprungChassisFrame, chassis.chassisFrame) annotation(
     Line(points = {{66, -84}, {44, -84}, {44, -46}}, color = {95, 95, 95}));
-  connect(aeroFrontRideHeight.y, aeroModel.frontRideHeight) annotation(
-    Line(points = {{41.5, -64}, {66, -64}, {66, -72}}, color = {0, 0, 127}));
-  connect(aeroRearRideHeight.y, aeroModel.rearRideHeight) annotation(
-    Line(points = {{41.5, -72}, {70, -72}}, color = {0, 0, 127}));
-  connect(aeroRelativeAirSpeed.y, aeroModel.relativeAirSpeed) annotation(
-    Line(points = {{41.5, -80}, {74, -80}, {74, -72}}, color = {0, 0, 127}));
-  connect(atmosphere.airDensity, aeroModel.airDensity) annotation(
-    Line(points = {{-30, -130}, {78, -130}, {78, -72}}, color = {0, 0, 127}));
-
-  connect(cgFixed.frame_b, cgFreeMotion.frame_a) annotation(
-    Line(points = {{152, -90}, {142, -90}}, color = {95, 95, 95}));
-  connect(cgFreeMotion.frame_b, chassis.chassisFrame) annotation(
-    Line(points = {{122, -90}, {112, -90}, {112, -110}, {44, -110}, {44, -46}}, color = {95, 95, 95}));
 
   annotation(
     Diagram(coordinateSystem(extent = {{-160, -150}, {175, 110}})),
@@ -335,7 +278,8 @@ Model <code>ConventionalRearDrive</code> is a complete IC rear-drive BobLib
 architecture assembled at the VehicleInterfaces subsystem level. It includes
 accessories, engine, transmission, driveline, chassis, brakes, road,
 atmosphere, aero, and world components, plus autonomous command sources that
-populate the standard VehicleInterfaces driver bus.
+cross a BobLib driver-environment boundary before populating the standard
+VehicleInterfaces driver bus.
 </p>
 <p>
 The engine and transmission are deliberately simple sample implementations.

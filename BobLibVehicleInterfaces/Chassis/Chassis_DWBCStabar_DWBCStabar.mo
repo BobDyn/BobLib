@@ -4,6 +4,7 @@ model Chassis_DWBCStabar_DWBCStabar
   "Detailed BobLib chassis configured with DWBC stabar front and rear axles"
   import Modelica.Constants.pi;
   import Modelica.Mechanics.MultiBody.Frames;
+  import SI = Modelica.Units.SI;
   import BobLibVehicleInterfaces.Utilities.Math.Vector;
   import Tire = BobLibVehicleInterfaces.Chassis.Suspension.Tires;
   import BobLibVehicleInterfaces.Records.VehicleDefn.EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord;
@@ -11,7 +12,56 @@ model Chassis_DWBCStabar_DWBCStabar
   parameter EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord pVehicle = EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord()
     "Vehicle parameter record";
 
+  final parameter SI.Mass pTotalMass =
+    pVehicle.pSprungMass.m +
+    pVehicle.pFrAxleMass.unsprungMass.m +
+    pVehicle.pFrAxleMass.ucaMass.m +
+    pVehicle.pFrAxleMass.lcaMass.m +
+    pVehicle.pFrAxleMass.tieMass.m +
+    pVehicle.pRrAxleMass.unsprungMass.m +
+    pVehicle.pRrAxleMass.ucaMass.m +
+    pVehicle.pRrAxleMass.lcaMass.m +
+    pVehicle.pRrAxleMass.tieMass.m
+    "Mass used for the initial chassis reference position";
+
+  final parameter SI.Position pVehicleCG[3] = {
+    (
+      pVehicle.pSprungMass.m * pVehicle.pSprungMass.rCM[1] +
+      pVehicle.pFrAxleMass.unsprungMass.m * pVehicle.pFrAxleMass.unsprungMass.rCM[1] +
+      pVehicle.pFrAxleMass.ucaMass.m * pVehicle.pFrAxleMass.ucaMass.rCM[1] +
+      pVehicle.pFrAxleMass.lcaMass.m * pVehicle.pFrAxleMass.lcaMass.rCM[1] +
+      pVehicle.pFrAxleMass.tieMass.m * pVehicle.pFrAxleMass.tieMass.rCM[1] +
+      pVehicle.pRrAxleMass.unsprungMass.m * pVehicle.pRrAxleMass.unsprungMass.rCM[1] +
+      pVehicle.pRrAxleMass.ucaMass.m * pVehicle.pRrAxleMass.ucaMass.rCM[1] +
+      pVehicle.pRrAxleMass.lcaMass.m * pVehicle.pRrAxleMass.lcaMass.rCM[1] +
+      pVehicle.pRrAxleMass.tieMass.m * pVehicle.pRrAxleMass.tieMass.rCM[1]
+    ) / pTotalMass,
+    (
+      pVehicle.pSprungMass.m * pVehicle.pSprungMass.rCM[2] +
+      pVehicle.pFrAxleMass.unsprungMass.m * pVehicle.pFrAxleMass.unsprungMass.rCM[2] +
+      pVehicle.pFrAxleMass.ucaMass.m * pVehicle.pFrAxleMass.ucaMass.rCM[2] +
+      pVehicle.pFrAxleMass.lcaMass.m * pVehicle.pFrAxleMass.lcaMass.rCM[2] +
+      pVehicle.pFrAxleMass.tieMass.m * pVehicle.pFrAxleMass.tieMass.rCM[2] +
+      pVehicle.pRrAxleMass.unsprungMass.m * pVehicle.pRrAxleMass.unsprungMass.rCM[2] +
+      pVehicle.pRrAxleMass.ucaMass.m * pVehicle.pRrAxleMass.ucaMass.rCM[2] +
+      pVehicle.pRrAxleMass.lcaMass.m * pVehicle.pRrAxleMass.lcaMass.rCM[2] +
+      pVehicle.pRrAxleMass.tieMass.m * pVehicle.pRrAxleMass.tieMass.rCM[2]
+    ) / pTotalMass,
+    (
+      pVehicle.pSprungMass.m * pVehicle.pSprungMass.rCM[3] +
+      pVehicle.pFrAxleMass.unsprungMass.m * pVehicle.pFrAxleMass.unsprungMass.rCM[3] +
+      pVehicle.pFrAxleMass.ucaMass.m * pVehicle.pFrAxleMass.ucaMass.rCM[3] +
+      pVehicle.pFrAxleMass.lcaMass.m * pVehicle.pFrAxleMass.lcaMass.rCM[3] +
+      pVehicle.pFrAxleMass.tieMass.m * pVehicle.pFrAxleMass.tieMass.rCM[3] +
+      pVehicle.pRrAxleMass.unsprungMass.m * pVehicle.pRrAxleMass.unsprungMass.rCM[3] +
+      pVehicle.pRrAxleMass.ucaMass.m * pVehicle.pRrAxleMass.ucaMass.rCM[3] +
+      pVehicle.pRrAxleMass.lcaMass.m * pVehicle.pRrAxleMass.lcaMass.rCM[3] +
+      pVehicle.pRrAxleMass.tieMass.m * pVehicle.pRrAxleMass.tieMass.rCM[3]
+    ) / pTotalMass
+  } "Initial chassis reference position";
+
   extends BobLibVehicleInterfaces.Chassis.Chassis_LockRrSteer(
+    final chassisReferencePosition = pVehicleCG,
     final frontWheelRadius = pVehicle.pFrPartialWheel.R0,
     final rearWheelRadius = pVehicle.pRrPartialWheel.R0,
     final contactPatchPosition_1 =

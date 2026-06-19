@@ -5,10 +5,10 @@ model TestFourMF52Transient
   import Modelica.Math.Vectors.norm;
 
   import BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.Templates.PartialWheelRecord;
-  import BobLibVehicleInterfaces.Records.VehicleDefn.DWBCStabar_DWBCStabarRecord;
+  import BobLibVehicleInterfaces.Records.VehicleDefn.EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord;
 
 // Record parameters
-  parameter DWBCStabar_DWBCStabarRecord pCar;
+  parameter EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord pCar;
 
   parameter SI.Velocity velocity = 10;
 

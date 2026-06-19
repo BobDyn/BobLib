@@ -74,6 +74,7 @@ For narrower checks:
 
 ```sh
 make test-python
+make test-pytest
 make modelica-translation
 make modelica-initialization
 make modelica-regression
@@ -81,6 +82,10 @@ make modelica-regression
 
 The CI workflow runs on pull requests and on pushes to every branch so large
 integration branches receive the same basic validation as `main`.
+
+Modelica translation, initialization, and signal regressions are collected as
+individual pytest cases. A failing model should appear directly in the pytest
+node id, for example `Tests/test_modelica_translation.py::test_modelica_model_translates[BobLib.Standards.VehicleSim]`.
 
 ## Adoption Guidance
 

@@ -4,8 +4,8 @@ model TestFrAxleDW
   import Modelica.Constants.pi;
   import Modelica.Mechanics.MultiBody.Frames;
   import BobLibVehicleInterfaces.Utilities.Math.Vector;
-  import BobLibVehicleInterfaces.Records.VehicleDefn.DWBCStabar_DWBCStabarRecord;
-  parameter DWBCStabar_DWBCStabarRecord pVehicle;
+  import BobLibVehicleInterfaces.Records.VehicleDefn.EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord;
+  parameter EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord pVehicle;
   inner parameter Real linkDiameter = 0.020;
   inner parameter Real jointDiameter = 0.030;
   inner parameter Boolean headless = false;

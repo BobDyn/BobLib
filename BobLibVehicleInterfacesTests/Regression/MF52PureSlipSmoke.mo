@@ -5,7 +5,7 @@ model MF52PureSlipSmoke
   import Tire = BobLibVehicleInterfaces.Chassis.Suspension.Tires.MF52;
   import Vehicle = BobLibVehicleInterfaces.Records.VehicleDefn;
 
-  parameter Vehicle.DWBCStabar_DWBCStabarRecord car;
+  parameter Vehicle.EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord car;
 
   parameter SI.Force Fz = 654;
   parameter SI.Angle alpha = 0.08;

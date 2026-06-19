@@ -54,15 +54,23 @@ commands, road, atmosphere, and world into one replaceable stack.
 </p>
 <p>
 Standard full-vehicle simulations are autonomous by default: the vehicle
-template owns steering, accelerator, brake, gear, gearbox-mode, ignition,
-torque, regen-limit, and inverter-enable command sources. Driver-level commands
-are wired directly to the VCU, and the same brake/driver intent is published on
-the VehicleInterfaces driver bus for subsystems such as mechanical brakes.
-Optional driver-environment adapters are available when a derived model needs
-an explicit driver interface. BobLib atmosphere models preserve the
-VehicleInterfaces function contract while exposing signal outputs so density
-and other ambient quantities can be drawn into aero models directly in the
-diagram view.
+template owns maneuver-intent sources, but those sources cross a
+driver-environment adapter before entering the shared
+<code>driverBus</code>. Subsystems broadcast the information they own:
+the chassis publishes ride heights and speed on <code>chassisBus</code>, the
+battery publishes terminal measurements on <code>batteryBus</code>, and the
+motor publishes shaft measurements on <code>electricMotorBus</code>. The VCU
+subscribes to those driver and plant-measurement buses, then publishes actuator
+requests on the downstream control buses. Positive speed-control torque is sent
+to the electric-drive path, while negative speed-control torque is split by the
+regen blend and the remaining mechanical-brake request is published on
+<code>brakesControlBus</code>. The default regen blend is zero, so speed-control
+braking demand goes to the mechanical brake model. BobLib atmosphere models
+preserve the VehicleInterfaces function contract while
+publishing density, wind velocity, temperature, humidity, and pressure on a
+shared <code>AtmosphereBus</code>. Those values may be parameter-backed in a
+constant atmosphere today, but they are still published as signals so later
+weather, altitude, or noise models can vary them without changing subscribers.
 </p>
 <p>
 Reusable redeclare stacks for standard experiments live in
@@ -73,10 +81,14 @@ under <code>Templates.FourPost</code> and remain PTN-agnostic at the model-name
 level.
 </p>
 <p>
-The aero model receives ride heights from the chassis and atmospheric
-conditions from the VehicleInterfaces atmosphere functions. The vehicle template
-evaluates wind velocity and density at the chassis CG, computes relative
-airspeed in the body frame, and connects those signals into the aero subsystem.
+The chassis publishes per-corner ride-height measurements onto
+<code>controlBus.chassisBus</code>, and aero models subscribe to those chassis
+signals through their own control-bus tap. The atmosphere publishes ambient
+signals onto <code>AtmosphereBus</code>, and aero models subscribe to that bus
+to combine wind with their sprung chassis frame velocity when computing
+relative airspeed. The inverter subscribes to
+<code>controlBus.electricMotorControlBus.powerRequest</code> rather than
+receiving a direct VCU connector.
 </p>
 <p>
 Simulation templates use <code>headless=false</code> by default so examples open

@@ -1,14 +1,38 @@
 within BobLibVehicleInterfaces.Icons;
 
-partial model CFDAeroMapIcon "Reusable cfdaero map icon"
+partial model CFDAeroMapIcon "Reusable CFD aero map icon overlay"
   annotation(
-    Icon(coordinateSystem(extent = {{-100, -100}, {100, 100}}), graphics = {Rectangle(fillColor = {230, 230, 230}, fillPattern = FillPattern.Solid, extent = {{-80, 80}, {80, -80}}), Ellipse(fillPattern = FillPattern.Solid, extent = {{-10, 10}, {10, -10}}), Line(origin = {6, 11}, points = {{-70, -3}, {-16, -3}, {-12, 1}, {-6, 3}, {-2, 3}, {70, 3}, {70, 3}}), Line(origin = {6, -9}, points = {{-70, 3}, {-16, 3}, {-12, -1}, {-6, -3}, {70, -3}}), Line(origin = {51, -6}, points = {{-23, 0}, {23, 0}}), Line(origin = {52, 0}, points = {{-22, 0}, {22, 0}}), Line(origin = {51, 6}, points = {{-23, 0}, {23, 0}}), Line(origin = {-39, 4}, points = {{-25, 0}, {25, 0}}), Line(origin = {-39, -2}, points = {{-25, 0}, {25, 0}}), Text(origin = {0, 49}, extent = {{-40, 19}, {40, -19}}, textString = "Aero")}),
+    Icon(coordinateSystem(extent = {{-100, -100}, {100, 100}}), graphics = {
+      Rectangle(
+        extent = {{-62, -54}, {62, -82}},
+        lineColor = {0, 85, 170},
+        fillColor = {235, 244, 255},
+        fillPattern = FillPattern.Solid,
+        radius = 4),
+      Line(points = {{-48, -76}, {-48, -60}}, color = {120, 145, 170}),
+      Line(points = {{-24, -76}, {-24, -60}}, color = {120, 145, 170}),
+      Line(points = {{0, -76}, {0, -60}}, color = {120, 145, 170}),
+      Line(points = {{24, -76}, {24, -60}}, color = {120, 145, 170}),
+      Line(points = {{48, -76}, {48, -60}}, color = {120, 145, 170}),
+      Line(points = {{-56, -70}, {56, -70}}, color = {120, 145, 170}),
+      Line(points = {{-56, -64}, {56, -64}}, color = {120, 145, 170}),
+      Line(
+        points = {{-52, -76}, {-26, -68}, {-4, -72}, {20, -61}, {50, -64}},
+        color = {0, 85, 170},
+        thickness = 0.75),
+      Text(
+        extent = {{-56, -52}, {56, -32}},
+        textString = "CFD",
+        textColor = {0, 85, 170})}),
     Documentation(info = "<html>
 <p>
-Partial model <code>CFDAeroMapIcon</code> defines shared icon geometry for cfdaero map icon.
+Partial model <code>CFDAeroMapIcon</code> defines the CFD map overlay used by
+aero map models. The base aero interface owns the body and load-path icon; this
+partial adds only the map cue.
 </p>
 <p>
-It contains only graphical annotation primitives. Component and package models extend it to share the BobLib visual language without duplicating icon geometry.
+It contains only graphical annotation primitives. Component and package models
+extend it to share the BobLib visual language without duplicating icon geometry.
 </p>
 </html>"));
 end CFDAeroMapIcon;

@@ -68,11 +68,38 @@ model Motor
   output SI.Torque tau_cmd "Commanded motor torque";
   output SI.Torque tau_lim "Active motor torque limit";
 
+protected
+  Modelica.Blocks.Interfaces.RealOutput speedBusSignal(
+    quantity = "AngularVelocity",
+    unit = "rad/s") "Shaft speed published to electricMotorBus";
+  Modelica.Blocks.Interfaces.RealOutput mechanicalPowerBusSignal(
+    quantity = "Power",
+    unit = "W") "Mechanical shaft power published to electricMotorBus";
+  Modelica.Blocks.Interfaces.RealOutput torqueCommandBusSignal(
+    quantity = "Torque",
+    unit = "N.m") "Commanded torque published to electricMotorBus";
+  Modelica.Blocks.Interfaces.RealOutput torqueLimitBusSignal(
+    quantity = "Torque",
+    unit = "N.m") "Active torque limit published to electricMotorBus";
+
 equation
   w = motor.w;
   P_mech = motor.P_mech;
   tau_cmd = motor.tau_cmd;
   tau_lim = motor.tau_lim;
+  speedBusSignal = w;
+  mechanicalPowerBusSignal = P_mech;
+  torqueCommandBusSignal = tau_cmd;
+  torqueLimitBusSignal = tau_lim;
+
+  connect(speedBusSignal, controlBus.electricMotorBus.speed) annotation(
+    Line(points = {{0, 0}, {-90, 0}, {-90, -60}, {-100, -60}}, color = {0, 0, 127}));
+  connect(mechanicalPowerBusSignal, controlBus.electricMotorBus.mechanicalPower) annotation(
+    Line(points = {{0, 0}, {-92, 0}, {-92, -60}, {-100, -60}}, color = {0, 0, 127}));
+  connect(torqueCommandBusSignal, controlBus.electricMotorBus.torqueCommand) annotation(
+    Line(points = {{0, 0}, {-94, 0}, {-94, -60}, {-100, -60}}, color = {0, 0, 127}));
+  connect(torqueLimitBusSignal, controlBus.electricMotorBus.torqueLimit) annotation(
+    Line(points = {{0, 0}, {-96, 0}, {-96, -60}, {-100, -60}}, color = {0, 0, 127}));
 
   connect(P_elec, motor.P_elec) annotation(
     Line(points = {{-120, 0}, {-56, 0}}, color = {0, 0, 127}));
@@ -86,7 +113,9 @@ equation
 Thin adapter around <code>BobLibVehicleInterfaces.ElectricDrives.Internal.PowerLimitedMotor</code>.
 The mechanical side follows <code>VehicleInterfaces.ElectricDrives.Interfaces.Base</code>
 and includes the motor rotor inertia so the downstream driveline can remain a
-pure final-drive/differential/halfshaft assembly.
+pure final-drive/differential/halfshaft assembly. The adapter publishes motor
+speed, mechanical power, commanded torque, and active torque limit on
+<code>controlBus.electricMotorBus</code>.
 </p>
 </html>"));
 end Motor;

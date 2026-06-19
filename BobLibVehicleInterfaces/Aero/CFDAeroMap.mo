@@ -46,15 +46,18 @@ equation
 Model <code>CFDAeroMap</code>: CFD-based aero load map from per-corner ride heights.
 </p>
 <p>
-The model receives front-left, front-right, rear-left, and rear-right ride
-height signals. It averages each axle internally before looking up the
-front/rear ride-height CFD tables, then scales the loads with dynamic pressure
-using relative airspeed and local air density from the atmosphere model.
+The model reads front-left, front-right, rear-left, and rear-right ride-height
+signals from <code>controlBus.chassisBus</code>. It averages each axle
+internally before looking up the front/rear ride-height CFD tables, then scales
+the loads with dynamic pressure using relative airspeed calculated from the
+sprung chassis frame and wind plus local air density read from
+<code>atmosphereBus</code>.
 </p>
 <p>
-It is part of the aerodynamic load path. Aero models receive ride height and
-atmospheric inputs, then provide body-frame force and torque outputs for the
-chassis.
+It is part of the aerodynamic load path. Aero models receive chassis-owned
+ride-height measurements through the shared VehicleInterfaces control bus and
+atmosphere-owned measurements through the BobLib atmosphere bus, then provide
+body-frame force and torque outputs for the chassis.
 </p>
 </html>"));
 end CFDAeroMap;

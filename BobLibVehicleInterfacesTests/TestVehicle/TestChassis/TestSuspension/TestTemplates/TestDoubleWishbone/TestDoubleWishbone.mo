@@ -1,9 +1,9 @@
 within BobLibVehicleInterfacesTests.TestVehicle.TestChassis.TestSuspension.TestTemplates.TestDoubleWishbone;
 
 model TestDoubleWishbone
-  import BobLibVehicleInterfaces.Records.VehicleDefn.DWBCStabar_DWBCStabarRecord;
+  import BobLibVehicleInterfaces.Records.VehicleDefn.EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord;
 
-  parameter DWBCStabar_DWBCStabarRecord pVehicle;
+  parameter EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord pVehicle;
 
   inner parameter Real linkDiameter = 0.020;
   inner parameter Real jointDiameter = 0.030;

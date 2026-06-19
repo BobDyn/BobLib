@@ -20,17 +20,17 @@ OMC_COMMAND_LINE_OPTIONS = (
 )
 
 CHECK_MODELS = (
-    "BobLibVehicleInterfaces.Experiments.Standards.Architectures.BatteryElectricRearDrive",
-    "BobLibVehicleInterfaces.Experiments.Standards.Architectures.ConventionalRearDrive",
     "BobLibVehicleInterfaces.Experiments.Standards.VehicleSim",
     "BobLibVehicleInterfaces.Experiments.Standards.FourPostSim",
     "BobLibVehicleInterfaces.Engines.SimpleICEngine",
     "BobLibVehicleInterfaces.Engines.ICEnginePlaceholder",
     "BobLibVehicleInterfaces.Transmissions.FixedRatioTransmission",
     "BobLibVehicleInterfaces.Atmospheres.ConstantAtmosphere",
+    "BobLibVehicleInterfaces.Chassis.Brakes.BasicVCUBrakes",
     "BobLibVehicleInterfaces.DriverEnvironments.AutomaticDriveByWire",
     "BobLibVehicleInterfaces.DriverEnvironments.EVDriveByWire",
     "BobLibVehicleInterfacesTests.TestVehicle.TestAero.TestCFDAeroMap",
+    "BobLibVehicleInterfacesTests.TestVehicle.TestPowertrain.TestVCU",
     "BobLibVehicleInterfacesTests.TestVehicle.TestPowertrain.TestPowertrain",
     "BobLibVehicleInterfacesTests.TestVehicle.TestChassis.TestSuspension.TestTemplates.TestTire.TestFourMF52Kinematic",
     "BobLibVehicleInterfacesTests.Regression.MF52PureSlipSmoke",
@@ -41,7 +41,7 @@ def _repo_root() -> Path:
     return Path(__file__).resolve().parents[1]
 
 
-def _render_mos(repo_root: Path) -> str:
+def _render_mos(repo_root: Path, model: str) -> str:
     library_root = repo_root / "BobLibVehicleInterfaces"
     tests_root = repo_root / "BobLibVehicleInterfacesTests"
     lines = [
@@ -52,18 +52,17 @@ def _render_mos(repo_root: Path) -> str:
         f'loadFile("{library_root.as_posix()}/package.mo");',
         f'loadFile("{tests_root.as_posix()}/package.mo");',
     ]
-    for model in CHECK_MODELS:
-        lines.extend((f"checkModel({model});", "getErrorString();"))
+    lines.extend((f"checkModel({model});", "getErrorString();"))
     return "\n".join(lines) + "\n"
 
 
-def test_boblibvehicleinterfaces_core_models_translate() -> None:
+def _check_model(model: str) -> int:
     omc = shutil.which("omc")
     if omc is None:
         pytest.skip("OpenModelica omc is not installed")
 
     with tempfile.NamedTemporaryFile("w", suffix=".mos", delete=False) as mos:
-        mos.write(_render_mos(_repo_root()))
+        mos.write(_render_mos(_repo_root(), model))
         mos_path = Path(mos.name)
 
     try:
@@ -79,16 +78,19 @@ def test_boblibvehicleinterfaces_core_models_translate() -> None:
 
     output = completed.stdout
     if completed.returncode != 0:
-        pytest.fail(f"omc failed for BobLibVehicleInterfaces checks:\n{output}")
+        pytest.fail(f"omc failed for {model}:\n{output}")
 
-    for model in CHECK_MODELS:
-        success = f"Check of {model} completed successfully."
-        assert success in output, (
-            f"checkModel did not report success for {model}:\n{output}"
-        )
-        match = re.search(
-            rf"Class {re.escape(model)} has ([0-9]+) equation\(s\)",
-            output,
-        )
-        assert match is not None, f"Could not parse equation count for {model}:\n{output}"
-        print(f"{model}: {int(match.group(1))} equations")
+    success = f"Check of {model} completed successfully."
+    assert success in output, f"checkModel did not report success for {model}:\n{output}"
+    match = re.search(
+        rf"Class {re.escape(model)} has ([0-9]+) equation\(s\)",
+        output,
+    )
+    assert match is not None, f"Could not parse equation count for {model}:\n{output}"
+    return int(match.group(1))
+
+
+@pytest.mark.parametrize("model", CHECK_MODELS, ids=CHECK_MODELS)
+def test_boblibvehicleinterfaces_model_translates(model: str) -> None:
+    equation_count = _check_model(model)
+    print(f"{model}: {equation_count} equations")

@@ -7,6 +7,8 @@ record RearFinalDriveDifferentialRecord
     "Motor speed divided by differential input speed";
   parameter SI.Inertia diffInputRotorJ = 0.04
     "Differential input/ring inertia";
+  parameter Boolean diff_lockedKinematics = false
+    "Use structural spool kinematics instead of open differential kinematics";
   parameter Boolean diff_use_lsd = true
     "Enable differential limited-slip locking torque";
   parameter Real diff_driveSideTorqueSign = 1

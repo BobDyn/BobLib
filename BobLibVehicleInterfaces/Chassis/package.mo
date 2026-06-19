@@ -13,9 +13,10 @@ chassis subsystem boundary.
 Direct chassis models are VehicleInterfaces-facing chassis contract adapters:
 partial adapters define the shared boundary, and concrete variants bind records
 and detailed physics for vehicle experiments. Detailed implementation cores live
-in <code>Internal</code>; body physics lives in <code>Body</code>; suspension,
-axle, tire, and raw contact-patch frame models live in <code>Suspension</code>
-and its nested packages. Shared MultiBody contact mechanics live under
+in <code>Internal</code>; body physics lives in <code>Body</code>; simple
+wheel-speed-opposing brake models live in <code>Brakes</code>; suspension, axle,
+tire, and raw contact-patch frame models live in <code>Suspension</code> and
+its nested packages. Shared MultiBody contact mechanics live under
 <code>Utilities.Mechanics.MultiBody</code> and are wired at the chassis or rig
 assembly level.
 </p>

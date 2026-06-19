@@ -8,6 +8,10 @@ model TestPowertrain
   // Inverter
   BobLibVehicleInterfaces.PowerElectronics.InverterDC inv annotation(
     Placement(transformation(origin = {-80, 30}, extent = {{-10, -10}, {10, 10}})));
+  VehicleInterfaces.Interfaces.ControlBus controlBus annotation(
+    Placement(transformation(origin = {-110, 20}, extent = {{-10, -10}, {10, 10}})));
+  VehicleInterfaces.Interfaces.ElectricMotorControlBus electricMotorControlBus annotation(
+    Placement(transformation(origin = {-110, 30}, extent = {{-10, -10}, {10, 10}})));
   // Power command
   Modelica.Blocks.Sources.Step P_step(height = 80e3,  // 80 kW
   startTime = 1.0) annotation(
@@ -46,8 +50,12 @@ model TestPowertrain
     w(start = 0, fixed = true)) annotation(
     Placement(transformation(origin = {90, -20}, extent = {{-10, -10}, {10, 10}})));
 equation
-  connect(P_step.y, inv.P_req) annotation(
-    Line(points = {{-99, 50}, {-80, 50}, {-80, 42}}, color = {0, 0, 255}));
+  connect(controlBus, inv.controlBus) annotation(
+    Line(points = {{-110, 20}, {-90, 20}, {-90, 36}}, color = {255, 204, 51}, thickness = 0.5));
+  connect(controlBus.electricMotorControlBus, electricMotorControlBus) annotation(
+    Line(points = {{-110, 20}, {-110, 30}}, color = {255, 204, 51}, thickness = 0.5));
+  connect(P_step.y, electricMotorControlBus.powerRequest) annotation(
+    Line(points = {{-99, 50}, {-110, 50}, {-110, 30}}, color = {0, 0, 255}));
   connect(g.p, batt.p) annotation(
     Line(points = {{-110, -40}, {-110, -20}, {-90, -20}}, color = {0, 0, 255}));
   connect(inv.p, batt.p) annotation(

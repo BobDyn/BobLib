@@ -7,6 +7,10 @@ record VCURecord
     "VCU motoring torque limit";
   parameter SI.Torque regenTorqueLimit = 220
     "Default generated-vehicle regen torque limit magnitude";
+  parameter SI.Torque mechanicalBrakeTorqueLimit = 1500
+    "Default generated-vehicle combined mechanical brake torque limit";
+  parameter Real regenBrakeBlend(unit = "1", min = 0, max = 1) = 0
+    "Default fraction of negative speed-control torque assigned to regen";
   parameter SI.AngularVelocity w_eps = 1.0
     "Low-speed regularization for VCU power conversion";
   parameter Real motorSpeedSign = 1
@@ -16,7 +20,8 @@ record VCURecord
     Documentation(info = "<html>
 <p>
 Record <code>VCURecord</code> contains controller parameters and the standard
-simulation regen command limit passed around the VCU subsystem.
+simulation regen and mechanical-brake command limits passed around the VCU
+subsystem.
 </p>
 </html>"));
 end VCURecord;

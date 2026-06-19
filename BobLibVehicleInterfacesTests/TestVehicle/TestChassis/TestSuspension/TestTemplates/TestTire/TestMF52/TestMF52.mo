@@ -7,7 +7,7 @@ model TestMF52
   import Vehicle = BobLibVehicleInterfaces.Records.VehicleDefn;
 
   // Vehicle Definition
-  parameter Vehicle.DWBCStabar_DWBCStabarRecord car;
+  parameter Vehicle.EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord car;
 
   // Operating Conditions
   parameter SI.Force Fz = 654;

@@ -10,8 +10,9 @@ models exposed through the standard VehicleInterfaces atmosphere contract.
 </p>
 <p>
 BobLib atmosphere models keep the VehicleInterfaces replaceable functions and
-also expose commonly used scalar/vector signals so vehicle diagrams can show
-the atmosphere-to-aero signal path explicitly.
+also publish commonly used scalar/vector measurements to a shared
+<code>AtmosphereBus</code> so downstream subsystems can subscribe without
+direct atmosphere-to-subsystem signal wiring.
 </p>
 </html>"));
 end Atmospheres;

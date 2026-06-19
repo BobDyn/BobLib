@@ -3,8 +3,6 @@ within BobLibVehicleInterfaces.Experiments.Standards.Templates.Vehicle;
 partial model BaseVehicleSim
   import SI = Modelica.Units.SI;
   import Modelica.Constants.pi;
-  import Modelica.Math.Vectors.norm;
-  import Modelica.Mechanics.MultiBody.Frames;
 
   // Import vehicle records
   import BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.Templates.PartialWheelRecord;
@@ -23,13 +21,16 @@ partial model BaseVehicleSim
   constant Integer MODE_OPEN_LOOP_RAMP = 0;
   constant Integer MODE_OPEN_LOOP_SINE = 1;
   constant Integer MODE_STEP_STEER = 2;
+  constant Integer MODE_STEADY_STATE_AY = 3;
 
   parameter Integer useMode = MODE_OPEN_LOOP_RAMP
-    "0 - open-loop ramp steer; 1 - open-loop sinusoidal steer; 2 - step steer"
+    "0 - open-loop ramp steer; 1 - open-loop sinusoidal steer; 2 - step steer; 3 - closed-loop steady-state lateral acceleration"
     annotation(Evaluate = false);
 
   // Toggle maneuver modes
   final parameter Boolean openLoopAy = useMode == MODE_OPEN_LOOP_RAMP;
+  final parameter Boolean steadyStateAy = useMode == MODE_STEADY_STATE_AY;
+  final parameter Boolean ayManeuver = openLoopAy or steadyStateAy;
 
   parameter Modelica.Units.SI.Time steerStart = 2.0
     "Start time"
@@ -37,8 +38,8 @@ partial model BaseVehicleSim
 
   // Open-loop ramp-steer parameters
   parameter SI.Acceleration targetAy = 18
-    "Lateral-acceleration sign used to choose open-loop handwheel ramp direction"
-    annotation(Evaluate = false, Dialog(enable = openLoopAy));
+    "Target lateral acceleration; open-loop ramp mode uses only its sign"
+    annotation(Evaluate = false, Dialog(enable = ayManeuver));
 
   parameter SI.Velocity initialVel = 15
     "Initial velocity"
@@ -62,23 +63,23 @@ partial model BaseVehicleSim
 
   parameter Boolean terminateOnTireLift = true
     "Terminate the maneuver if a tire reaches the lift threshold"
-    annotation(Evaluate = false, Dialog(enable = openLoopAy));
+    annotation(Evaluate = false, Dialog(enable = ayManeuver));
 
   parameter SI.Force tireLiftTerminateLoad = 75.0
     "Tire normal load threshold used for hard lift termination"
-    annotation(Evaluate = false, Dialog(enable = openLoopAy));
+    annotation(Evaluate = false, Dialog(enable = ayManeuver));
 
   parameter Boolean terminateOnSpinout = true
-    "Terminate the open-loop ramp if body sideslip indicates loss of directional control"
-    annotation(Evaluate = false, Dialog(enable = openLoopAy));
+    "Terminate the maneuver if body sideslip indicates loss of directional control"
+    annotation(Evaluate = false, Dialog(enable = ayManeuver));
 
   parameter SI.Angle sideslipTerminate = 20*pi/180
     "Absolute body sideslip threshold used for spinout termination"
-    annotation(Evaluate = false, Dialog(enable = openLoopAy and terminateOnSpinout));
+    annotation(Evaluate = false, Dialog(enable = ayManeuver and terminateOnSpinout));
 
   parameter SI.Time spinoutHoldDuration = 0.02
     "Duration the sideslip threshold must remain true before spinout termination"
-    annotation(Evaluate = false, Dialog(enable = openLoopAy and terminateOnSpinout));
+    annotation(Evaluate = false, Dialog(enable = ayManeuver and terminateOnSpinout));
 
   parameter Boolean enableLinearityTermination = true
     "Terminate the open-loop ramp when steering response leaves the linear region"
@@ -97,8 +98,8 @@ partial model BaseVehicleSim
     annotation(Evaluate = false, Dialog(enable = openLoopAy));
 
   parameter SI.Time linearitySlopeSamplePeriod = 0.10
-    "Sample period for the finite-difference local lateral-gain monitor"
-    annotation(Evaluate = false, Dialog(enable = openLoopAy));
+    "Sample period for finite-difference lateral-gain and steady-state monitors"
+    annotation(Evaluate = false, Dialog(enable = ayManeuver));
 
   parameter SI.Time linearityHoldDuration = 0.05
     "Duration that the nonlinearity threshold must remain true before termination"
@@ -106,16 +107,65 @@ partial model BaseVehicleSim
 
   parameter SI.Time steadyHoldDuration = 0.1
     "Duration that the QSS plateau conditions must remain true before termination"
-    annotation(Evaluate = false, Dialog(enable = openLoopAy));
+    annotation(Evaluate = false, Dialog(enable = ayManeuver));
 
   parameter Real der_yawVelTol = 0.01
     "Yaw-rate derivative tolerance for ramp-steer steady-state detection";
 
   parameter Real handwheelRateTol = 0.01
-    "Handwheel-rate derivative tolerance for open-loop QSS detection";
+    "Handwheel-rate derivative tolerance for QSS/steady-state detection";
 
   parameter SI.Time settleTimeout = 3.0
     "Fail-fast timeout after the ramp ends if QSS is never reached";
+
+  // Closed-loop steady-state lateral-acceleration parameters
+  parameter Real steadyStateAyRampRate(unit = "m/s3") = 2.0
+    "Rate used to ramp the closed-loop lateral-acceleration target"
+    annotation(Evaluate = false, Dialog(enable = steadyStateAy));
+
+  parameter SI.Angle steadyStateMaxHandwheel = 120*pi/180
+    "Closed-loop steady-state steering command limit"
+    annotation(Evaluate = false, Dialog(enable = steadyStateAy));
+
+  parameter Real steadyStateAyGain(unit = "rad.s2/m") = 0.050
+    "Closed-loop steering PI gain from lateral-acceleration error to handwheel angle"
+    annotation(Evaluate = false, Dialog(enable = steadyStateAy));
+
+  parameter SI.Time steadyStateAyTi = 1.0
+    "Closed-loop steering PI integral time"
+    annotation(Evaluate = false, Dialog(enable = steadyStateAy));
+
+  parameter SI.Time steadyStateSteerTimeConstant = 0.15
+    "First-order lag applied to the closed-loop steering command"
+    annotation(Evaluate = false, Dialog(enable = steadyStateAy));
+
+  parameter SI.Acceleration steadyStateAyTolerance = 0.05
+    "Allowed lateral-acceleration error for closed-loop steady-state detection"
+    annotation(Evaluate = false, Dialog(enable = steadyStateAy));
+
+  parameter Real steadyStateAyRateTolerance(unit = "m/s3") = 0.05
+    "Lateral-acceleration finite-difference rate tolerance for steady-state detection"
+    annotation(Evaluate = false, Dialog(enable = steadyStateAy));
+
+  parameter SI.Velocity steadyStateSpeedTolerance = 0.10
+    "Allowed vehicle-speed error for closed-loop steady-state detection"
+    annotation(Evaluate = false, Dialog(enable = steadyStateAy));
+
+  parameter Real steadyStateYawRateDerivativeTolerance(unit = "rad/s2") = 0.01
+    "Yaw-rate derivative tolerance for closed-loop steady-state detection"
+    annotation(Evaluate = false, Dialog(enable = steadyStateAy));
+
+  parameter Real steadyStateSideslipRateTolerance(unit = "rad/s") = 0.005
+    "Sideslip-rate tolerance for closed-loop steady-state detection"
+    annotation(Evaluate = false, Dialog(enable = steadyStateAy));
+
+  parameter Real steadyStateRollRateTolerance(unit = "rad/s") = 0.005
+    "Roll-rate tolerance for closed-loop steady-state detection"
+    annotation(Evaluate = false, Dialog(enable = steadyStateAy));
+
+  parameter SI.Time steadyStateSettleTimeout = 20.0
+    "Fail-fast timeout after the closed-loop target reaches its final value"
+    annotation(Evaluate = false, Dialog(enable = steadyStateAy));
 
   // Ramp-steer parameters
   parameter SI.Angle frRampSteerHeight = 5*pi/180
@@ -143,11 +193,6 @@ partial model BaseVehicleSim
   Real bodyAccels[3];
 
   Real speed;
-  SI.Velocity windVelocityWorld[3];
-  SI.Velocity windVelocityBody[3];
-  SI.Velocity relativeAirVelocity[3];
-  SI.Velocity relativeAirSpeed;
-  SI.Density airDensity;
   Real curvature;
   SI.Angle handwheelRampCmd(start = 0, fixed = true);
   SI.AngularVelocity handwheelRateCmd;
@@ -166,6 +211,20 @@ partial model BaseVehicleSim
   Real linearityGainLossFraction;
   Real steerSine;
   Real steerStep;
+  Real steadyStateAyRampDuration;
+  Real steadyStateAyRampXi;
+  SI.Acceleration steadyStateAyCommand(start = 0);
+  discrete Real steadyStateAyError(start = 0, fixed = true);
+  discrete Real steadyStateSpeedError(start = 0, fixed = true);
+  SI.Velocity steadyStateAyIntegral(start = 0, fixed = true);
+  SI.Angle steadyStateSteerCmd(start = 0, fixed = true);
+  Boolean steadyStateTargetReached;
+  discrete Boolean steadyStateConditionsMet(start = false, fixed = true);
+  discrete Real steadyStateAyRate(start = 0, fixed = true);
+  discrete Real steadyStateYawRateDerivative(start = 0, fixed = true);
+  discrete Real steadyStateSideslipRate(start = 0, fixed = true);
+  discrete Real steadyStateRollRate(start = 0, fixed = true);
+  discrete Real steadyStateHandwheelRate(start = 0, fixed = true);
 
   // Standard outputs
   SI.Acceleration accX;
@@ -196,12 +255,8 @@ partial model BaseVehicleSim
       Dialog(group = "Plant Models"),
       Placement(transformation(extent = {{44, -50}, {104, -10}})));
 
-  replaceable BobLibVehicleInterfaces.EnergyStorage.BatteryPack battery(
-    includeGround = true,
-    Ns = pVehicle.pBattery.Ns,
-    Np = pVehicle.pBattery.Np,
-    SOC_start = pVehicle.pBattery.SOC_start)
-    constrainedby VehicleInterfaces.EnergyStorage.Interfaces.Base
+  replaceable BobLibVehicleInterfaces.EnergyStorage.BatteryPack battery(includeGround = true, Ns = pVehicle.pBattery.Ns, Np = pVehicle.pBattery.Np, SOC_start = pVehicle.pBattery.SOC_start) annotation(
+    Placement(transformation(origin = {-6, 0}, extent = {{-128, -46}, {-98, -16}})))constrainedby VehicleInterfaces.EnergyStorage.Interfaces.Base
     "Energy storage subsystem" annotation(
       choicesAllMatching = true,
       Dialog(group = "Plant Models"),
@@ -212,7 +267,9 @@ partial model BaseVehicleSim
     w_eps = pVehicle.pVCU.w_eps,
     motorSpeedSign = pVehicle.pVCU.motorSpeedSign,
     finalDriveRatio = pVehicle.pDriveline.finalDriveRatio,
-    regenTorqueLimit = pVehicle.pVCU.regenTorqueLimit)
+    regenTorqueLimit = pVehicle.pVCU.regenTorqueLimit,
+    mechanicalBrakeTorqueLimit = pVehicle.pVCU.mechanicalBrakeTorqueLimit,
+    regenBrakeBlend = pVehicle.pVCU.regenBrakeBlend)
     constrainedby VehicleInterfaces.Controllers.Interfaces.Base
     "Vehicle control unit" annotation(
       choicesAllMatching = true,
@@ -224,27 +281,10 @@ partial model BaseVehicleSim
     P_max_reg = pVehicle.pInverter.P_max_reg,
     V_dc_max = pVehicle.pInverter.V_dc_max)
     "Power electronics subsystem" annotation(
-      choicesAllMatching = true,
-      Dialog(group = "Plant Models"),
-      Placement(transformation(extent = {{-84, -46}, {-54, -16}})));
+      Placement(transformation(origin = {-2, 8}, extent = {{-84, -46}, {-54, -16}})));
 
-  replaceable BobLibVehicleInterfaces.ElectricDrives.Motor motor(
-    Vdc_max = pVehicle.pMotor.Vdc_max,
-    rpm_max_peak = pVehicle.pMotor.rpm_max_peak,
-    T_peak = pVehicle.pMotor.T_peak,
-    T_cont = pVehicle.pMotor.T_cont,
-    I_peak_2min = pVehicle.pMotor.I_peak_2min,
-    I_cont = pVehicle.pMotor.I_cont,
-    Kt_Nm_per_A = pVehicle.pMotor.Kt_Nm_per_A,
-    peakTime = pVehicle.pMotor.peakTime,
-    P_mech_peak = pVehicle.pMotor.P_mech_peak,
-    P_cont_low = pVehicle.pMotor.P_cont_low,
-    P_cont_high = pVehicle.pMotor.P_cont_high,
-    eta_mot = pVehicle.pMotor.eta_mot,
-    eta_reg = pVehicle.pMotor.eta_reg,
-    w_eps = pVehicle.pMotor.w_eps,
-    rotorJ = pVehicle.pMotor.rotorJ)
-    constrainedby VehicleInterfaces.ElectricDrives.Interfaces.Base
+  replaceable BobLibVehicleInterfaces.ElectricDrives.Motor motor(Vdc_max = pVehicle.pMotor.Vdc_max, rpm_max_peak = pVehicle.pMotor.rpm_max_peak, T_peak = pVehicle.pMotor.T_peak, T_cont = pVehicle.pMotor.T_cont, I_peak_2min = pVehicle.pMotor.I_peak_2min, I_cont = pVehicle.pMotor.I_cont, Kt_Nm_per_A = pVehicle.pMotor.Kt_Nm_per_A, peakTime = pVehicle.pMotor.peakTime, P_mech_peak = pVehicle.pMotor.P_mech_peak, P_cont_low = pVehicle.pMotor.P_cont_low, P_cont_high = pVehicle.pMotor.P_cont_high, eta_mot = pVehicle.pMotor.eta_mot, eta_reg = pVehicle.pMotor.eta_reg, w_eps = pVehicle.pMotor.w_eps, rotorJ = pVehicle.pMotor.rotorJ) annotation(
+    Placement(transformation(origin = {-4, -16}, extent = {{-42, -44}, {-12, -14}})))constrainedby VehicleInterfaces.ElectricDrives.Interfaces.Base
     "Traction motor subsystem" annotation(
       choicesAllMatching = true,
       Dialog(group = "Plant Models"),
@@ -261,6 +301,8 @@ partial model BaseVehicleSim
   replaceable BobLibVehicleInterfaces.Drivelines.RearFinalDriveDifferential driveline(
     finalDriveRatio = 1,
     diffInputRotorJ = pVehicle.pDriveline.diffInputRotorJ,
+    initialOutputAngularVelocity = initialVel / pVehicle.pRrPartialWheel.R0,
+    diff_lockedKinematics = pVehicle.pDriveline.diff_lockedKinematics,
     diff_use_lsd = pVehicle.pDriveline.diff_use_lsd,
     diff_driveSideTorqueSign = pVehicle.pDriveline.diff_driveSideTorqueSign,
     diff_T_preload = pVehicle.pDriveline.diff_T_preload,
@@ -281,22 +323,28 @@ partial model BaseVehicleSim
       Dialog(group = "Plant Models"),
       Placement(transformation(extent = {{14, -40}, {44, -10}})));
 
-  replaceable VehicleInterfaces.Brakes.MinimalBrakes brakes(
-    maxTorque = 1500)
+  replaceable BobLibVehicleInterfaces.Chassis.Brakes.BasicVCUBrakes brakes(
+    maxTorque = pVehicle.pVCU.mechanicalBrakeTorqueLimit)
     constrainedby VehicleInterfaces.Brakes.Interfaces.TwoAxleBase
     "Brakes subsystem" annotation(
       choicesAllMatching = true,
       Dialog(group = "Plant Models"),
       Placement(transformation(extent = {{120, -40}, {150, -10}})));
 
-  inner replaceable VehicleInterfaces.Roads.FlatRoad road
+  BobLibVehicleInterfaces.DriverEnvironments.EVDriveByWire driverEnvironment
+    "Driver environment publishing driver intent onto the VehicleInterfaces driver bus" annotation(
+      Placement(transformation(origin = {0, 2}, extent = {{-20, 54}, {20, 94}})));
+
+  inner replaceable VehicleInterfaces.Roads.FlatRoad road annotation(
+    Placement(transformation(origin = {40, 0}, extent = {{-120, -140}, {-80, -120}})))
     constrainedby VehicleInterfaces.Roads.Interfaces.Base
     "Road model" annotation(
       choicesAllMatching = true,
       Dialog(group = "Conditions"),
       Placement(transformation(extent = {{-120, -140}, {-80, -120}})));
 
-  inner replaceable BobLibVehicleInterfaces.Atmospheres.ConstantAtmosphere atmosphere
+  inner replaceable BobLibVehicleInterfaces.Atmospheres.ConstantAtmosphere atmosphere annotation(
+    Placement(transformation(origin = {50, 0}, extent = {{-70, -140}, {-30, -120}})))
     constrainedby VehicleInterfaces.Atmospheres.Interfaces.Base
     "Atmospheric model" annotation(
       choicesAllMatching = true,
@@ -312,8 +360,6 @@ partial model BaseVehicleSim
       choicesAllMatching = true,
       Dialog(group = "Conditions"),
       Placement(transformation(extent = {{-150, -140}, {-130, -120}})));
-
-public
   VehicleInterfaces.Interfaces.ControlBus controlBus "Control bus connector"
     annotation(Placement(transformation(
       origin = {-150, 30},
@@ -324,104 +370,33 @@ public
       rotation = 90,
       origin = {-100, 60})));
 
-  Modelica.Mechanics.MultiBody.Joints.FreeMotion cgFreeMotion(
-    animation = false,
-    r_rel_a(start = {0, 0, 0}, each fixed = true),
-    angles_fixed = true,
-    angles_start = {0, 0, 0},
-    enforceStates = true,
-    useQuaternions = false,
-    w_rel_a_fixed = true,
-    w_rel_a_start = {0, 0, 0},
-    v_rel_a(start = {initialVel, 0, 0}, each fixed = true)) annotation(
-    Placement(transformation(origin = {132, -90}, extent = {{10, -10}, {-10, 10}})));
-
   final parameter SI.Length wheelbase = abs(
     pVehicle.pFrDW.wheelCenter[1] - pVehicle.pRrDW.wheelCenter[1]);
-
-  final parameter SI.Mass pTotalMass =
-    pVehicle.pSprungMass.m +
-    pVehicle.pFrAxleMass.unsprungMass.m +
-    pVehicle.pFrAxleMass.ucaMass.m +
-    pVehicle.pFrAxleMass.lcaMass.m +
-    pVehicle.pFrAxleMass.tieMass.m +
-    pVehicle.pRrAxleMass.unsprungMass.m +
-    pVehicle.pRrAxleMass.ucaMass.m +
-    pVehicle.pRrAxleMass.lcaMass.m +
-    pVehicle.pRrAxleMass.tieMass.m;
-
-  final parameter SI.Position pVehicleCG[3] = {
-    (
-      pVehicle.pSprungMass.m * pVehicle.pSprungMass.rCM[1] +
-      pVehicle.pFrAxleMass.unsprungMass.m * pVehicle.pFrAxleMass.unsprungMass.rCM[1] +
-      pVehicle.pFrAxleMass.ucaMass.m * pVehicle.pFrAxleMass.ucaMass.rCM[1] +
-      pVehicle.pFrAxleMass.lcaMass.m * pVehicle.pFrAxleMass.lcaMass.rCM[1] +
-      pVehicle.pFrAxleMass.tieMass.m * pVehicle.pFrAxleMass.tieMass.rCM[1] +
-      pVehicle.pRrAxleMass.unsprungMass.m * pVehicle.pRrAxleMass.unsprungMass.rCM[1] +
-      pVehicle.pRrAxleMass.ucaMass.m * pVehicle.pRrAxleMass.ucaMass.rCM[1] +
-      pVehicle.pRrAxleMass.lcaMass.m * pVehicle.pRrAxleMass.lcaMass.rCM[1] +
-      pVehicle.pRrAxleMass.tieMass.m * pVehicle.pRrAxleMass.tieMass.rCM[1]
-    ) / pTotalMass,
-    (
-      pVehicle.pSprungMass.m * pVehicle.pSprungMass.rCM[2] +
-      pVehicle.pFrAxleMass.unsprungMass.m * pVehicle.pFrAxleMass.unsprungMass.rCM[2] +
-      pVehicle.pFrAxleMass.ucaMass.m * pVehicle.pFrAxleMass.ucaMass.rCM[2] +
-      pVehicle.pFrAxleMass.lcaMass.m * pVehicle.pFrAxleMass.lcaMass.rCM[2] +
-      pVehicle.pFrAxleMass.tieMass.m * pVehicle.pFrAxleMass.tieMass.rCM[2] +
-      pVehicle.pRrAxleMass.unsprungMass.m * pVehicle.pRrAxleMass.unsprungMass.rCM[2] +
-      pVehicle.pRrAxleMass.ucaMass.m * pVehicle.pRrAxleMass.ucaMass.rCM[2] +
-      pVehicle.pRrAxleMass.lcaMass.m * pVehicle.pRrAxleMass.lcaMass.rCM[2] +
-      pVehicle.pRrAxleMass.tieMass.m * pVehicle.pRrAxleMass.tieMass.rCM[2]
-    ) / pTotalMass,
-    (
-      pVehicle.pSprungMass.m * pVehicle.pSprungMass.rCM[3] +
-      pVehicle.pFrAxleMass.unsprungMass.m * pVehicle.pFrAxleMass.unsprungMass.rCM[3] +
-      pVehicle.pFrAxleMass.ucaMass.m * pVehicle.pFrAxleMass.ucaMass.rCM[3] +
-      pVehicle.pFrAxleMass.lcaMass.m * pVehicle.pFrAxleMass.lcaMass.rCM[3] +
-      pVehicle.pFrAxleMass.tieMass.m * pVehicle.pFrAxleMass.tieMass.rCM[3] +
-      pVehicle.pRrAxleMass.unsprungMass.m * pVehicle.pRrAxleMass.unsprungMass.rCM[3] +
-      pVehicle.pRrAxleMass.ucaMass.m * pVehicle.pRrAxleMass.ucaMass.rCM[3] +
-      pVehicle.pRrAxleMass.lcaMass.m * pVehicle.pRrAxleMass.lcaMass.rCM[3] +
-      pVehicle.pRrAxleMass.tieMass.m * pVehicle.pRrAxleMass.tieMass.rCM[3]
-    ) / pTotalMass
-  };
 
 protected
   discrete Boolean rampEnding(start = false, fixed = true);
   discrete Boolean linearitySampleValid(start = false, fixed = true);
   discrete Boolean linearityReferenceValid(start = false, fixed = true);
+  discrete Boolean steadyStateSampleValid(start = false, fixed = true);
   discrete Real t_qss_hit(start = -1, fixed = true);
+  discrete Real t_steady_state_hit(start = -1, fixed = true);
   discrete Real t_ramp_end_hit(start = -1, fixed = true);
   discrete Real t_linearity_limit_hit(start = -1, fixed = true);
   discrete Real t_spinout_hit(start = -1, fixed = true);
   discrete Real t_yawVel_hit(start = -1, fixed = true);
+  discrete Real steadyStateSampleAy(start = 0, fixed = true);
+  discrete Real steadyStateSampleYawVel(start = 0, fixed = true);
+  discrete Real steadyStateSampleSideslip(start = 0, fixed = true);
+  discrete Real steadyStateSampleRoll(start = 0, fixed = true);
+  discrete Real steadyStateSampleHandwheel(start = 0, fixed = true);
 
-  Modelica.Mechanics.MultiBody.Parts.Fixed cgFixed(
-    r = pVehicleCG,
-    animation = false) annotation(
-    Placement(transformation(origin = {162, -90}, extent = {{10, -10}, {-10, 10}})));
-
-  VehicleInterfaces.Interfaces.DriverBus driverBus
-    "Autonomous driver-command bus populated by the simulation template" annotation(
-    Placement(transformation(extent = {{-136, 74}, {-116, 94}})));
+  BobLibVehicleInterfaces.Atmospheres.Interfaces.AtmosphereBus atmosphereBus
+    "Shared atmosphere signal bus populated by the atmosphere subsystem" annotation(
+      Placement(transformation(extent = {{-136, -126}, {-116, -106}})));
 
   Modelica.Blocks.Sources.RealExpression steerCommand(
     y = frSteerCmd) annotation(
-      Placement(transformation(origin = {30, 100}, extent = {{-10, -10}, {10, 10}})));
-
-  Modelica.Mechanics.Rotational.Sources.Position frSteerPosition(
-    exact = true,
-    w(start = 0)) annotation(
-      Placement(transformation(origin = {74, 72}, extent = {{-10, -10}, {10, 10}})));
-
-  Modelica.Blocks.Sources.RealExpression acceleratorPedalCommand(
-    y = vcu.acceleratorPedalCmd)
-    "Autonomous accelerator command published to the VehicleInterfaces driver bus" annotation(
-      Placement(transformation(origin = {-154, 90}, extent = {{-5, -2}, {5, 2}})));
-
-  Modelica.Blocks.Sources.RealExpression brakePedalCommand(
-    y = vcu.brakePedalCmd) "Autonomous brake command published to the VehicleInterfaces driver bus" annotation(
-      Placement(transformation(origin = {-154, 84}, extent = {{-5, -2}, {5, 2}})));
+      Placement(transformation(origin = {30, 70}, extent = {{-10, -10}, {10, 10}})));
 
   Modelica.Blocks.Sources.IntegerConstant requestedGearCommand(
     k = 0) "Requested automatic-transmission gear" annotation(
@@ -437,53 +412,39 @@ protected
     "Ignition command published to the VehicleInterfaces driver bus" annotation(
       Placement(transformation(origin = {-154, 66}, extent = {{-5, -2}, {5, 2}})));
 
-  Modelica.Blocks.Sources.BooleanConstant inverterEnable(k = true) annotation(
+  Modelica.Blocks.Sources.BooleanConstant inverterEnableCommand(k = true)
+    "Inverter-enable command published to the VehicleInterfaces driver bus" annotation(
       Placement(transformation(origin = {-132, 51}, extent = {{-5, -2}, {5, 2}})));
 
-  Modelica.Blocks.Sources.RealExpression motorSpeed(
-    y = motor.w) annotation(
-      Placement(transformation(origin = {-132, 63}, extent = {{-5, -2}, {5, 2}})));
+  Modelica.Blocks.Sources.Constant driverAcceleratorPedalCommand(k = 0)
+    "Inactive driver accelerator-pedal command for VCU speed-control templates" annotation(
+      Placement(transformation(origin = {-154, 92}, extent = {{-5, -2}, {5, 2}})));
 
-  Modelica.Blocks.Sources.RealExpression hvVoltage(
-    y = inverter.V_dc) annotation(
-      Placement(transformation(origin = {-132, 39}, extent = {{-5, -2}, {5, 2}})));
+  Modelica.Blocks.Sources.Constant driverBrakePedalCommand(k = 0)
+    "Inactive driver brake-pedal command for VCU speed-control templates" annotation(
+      Placement(transformation(origin = {-154, 86}, extent = {{-5, -2}, {5, 2}})));
 
-  Modelica.Blocks.Sources.RealExpression hvCurrent(
-    y = inverter.I_dc) annotation(
-      Placement(transformation(origin = {-132, 33}, extent = {{-5, -2}, {5, 2}})));
+  Modelica.Blocks.Sources.Constant driverMotorTorqueCommand(k = 0)
+    "Inactive direct driver motor-torque command" annotation(
+      Placement(transformation(origin = {-154, 60}, extent = {{-5, -2}, {5, 2}})));
 
-  Modelica.Blocks.Sources.RealExpression aeroRideHeight_1(
-    y = chassis.rideHeight_1) annotation(
-      Placement(transformation(origin = {36, -54}, extent = {{-5, -2}, {5, 2}})));
-
-  Modelica.Blocks.Sources.RealExpression aeroRideHeight_2(
-    y = chassis.rideHeight_2) annotation(
-      Placement(transformation(origin = {36, -60}, extent = {{-5, -2}, {5, 2}})));
-
-  Modelica.Blocks.Sources.RealExpression aeroRideHeight_3(
-    y = chassis.rideHeight_3) annotation(
-      Placement(transformation(origin = {36, -66}, extent = {{-5, -2}, {5, 2}})));
-
-  Modelica.Blocks.Sources.RealExpression aeroRideHeight_4(
-    y = chassis.rideHeight_4) annotation(
-      Placement(transformation(origin = {36, -72}, extent = {{-5, -2}, {5, 2}})));
-
-  Modelica.Blocks.Sources.RealExpression aeroRelativeAirSpeed(
-    y = relativeAirSpeed) annotation(
-      Placement(transformation(origin = {36, -80}, extent = {{-5, -2}, {5, 2}})));
+  Modelica.Blocks.Sources.Constant driverRegenTorqueLimitCommand(k = 0)
+    "Inactive direct driver regenerative-torque command" annotation(
+      Placement(transformation(origin = {-154, 54}, extent = {{-5, -2}, {5, 2}})));
 
   BobLibVehicleInterfaces.Aero.CFDAeroMap aeroModel(
     pAero = pVehicle.pAero,
-    mountOffset = pVehicle.pAero.aeroRef - pVehicleCG,
+    mountOffset = pVehicle.pAero.aeroRef - chassis.chassisReferencePosition,
     headless = headless) annotation(
-      Placement(transformation(origin = {76, -84}, extent = {{-10, -10}, {10, 10}})));
+      Placement(transformation(origin = {81, -100}, extent = {{-21, -20}, {21, 20}})));
 
 equation
   assert(
     useMode == MODE_OPEN_LOOP_RAMP or
     useMode == MODE_OPEN_LOOP_SINE or
-    useMode == MODE_STEP_STEER,
-    "VehicleSim.useMode must be 0 (open-loop ramp), 1 (open-loop sine), or 2 (step steer).");
+    useMode == MODE_STEP_STEER or
+    useMode == MODE_STEADY_STATE_AY,
+    "VehicleSim.useMode must be 0 (open-loop ramp), 1 (open-loop sine), 2 (step steer), or 3 (closed-loop steady-state lateral acceleration).");
 
   curvature =
     bodyAngularVels[3] / max(speed, 0.1);
@@ -517,6 +478,26 @@ equation
       0;
 
   der(handwheelRampCmd) = handwheelRateCmd;
+
+  steadyStateAyRampDuration =
+    noEvent(abs(targetAy) / max(steadyStateAyRampRate, 1e-6));
+
+  steadyStateAyRampXi =
+    if steadyStateAy
+       and noEvent(time >= steerStart) then
+      noEvent(min(1, max(0, (time - steerStart) / max(steadyStateAyRampDuration, 1e-6))))
+    else
+      0;
+
+  steadyStateAyCommand =
+    targetAy * noEvent(
+      3*steadyStateAyRampXi^2 - 2*steadyStateAyRampXi^3);
+
+  der(steadyStateAyIntegral) = 0;
+  der(steadyStateSteerCmd) = 0;
+
+  steadyStateTargetReached =
+    steadyStateAy and noEvent(steadyStateAyRampXi >= 1);
 
   linearityGainRatio =
     if linearityReferenceValid then
@@ -575,6 +556,93 @@ equation
       linearityReferenceHandwheel = pre(linearityReferenceHandwheel);
       linearityReferenceLateralGain = pre(linearityReferenceLateralGain);
     end if;
+
+    if useMode == MODE_STEADY_STATE_AY and time >= steerStart then
+      steadyStateAyError = steadyStateAyCommand - accY;
+      steadyStateSpeedError = vcu.targetVel - speed;
+
+      if pre(steadyStateSampleValid) then
+        steadyStateAyRate =
+          (accY - pre(steadyStateSampleAy)) /
+          max(linearitySlopeSamplePeriod, 1e-6);
+        steadyStateYawRateDerivative =
+          (yawVel - pre(steadyStateSampleYawVel)) /
+          max(linearitySlopeSamplePeriod, 1e-6);
+        steadyStateSideslipRate =
+          (sideslip - pre(steadyStateSampleSideslip)) /
+          max(linearitySlopeSamplePeriod, 1e-6);
+        steadyStateRollRate =
+          (roll - pre(steadyStateSampleRoll)) /
+          max(linearitySlopeSamplePeriod, 1e-6);
+        steadyStateHandwheelRate =
+          (handwheelAngle - pre(steadyStateSampleHandwheel)) /
+          max(linearitySlopeSamplePeriod, 1e-6);
+      else
+        steadyStateAyRate = pre(steadyStateAyRate);
+        steadyStateYawRateDerivative = pre(steadyStateYawRateDerivative);
+        steadyStateSideslipRate = pre(steadyStateSideslipRate);
+        steadyStateRollRate = pre(steadyStateRollRate);
+        steadyStateHandwheelRate = pre(steadyStateHandwheelRate);
+      end if;
+
+      steadyStateConditionsMet =
+        steadyStateTargetReached
+        and abs(steadyStateAyCommand - accY) <= steadyStateAyTolerance
+        and abs(vcu.targetVel - speed) <= steadyStateSpeedTolerance
+        and abs(steadyStateAyRate) <= steadyStateAyRateTolerance
+        and abs(steadyStateYawRateDerivative) <= steadyStateYawRateDerivativeTolerance
+        and abs(steadyStateSideslipRate) <= steadyStateSideslipRateTolerance
+        and abs(steadyStateRollRate) <= steadyStateRollRateTolerance
+        and abs(steadyStateHandwheelRate) <= handwheelRateTol;
+
+      steadyStateSampleValid = true;
+      steadyStateSampleAy = accY;
+      steadyStateSampleYawVel = yawVel;
+      steadyStateSampleSideslip = sideslip;
+      steadyStateSampleRoll = roll;
+      steadyStateSampleHandwheel = handwheelAngle;
+    else
+      steadyStateAyError = pre(steadyStateAyError);
+      steadyStateSpeedError = pre(steadyStateSpeedError);
+      steadyStateConditionsMet = false;
+      steadyStateAyRate = pre(steadyStateAyRate);
+      steadyStateYawRateDerivative = pre(steadyStateYawRateDerivative);
+      steadyStateSideslipRate = pre(steadyStateSideslipRate);
+      steadyStateRollRate = pre(steadyStateRollRate);
+      steadyStateHandwheelRate = pre(steadyStateHandwheelRate);
+      steadyStateSampleValid = pre(steadyStateSampleValid);
+      steadyStateSampleAy = pre(steadyStateSampleAy);
+      steadyStateSampleYawVel = pre(steadyStateSampleYawVel);
+      steadyStateSampleSideslip = pre(steadyStateSampleSideslip);
+      steadyStateSampleRoll = pre(steadyStateSampleRoll);
+      steadyStateSampleHandwheel = pre(steadyStateSampleHandwheel);
+    end if;
+  end when;
+
+  when sample(0, linearitySlopeSamplePeriod)
+       and useMode == MODE_STEADY_STATE_AY
+       and time >= steerStart then
+    reinit(
+      steadyStateAyIntegral,
+      pre(steadyStateAyIntegral) +
+      (steadyStateAyCommand - accY) * max(linearitySlopeSamplePeriod, 1e-6));
+    reinit(
+      steadyStateSteerCmd,
+      pre(steadyStateSteerCmd) +
+      min(
+        1,
+        max(linearitySlopeSamplePeriod, 1e-6) /
+        max(steadyStateSteerTimeConstant, 1e-6)) *
+      (max(
+        -steadyStateMaxHandwheel,
+        min(
+          steadyStateMaxHandwheel,
+          steadyStateAyGain *
+            ((steadyStateAyCommand - accY) +
+             (pre(steadyStateAyIntegral) +
+              (steadyStateAyCommand - accY) * max(linearitySlopeSamplePeriod, 1e-6)) /
+             max(steadyStateAyTi, 1e-6)))) -
+       pre(steadyStateSteerCmd)));
   end when;
 
   when useMode == MODE_OPEN_LOOP_RAMP
@@ -635,27 +703,46 @@ equation
     terminate("Open-loop ramp steer did not reach QSS plateau before timeout");
   end when;
 
-  when useMode == MODE_OPEN_LOOP_RAMP
+  when steadyStateConditionsMet and pre(t_steady_state_hit) < 0 then
+    t_steady_state_hit = time;
+
+  elsewhen useMode == MODE_STEADY_STATE_AY and not steadyStateConditionsMet then
+    t_steady_state_hit = -1;
+  end when;
+
+  when useMode == MODE_STEADY_STATE_AY
+     and t_steady_state_hit > 0
+     and time > t_steady_state_hit + steadyHoldDuration then
+    terminate("Reached closed-loop steady-state lateral-acceleration target");
+  end when;
+
+  when useMode == MODE_STEADY_STATE_AY
+     and steadyStateTargetReached
+     and time > steerStart + steadyStateAyRampDuration + steadyStateSettleTimeout then
+    terminate("Closed-loop steady-state target did not settle before timeout");
+  end when;
+
+  when (useMode == MODE_OPEN_LOOP_RAMP or useMode == MODE_STEADY_STATE_AY)
      and terminateOnTireLift
      and time > steerStart
      and minTireNormalLoad <= tireLiftTerminateLoad then
     terminate("Tire normal load reached lift threshold");
   end when;
 
-  when useMode == MODE_OPEN_LOOP_RAMP
+  when (useMode == MODE_OPEN_LOOP_RAMP or useMode == MODE_STEADY_STATE_AY)
      and terminateOnSpinout
      and time > steerStart
      and abs(sideslip) >= sideslipTerminate
      and pre(t_spinout_hit) < 0 then
     t_spinout_hit = time;
 
-  elsewhen useMode == MODE_OPEN_LOOP_RAMP
+  elsewhen (useMode == MODE_OPEN_LOOP_RAMP or useMode == MODE_STEADY_STATE_AY)
      and terminateOnSpinout
      and abs(sideslip) < sideslipTerminate then
     t_spinout_hit = -1;
   end when;
 
-  when useMode == MODE_OPEN_LOOP_RAMP
+  when (useMode == MODE_OPEN_LOOP_RAMP or useMode == MODE_STEADY_STATE_AY)
      and terminateOnSpinout
      and t_spinout_hit > 0
      and time > t_spinout_hit + spinoutHoldDuration then
@@ -700,32 +787,14 @@ equation
       steerSine
     elseif useMode == MODE_STEP_STEER then
       steerStep
+    elseif useMode == MODE_STEADY_STATE_AY then
+      steadyStateSteerCmd
     else
       0;
 
-  bodyVels =
-    Frames.resolve2(cgFreeMotion.frame_b.R, cgFreeMotion.v_rel_a);
-
-  windVelocityWorld =
-    atmosphere.windVelocityWorld;
-
-  windVelocityBody =
-    Frames.resolve2(cgFreeMotion.frame_b.R, windVelocityWorld);
-
-  relativeAirVelocity =
-    bodyVels - windVelocityBody;
-
-  relativeAirSpeed =
-    norm(relativeAirVelocity);
-
-  airDensity =
-    atmosphere.airDensity;
-
-  bodyAngularVels =
-    Frames.angularVelocity2(cgFreeMotion.frame_b.R);
-
-  bodyAccels =
-    Frames.resolve2(cgFreeMotion.frame_b.R, cgFreeMotion.a_rel_a);
+  bodyVels = chassis.bodyVelocity;
+  bodyAngularVels = chassis.bodyAngularVelocity;
+  bodyAccels = chassis.bodyAcceleration;
 
   leftSteerAngle = chassis.leftSteerAngle;
   rightSteerAngle = chassis.rightSteerAngle;
@@ -734,8 +803,7 @@ equation
   handwheelAngle = chassis.steeringWheel.phi;
   steerExcess = avgSteerAngle - wheelbase * curvature;
 
-  speed = norm(bodyVels);
-  vcu.sens_vehicle_speed = speed;
+  speed = chassis.vehicleSpeed;
 
   velX = bodyVels[1];
   velY = bodyVels[2];
@@ -796,108 +864,83 @@ equation
     points = {{-150, 30}, {-18, 30}, {-18, -16}, {-10, -16}},
     color = {255, 204, 51},
     thickness = 0.5));
-  connect(battery.controlBus, controlBus.batteryBus) annotation(Line(
-    points = {{-128, -40}, {-138, -40}, {-138, 30}, {-150, 30}},
+  connect(controlBus, battery.controlBus) annotation(Line(
+    points = {{-150, 30}, {-138, 30}, {-138, -40}, {-134, -40}},
     color = {255, 204, 51},
     thickness = 0.5));
   connect(controlBus, vcu.controlBus) annotation(Line(
     points = {{-150, 30}, {-89, 30}, {-89, 36}},
     color = {255, 204, 51},
     thickness = 0.5));
+  connect(controlBus, inverter.controlBus) annotation(Line(
+    points = {{-150, 30}, {-150, -10}, {-86, -10}},
+    color = {255, 204, 51},
+    thickness = 0.5));
   connect(controlBus, motor.controlBus) annotation(Line(
-    points = {{-150, 30}, {-46, 30}, {-46, -38}, {-42, -38}},
+    points = {{-150, 30}, {-46, 30}, {-46, -54}},
     color = {255, 204, 51},
     thickness = 0.5));
   connect(controlBus, chassis.controlBus) annotation(Line(
     points = {{-150, 30}, {108, 30}, {108, -8}, {44.375, -8}, {44.375, -18}},
     color = {255, 204, 51},
     thickness = 0.5));
+  connect(controlBus, aeroModel.controlBus) annotation(Line(
+    points = {{-150, 30}, {52, 30}, {52, -84}, {65, -84}},
+    color = {255, 204, 51},
+    thickness = 0.5));
+  connect(atmosphere.atmosphereBus, atmosphereBus) annotation(Line(
+    points = {{-10, -124}, {-114, -124}, {-114, -116}, {-126, -116}},
+    color = {255, 204, 51},
+    thickness = 0.5));
+  connect(atmosphereBus, aeroModel.atmosphereBus) annotation(Line(
+    points = {{-126, -116}, {48, -116}, {48, -92}, {65, -92}},
+    color = {255, 204, 51},
+    thickness = 0.5));
   connect(controlBus, brakes.controlBus) annotation(Line(
     points = {{-150, 30}, {115, 30}, {115, -16}, {120, -16}},
     color = {255, 204, 51},
     thickness = 0.5));
-  connect(controlBus.driverBus, driverBus) annotation(Line(
-    points = {{-150, 30}, {-126, 30}, {-126, 84}},
+  connect(controlBus, driverEnvironment.controlBus) annotation(Line(
+    points = {{-150, 30}, {-34, 30}, {-34, 88}, {20, 88}},
     color = {255, 204, 51},
     thickness = 0.5));
-  connect(acceleratorPedalCommand.y, driverBus.acceleratorPedalPosition) annotation(
-    Line(points = {{-148.5, 90}, {-126, 90}, {-126, 84}}, color = {0, 0, 127}));
-  connect(brakePedalCommand.y, driverBus.brakePedalPosition) annotation(
-    Line(points = {{-148.5, 84}, {-126, 84}}, color = {0, 0, 127}));
-  connect(requestedGearCommand.y, driverBus.requestedGear) annotation(
-    Line(points = {{-148.5, 78}, {-126, 78}, {-126, 84}}, color = {255, 127, 0}));
-  connect(gearboxModeCommand.y, driverBus.gearboxMode) annotation(
-    Line(points = {{-148.5, 72}, {-122, 72}, {-122, 84}}, color = {255, 127, 0}));
-  connect(ignitionCommand.y, driverBus.ignition) annotation(
-    Line(points = {{-148.5, 66}, {-118, 66}, {-118, 84}}, color = {255, 127, 0}));
+  connect(steerCommand.y, driverEnvironment.steeringAngleCommand) annotation(
+    Line(points = {{41, 70}, {44, 70}, {44, 98}, {-24, 98}, {-24, 92}}, color = {0, 0, 127}));
+  connect(driverAcceleratorPedalCommand.y, driverEnvironment.acceleratorPedalCommand) annotation(
+    Line(points = {{-148.5, 92}, {-30, 92}, {-30, 86}, {-24, 86}}, color = {0, 0, 127}));
+  connect(driverBrakePedalCommand.y, driverEnvironment.brakePedalCommand) annotation(
+    Line(points = {{-148.5, 86}, {-36, 86}, {-36, 79}, {-24, 79}}, color = {0, 0, 127}));
+  connect(requestedGearCommand.y, driverEnvironment.requestedGearCommand) annotation(
+    Line(points = {{-148.5, 78}, {-42, 78}, {-42, 72}, {-24, 72}}, color = {255, 127, 0}));
+  connect(gearboxModeCommand.y, driverEnvironment.gearboxModeCommand) annotation(
+    Line(points = {{-148.5, 72}, {-48, 72}, {-48, 66}, {-24, 66}}, color = {255, 127, 0}));
+  connect(ignitionCommand.y, driverEnvironment.ignitionCommand) annotation(
+    Line(points = {{-148.5, 66}, {-54, 66}, {-54, 59}, {-24, 59}}, color = {255, 127, 0}));
+  connect(driverMotorTorqueCommand.y, driverEnvironment.motorTorqueCommand) annotation(
+    Line(points = {{-148.5, 60}, {-60, 60}, {-60, 53}, {-24, 53}}, color = {0, 0, 127}));
+  connect(driverRegenTorqueLimitCommand.y, driverEnvironment.regenTorqueLimitCommand) annotation(
+    Line(points = {{-148.5, 54}, {-66, 54}, {-66, 46}, {-24, 46}}, color = {0, 0, 127}));
+  connect(inverterEnableCommand.y, driverEnvironment.inverterEnableCommand) annotation(
+    Line(points = {{-126.5, 51}, {-72, 51}, {-72, 40}, {-24, 40}}, color = {255, 0, 255}));
+  connect(driverEnvironment.steeringWheel, chassis.steeringWheel) annotation(
+    Line(points = {{20, 76}, {74, 76}, {74, -10}}));
   connect(aeroModel.sprungChassisFrame, chassis.chassisFrame) annotation(
-    Line(points = {{66, -82}, {44, -82}, {44, -44}}, color = {95, 95, 95}));
-  connect(aeroRideHeight_1.y, aeroModel.rideHeight_1) annotation(
-    Line(points = {{41.5, -54}, {56, -54}, {56, -70}, {64, -70}}, color = {0, 0, 127}));
-  connect(aeroRideHeight_2.y, aeroModel.rideHeight_2) annotation(
-    Line(points = {{41.5, -60}, {60, -60}, {60, -70}, {68, -70}}, color = {0, 0, 127}));
-  connect(aeroRideHeight_3.y, aeroModel.rideHeight_3) annotation(
-    Line(points = {{41.5, -66}, {64, -66}, {64, -70}, {72, -70}}, color = {0, 0, 127}));
-  connect(aeroRideHeight_4.y, aeroModel.rideHeight_4) annotation(
-    Line(points = {{41.5, -72}, {76, -72}, {76, -70}}, color = {0, 0, 127}));
-  connect(aeroRelativeAirSpeed.y, aeroModel.relativeAirSpeed) annotation(
-    Line(points = {{41.5, -80}, {80, -80}, {80, -70}}, color = {0, 0, 127}));
-  connect(atmosphere.airDensity, aeroModel.airDensity) annotation(
-    Line(points = {{-30, -130}, {78, -130}, {78, -70}}, color = {0, 0, 127}));
-
-  connect(cgFixed.frame_b, cgFreeMotion.frame_a) annotation(
-    Line(points = {{152, -90}, {142, -90}}, color = {95, 95, 95}));
+    Line(points = {{60, -100}, {60, -44}, {44, -44}}, color = {95, 95, 95}));
 
   connect(battery.pin_p, inverter.p) annotation(
-    Line(points = {{-98, -22}, {-90, -22}, {-90, -31}, {-84, -31}}, color = {0, 0, 255}));
+    Line(points = {{-104, -22}, {-86, -22}, {-86, -23}}, color = {0, 0, 255}));
 
   connect(inverter.n, battery.pin_n) annotation(
-    Line(points = {{-54, -31}, {-48, -31}, {-48, -54}, {-98, -54}, {-98, -40}}, color = {0, 0, 255}));
-
-  connect(inverterEnable.y, vcu.cmd_inverter_enable) annotation(
-    Line(points = {{-126.5, 51}, {-107, 51}}, color = {255, 0, 255}));
-
-  connect(steerCommand.y, vcu.cmd_steering_angle) annotation(
-    Line(points = {{41, 100}, {48, 100}, {48, 82}, {-112, 82}, {-112, 69}, {-107, 69}}, color = {0, 0, 127}));
-
-  connect(requestedGearCommand.y, vcu.cmd_requested_gear) annotation(
-    Line(points = {{-148.5, 78}, {-120, 78}, {-120, 47.4}, {-107, 47.4}}, color = {255, 127, 0}));
-
-  connect(gearboxModeCommand.y, vcu.cmd_gearbox_mode) annotation(
-    Line(points = {{-148.5, 72}, {-124, 72}, {-124, 42.6}, {-107, 42.6}}, color = {255, 127, 0}));
-
-  connect(ignitionCommand.y, vcu.cmd_ignition) annotation(
-    Line(points = {{-148.5, 66}, {-128, 66}, {-128, 37.8}, {-107, 37.8}}, color = {255, 127, 0}));
-
-  connect(motorSpeed.y, vcu.sens_motor_speed) annotation(
-    Line(points = {{-126.5, 63}, {-107, 63}}, color = {0, 0, 127}));
-
-  connect(hvVoltage.y, vcu.sens_hv_bus_voltage) annotation(
-    Line(points = {{-126.5, 39}, {-107, 39}}, color = {0, 0, 127}));
-
-  connect(hvCurrent.y, vcu.sens_hv_bus_current) annotation(
-    Line(points = {{-126.5, 33}, {-107, 33}}, color = {0, 0, 127}));
-
-  connect(vcu.P_req, inverter.P_req) annotation(
-    Line(points = {{-71, 51}, {-69, 51}, {-69, -13}}, color = {0, 0, 127}));
+    Line(points = {{-56, -23}, {-56, -54}, {-104, -54}, {-104, -40}}, color = {0, 0, 255}));
 
   connect(inverter.P_out, motor.P_elec) annotation(
-    Line(points = {{-69, -49}, {-50, -49}, {-50, -29}, {-45, -29}}, color = {0, 0, 127}));
+    Line(points = {{-71, -47}, {-61, -47}, {-61, -45}, {-49, -45}}, color = {0, 0, 127}));
 
   connect(motor.shaft_b, transmission.engineFlange) annotation(
-    Line(points = {{-12, -29}, {-10, -29}, {-10, -25}}, color = {135, 135, 135}, thickness = 0.5));
+    Line(points = {{-16, -45}, {-16, -36}, {-10, -36}, {-10, -25}}, color = {135, 135, 135}, thickness = 0.5));
 
   connect(transmission.drivelineFlange, driveline.transmissionFlange) annotation(
     Line(points = {{10, -25}, {14, -25}}, color = {135, 135, 135}, thickness = 0.5));
-
-  connect(steerCommand.y, frSteerPosition.phi_ref) annotation(
-    Line(points = {{41, 100}, {56, 100}, {56, 72}, {62, 72}}, color = {0, 0, 127}));
-
-  connect(frSteerPosition.flange, chassis.steeringWheel) annotation(
-    Line(points = {{84, 72}, {100, 72}, {100, 4}, {74, 4}, {74, -10}}));
-
-  connect(cgFreeMotion.frame_b, chassis.chassisFrame) annotation(
-    Line(points = {{122, -90}, {112, -90}, {112, -110}, {44, -110}, {44, -44}}, color = {95, 95, 95}));
 
   annotation(
     Diagram(coordinateSystem(extent = {{-160, -150}, {175, 110}})),
@@ -918,10 +961,24 @@ Partial model <code>BaseVehicleSim</code> is the shared full-vehicle simulation 
 It exposes the complete replaceable vehicle stack: chassis, brakes, driveline,
 transmission, electric drive, power electronics, energy storage, VCU, road,
 atmosphere, aero, and world. The template owns maneuver excitation and plant
-signal wiring, while the VCU owns PTN speed-control toggles, controller gains,
-target velocity, generated torque, regenerative limit, and pedal commands.
-The VCU-generated pedal commands are published on the VehicleInterfaces driver
-bus for subsystems such as mechanical brakes.
+bus wiring, while subsystem adapters publish the measurements and commands they
+own on the shared VehicleInterfaces control bus. The driver environment
+publishes driver intent, including zero pedal/direct EV torque commands in the
+default speed-control template. The VCU owns PTN speed-control toggles,
+controller gains, target velocity, electric-drive torque, regenerative blend,
+and mechanical brake request. It subscribes to driver, chassis, battery, and
+motor bus signals, then publishes inverter/motor requests and
+<code>brakesControlBus</code> torque requests for downstream subscribers.
+</p>
+<p>
+The maneuver selector supports open-loop ramp steer, sine steer, step steer,
+and closed-loop steady-state lateral-acceleration mode. In
+<code>useMode=3</code>, the template ramps <code>targetAy</code>, uses a
+handwheel-angle PI controller to drive measured <code>accY</code> to that
+target, leaves the VCU speed controller responsible for longitudinal speed,
+and terminates only after the lateral acceleration, speed, yaw rate, sideslip,
+roll, and handwheel-rate settle criteria have held for
+<code>steadyHoldDuration</code>.
 </p>
 </html>"));
 

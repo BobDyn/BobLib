@@ -14,15 +14,15 @@ model InverterDC
     "DC bus negative" annotation(
       Placement(transformation(origin = {100, 0}, extent = {{-10, -10}, {10, 10}})));
 
-  Modelica.Blocks.Interfaces.RealInput P_req
-    "Requested mechanical/electrical output power [W] (+motoring, -regen)" annotation(
-      Placement(transformation(origin = {0, 120}, extent = {{-20, -20}, {20, 20}}, rotation = -90),
-        iconTransformation(origin = {0, 120}, extent = {{-20, -20}, {20, 20}}, rotation = -90)));
-
   Modelica.Blocks.Interfaces.RealOutput P_out(start = 0)
     "Electrical power delivered to motor side [W] (+motoring, -regen)" annotation(
       Placement(transformation(origin = {0, -120}, extent = {{-20, -20}, {20, 20}}, rotation = -90),
         iconTransformation(origin = {0, -110}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
+
+  VehicleInterfaces.Interfaces.ControlBus controlBus
+    "VehicleInterfaces control bus carrying electric-drive controller commands" annotation(
+      Placement(transformation(origin = {-100, 60}, extent = {{-20, -20}, {20, 20}}, rotation = 90),
+        iconTransformation(origin = {-100, 60}, extent = {{-20, -20}, {20, 20}}, rotation = 90)));
 
   parameter Real eta_mot = 0.97 "Inverter efficiency (motoring)";
   parameter Real eta_reg = 0.95 "Inverter efficiency (regen)";
@@ -67,6 +67,8 @@ model InverterDC
   SI.Current I_dc(start = 0) "DC current drawn from battery (+discharge)";
   SI.Power P_dc(start = 0) "DC electrical power from battery";
   SI.Power P_loss(start = 0) "Inverter losses";
+  output SI.Power P_req(start = 0)
+    "Power request received from electricMotorControlBus";
   SI.Power P_req_limited(start = 0)
     "Power request after bus, current, and nameplate limits";
   SI.Power P_mot_max_active(start = 0) "Active motoring power limit";
@@ -77,6 +79,11 @@ model InverterDC
     "Normalized absolute output power request";
 
 protected
+  Modelica.Blocks.Interfaces.RealInput powerRequestBusTap(
+    quantity = "Power",
+    unit = "W")
+    "Power request tap from electricMotorControlBus";
+
   BobLibVehicleInterfaces.PowerElectronics.Internal.InverterDCCore inverter(
     eta_mot = eta_mot,
     eta_reg = eta_reg,
@@ -100,6 +107,7 @@ protected
       Placement(transformation(extent = {{-20, -20}, {20, 20}})));
 
 equation
+  P_req = powerRequestBusTap;
   V_dc = inverter.V_dc;
   I_dc = inverter.I_dc;
   P_dc = inverter.P_dc;
@@ -114,8 +122,10 @@ equation
     Line(points = {{-100, 0}, {-20, 0}}, color = {0, 0, 255}));
   connect(inverter.n, n) annotation(
     Line(points = {{20, 0}, {100, 0}}, color = {0, 0, 255}));
-  connect(P_req, inverter.P_req) annotation(
-    Line(points = {{0, 120}, {0, 20}}, color = {0, 0, 127}));
+  connect(controlBus.electricMotorControlBus.powerRequest, powerRequestBusTap) annotation(
+    Line(points = {{-100, 60}, {-44, 60}, {-44, 22}, {0, 22}}, color = {0, 0, 127}));
+  connect(powerRequestBusTap, inverter.P_req) annotation(
+    Line(points = {{0, 22}, {0, 20}}, color = {0, 0, 127}));
   connect(inverter.P_out, P_out) annotation(
     Line(points = {{0, -20}, {0, -120}}, color = {0, 0, 127}));
 
@@ -124,7 +134,9 @@ equation
 Vehicle-level power-electronics adapter for the BobLib DC inverter model.
 The public model owns the subsystem boundary used by vehicle experiments;
 the conversion equations and electrical current source live in
-<code>Internal.InverterDCCore</code>.
+<code>Internal.InverterDCCore</code>. The inverter subscribes to
+<code>controlBus.electricMotorControlBus.powerRequest</code> instead of
+receiving a direct controller pin.
 </p>
 </html>"));
 end InverterDC;
