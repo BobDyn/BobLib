@@ -6,6 +6,8 @@ package BobLib
   annotation(
     preferredView = "info",
     version = "0.1.0",
+    versionDate = "2026-06-21",
+    dateModified = "2026-06-21",
     uses(
       Modelica(version = "4.1.0"),
       VehicleInterfaces(version = "2.0.2")),
@@ -29,6 +31,13 @@ standard contracts in VehicleInterfaces and builds BobLib components inside
 those subsystem boundaries.
 </p>
 <p>
+The authoritative documentation for this package version is
+<a href=\"modelica://BobLib.UsersGuide\">BobLib.UsersGuide</a>. BobDocs may
+mirror or expand the same material for web reading, but the in-package guide is
+the source of truth for current architecture, usage, extension, and validation
+guidance.
+</p>
+<p>
 The public package layout mirrors the VehicleInterfaces style: vehicle-level
 runnable models live in <code>Experiments</code>, reusable drawings live in
 <code>Icons</code>, and vehicle parameters live in <code>Records</code>.
@@ -44,8 +53,34 @@ Subsystem domains include <code>Chassis</code>, <code>Drivelines</code>,
 <code>DriverEnvironments</code>, <code>PowerElectronics</code>,
 <code>Atmospheres</code>, and <code>Aero</code>.
 Regression and component tests are kept in the sibling library
-<code>Tests</code>. Shared mechanics helpers are kept
+<code>BobLibTest</code> under the repository <code>Tests</code> directory.
+Shared mechanics helpers are kept
 under <code>Utilities.Mechanics</code>.
 </p>
+</html>",
+      revisions = "<html>
+<h4>Version 0.1.0 - 2026-06-21</h4>
+<p>
+Initial standalone BobLib release aligned with
+Modelica Standard Library 4.1.0 and VehicleInterfaces 2.0.2.
+</p>
+<ul>
+<li>Promoted BobLib to the primary standalone package with public subsystem
+domains that follow VehicleInterfaces contracts.</li>
+<li>Added standard full-vehicle, FMI, and four-post entry points under
+<code>Experiments.Standards</code>.</li>
+<li>Implemented the publish/subscribe bus architecture for driver intent,
+chassis measurements, battery and motor measurements, actuator requests, and
+atmosphere-owned ambient signals.</li>
+<li>Included the EV battery-inverter-motor-fixed-ratio-transmission-rear-differential
+stack, standard VCU, VCU-commanded mechanical brakes, CFD aero map, constant
+atmosphere, and detailed double-wishbone suspension/tire/contact models.</li>
+<li>Added <code>UsersGuide</code> as the in-library tutorial covering template
+execution, vehicle construction, bus usage, lumped model development, core
+physics changes, and validation workflow.</li>
+<li>Moved production regression coverage to the sibling
+<code>Tests/BobLibTest</code> library with pytest-driven translation,
+initialization, physics validation, runtime, and regression checks.</li>
+</ul>
 </html>"));
 end BobLib;

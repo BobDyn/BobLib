@@ -9,12 +9,38 @@ execution, signal extraction, metrics, plots, reports, envelope maps, and
 sensitivity sweeps. Use BobLib when you are developing or inspecting the
 underlying Modelica models.
 
-The official documentation lives at:
+The authoritative documentation for this package version lives inside the
+Modelica package at:
+
+`BobLib.UsersGuide`
+
+The UsersGuide is part of the versioned, tested package and should be treated
+as the source of truth for current BobLib architecture, usage, extension, and
+validation guidance. BobDocs may mirror or expand this material for web
+reading, but when version-specific details differ, the in-package UsersGuide
+wins.
+
+The web documentation lives at:
 
 https://bobdyn.com/boblib
 
-Treat that site as the definitive source for installation, translation,
-simulation, and OMEdit workflows.
+## Release
+
+Current package version: `0.1.0`, dated `2026-06-21`.
+
+Release notes are maintained in `CHANGELOG.md` and in the `BobLib` package
+revision annotation. The in-library tutorial lives at
+`BobLib.UsersGuide`.
+
+## License and Third-Party Notices
+
+BobLib is licensed under GPL-3.0; see `LICENSE`.
+
+BobLib depends on Modelica Standard Library 4.1.0 and VehicleInterfaces 2.0.2
+through the package `uses(...)` annotation. The dependency notices are recorded
+in `THIRD_PARTY_NOTICES.md`. If a release bundle vendors either dependency, the
+corresponding full dependency license text should be distributed with that
+bundle as well.
 
 ## Status
 
