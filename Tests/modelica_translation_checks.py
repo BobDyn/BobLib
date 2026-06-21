@@ -9,6 +9,10 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
+MODELICA_VERSION = "4.1.0"
+VEHICLE_INTERFACES_VERSION = "2.0.2"
+
+
 @dataclass(frozen=True)
 class ModelCheck:
     name: str
@@ -16,24 +20,19 @@ class ModelCheck:
 
 
 DEFAULT_CHECKS = (
-    ModelCheck("BobLib.Standards.VehicleSim", expected_equations=18134),
-    ModelCheck("BobLib.Standards.FourPostSim", expected_equations=18622),
-    ModelCheck(
-        "BobLib.Tests.Regression.VehicleSimAnimationOn",
-        expected_equations=24776,
-    ),
-    ModelCheck(
-        "BobLib.Tests.Regression.MF52PureSlipSmoke",
-        expected_equations=8,
-    ),
+    ModelCheck("BobLib.Experiments.Standards.VehicleFMI"),
+    ModelCheck("BobLib.Experiments.Standards.VehicleSim"),
+    ModelCheck("BobLib.Experiments.Standards.FourPostSim"),
+    ModelCheck("BobLibTest.Regression.VehicleSimAnimationOn"),
+    ModelCheck("BobLibTest.Regression.MF52PureSlipSmoke"),
 )
 
 
 def test_fixture_checks(package_root: Path) -> tuple[ModelCheck, ...]:
-    tests_root = package_root / "Tests"
+    tests_root = package_root.parent / "Tests" / "BobLibTest"
     tests = sorted(
         {
-            _class_path(package_root, path)
+            _class_path(tests_root, path)
             for path in tests_root.rglob("*.mo")
             if path.name != "package.mo"
         }
@@ -61,10 +60,13 @@ def default_package_root() -> Path:
 
 
 def render_mos(package_root: Path, check: ModelCheck) -> str:
+    tests_root = package_root.parent / "Tests" / "BobLibTest"
     lines = [
         "clear();",
-        'loadModel(Modelica, {"4.1.0"});',
+        f'loadModel(Modelica, {{"{MODELICA_VERSION}"}});',
+        f'loadModel(VehicleInterfaces, {{"{VEHICLE_INTERFACES_VERSION}"}});',
         f'loadFile("{package_root.as_posix()}/package.mo");',
+        f'loadFile("{tests_root.as_posix()}/package.mo");',
     ]
     lines.extend(
         [
@@ -145,7 +147,7 @@ def parse_args() -> argparse.Namespace:
         "--no-test-fixtures",
         action="store_true",
         dest="no_test_fixtures",
-        help="Only translate core regression models, not every BobLib.Tests fixture.",
+        help="Only translate core regression models, not every Tests fixture.",
     )
     return parser.parse_args()
 

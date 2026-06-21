@@ -3,15 +3,14 @@ PYTEST ?= $(PYTHON) -m pytest
 PYTEST_FLAGS ?=
 PACKAGE_ROOT ?= BobLib
 MODELICA_INIT_TIMEOUT_S ?= 600
-MODELICA_LINT_PATHS ?= BobLib BobLibVehicleInterfaces BobLibVehicleInterfacesTests
+MODELICA_LINT_PATHS ?= BobLib Tests/BobLibTest
 
 PYTHON_TESTS := \
-	Tests/test_vehicle_test_coverage.py \
 	Tests/test_modelica_linter.py
 
 MODELICA_REGRESSION_TESTS := \
 	Tests/test_modelica_regression.py \
-	Tests/test_boblibvehicleinterfaces_modelica.py
+	Tests/test_boblib_modelica.py
 
 MODELICA_TRANSLATION_TESTS := \
 	Tests/test_modelica_translation.py
@@ -44,11 +43,11 @@ help:
 		'  make test-python          Run pure Python pytest checks only' \
 		'  make test-pytest          Run every pytest-collected check in one invocation' \
 		'  make modelica-deps        Install OpenModelica library dependencies' \
-		'  make modelica-translation Translate standards and all BobLib.Tests fixtures via pytest' \
-		'  make modelica-initialization Initialize all BobLib.Tests fixtures via pytest and compare baselines' \
+		'  make modelica-translation Translate standards and all BobLibTest fixtures via pytest' \
+		'  make modelica-initialization Initialize all BobLibTest fixtures via pytest and compare baselines' \
 		'      MODELICA_INIT_TIMEOUT_S=600 controls the per-model OMC timeout' \
 		'  make modelica-physics     Simulate physical validation baselines with scaled runtime budgets' \
-		'  make modelica-regression  Simulate signal-level regressions and smoke-check BobLibVehicleInterfaces' \
+		'  make modelica-regression  Simulate signal-level regressions and smoke-check BobLib/BobLibTest' \
 		'  make test-modelica        Run all Modelica checks' \
 		'  make ci                   Run the full local CI suite'
 

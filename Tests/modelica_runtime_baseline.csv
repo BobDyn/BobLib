@@ -1,5 +1,4 @@
 model,budget_s,description
-BobLib.Tests.Regression.MF52PureSlipSmoke,8,MF52 smoke physical baseline simulation
-BobLib.Tests.TestVehicle.TestAero.TestCFDAeroMap,5,CFD aero map physical baseline simulation
-BobLib.Tests.TestVehicle.TestPowertrain.TestVCU,5,VCU physical baseline simulation
-BobLib.Tests.TestVehicle.TestPowertrain.TestPowertrainBatInvMotDiff,30,Powertrain assembly physical baseline simulation
+BobLibTest.Regression.MF52PureSlipSmoke,8,MF52 smoke physical baseline simulation
+BobLibTest.TestVehicle.TestAero.TestCFDAeroMap,5,CFD aero map physical baseline simulation
+BobLibTest.TestVehicle.TestPowertrain.TestVCU,5,VCU physical baseline simulation

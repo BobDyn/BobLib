@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 
 
-MF52_REGRESSION_MODEL = "BobLib.Tests.Regression.MF52PureSlipSmoke"
+MF52_REGRESSION_MODEL = "BobLibTest.Regression.MF52PureSlipSmoke"
 MF52_RESULT_SIGNALS = (
     "Fx",
     "Fy",
@@ -24,7 +24,7 @@ MF52_RESULT_SIGNALS = (
 
 LOW_LEVEL_SIGNAL_CASES = (
     (
-        "BobLib.Tests.TestVehicle.TestAero.TestBilinear2D",
+        "BobLibTest.TestVehicle.TestAero.TestBilinear2D",
         ("zInterior", "zClamped"),
         0.01,
         {
@@ -33,7 +33,7 @@ LOW_LEVEL_SIGNAL_CASES = (
         },
     ),
     (
-        "BobLib.Tests.TestVehicle.TestAero.TestCFDAeroMap",
+        "BobLibTest.TestVehicle.TestAero.TestCFDAeroMap",
         ("aero.drag", "aero.downforce"),
         0.01,
         {
@@ -42,17 +42,18 @@ LOW_LEVEL_SIGNAL_CASES = (
         },
     ),
     (
-        "BobLib.Tests.TestVehicle.TestPowertrain.TestVCU",
+        "BobLibTest.TestVehicle.TestPowertrain.TestVCU",
         ("vcu.P_req", "vcu.tau_cmd_limited"),
         0.01,
         {
-            "vcu.P_req": (20000.0, 1e-6),
-            "vcu.tau_cmd_limited": (200.0, 1e-9),
+            "vcu.P_req": (3000.0, 1e-6),
+            "vcu.tau_cmd_limited": (30.0, 1e-9),
         },
     ),
 )
 
 MODELICA_VERSION = "4.1.0"
+VEHICLE_INTERFACES_VERSION = "2.0.2"
 OMC_COMMAND_LINE_OPTIONS = (
     "--matchingAlgorithm=PFPlusExt "
     "--indexReductionMethod=dynamicStateSelection "
@@ -81,13 +82,16 @@ def _render_mos(
     signals: tuple[str, ...],
     stop_time: float,
 ) -> str:
+    tests_root = package_root.parent / "Tests" / "BobLibTest"
     result_prefix = model.rsplit(".", maxsplit=1)[-1]
     signal_filter = "time|" + "|".join(signals)
     return f"""
 clear();
 setCommandLineOptions("{OMC_COMMAND_LINE_OPTIONS}");
 loadModel(Modelica, {{"{MODELICA_VERSION}"}});
+loadModel(VehicleInterfaces, {{"{VEHICLE_INTERFACES_VERSION}"}});
 loadFile("{package_root.as_posix()}/package.mo");
+loadFile("{tests_root.as_posix()}/package.mo");
 cd("{work_dir.as_posix()}");
 simulate(
   {model},

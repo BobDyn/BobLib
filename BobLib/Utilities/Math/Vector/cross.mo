@@ -12,4 +12,13 @@ algorithm
     a[3]*b[1] - a[1]*b[3],
     a[1]*b[2] - a[2]*b[1]
   };
+  annotation(
+    Documentation(info = "<html>
+<p>
+Function <code>cross</code> computes the three-dimensional vector cross product.
+</p>
+<p>
+The helper supports frame, moment, and geometry calculations without tying those calculations to a subsystem package.
+</p>
+</html>"));
 end cross;

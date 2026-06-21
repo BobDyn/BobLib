@@ -1,9 +1,9 @@
 # Agent Notes
 
-These rules capture the current BobLib/BobLibVehicleInterfaces architecture so
+These rules capture the current BobLib/BobLib architecture so
 future agents preserve the package boundaries.
 
-## BobLibVehicleInterfaces Architecture
+## BobLib Architecture
 
 - Keep the first level of each public domain package aligned with the
   `VehicleInterfaces` contract. First-level models are the shared adapters or
@@ -35,7 +35,7 @@ future agents preserve the package boundaries.
   aggregate domain-owned records such as `pBattery`, `pVCU`, `pInverter`,
   `pMotor`, and `pDriveline`; avoid reintroducing a monolithic powertrain
   record as a second access path.
-- Keep tests in the sibling `BobLibVehicleInterfacesTests` library. Production
+- Keep tests in the sibling `Tests` library. Production
   packages should not contain regression or component test models.
 - Use Modelica Standard Library 4.1.0 and VehicleInterfaces 2.0.2 for this
   comparison library unless the user explicitly changes the target versions.
@@ -54,7 +54,7 @@ future agents preserve the package boundaries.
   selected class/model in the viewer. Double-clicking the row is the mouse
   equivalent of `Enter`.
 - From a reset top-level library tree, the primary simulation entry point lives
-  at `BobLibVehicleInterfaces > Experiments > Standards > VehicleSim`; the
+  at `BobLib > Experiments > Standards > VehicleSim`; the
   four-post entry point is the sibling `FourPostSim`. Expand packages in the
   left tree rather than searching for these through the top menu bar.
 - After a model is opened with `Enter`, OMEdit switches to the model viewer.
@@ -90,10 +90,10 @@ future agents preserve the package boundaries.
   screen coordinates. If using `hyprctl dispatch movecursor`, add the window
   offset from `hyprctl clients -j` or use a visual screenshot check.
 - Verified complete traversal from a reset top-level tree to `VehicleSim`,
-  using the current `package.order`: click/select `BobLibVehicleInterfaces`,
+  using the current `package.order`: click/select `BobLib`,
   send `Right`, then send `Down`, `Down`, `Right`, `Down`, `Right`,
   `Down`, `Down`, and finally `Enter`. That expands
-  `BobLibVehicleInterfaces > Experiments > Standards` and opens `VehicleSim`.
+  `BobLib > Experiments > Standards` and opens `VehicleSim`.
   `FourPostSim` is one `Down` below `VehicleSim`.
 - Once `VehicleSim` is open, the model toolbar exposes buttons named
   `Check Model`, `Instantiate Model`, `Simulation Setup`, and `Simulate`.

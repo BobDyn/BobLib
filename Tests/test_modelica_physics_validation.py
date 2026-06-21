@@ -16,6 +16,7 @@ import pytest
 
 
 MODELICA_VERSION = "4.1.0"
+VEHICLE_INTERFACES_VERSION = "2.0.2"
 OMC_COMMAND_LINE_OPTIONS = (
     "--matchingAlgorithm=PFPlusExt "
     "--indexReductionMethod=dynamicStateSelection "
@@ -110,12 +111,15 @@ def _render_mos(
     work_dir: Path,
     baseline: PhysicalBaseline,
 ) -> str:
+    tests_root = package_root.parent / "Tests" / "BobLibTest"
     signal_filter = "time|" + "|".join(re.escape(signal) for signal in baseline.signals)
     return f"""
 clear();
 setCommandLineOptions("{OMC_COMMAND_LINE_OPTIONS}");
 loadModel(Modelica, {{"{MODELICA_VERSION}"}});
+loadModel(VehicleInterfaces, {{"{VEHICLE_INTERFACES_VERSION}"}});
 loadFile("{package_root.as_posix()}/package.mo");
+loadFile("{tests_root.as_posix()}/package.mo");
 cd("{work_dir.as_posix()}");
 simulate(
   {baseline.model},

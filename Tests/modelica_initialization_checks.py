@@ -26,6 +26,7 @@ BASELINE_COLUMNS = (
 )
 
 MODELICA_VERSION = "4.1.0"
+VEHICLE_INTERFACES_VERSION = "2.0.2"
 OMC_COMMAND_LINE_OPTIONS = (
     "--matchingAlgorithm=PFPlusExt "
     "--indexReductionMethod=dynamicStateSelection "
@@ -96,11 +97,11 @@ def default_package_root() -> Path:
 
 
 def test_fixture_models(package_root: Path) -> tuple[str, ...]:
-    tests_root = package_root / "Tests"
+    tests_root = package_root.parent / "Tests" / "BobLibTest"
     return tuple(
         sorted(
             {
-                _class_path(package_root, path)
+                _class_path(tests_root, path)
                 for path in tests_root.rglob("*.mo")
                 if path.name != "package.mo"
             }
@@ -109,11 +110,14 @@ def test_fixture_models(package_root: Path) -> tuple[str, ...]:
 
 
 def render_mos(package_root: Path, work_dir: Path, model: str, prefix: str) -> str:
+    tests_root = package_root.parent / "Tests" / "BobLibTest"
     return f"""
 clear();
 setCommandLineOptions("{OMC_COMMAND_LINE_OPTIONS}");
 loadModel(Modelica, {{"{MODELICA_VERSION}"}});
+loadModel(VehicleInterfaces, {{"{VEHICLE_INTERFACES_VERSION}"}});
 loadFile("{package_root.as_posix()}/package.mo");
+loadFile("{tests_root.as_posix()}/package.mo");
 cd("{work_dir.as_posix()}");
 simulate(
   {model},

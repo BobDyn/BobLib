@@ -13,7 +13,7 @@ function angle_between
 protected
   Real num;
   Real den;
-  Real eps = 1e-8;  // hard numerical floor
+  Real eps = 1e-8; // hard numerical floor
 
 algorithm
 
@@ -33,4 +33,13 @@ algorithm
   // Regularize only to avoid atan2(0,0)
   theta := atan2(num, den + eps);
 
+  annotation(
+    Documentation(info = "<html>
+<p>
+Function <code>angle_between</code> returns the angle between two vectors.
+</p>
+<p>
+It normalizes the geometric calculation for linkage and suspension setup code.
+</p>
+</html>"));
 end angle_between;

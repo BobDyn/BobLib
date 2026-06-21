@@ -1,4 +1,0 @@
-within BobLibVehicleInterfacesTests.TestUtilities.TestMechanics.TestMultiBody;
-package TestContactMechanics
-
-end TestContactMechanics;

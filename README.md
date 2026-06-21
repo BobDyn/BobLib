@@ -40,7 +40,7 @@ It is not yet:
 Current checks target:
 
 - Modelica Standard Library 4.1.0
-- VehicleInterfaces 2.0.2 for `BobLibVehicleInterfaces`
+- VehicleInterfaces 2.0.2 for `BobLib`
 - OpenModelica via the CI container `openmodelica/openmodelica:v1.26.3-ompython`
 - Python with `pytest` and `ruff`
 
@@ -52,15 +52,14 @@ make modelica-deps
 
 ## Primary Entrypoints
 
-- `BobLib.Standards.VehicleSim`: legacy/current BobLib full-vehicle benchmark
-- `BobLib.Standards.FourPostSim`: legacy/current four-post benchmark
-- `BobLibVehicleInterfaces.Experiments.Standards.VehicleSim`: VehicleInterfaces-aligned full-vehicle benchmark
-- `BobLibVehicleInterfaces.Experiments.Standards.FourPostSim`: VehicleInterfaces-aligned four-post benchmark
+- `BobLib.Experiments.Standards.VehicleFMI`: driver-input FMI/DIL/SIL vehicle boundary
+- `BobLib.Experiments.Standards.VehicleSim`: full-vehicle maneuver benchmark
+- `BobLib.Experiments.Standards.FourPostSim`: four-post benchmark
 
-`BobLibVehicleInterfaces` is the forward-looking standalone package. It builds
+`BobLib` is the forward-looking standalone package. It builds
 BobLib physics inside the public subsystem contracts from VehicleInterfaces
-while keeping regression tests in the sibling `BobLibVehicleInterfacesTests`
-library.
+while keeping regression tests in the `BobLibTest` Modelica package under
+the repository `Tests/` directory.
 
 ## Local Health Checks
 
@@ -86,7 +85,7 @@ integration branches receive the same basic validation as `main`.
 
 Modelica translation, initialization, and signal regressions are collected as
 individual pytest cases. A failing model should appear directly in the pytest
-node id, for example `Tests/test_modelica_translation.py::test_modelica_model_translates[BobLib.Standards.VehicleSim]`.
+node id, for example `Tests/test_modelica_translation.py::test_modelica_model_translates[BobLib.Experiments.Standards.VehicleSim]`.
 Physical validation baselines also run through pytest and compare small
 simulation outputs against checked-in signal baselines. Runtime budgets are
 checked with a hardware-tolerant scale factor; override it with
