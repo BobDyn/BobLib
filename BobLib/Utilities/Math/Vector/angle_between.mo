@@ -1,6 +1,7 @@
 within BobLib.Utilities.Math.Vector;
 
 function angle_between
+
   import BobLib.Utilities.Math.Vector.cross;
   import BobLib.Utilities.Math.Vector.dot;
 
@@ -12,9 +13,10 @@ function angle_between
 protected
   Real num;
   Real den;
-  Real eps = 1e-8;  // hard numerical floor
+  Real eps = 1e-8; // hard numerical floor
 
 algorithm
+
   // Signed angle using atan2 formulation
   // theta = atan2( n · (a × b), a · b )
   //
@@ -31,4 +33,13 @@ algorithm
   // Regularize only to avoid atan2(0,0)
   theta := atan2(num, den + eps);
 
+  annotation(
+    Documentation(info = "<html>
+<p>
+Function <code>angle_between</code> returns the angle between two vectors.
+</p>
+<p>
+It normalizes the geometric calculation for linkage and suspension setup code.
+</p>
+</html>"));
 end angle_between;

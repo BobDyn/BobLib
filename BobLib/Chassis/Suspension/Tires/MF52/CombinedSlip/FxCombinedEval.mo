@@ -1,0 +1,78 @@
+within BobLib.Chassis.Suspension.Tires.MF52.CombinedSlip;
+
+function FxCombinedEval
+
+  // Modelica units
+  import SI = Modelica.Units.SI;
+
+  // MF imports
+  import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.FxPureRecord;
+  import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.CombinedSlip.FxCombinedRecord;
+  import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.SetupRecord;
+
+  import BobLib.Chassis.Suspension.Tires.MF52.PureSlip.FxPureEval;
+
+  input SI.Force Fz;
+  input SI.DimensionlessRatio kappa;
+  input SI.Angle alpha;
+  input SI.Angle gamma;
+
+  input FxPureRecord pPure;
+  input FxCombinedRecord pComb;
+  input SetupRecord setup;
+
+  output SI.Force Fx;
+
+protected
+  SI.Force Fx_pure;
+
+  Real dfz;
+
+  Real C_xSA;
+  Real B_xSA;
+  Real E_xSA;
+  Real S_HxSA;
+  Real SA_s;
+  Real G_xSA;
+
+algorithm
+  if Fz > 1e-3 then
+
+    // Pure slip
+    Fx_pure := FxPureEval(Fz, kappa, gamma, pPure, setup);
+
+    // Normalized load
+    dfz := (Fz - setup.FNOMIN * pPure.LFZO) / (setup.FNOMIN * pPure.LFZO);
+
+    // Combined slip coefficients
+    C_xSA := pComb.RCX1;
+    B_xSA := pComb.RBX1 * cos(atan(pComb.RBX2 * kappa)) * pPure.LXAL;
+    E_xSA := pComb.REX1 + pComb.REX2 * dfz;
+    S_HxSA := pComb.RHX1;
+
+    // Shifted slip angle
+    SA_s := alpha + S_HxSA;
+
+    // Normalized reduction factor
+    G_xSA :=
+      cos(C_xSA * atan(B_xSA * SA_s - E_xSA * (B_xSA * SA_s - atan(B_xSA * SA_s))))
+      /
+      cos(C_xSA * atan(B_xSA * S_HxSA - E_xSA * (B_xSA * S_HxSA - atan(B_xSA * S_HxSA))));
+
+    // Final force
+    Fx := Fx_pure * G_xSA;
+
+  else
+    Fx := 0;
+  end if;
+
+  annotation(
+    Documentation(info = "<html>
+<p>
+Function <code>FxCombinedEval</code> evaluates the MF5.2 combined-slip contribution for longitudinal force.
+</p>
+<p>
+The function is intentionally narrow so each tire force or moment equation can be maintained and tested independently.
+</p>
+</html>"));
+end FxCombinedEval;

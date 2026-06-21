@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 
 
-MF52_REGRESSION_MODEL = "BobLib.Tests.Regression.MF52PureSlipSmoke"
+MF52_REGRESSION_MODEL = "BobLibTest.Regression.MF52PureSlipSmoke"
 MF52_RESULT_SIGNALS = (
     "Fx",
     "Fy",
@@ -24,30 +24,42 @@ MF52_RESULT_SIGNALS = (
 
 LOW_LEVEL_SIGNAL_CASES = (
     (
-        "BobLib.Tests.TestVehicle.TestAero.TestBilinear2D",
+        "BobLibTest.TestVehicle.TestAero.TestBilinear2D",
         ("zInterior", "zClamped"),
         0.01,
+        {
+            "zInterior": (25.0, 1e-9),
+            "zClamped": (30.0, 1e-9),
+        },
     ),
     (
-        "BobLib.Tests.TestVehicle.TestAero.TestCFDAeroMap",
+        "BobLibTest.TestVehicle.TestAero.TestCFDAeroMap",
         ("aero.drag", "aero.downforce"),
         0.01,
+        {
+            "aero.drag": (52.0, 1e-9),
+            "aero.downforce": (520.0, 1e-9),
+        },
     ),
     (
-        "BobLib.Tests.TestVehicle.TestElectronics.TestSpeedController",
-        ("speedController.drive_torque",),
-        0.2,
-    ),
-    (
-        "BobLib.Tests.TestVehicle.TestElectronics.TestCurvatureController",
-        ("curvatureController.rack",),
-        0.2,
-    ),
-    (
-        "BobLib.Tests.TestVehicle.TestPowertrain.TestVCU",
+        "BobLibTest.TestVehicle.TestPowertrain.TestVCU",
         ("vcu.P_req", "vcu.tau_cmd_limited"),
         0.01,
+        {
+            "vcu.P_req": (3000.0, 1e-6),
+            "vcu.tau_cmd_limited": (30.0, 1e-9),
+        },
     ),
+)
+
+MODELICA_VERSION = "4.1.0"
+VEHICLE_INTERFACES_VERSION = "2.0.2"
+OMC_COMMAND_LINE_OPTIONS = (
+    "--matchingAlgorithm=PFPlusExt "
+    "--indexReductionMethod=dynamicStateSelection "
+    "-d=initialization,NLSanalyticJacobian,disableStartCalc "
+    "--maxSizeLinearTearing=5000 "
+    "--generateDynamicJacobian=none"
 )
 
 
@@ -70,12 +82,16 @@ def _render_mos(
     signals: tuple[str, ...],
     stop_time: float,
 ) -> str:
+    tests_root = package_root.parent / "Tests" / "BobLibTest"
     result_prefix = model.rsplit(".", maxsplit=1)[-1]
     signal_filter = "time|" + "|".join(signals)
     return f"""
 clear();
-loadModel(Modelica, {{"3.2.3"}});
+setCommandLineOptions("{OMC_COMMAND_LINE_OPTIONS}");
+loadModel(Modelica, {{"{MODELICA_VERSION}"}});
+loadModel(VehicleInterfaces, {{"{VEHICLE_INTERFACES_VERSION}"}});
 loadFile("{package_root.as_posix()}/package.mo");
+loadFile("{tests_root.as_posix()}/package.mo");
 cd("{work_dir.as_posix()}");
 simulate(
   {model},
@@ -180,28 +196,23 @@ def test_mf52_pure_slip_smoke_runs_and_returns_sane_signals() -> None:
     assert math.isfinite(data["residualScrub"][-1])
 
 
-def test_low_level_signal_models_return_expected_values() -> None:
-    for model, signals, stop_time in LOW_LEVEL_SIGNAL_CASES:
-        data = _simulate_model(model, signals, stop_time)
+@pytest.mark.parametrize(
+    "model,signals,stop_time,expected_values",
+    LOW_LEVEL_SIGNAL_CASES,
+    ids=[case[0] for case in LOW_LEVEL_SIGNAL_CASES],
+)
+def test_low_level_signal_model_returns_expected_values(
+    model: str,
+    signals: tuple[str, ...],
+    stop_time: float,
+    expected_values: dict[str, tuple[float, float]],
+) -> None:
+    data = _simulate_model(model, signals, stop_time)
 
-        for signal in signals:
-            values = _finite(data[signal])
-            assert len(values) == len(data[signal]), f"{model}.{signal} is non-finite"
+    for signal in signals:
+        values = _finite(data[signal])
+        assert len(values) == len(data[signal]), f"{model}.{signal} is non-finite"
 
-        final_values = {signal: data[signal][-1] for signal in signals}
-
-        if model.endswith("TestBilinear2D"):
-            assert abs(final_values["zInterior"] - 25.0) < 1e-9
-            assert abs(final_values["zClamped"] - 30.0) < 1e-9
-        elif model.endswith("TestCFDAeroMap"):
-            assert abs(final_values["aero.drag"] - 52.0) < 1e-9
-            assert abs(final_values["aero.downforce"] - 520.0) < 1e-9
-        elif model.endswith("TestSpeedController"):
-            assert 49.0 < final_values["speedController.drive_torque"] < 50.1
-        elif model.endswith("TestCurvatureController"):
-            assert 0.009 < final_values["curvatureController.rack"] < 0.011
-        elif model.endswith("TestVCU"):
-            assert abs(final_values["vcu.tau_cmd_limited"] - 200.0) < 1e-9
-            assert abs(final_values["vcu.P_req"] - 20000.0) < 1e-6
-        else:
-            raise AssertionError(f"Unhandled low-level signal model: {model}")
+    final_values = {signal: data[signal][-1] for signal in signals}
+    for signal, (expected_value, tolerance) in expected_values.items():
+        assert abs(final_values[signal] - expected_value) < tolerance

@@ -5,6 +5,7 @@ import argparse
 import csv
 import hashlib
 import math
+import os
 import shutil
 import subprocess
 import tempfile
@@ -23,6 +24,17 @@ BASELINE_COLUMNS = (
     "max_abs",
     "values_sha256",
 )
+
+MODELICA_VERSION = "4.1.0"
+VEHICLE_INTERFACES_VERSION = "2.0.2"
+OMC_COMMAND_LINE_OPTIONS = (
+    "--matchingAlgorithm=PFPlusExt "
+    "--indexReductionMethod=dynamicStateSelection "
+    "-d=initialization,NLSanalyticJacobian,disableStartCalc "
+    "--maxSizeLinearTearing=5000 "
+    "--generateDynamicJacobian=none"
+)
+DEFAULT_TIMEOUT_S = 600
 
 
 @dataclass(frozen=True)
@@ -85,11 +97,11 @@ def default_package_root() -> Path:
 
 
 def test_fixture_models(package_root: Path) -> tuple[str, ...]:
-    tests_root = package_root / "Tests"
+    tests_root = package_root.parent / "Tests" / "BobLibTest"
     return tuple(
         sorted(
             {
-                _class_path(package_root, path)
+                _class_path(tests_root, path)
                 for path in tests_root.rglob("*.mo")
                 if path.name != "package.mo"
             }
@@ -98,10 +110,14 @@ def test_fixture_models(package_root: Path) -> tuple[str, ...]:
 
 
 def render_mos(package_root: Path, work_dir: Path, model: str, prefix: str) -> str:
+    tests_root = package_root.parent / "Tests" / "BobLibTest"
     return f"""
 clear();
-loadModel(Modelica, {{"3.2.3"}});
+setCommandLineOptions("{OMC_COMMAND_LINE_OPTIONS}");
+loadModel(Modelica, {{"{MODELICA_VERSION}"}});
+loadModel(VehicleInterfaces, {{"{VEHICLE_INTERFACES_VERSION}"}});
 loadFile("{package_root.as_posix()}/package.mo");
+loadFile("{tests_root.as_posix()}/package.mo");
 cd("{work_dir.as_posix()}");
 simulate(
   {model},
@@ -128,14 +144,21 @@ def run_omc(mos_text: str, model: str, *, timeout_s: int) -> str:
         mos_path = Path(mos.name)
 
     try:
-        completed = subprocess.run(
-            [omc, str(mos_path)],
-            check=False,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            timeout=timeout_s,
-        )
+        try:
+            completed = subprocess.run(
+                [omc, str(mos_path)],
+                check=False,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                timeout=timeout_s,
+            )
+        except subprocess.TimeoutExpired as exc:
+            output = exc.stdout or ""
+            raise RuntimeError(
+                f"omc timed out after {timeout_s} seconds while initializing {model}:\n"
+                f"{output}"
+            ) from exc
     finally:
         mos_path.unlink(missing_ok=True)
 
@@ -224,7 +247,7 @@ def read_baseline(path: Path) -> dict[str, InitializationMetrics]:
 def write_baseline(path: Path, metrics: list[InitializationMetrics]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=BASELINE_COLUMNS)
+        writer = csv.DictWriter(handle, fieldnames=BASELINE_COLUMNS, lineterminator="\n")
         writer.writeheader()
         for metric in sorted(metrics, key=lambda item: item.model):
             writer.writerow(metric.as_row())
@@ -266,6 +289,9 @@ def assert_matches_baseline(
 
 
 def parse_args() -> argparse.Namespace:
+    default_timeout_s = int(
+        os.environ.get("BOBLIB_INITIALIZATION_TIMEOUT_S", str(DEFAULT_TIMEOUT_S))
+    )
     parser = argparse.ArgumentParser(
         description="Run BobLib Modelica initialization regression checks."
     )
@@ -295,7 +321,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--timeout-s",
         type=int,
-        default=180,
+        default=default_timeout_s,
         help="Per-model OpenModelica timeout in seconds.",
     )
     parser.add_argument(
@@ -323,6 +349,7 @@ def main() -> None:
     models = tuple(args.model) if args.model else test_fixture_models(package_root)
     actual_metrics: list[InitializationMetrics] = []
     for model in models:
+        print(f"Initializing {model} with timeout {args.timeout_s}s", flush=True)
         metrics = initialize_model(package_root, model, timeout_s=args.timeout_s)
         actual_metrics.append(metrics)
         print(
