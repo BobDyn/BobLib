@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Chassis.Suspension.Tires;
 package TirePhysics
+
   extends BobLibVehicleInterfaces.Icons.BobLibPackageBackground;
 
   annotation(

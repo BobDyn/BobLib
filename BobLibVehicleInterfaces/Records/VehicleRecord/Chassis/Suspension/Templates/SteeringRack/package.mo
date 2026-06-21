@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates;
 package SteeringRack
+
   extends BobLibVehicleInterfaces.Icons.RecordsPackageIcon;
 
   annotation(

@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Utilities.Math;
 package Tensor
+
   extends BobLibVehicleInterfaces.Icons.BobLibPackageBackground;
 
   annotation(

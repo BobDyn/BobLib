@@ -1,6 +1,7 @@
 within BobLib.Resources.Icons;
 
 partial model PowertrainBatInvMotDiffIcon "Reusable powertrain bat inv mot diff icon"
+
   annotation(
     Icon(coordinateSystem(extent = {{-100, -100}, {100, 100}}), graphics = {
       Rectangle(extent = {{-86, 56}, {-44, 18}}, lineColor = {35, 35, 35}, fillColor = {235, 245, 239}, fillPattern = FillPattern.Solid),

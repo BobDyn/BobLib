@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Chassis.Suspension.Linkages;
 
 model TabularDamper "Tabular translational damper with velocity-force curve"
+
   extends BobLibVehicleInterfaces.Icons.TabularDamperIcon;
 
   import SI = Modelica.Units.SI;
@@ -24,7 +25,11 @@ model TabularDamper "Tabular translational damper with velocity-force curve"
     Placement(transformation(origin = {-60, 30}, extent = {{-10, -10}, {10, 10}})));
 
   // Force output block
-  Modelica.Blocks.Tables.CombiTable1Ds combiTable1D(columns = {2}, extrapolation = Modelica.Blocks.Types.Extrapolation.LastTwoPoints, smoothness = Modelica.Blocks.Types.Smoothness.LinearSegments, table = damperTable) annotation(
+  Modelica.Blocks.Tables.CombiTable1Ds combiTable1D(
+    columns = {2},
+    extrapolation = Modelica.Blocks.Types.Extrapolation.LastTwoPoints,
+    smoothness = Modelica.Blocks.Types.Smoothness.LinearSegments,
+    table = damperTable) annotation(
     Placement(transformation(origin = {-20, 30}, extent = {{-10, -10}, {10, 10}})));
 
 equation

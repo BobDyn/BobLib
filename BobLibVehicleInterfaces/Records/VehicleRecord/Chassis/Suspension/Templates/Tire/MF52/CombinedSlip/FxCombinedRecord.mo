@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.CombinedSlip;
 
 record FxCombinedRecord
+
   // Reduction (Gx)
   Real RBX1 "Slope factor for combined slip reduction [-]";
   Real RBX2 "Slip influence on combined reduction [-]";
@@ -21,4 +22,3 @@ It mirrors the coefficient grouping used by the tire evaluator so each force or 
 </p>
 </html>"));
 end FxCombinedRecord;
-

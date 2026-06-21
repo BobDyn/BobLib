@@ -1,7 +1,9 @@
 within BobLib.Tests.TestVehicle.TestChassis.TestSuspension.TestLinkages;
 
 model TestBellcrank2
+
   inner parameter Boolean enableAnimation = false;
+
   inner Modelica.Mechanics.MultiBody.World world(
     n = {0, 0, -1},
     enableAnimation = enableAnimation) annotation(

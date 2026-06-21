@@ -1,6 +1,7 @@
 within BobLibVehicleInterfacesTests.TestVehicle.TestChassis.TestSuspension.TestTemplates.TestTire.TestMF52;
 
 model TestMF52
+
   import SI = Modelica.Units.SI;
 
   import Tire = BobLibVehicleInterfaces.Chassis.Suspension.Tires.MF52;
@@ -19,10 +20,10 @@ model TestMF52
   parameter Integer nKappa = 41;
 
   parameter SI.Angle alphaMin = -0.25;
-  parameter SI.Angle alphaMax =  0.25;
+  parameter SI.Angle alphaMax = 0.25;
 
   parameter Real kappaMin = -0.25;
-  parameter Real kappaMax =  0.25;
+  parameter Real kappaMax = 0.25;
 
   // Grids
   SI.Angle alphaGrid[nAlpha];
@@ -57,6 +58,7 @@ protected
 
 algorithm
   when initial() then
+
     // Mid indices
     midAlpha := integer((nAlpha + 1) / 2);
     midKappa := integer((nKappa + 1) / 2);
@@ -79,7 +81,7 @@ algorithm
     for i in 1:nAlpha loop
       for j in 1:nKappa loop
 
-        (Fx[i,j], Fy[i,j], Mx[i,j], My[i,j], Mz[i,j], t[i,j], s[i,j]) :=
+        (Fx[i, j], Fy[i, j], Mx[i, j], My[i, j], Mz[i, j], t[i, j], s[i, j]) :=
           Tire.Eval(
             Fz,
             alphaGrid[i],
@@ -88,8 +90,9 @@ algorithm
             Vx,
             car.pFrTireModel
           );
+
         // Reconstruction check
-        Mz_reconstructed[i,j] := -t[i,j] * Fy[i,j] + s[i,j] * Fx[i,j];
+        Mz_reconstructed[i, j] := -t[i, j] * Fy[i, j] + s[i, j] * Fx[i, j];
 
       end for;
     end for;

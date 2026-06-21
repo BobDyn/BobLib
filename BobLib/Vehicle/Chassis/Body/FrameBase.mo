@@ -1,6 +1,7 @@
 within BobLib.Vehicle.Chassis.Body;
 
 partial model FrameBase
+
   extends BobLib.Resources.Icons.FrameBaseIcon;
 
   import SI = Modelica.Units.SI;
@@ -19,20 +20,40 @@ partial model FrameBase
   outer parameter Boolean enableAnimation;
 
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a frontFrame annotation(
-    Placement(transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}})));
+    Placement(
+      transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}),
+      iconTransformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}})));
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b rearFrame annotation(
-    Placement(transformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}})));
+    Placement(
+      transformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}}),
+      iconTransformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}})));
 
-  Modelica.Mechanics.MultiBody.Parts.Body sprungBody(m = pSprung.m, r_CM = {0, 0, 0}, I_11 = pSprung.inertia[1, 1], I_22 = pSprung.inertia[2, 2], I_33 = pSprung.inertia[3, 3], I_21 = pSprung.inertia[2, 1], I_31 = pSprung.inertia[3, 1], I_32 = pSprung.inertia[3, 2], sphereDiameter = jointDiameter, cylinderDiameter = 0, useQuaternions = false, angles_fixed = false) annotation(
+  Modelica.Mechanics.MultiBody.Parts.Body sprungBody(
+    m = pSprung.m,
+    r_CM = {0, 0, 0},
+    I_11 = pSprung.inertia[1, 1],
+    I_22 = pSprung.inertia[2, 2],
+    I_33 = pSprung.inertia[3, 3],
+    I_21 = pSprung.inertia[2, 1],
+    I_31 = pSprung.inertia[3, 1],
+    I_32 = pSprung.inertia[3, 2],
+    sphereDiameter = jointDiameter,
+    cylinderDiameter = 0,
+    useQuaternions = false,
+    angles_fixed = false) annotation(
     Placement(transformation(origin = {50, 70}, extent = {{-10, -10}, {10, 10}})));
 
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation midToFore(r = (frRef - rrRef)/2)  annotation(
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation midToFore(r = (frRef - rrRef)/2) annotation(
     Placement(transformation(origin = {-50, 0}, extent = {{10, -10}, {-10, 10}}, rotation = -0)));
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation midToAft(r = -1*(frRef - rrRef)/2)  annotation(
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation midToAft(r = -1*(frRef - rrRef)/2) annotation(
     Placement(transformation(origin = {50, 0}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b cgFrame annotation(
-    Placement(transformation(origin = {20, 100}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {0, -60}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation midToCG(r = pSprung.rCM - (frRef + rrRef)/2, animation = false)  annotation(
+    Placement(
+      transformation(origin = {20, 100}, extent = {{-16, -16}, {16, 16}}, rotation = -90),
+      iconTransformation(origin = {0, -60}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation midToCG(
+    r = pSprung.rCM - (frRef + rrRef)/2,
+    animation = false) annotation(
     Placement(transformation(origin = {-10, 70}, extent = {{-10, -10}, {10, 10}})));
 
 equation

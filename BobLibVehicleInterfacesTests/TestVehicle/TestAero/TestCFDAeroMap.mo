@@ -1,6 +1,7 @@
 within BobLibVehicleInterfacesTests.TestVehicle.TestAero;
 
 model TestCFDAeroMap
+
   import BobLibVehicleInterfaces.Records.VehicleRecord.Aero.CFDAeroMapRecord;
 
   inner parameter Boolean headless = false;

@@ -1,12 +1,16 @@
 within BobLib.Tests.TestVehicle.TestPowertrain;
 model TestBatteryInverterMotor
+
   import SI = Modelica.Units.SI;
+
   // Battery
   BobLib.Vehicle.Powertrain.Battery.BatteryPack batt(Ns = 140, Np = 4, SOC_start = 1.0, E_cell = 38880) annotation(
     Placement(transformation(origin = {-50, -10}, extent = {{-10, -10}, {10, 10}})));
+
   // Inverter
   BobLib.Vehicle.Electronics.PowerElectronics.InverterDC inv annotation(
     Placement(transformation(origin = {-50, 40}, extent = {{-10, -10}, {10, 10}})));
+
   // Power command
   // Electrical reference
   Modelica.Electrical.Analog.Basic.Ground g annotation(
@@ -15,7 +19,7 @@ model TestBatteryInverterMotor
     Placement(transformation(origin = {-10, 10}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.Rotational.Sensors.TorqueSensor torqueSensor annotation(
     Placement(transformation(origin = {20, 10}, extent = {{-10, -10}, {10, 10}})));
-  Modelica.Mechanics.Rotational.Components.Inertia inertia(J = 2)  annotation(
+  Modelica.Mechanics.Rotational.Components.Inertia inertia(J = 2) annotation(
     Placement(transformation(origin = {50, 10}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Blocks.Sources.CombiTimeTable combiTimeTable(table = [
   0.000000, 0.000000;
@@ -4225,8 +4229,9 @@ model TestBatteryInverterMotor
   41.353210, 225.337500;
   41.362243, 225.337500;
   41.370605, 225.337500;
-  41.378845, 225.337500])  annotation(
+  41.378845, 225.337500]) annotation(
     Placement(transformation(origin = {-70, 70}, extent = {{-10, -10}, {10, 10}})));
+
 equation
   connect(g.p, batt.p) annotation(
     Line(points = {{-80, -30}, {-80, -10}, {-60, -10}}, color = {0, 0, 255}));

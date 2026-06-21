@@ -1,6 +1,7 @@
 within BobLibVehicleInterfacesTests.TestVehicle.TestChassis.TestSuspension.TestTemplates.TestTire;
 
 model TestFourMF52Transient
+
   import SI = Modelica.Units.SI;
   import Modelica.Math.Vectors.norm;
 
@@ -34,7 +35,9 @@ model TestFourMF52Transient
 
   BobLibVehicleInterfaces.Chassis.Suspension.Tires.MF52Tire tireFL(pPartialWheel = pCar.pFrPartialWheel,
                                                                     pTireModel = pCar.pFrTireModel,
-                                                                    redeclare BobLibVehicleInterfaces.Chassis.Suspension.Tires.TirePhysics.Wheel1DOF_Y wheelModel(partialWheelParams = pCar.pFrPartialWheel, wheel1DOF_YParams = pCar.pFrTire1DOF_YParams),
+                                                                    redeclare BobLibVehicleInterfaces.Chassis.Suspension.Tires.TirePhysics.Wheel1DOF_Y wheelModel(
+                                                                      partialWheelParams = pCar.pFrPartialWheel,
+                                                                      wheel1DOF_YParams = pCar.pFrTire1DOF_YParams),
                                                                     redeclare BobLibVehicleInterfaces.Chassis.Suspension.Tires.MF52.SlipModel.TransientSlip slipModel) annotation(
     Placement(transformation(origin = {-70, 80}, extent = {{10, -10}, {-10, 10}})));
   BobLibVehicleInterfaces.Chassis.Suspension.Tires.MF52Tire tireFR(pPartialWheel = PartialWheelRecord(R0 = pCar.pFrPartialWheel.R0,
@@ -53,7 +56,9 @@ model TestFourMF52Transient
     Placement(transformation(origin = {70, 80}, extent = {{-10, -10}, {10, 10}})));
   BobLibVehicleInterfaces.Chassis.Suspension.Tires.MF52Tire tireRL(pPartialWheel = pCar.pFrPartialWheel,
                                                                     pTireModel = pCar.pFrTireModel,
-                                                                    redeclare BobLibVehicleInterfaces.Chassis.Suspension.Tires.TirePhysics.Wheel1DOF_Y wheelModel(partialWheelParams = pCar.pFrPartialWheel, wheel1DOF_YParams = pCar.pRrTire1DOF_YParams),
+                                                                    redeclare BobLibVehicleInterfaces.Chassis.Suspension.Tires.TirePhysics.Wheel1DOF_Y wheelModel(
+                                                                      partialWheelParams = pCar.pFrPartialWheel,
+                                                                      wheel1DOF_YParams = pCar.pRrTire1DOF_YParams),
                                                                     redeclare BobLibVehicleInterfaces.Chassis.Suspension.Tires.MF52.SlipModel.TransientSlip slipModel) annotation(
     Placement(transformation(origin = {-70, 0}, extent = {{10, -10}, {-10, 10}})));
   BobLibVehicleInterfaces.Chassis.Suspension.Tires.MF52Tire tireRR(pPartialWheel = PartialWheelRecord(R0 = pCar.pFrPartialWheel.R0,
@@ -84,7 +89,7 @@ model TestFourMF52Transient
                                          height = 5*Modelica.Constants.pi/180,
                                          startTime = 1) annotation(
     Placement(transformation(origin = {-110, 110}, extent = {{-10, -10}, {10, 10}})));
-  Modelica.Mechanics.Rotational.Sources.Position steerPosition(exact = true)  annotation(
+  Modelica.Mechanics.Rotational.Sources.Position steerPosition(exact = true) annotation(
     Placement(transformation(origin = {-70, 110}, extent = {{-10, -10}, {10, 10}})));
 
   Modelica.Mechanics.MultiBody.Joints.Revolute leftRevolute(useAxisFlange = true) annotation(
@@ -100,13 +105,14 @@ model TestFourMF52Transient
   Modelica.Mechanics.MultiBody.Parts.Mounting1D mounting1D annotation(
     Placement(transformation(origin = {0, -20}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
 
-  Modelica.Blocks.Sources.RealExpression velErrorExpression(y = velocity - vCG)  annotation(
+  Modelica.Blocks.Sources.RealExpression velErrorExpression(y = velocity - vCG) annotation(
     Placement(transformation(origin = {-100, -80}, extent = {{-10, -10}, {10, 10}})));
 
-  Modelica.Blocks.Continuous.PI PI(T = 1, k = 200)  annotation(
+  Modelica.Blocks.Continuous.PI PI(T = 1, k = 200) annotation(
     Placement(transformation(origin = {-60, -80}, extent = {{-10, -10}, {10, 10}})));
 
 protected
+
   // Geometry + CG bodyCG
   Modelica.Mechanics.MultiBody.Parts.Fixed fixedFL(r = {1, 1, 0}, animation = false) annotation(
     Placement(transformation(origin = {-110, 40}, extent = {{-10, -10}, {10, 10}})));
@@ -128,7 +134,18 @@ protected
     Placement(transformation(origin = {0, 50}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation frToCG(r = {-1, 0, 0}, animation = false) annotation(
     Placement(transformation(origin = {30, 50}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
-  Modelica.Mechanics.MultiBody.Parts.Body bodyCG(r_CM = {0, 0, 0}, m = 150, I_11 = 40, I_22 = 50, I_33 = 60, animation = true, useQuaternions = false, angles_fixed = true, angles_start (each displayUnit = "rad"), v_0(start = {10, 0, 0}), r_0(start = {0, 0, pCar.pFrPartialWheel.R0})) annotation(
+  Modelica.Mechanics.MultiBody.Parts.Body bodyCG(
+    r_CM = {0, 0, 0},
+    m = 150,
+    I_11 = 40,
+    I_22 = 50,
+    I_33 = 60,
+    animation = true,
+    useQuaternions = false,
+    angles_fixed = true,
+    angles_start(each displayUnit = "rad"),
+    v_0(start = {10, 0, 0}),
+    r_0(start = {0, 0, pCar.pFrPartialWheel.R0})) annotation(
     Placement(transformation(origin = {30, 20}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
 
 initial equation

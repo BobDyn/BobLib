@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Utilities;
 package FMI
+
   extends BobLibVehicleInterfaces.Icons.FMIIcon;
 
   annotation(

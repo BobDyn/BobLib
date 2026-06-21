@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Engines;
 model SimpleICEngine
+
   "Simple internal-combustion engine sample exposed through VehicleInterfaces"
   extends VehicleInterfaces.Icons.Engine;
   extends VehicleInterfaces.Engines.Interfaces.Base;

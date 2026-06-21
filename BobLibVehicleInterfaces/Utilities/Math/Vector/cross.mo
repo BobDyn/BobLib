@@ -1,9 +1,11 @@
 within BobLibVehicleInterfaces.Utilities.Math.Vector;
 
 function cross
+
   input Real a[3];
   input Real b[3];
   output Real result[3];
+
 algorithm
   result := {
     a[2]*b[3] - a[3]*b[2],

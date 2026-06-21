@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Records.StandardRecord;
 
 record SteadyStateEvalRecord
+
   import SI = Modelica.Units.SI;
 
   // Inputs

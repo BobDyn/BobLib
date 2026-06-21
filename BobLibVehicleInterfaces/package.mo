@@ -1,5 +1,6 @@
 within ;
 package BobLibVehicleInterfaces
+
   "Standalone vehicle library built from VehicleInterfaces contracts"
 
   annotation(
@@ -19,8 +20,8 @@ package BobLibVehicleInterfaces
         Line(points = {{-70, 58}, {70, 58}}, color = {230, 235, 242}),
         Bitmap(extent = {{-74, -76}, {74, 72}}, fileName = "modelica://BobLibVehicleInterfaces/Resources/Images/bobdyn.png")}),
     Documentation(info = "<html>
-<p style=\"text-align:center;\">
-<img src=\"modelica://BobLibVehicleInterfaces/Resources/Images/bobdyn.png\" width=\"240\"/>
+<p style = \"text-align:center;\">
+<img src = \"modelica://BobLibVehicleInterfaces/Resources/Images/bobdyn.png\" width=\"240\"/>
 </p>
 <p>
 BobLibVehicleInterfaces is a standalone vehicle library that starts from the

@@ -1,6 +1,7 @@
 within BobLib.Resources.Icons;
 
 partial model PartialWheelIcon "Reusable partial wheel icon"
+
   annotation(
     Icon(graphics = {
       Ellipse(fillColor = {40, 40, 40}, fillPattern = FillPattern.Solid, lineThickness = 3, extent = {{-60, -60}, {60, 60}}),

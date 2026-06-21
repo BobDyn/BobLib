@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Icons;
 
 partial package BobLibInternalPackageBackground
+
   "BobDocs-themed BobLib package background for internal packages"
   extends BobLibVehicleInterfaces.Icons.BobLibPackageBackground;
 

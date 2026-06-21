@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces;
 package PowerElectronics
+
   "Power-electronics subsystem adapters used by VehicleInterfaces electric-drive assemblies"
   extends Modelica.Icons.Package;
 

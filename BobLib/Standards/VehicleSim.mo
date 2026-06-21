@@ -1,6 +1,7 @@
 within BobLib.Standards;
 
 model VehicleSim
+
   extends Templates.VehicleSim_DWBCStabar_DWBCStabar;
   annotation(
     Diagram(coordinateSystem(extent = {{-140, -120}, {140, 120}})),

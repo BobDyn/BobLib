@@ -1,6 +1,7 @@
 within BobLibVehicleInterfacesTests.TestVehicle.TestPowertrain;
 
 model TestVCU
+
   BobLibVehicleInterfaces.Controllers.VCU vcu(
     tau_max = 200,
     w_eps = 0.1) annotation(
@@ -19,22 +20,25 @@ model TestVCU
 
   Modelica.Blocks.Sources.Constant steeringAngle(k = 0) annotation(
     Placement(transformation(extent = {{-120, 44}, {-100, 64}})));
-  Modelica.Blocks.Sources.BooleanConstant inverterEnable(k = true) annotation(
+
+  Modelica.Blocks.Sources.Constant acceleratorPedal(k = 0) annotation(
+    Placement(transformation(extent = {{-120, 34}, {-100, 54}})));
+
+  Modelica.Blocks.Sources.Constant brakePedal(k = 0) annotation(
     Placement(transformation(extent = {{-120, 24}, {-100, 44}})));
-  Modelica.Blocks.Sources.IntegerConstant requestedGear(k = 0) annotation(
-    Placement(transformation(extent = {{-120, 4}, {-100, 24}})));
-  Modelica.Blocks.Sources.IntegerConstant gearboxMode(
-    k = VehicleInterfaces.Types.GearMode.Drive) annotation(
-    Placement(transformation(extent = {{-120, -16}, {-100, 4}})));
-  Modelica.Blocks.Sources.IntegerConstant ignition(
-    k = VehicleInterfaces.Types.IgnitionSetting.On) annotation(
-    Placement(transformation(extent = {{-120, -36}, {-100, -16}})));
+
+  Modelica.Blocks.Sources.BooleanConstant inverterEnable(k = true) annotation(
+    Placement(transformation(extent = {{-120, 14}, {-100, 34}})));
+
   Modelica.Blocks.Sources.Constant vehicleSpeed(k = 0) annotation(
     Placement(transformation(extent = {{-120, -56}, {-100, -36}})));
+
   Modelica.Blocks.Sources.Constant motorSpeed(k = 100) annotation(
     Placement(transformation(extent = {{-120, -76}, {-100, -56}})));
+
   Modelica.Blocks.Sources.Constant hvVoltage(k = 400) annotation(
     Placement(transformation(extent = {{-120, -96}, {-100, -76}})));
+
   Modelica.Blocks.Sources.Constant hvCurrent(k = 20) annotation(
     Placement(transformation(extent = {{-120, -116}, {-100, -96}})));
 
@@ -52,14 +56,12 @@ equation
 
   connect(steeringAngle.y, driverBus.steeringWheelAngle) annotation(
     Line(points = {{-99, 54}, {-70, 54}, {-70, 40}}, color = {0, 0, 127}));
+  connect(acceleratorPedal.y, driverBus.acceleratorPedalPosition) annotation(
+    Line(points = {{-99, 44}, {-74, 44}, {-74, 40}, {-70, 40}}, color = {0, 0, 127}));
+  connect(brakePedal.y, driverBus.brakePedalPosition) annotation(
+    Line(points = {{-99, 34}, {-70, 34}, {-70, 40}}, color = {0, 0, 127}));
   connect(inverterEnable.y, driverBus.inverterEnable) annotation(
-    Line(points = {{-99, 34}, {-70, 34}, {-70, 40}}, color = {255, 0, 255}));
-  connect(requestedGear.y, driverBus.requestedGear) annotation(
-    Line(points = {{-99, 14}, {-70, 14}, {-70, 40}}, color = {255, 127, 0}));
-  connect(gearboxMode.y, driverBus.gearboxMode) annotation(
-    Line(points = {{-99, -6}, {-66, -6}, {-66, 40}, {-70, 40}}, color = {255, 127, 0}));
-  connect(ignition.y, driverBus.ignition) annotation(
-    Line(points = {{-99, -26}, {-62, -26}, {-62, 40}, {-70, 40}}, color = {255, 127, 0}));
+    Line(points = {{-99, 24}, {-76, 24}, {-76, 40}, {-70, 40}}, color = {255, 0, 255}));
   connect(vehicleSpeed.y, chassisBus.vehicleSpeed) annotation(
     Line(points = {{-99, -46}, {-70, -46}, {-70, 20}}, color = {0, 0, 127}));
   connect(motorSpeed.y, electricMotorBus.speed) annotation(

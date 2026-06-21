@@ -1,6 +1,7 @@
 within BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52;
 
 record MF52Record
+
   import SI = Modelica.Units.SI;
 
   // Setup

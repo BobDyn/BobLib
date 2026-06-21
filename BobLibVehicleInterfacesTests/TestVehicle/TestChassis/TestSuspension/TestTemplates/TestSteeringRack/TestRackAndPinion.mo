@@ -1,6 +1,7 @@
 within BobLibVehicleInterfacesTests.TestVehicle.TestChassis.TestSuspension.TestTemplates.TestSteeringRack;
 
 model TestRackAndPinion
+
   import BobLibVehicleInterfaces.Records.VehicleDefn.EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord;
 
   parameter EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord pVehicle;
@@ -8,25 +9,34 @@ model TestRackAndPinion
   inner parameter Real linkDiameter = 0.020;
   inner parameter Boolean headless = false;
 
-  inner Modelica.Mechanics.MultiBody.World world(n = {0, 0, -1})  annotation(
+  inner Modelica.Mechanics.MultiBody.World world(n = {0, 0, -1}) annotation(
     Placement(transformation(origin = {-90, -90}, extent = {{-10, -10}, {10, 10}})));
 
   // Rack definition
-  Modelica.Mechanics.MultiBody.Parts.Fixed rackFixed(r = {pVehicle.pFrRack.leftPickup[1], 0, pVehicle.pFrRack.leftPickup[3]}, animation = false)  annotation(
+  Modelica.Mechanics.MultiBody.Parts.Fixed rackFixed(
+    r = {pVehicle.pFrRack.leftPickup[1], 0, pVehicle.pFrRack.leftPickup[3]},
+    animation = false) annotation(
     Placement(transformation(origin = {0, -30}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
-  BobLibVehicleInterfaces.Chassis.Suspension.Templates.SteeringRack.RackAndPinion rackAndPinion(pRack = pVehicle.pFrRack, linkDiameter = linkDiameter)  annotation(
+  BobLibVehicleInterfaces.Chassis.Suspension.Templates.SteeringRack.RackAndPinion rackAndPinion(
+    pRack = pVehicle.pFrRack,
+    linkDiameter = linkDiameter) annotation(
     Placement(transformation(extent = {{-20, -20}, {20, 20}})));
 
   // Pinion input
-  Modelica.Blocks.Sources.Ramp pinionRamp(height = 100*Modelica.Constants.pi/180, duration = 1, startTime = 1)  annotation(
+  Modelica.Blocks.Sources.Ramp pinionRamp(
+    height = 100*Modelica.Constants.pi/180,
+    duration = 1,
+    startTime = 1) annotation(
     Placement(transformation(origin = {-60, 30}, extent = {{-10, -10}, {10, 10}})));
-  Modelica.Mechanics.Rotational.Sources.Position pinionPosition(exact = true)  annotation(
+  Modelica.Mechanics.Rotational.Sources.Position pinionPosition(exact = true) annotation(
     Placement(transformation(origin = {-20, 30}, extent = {{-10, -10}, {10, 10}})));
 
   // Torque feedback
-  Modelica.Mechanics.MultiBody.Parts.Fixed springSupport(r = {pVehicle.pFrRack.leftPickup[1], pVehicle.pFrRack.leftPickup[2] + 0.5, pVehicle.pFrRack.leftPickup[3]}, animation = false)  annotation(
+  Modelica.Mechanics.MultiBody.Parts.Fixed springSupport(
+    r = {pVehicle.pFrRack.leftPickup[1], pVehicle.pFrRack.leftPickup[2] + 0.5, pVehicle.pFrRack.leftPickup[3]},
+    animation = false) annotation(
     Placement(transformation(origin = {-80, 0}, extent = {{-10, -10}, {10, 10}})));
-  Modelica.Mechanics.MultiBody.Forces.Spring spring(c = 1e6, s_unstretched = 0.5, width = linkDiameter*2)  annotation(
+  Modelica.Mechanics.MultiBody.Forces.Spring spring(c = 1e6, s_unstretched = 0.5, width = linkDiameter*2) annotation(
     Placement(transformation(origin = {-50, 0}, extent = {{-10, -10}, {10, 10}})));
 
 equation

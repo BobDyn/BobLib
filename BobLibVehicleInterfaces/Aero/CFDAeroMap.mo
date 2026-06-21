@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Aero;
 
 model CFDAeroMap "CFD-based aero load map from per-corner ride heights"
+
   extends BobLibVehicleInterfaces.Aero.Interfaces.Base;
   extends BobLibVehicleInterfaces.Icons.CFDAeroMapIcon;
 
@@ -9,6 +10,7 @@ model CFDAeroMap "CFD-based aero load map from per-corner ride heights"
   parameter BobLibVehicleInterfaces.Records.VehicleRecord.Aero.CFDAeroMapRecord pAero "CFD aero map record";
   output SI.Force drag "Positive drag magnitude";
   output SI.Force downforce "Positive downforce magnitude";
+
 protected
   Real speedScale;
   Real dragRaw;
@@ -18,6 +20,7 @@ protected
   Real mzRaw;
   SI.Length frontRideHeight;
   SI.Length rearRideHeight;
+
 equation
   assert(pAero.referenceSpeed > 0, "CFDAeroMap: referenceSpeed must be positive");
   assert(pAero.referenceDensity > 0, "CFDAeroMap: referenceDensity must be positive");
@@ -25,22 +28,48 @@ equation
   frontRideHeight = (rideHeight_1 + rideHeight_2) / 2;
   rearRideHeight = (rideHeight_3 + rideHeight_4) / 2;
 
-  speedScale =
+  speedScale = 
     noEvent(max(airDensity, 0)/pAero.referenceDensity)*
     (relativeAirSpeed/pAero.referenceSpeed)*
     (relativeAirSpeed/pAero.referenceSpeed);
-  dragRaw = Bilinear2D(frontRideHeight, rearRideHeight, pAero.frontRideHeightGrid, pAero.rearRideHeightGrid, pAero.dragTable);
-  downforceRaw = Bilinear2D(frontRideHeight, rearRideHeight, pAero.frontRideHeightGrid, pAero.rearRideHeightGrid, pAero.downforceTable);
-  mxRaw = Bilinear2D(frontRideHeight, rearRideHeight, pAero.frontRideHeightGrid, pAero.rearRideHeightGrid, pAero.mxTable);
-  myRaw = Bilinear2D(frontRideHeight, rearRideHeight, pAero.frontRideHeightGrid, pAero.rearRideHeightGrid, pAero.myTable);
-  mzRaw = Bilinear2D(frontRideHeight, rearRideHeight, pAero.frontRideHeightGrid, pAero.rearRideHeightGrid, pAero.mzTable);
+  dragRaw = Bilinear2D(
+    frontRideHeight,
+    rearRideHeight,
+    pAero.frontRideHeightGrid,
+    pAero.rearRideHeightGrid,
+    pAero.dragTable);
+  downforceRaw = Bilinear2D(
+    frontRideHeight,
+    rearRideHeight,
+    pAero.frontRideHeightGrid,
+    pAero.rearRideHeightGrid,
+    pAero.downforceTable);
+  mxRaw = Bilinear2D(
+    frontRideHeight,
+    rearRideHeight,
+    pAero.frontRideHeightGrid,
+    pAero.rearRideHeightGrid,
+    pAero.mxTable);
+  myRaw = Bilinear2D(
+    frontRideHeight,
+    rearRideHeight,
+    pAero.frontRideHeightGrid,
+    pAero.rearRideHeightGrid,
+    pAero.myTable);
+  mzRaw = Bilinear2D(
+    frontRideHeight,
+    rearRideHeight,
+    pAero.frontRideHeightGrid,
+    pAero.rearRideHeightGrid,
+    pAero.mzTable);
   drag = speedScale*dragRaw;
   downforce = speedScale*downforceRaw;
+
   // Body-frame convention: x forward, z up.
   force = {-drag, 0, -downforce};
   torque = {speedScale*mxRaw, speedScale*myRaw, speedScale*mzRaw};
   annotation(
-    Diagram(coordinateSystem(extent = {{-140, -100}, {140, 100}})),
+    Diagram,
     Documentation(info = "<html>
 <p>
 Model <code>CFDAeroMap</code>: CFD-based aero load map from per-corner ride heights.

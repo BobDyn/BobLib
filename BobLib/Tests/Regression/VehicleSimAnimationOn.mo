@@ -1,6 +1,7 @@
 within BobLib.Tests.Regression;
 
 model VehicleSimAnimationOn
+
   extends BobLib.Standards.VehicleSim(enableAnimation = true);
 
   annotation(

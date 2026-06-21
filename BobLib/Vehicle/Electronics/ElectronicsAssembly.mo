@@ -1,6 +1,7 @@
 within BobLib.Vehicle.Electronics;
 
 model ElectronicsAssembly
+
   "VCU and inverter assembly for vehicle-level ELC substitution"
   extends BobLib.Vehicle.Electronics.ElectronicsBase;
 

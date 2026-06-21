@@ -1,13 +1,16 @@
 within BobLib.Vehicle.Chassis.Suspension.Templates.Stabar;
 
 model Stabar "Stabar with rigid arms and compliant torsion bar"
+
   extends BobLib.Resources.Icons.StabarIcon;
 
   import SI = Modelica.Units.SI;
   import BobLib.Utilities.Math.Vector;
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Stabar.StabarRecord;
+
   // Record parameters
   parameter StabarRecord pStabar;
+
   // Visual parameters
   parameter SI.Length jointDiameter annotation(
     Evaluate = true,
@@ -15,33 +18,61 @@ model Stabar "Stabar with rigid arms and compliant torsion bar"
   parameter SI.Length linkDiameter annotation(
     Placement(visible = false, transformation(origin = {nan, nan}, extent = {{nan, nan}, {nan, nan}})));
   outer parameter Boolean enableAnimation;
+
   // Frames
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b leftArmFrame annotation(
-    Placement(transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-100, 20}, extent = {{-16, -16}, {16, 16}})));
+    Placement(
+      transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}),
+      iconTransformation(origin = {-100, 20}, extent = {{-16, -16}, {16, 16}})));
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b rightArmFrame annotation(
-    Placement(transformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {100, 20}, extent = {{-16, -16}, {16, 16}})));
+    Placement(
+      transformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}}),
+      iconTransformation(origin = {100, 20}, extent = {{-16, -16}, {16, 16}})));
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a supportFrame annotation(
-    Placement(transformation(origin = {0, -100}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {0, -30}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toLeftArmEnd(r = pStabar.leftArmEnd - pStabar.leftBarEnd, width = linkDiameter, height = linkDiameter, animation = enableAnimation) annotation(
+    Placement(
+      transformation(origin = {0, -100}, extent = {{-16, -16}, {16, 16}}, rotation = -90),
+      iconTransformation(origin = {0, -30}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toLeftArmEnd(
+    r = pStabar.leftArmEnd - pStabar.leftBarEnd,
+    width = linkDiameter,
+    height = linkDiameter,
+    animation = enableAnimation) annotation(
     Placement(transformation(origin = {-70, 30}, extent = {{10, -10}, {-10, 10}}, rotation = 90)));
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRightArmEnd(r = Vector.mirrorXZ(pStabar.leftArmEnd - pStabar.leftBarEnd), width = linkDiameter, height = linkDiameter, animation = enableAnimation) annotation(
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRightArmEnd(
+    r = Vector.mirrorXZ(pStabar.leftArmEnd - pStabar.leftBarEnd),
+    width = linkDiameter,
+    height = linkDiameter,
+    animation = enableAnimation) annotation(
     Placement(transformation(origin = {70, 30}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
   Modelica.Mechanics.MultiBody.Joints.Revolute stabarAxis(n = {0, 1, 0},
                                                           useAxisFlange = true,
                                                           animation = enableAnimation,
                                                           cylinderLength = jointDiameter,
                                                           cylinderDiameter = jointDiameter,
-                                                          phi(nominal=0.05),
-                                                          w(start = 0, nominal = 1))  annotation(
+                                                          phi(nominal = 0.05),
+                                                          w(start = 0, nominal = 1)) annotation(
     Placement(transformation(origin = {-30, 0}, extent = {{-10, -10}, {10, 10}}, rotation = -180)));
-  Modelica.Mechanics.MultiBody.Joints.Revolute mountAxis(n = {0, 1, 0}, animation = false, phi(nominal=0.05), w(start = 0, nominal = 1))  annotation(
+  Modelica.Mechanics.MultiBody.Joints.Revolute mountAxis(
+    n = {0, 1, 0},
+    animation = false,
+    phi(nominal = 0.05),
+    w(start = 0, nominal = 1)) annotation(
     Placement(transformation(origin = {0, -70}, extent = {{10, -10}, {-10, 10}}, rotation = 90)));
   Modelica.Mechanics.Rotational.Components.Spring spring(c = pStabar.barRate) annotation(
     Placement(transformation(origin = {-34, -20}, extent = {{-10, -10}, {10, 10}})));
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toLeftBarEnd(r = pStabar.leftBarEnd - {pStabar.leftBarEnd[1], 0, pStabar.leftBarEnd[3]}, width = linkDiameter, height = linkDiameter, animation = enableAnimation) annotation(
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toLeftBarEnd(
+    r = pStabar.leftBarEnd - {pStabar.leftBarEnd[1], 0, pStabar.leftBarEnd[3]},
+    width = linkDiameter,
+    height = linkDiameter,
+    animation = enableAnimation) annotation(
     Placement(transformation(origin = {-50, 30}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRightBarEnd(r = Vector.mirrorXZ(pStabar.leftBarEnd) - {pStabar.leftBarEnd[1], 0, pStabar.leftBarEnd[3]}, width = linkDiameter, height = linkDiameter, animation = enableAnimation) annotation(
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRightBarEnd(
+    r = Vector.mirrorXZ(pStabar.leftBarEnd) - {pStabar.leftBarEnd[1], 0, pStabar.leftBarEnd[3]},
+    width = linkDiameter,
+    height = linkDiameter,
+    animation = enableAnimation) annotation(
     Placement(transformation(origin = {50, 30}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
+
 equation
   connect(supportFrame, mountAxis.frame_b) annotation(
     Line(points = {{0, -100}, {0, -80}}));

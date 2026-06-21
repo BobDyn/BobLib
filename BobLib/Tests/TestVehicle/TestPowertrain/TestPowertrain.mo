@@ -1,19 +1,25 @@
 within BobLib.Tests.TestVehicle.TestPowertrain;
 
 model TestPowertrain
+
   import SI = Modelica.Units.SI;
+
   inner Modelica.Mechanics.MultiBody.World world(n = {0, 0, -1}) annotation(
     Placement(transformation(origin = {120, 50}, extent = {{-10, -10}, {10, 10}})));
+
   // Battery
   BobLib.Vehicle.Powertrain.Battery.BatteryPack batt(Ns = 140, Np = 4, SOC_start = 1.0) annotation(
     Placement(transformation(origin = {-80, -20}, extent = {{-10, -10}, {10, 10}})));
+
   // Inverter
   BobLib.Vehicle.Electronics.PowerElectronics.InverterDC inv annotation(
     Placement(transformation(origin = {-80, 30}, extent = {{-10, -10}, {10, 10}})));
+
   // Power command
   Modelica.Blocks.Sources.Step P_step(height = 80e3,  // 80 kW
   startTime = 1.0) annotation(
     Placement(transformation(origin = {-110, 50}, extent = {{-10, -10}, {10, 10}})));
+
   // Electrical reference
   Modelica.Electrical.Analog.Basic.Ground g annotation(
     Placement(transformation(origin = {-110, -50}, extent = {{-10, -10}, {10, 10}})));
@@ -39,7 +45,7 @@ model TestPowertrain
     Placement(transformation(origin = {20, 0}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.MultiBody.Parts.Fixed differentialSupport annotation(
     Placement(transformation(origin = {20, 42}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
-  Modelica.Mechanics.Rotational.Components.IdealGear idealGear(ratio = 3.31, useSupport = false)  annotation(
+  Modelica.Mechanics.Rotational.Components.IdealGear idealGear(ratio = 3.31, useSupport = false) annotation(
     Placement(transformation(origin = {-10, 0}, extent = {{-10, -10}, {10, 10}})));
 
   Modelica.Mechanics.Rotational.Sensors.TorqueSensor torqueSensor1 annotation(
@@ -49,6 +55,7 @@ model TestPowertrain
     phi(start = 0, fixed = true),
     w(start = 0, fixed = true)) annotation(
     Placement(transformation(origin = {90, -20}, extent = {{-10, -10}, {10, 10}})));
+
 equation
   connect(P_step.y, inv.P_req) annotation(
     Line(points = {{-99, 50}, {-80, 50}, {-80, 42}}, color = {0, 0, 255}));

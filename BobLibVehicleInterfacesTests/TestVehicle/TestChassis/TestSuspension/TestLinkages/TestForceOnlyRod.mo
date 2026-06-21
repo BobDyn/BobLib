@@ -1,6 +1,7 @@
 within BobLibVehicleInterfacesTests.TestVehicle.TestChassis.TestSuspension.TestLinkages;
 
 model TestForceOnlyRod
+
   inner Modelica.Mechanics.MultiBody.World world(n = {0, 0, -1}) annotation(
     Placement(transformation(origin = {-60, -60}, extent = {{-10, -10}, {10, 10}})));
 

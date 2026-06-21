@@ -1,6 +1,7 @@
 within BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.SlipModel;
 
 model TransientSlip
+
   extends BaseSlipModel;
 
   import SI = Modelica.Units.SI;
@@ -53,10 +54,10 @@ model TransientSlip
   parameter Real alpha_max = 1.2
     "Clamp for slip angle [rad]";
 
-  SI.Length u(nominal=0.1)
+  SI.Length u(nominal = 0.1)
     "Longitudinal deformation state";
 
-  SI.Length v(nominal=0.1)
+  SI.Length v(nominal = 0.1)
     "Lateral deformation state";
 
   SI.Length sigma_kappa
@@ -90,13 +91,15 @@ equation
   dfz = (Fz_eff - Fz0_scaled) / Fz0_scaled;
   camber_factor = 1 - PKY3*abs(gamma);
 
-  sigma_kappa =
+  sigma_kappa = 
+
     if PTX1 > 0 then
       noEvent(max(1e-4, Fz_eff * (PTX1 + PTX2*dfz) * exp(-PTX3*dfz) * (UNLOADED_RADIUS/Fz0) * LSGKP))
     else
       sigma_kappa_default;
 
-  sigma_alpha =
+  sigma_alpha = 
+
     if PTY1 > 0 and PTY2 > 0 then
       noEvent(max(1e-4, PTY1 * sin(2*atan(Fz_eff/(PTY2*Fz0*LFZO))) * camber_factor * UNLOADED_RADIUS * LFZO * LSGAL))
     else

@@ -1,6 +1,7 @@
 within BobLib.Standards;
 
 model FourPostSim
+
   extends Templates.FourPostSim_DWBCStabar_DWBCStabar;
   annotation(
     experiment(StartTime = 0, StopTime = 118, Tolerance = 1e-06, Interval = 1),

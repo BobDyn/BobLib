@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Chassis;
 partial model Chassis_LockRrSteer
+
   "Detailed BobLib chassis with rear steer locked"
   extends BobLibVehicleInterfaces.Chassis.ChassisBase(
     redeclare BobLibVehicleInterfaces.Chassis.Internal.DetailedChassis_LockRrSteer detailedChassis);

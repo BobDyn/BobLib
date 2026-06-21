@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.PowerElectronics;
 package Internal
+
   "Implementation details for public power-electronics subsystem models"
   extends BobLibVehicleInterfaces.Icons.BobLibInternalPackageBackground;
   annotation(

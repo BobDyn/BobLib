@@ -1,6 +1,7 @@
 within BobLib.Vehicle;
 
 model Vehicle_DWBC_DWBC
+
   import BobLib.Vehicle.Chassis.Suspension.Templates.Tire;
   import BobLib.Resources.VehicleDefn.DWBC_DWBCRecord;
 
@@ -222,6 +223,9 @@ annotation(Diagram(graphics),
     Line(origin = {-130, -120}, points = {{-10, 0}, {-30, 0}}, pattern = LinePattern.Dash, thickness = 1),
     Line(origin = {190, -120}, points = {{-30, 0}, {-50, 0}}, pattern = LinePattern.Dash, thickness = 1),
     Line(origin = {-80, -159}, points = {{80, -41}, {80, -31}, {-80, -31}, {-80, 39}}, color = {0, 0, 255}),
-    Line(origin = {71.18, -171.82}, points = {{-71.1799, -18.1799}, {88.8201, -18.1799}, {88.8201, 51.8201}}, color = {0, 0, 255})
+    Line(
+      origin = {71.18, -171.82},
+      points = {{-71.1799, -18.1799}, {88.8201, -18.1799}, {88.8201, 51.8201}},
+      color = {0, 0, 255})
   }));
 end Vehicle_DWBC_DWBC;

@@ -1,6 +1,7 @@
 within BobLib.Standards.Templates;
 
 partial model BaseVehicleSim
+
   import SI = Modelica.Units.SI;
   import Modelica.Constants.pi;
   import Modelica.Math.Vectors.norm;
@@ -31,7 +32,7 @@ partial model BaseVehicleSim
 
   // Toggle controllers
   final parameter Boolean openLoopAy = useMode == MODE_OPEN_LOOP_RAMP;
-  final parameter Boolean closedLoopVelocity =
+  final parameter Boolean closedLoopVelocity = 
     useMode == MODE_OPEN_LOOP_RAMP or
     useMode == MODE_OPEN_LOOP_SINE or
     useMode == MODE_STEP_STEER;
@@ -231,7 +232,7 @@ partial model BaseVehicleSim
     w(start = 0)) annotation(
     Placement(transformation(origin = {-30, 110}, extent = {{-10, -10}, {10, 10}}, rotation = -0)));
 
-  final parameter Real cpInitFL[3] =
+  final parameter Real cpInitFL[3] = 
     pVehicle.pFrDW.wheelCenter +
     Frames.resolve1(
       Frames.axesRotations(
@@ -246,7 +247,7 @@ partial model BaseVehicleSim
 
   final parameter Real cpInitFR[3] = Vector.mirrorXZ(cpInitFL);
 
-  final parameter Real cpInitRL[3] =
+  final parameter Real cpInitRL[3] = 
     pVehicle.pRrDW.wheelCenter +
     Frames.resolve1(
       Frames.axesRotations(
@@ -334,16 +335,16 @@ protected
     Placement(transformation(origin = {-30, -50}, extent = {{-10, -10}, {10, 10}})));
 
 initial equation
-  vehicle.chassis.frAxleDW.leftTire.wheelModel.hubAxis.w =
+  vehicle.chassis.frAxleDW.leftTire.wheelModel.hubAxis.w = 
     initialVel / pVehicle.pFrPartialWheel.R0;
 
-  vehicle.chassis.frAxleDW.rightTire.wheelModel.hubAxis.w =
+  vehicle.chassis.frAxleDW.rightTire.wheelModel.hubAxis.w = 
     initialVel / pVehicle.pFrPartialWheel.R0;
 
-  vehicle.chassis.rrAxleDW.leftTire.wheelModel.hubAxis.w =
+  vehicle.chassis.rrAxleDW.leftTire.wheelModel.hubAxis.w = 
     initialVel / pVehicle.pRrPartialWheel.R0;
 
-  vehicle.chassis.rrAxleDW.rightTire.wheelModel.hubAxis.w =
+  vehicle.chassis.rrAxleDW.rightTire.wheelModel.hubAxis.w = 
     initialVel / pVehicle.pRrPartialWheel.R0;
 
 equation
@@ -353,13 +354,13 @@ equation
     useMode == MODE_STEP_STEER,
     "VehicleSim.useMode must be 0 (open-loop ramp), 1 (open-loop sine), or 2 (step steer).");
 
-  curvature =
+  curvature = 
     bodyAngularVels[3] / max(speed, 0.1);
 
-  minTireNormalLoad =
+  minTireNormalLoad = 
     noEvent(min(min(Fz_FL, Fz_FR), min(Fz_RL, Fz_RR)));
 
-  der(tireNormalLoadStopXi) =
+  der(tireNormalLoadStopXi) = 
     if useMode == MODE_OPEN_LOOP_RAMP
        and enableNormalLoadSteerLimiter
        and rampEnding
@@ -368,16 +369,16 @@ equation
     else
       0;
 
-  tireNormalLoadRateXi =
+  tireNormalLoadRateXi = 
     noEvent(min(1, max(0, tireNormalLoadStopXi)));
 
-  tireNormalLoadRateScale =
+  tireNormalLoadRateScale = 
     noEvent(1 - (3*tireNormalLoadRateXi^2 - 2*tireNormalLoadRateXi^3));
 
-  handwheelRampDirection =
+  handwheelRampDirection = 
     if noEvent(targetAy >= 0) then 1 else -1;
 
-  handwheelRateCmd =
+  handwheelRateCmd = 
     if useMode == MODE_OPEN_LOOP_RAMP
        and noEvent(time >= steerStart) then
       handwheelRampDirection * handwheelRampRate * tireNormalLoadRateScale
@@ -386,7 +387,8 @@ equation
 
   der(handwheelRampCmd) = handwheelRateCmd;
 
-  linearityGainRatio =
+  linearityGainRatio = 
+
     if linearityReferenceValid then
       noEvent(
         abs(linearityLocalLateralGain) /
@@ -395,7 +397,7 @@ equation
     else
       1;
 
-  linearityGainLossFraction =
+  linearityGainLossFraction = 
     if useMode == MODE_OPEN_LOOP_RAMP
        and enableLinearityTermination
        and linearityReferenceValid
@@ -408,7 +410,7 @@ equation
     if useMode == MODE_OPEN_LOOP_RAMP and enableLinearityTermination and time >= steerStart then
       if pre(linearitySampleValid)
          and abs(handwheelAngle - pre(linearitySampleHandwheel)) > 1e-6 then
-        linearityLocalLateralGain =
+        linearityLocalLateralGain = 
           (accY - pre(linearitySampleAy)) /
           (handwheelAngle - pre(linearitySampleHandwheel));
       else
@@ -547,13 +549,15 @@ equation
     terminate("Reached open-loop step-steer steady-state: der(yawVel) below tolerance (held 0.1s)");
   end when;
 
-  steerSine =
+  steerSine = 
+
     if noEvent(useMode == MODE_OPEN_LOOP_SINE and time > steerStart) then
       steerAmp*sin(2*pi*steerFreq*(time - steerStart))
     else
       0;
 
-  steerStep =
+  steerStep = 
+
     if noEvent(time > steerStart) then
       frRampSteerHeight * noEvent(min(1, max(0, (time - steerStart) / stepDuration)))
     else
@@ -561,7 +565,8 @@ equation
 
   // Open-loop mode uses a constant handwheel rate until any tire reaches
   // tireNormalLoadMin. After that event, the rate smoothly rolls to zero.
-  frSteerCmd =
+  frSteerCmd = 
+
     if useMode == MODE_OPEN_LOOP_RAMP and noEvent(time >= steerStart) then
       handwheelRampCmd
     elseif useMode == MODE_OPEN_LOOP_SINE then
@@ -571,10 +576,11 @@ equation
     else
       0;
 
-  driveTorqueCmd =
+  driveTorqueCmd = 
     if useMode == MODE_OPEN_LOOP_RAMP or
        useMode == MODE_OPEN_LOOP_SINE or
        useMode == MODE_STEP_STEER then
+
       if enablePTNDriveSpeedControl and enablePTNRegenSpeedControl then
         speedPI.y
       elseif enablePTNDriveSpeedControl then
@@ -588,27 +594,28 @@ equation
 
   frSteerPosition.phi_ref = frSteerCmd;
   vehicle.uPTNTorque = driveTorqueCmd;
-  vehicle.uPTNRegenLimit =
+  vehicle.uPTNRegenLimit = 
+
     if enablePTNRegenSpeedControl then
       pVehicle.pPowertrain.regenTorqueLimit
     else
       0;
 
-  bodyVels =
+  bodyVels = 
     Frames.resolve2(cgFreeMotion.frame_b.R, cgFreeMotion.v_rel_a);
 
-  bodyAngularVels =
+  bodyAngularVels = 
     Frames.angularVelocity2(cgFreeMotion.frame_b.R);
 
-  bodyAccels =
+  bodyAccels = 
     Frames.resolve2(cgFreeMotion.frame_b.R, cgFreeMotion.a_rel_a);
 
-  leftWheelVector =
+  leftWheelVector = 
     Frames.resolve1(
       vehicle.chassis.frAxleFrame.R,
       Frames.resolve2(vehicle.frameFL.R, {1, 0, 0}));
 
-  rightWheelVector =
+  rightWheelVector = 
     Frames.resolve1(
       vehicle.chassis.frAxleFrame.R,
       Frames.resolve2(vehicle.frameFR.R, {1, 0, 0}));

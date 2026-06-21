@@ -1,6 +1,7 @@
 within BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip;
 
 record FyPureRecord
+
   // Scaling
   Real LFZO "Nominal load scaling [-]";
   Real LGAY "Camber influence scaling [-]";

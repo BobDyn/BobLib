@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Records.VisualRecord.Chassis;
 
 record ChassisVisualRecord
+
   import BobLibVehicleInterfaces.Records.VisualRecord.Chassis.Suspension.AxleDW_BC_ARB_VisualRecord;
 
   AxleDW_BC_ARB_VisualRecord frontAxle;

@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip;
 
 record FxPureRecord
+
   // Scaling
   Real LGAX "Camber influence scaling for longitudinal force [-]";
   Real LFZO "Scaling of nominal load Fz0 [-]";

@@ -1,6 +1,7 @@
 within BobLib.Vehicle.Powertrain;
 
 model PowertrainBatInvMotDiff
+
   "Battery-motor-final-drive-differential plant for an external ELC assembly"
   extends BobLib.Resources.Icons.PowertrainBatInvMotDiffIcon;
 
@@ -50,14 +51,14 @@ model PowertrainBatInvMotDiff
     "Left halfshaft torsional stiffness";
   parameter SI.Inertia halfshaftLeftJEquivalent(min = 0) = 0.02
     "Effective reflected inertia used to estimate left halfshaft critical damping";
-  parameter SI.RotationalDampingConstant halfshaftLeftD(min = 0) =
+  parameter SI.RotationalDampingConstant halfshaftLeftD(min = 0) = 
     2*sqrt(halfshaftLeftC*halfshaftLeftJEquivalent)
     "Left halfshaft torsional damping";
   parameter SI.RotationalSpringConstant halfshaftRightC(min = 0) = 15000
     "Right halfshaft torsional stiffness";
   parameter SI.Inertia halfshaftRightJEquivalent(min = 0) = 0.02
     "Effective reflected inertia used to estimate right halfshaft critical damping";
-  parameter SI.RotationalDampingConstant halfshaftRightD(min = 0) =
+  parameter SI.RotationalDampingConstant halfshaftRightD(min = 0) = 
     2*sqrt(halfshaftRightC*halfshaftRightJEquivalent)
     "Right halfshaft torsional damping";
   parameter SI.Voltage motorVdcMax = 630

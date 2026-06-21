@@ -1,6 +1,7 @@
 within BobLib.Vehicle.Chassis.Suspension.Linkages;
 
 model TabularSpring "Tabular translational spring with optional mass"
+
   extends BobLib.Resources.Icons.TabularSpringIcon;
 
   import SI = Modelica.Units.SI;
@@ -26,7 +27,11 @@ model TabularSpring "Tabular translational spring with optional mass"
     Placement(transformation(origin = {-60, 30}, extent = {{-10, -10}, {10, 10}})));
 
   // Force output block
-  Modelica.Blocks.Tables.CombiTable1Ds combiTable1D(columns = {2}, extrapolation = Modelica.Blocks.Types.Extrapolation.LastTwoPoints, smoothness = Modelica.Blocks.Types.Smoothness.LinearSegments, table = springTable) annotation(
+  Modelica.Blocks.Tables.CombiTable1Ds combiTable1D(
+    columns = {2},
+    extrapolation = Modelica.Blocks.Types.Extrapolation.LastTwoPoints,
+    smoothness = Modelica.Blocks.Types.Smoothness.LinearSegments,
+    table = springTable) annotation(
     Placement(transformation(origin = {-20, 30}, extent = {{-10, -10}, {10, 10}})));
 
 equation

@@ -1,30 +1,36 @@
 within BobLib.Tests.TestUtilities.TestMechanics.TestMultibody;
 
 model TestGroundPhysics
+
   import Modelica.Math.Vectors.normalize;
 
   // Force sensor
-  Modelica.Mechanics.MultiBody.Sensors.CutForce cut_force(resolveInFrame = Modelica.Mechanics.MultiBody.Types.ResolveInFrameA.world)  annotation(
+  Modelica.Mechanics.MultiBody.Sensors.CutForce cut_force(resolveInFrame = Modelica.Mechanics.MultiBody.Types.ResolveInFrameA.world) annotation(
     Placement(transformation(origin = {0, 10}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
 
 protected
+
   // Set gravity
   inner Modelica.Mechanics.MultiBody.World world(n = {0, 0, -1}) annotation(Placement(transformation(origin = {-90, -90}, extent = {{-10, -10}, {10, 10}})));
 
   // Define ground reference
   Modelica.Mechanics.MultiBody.Parts.Fixed ground_reference(r = {0, 0, 0}) annotation(
     Placement(transformation(origin = {0, -70}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
-  
+
   // Define ground
   BobLib.Utilities.Mechanics.Multibody.GroundPhysics ground annotation(
-    Placement(transformation(origin = {0, -30},extent = {{-10, -10}, {10, 10}}, rotation = 90)));
-  
+    Placement(transformation(origin = {0, -30}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
+
   // Define mass above ground
-  Modelica.Mechanics.MultiBody.Parts.Body body(r_CM = {0, 0, 0}, m = 1, sphereDiameter = 0.05, r_0(start = {0, 0, 0.25}, each fixed = true)) annotation(
+  Modelica.Mechanics.MultiBody.Parts.Body body(
+    r_CM = {0, 0, 0},
+    m = 1,
+    sphereDiameter = 0.05,
+    r_0(start = {0, 0, 0.25}, each fixed = true)) annotation(
     Placement(transformation(origin = {0, 70}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
-  
+
   // Define force with x and y component
-  Modelica.Blocks.Sources.RealExpression e_f[3](y = normalize({1, 1, 0}))  annotation(
+  Modelica.Blocks.Sources.RealExpression e_f[3](y = normalize({1, 1, 0})) annotation(
     Placement(transformation(origin = {-70, 50}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.MultiBody.Forces.WorldForce force annotation(
     Placement(transformation(origin = {-30, 50}, extent = {{-10, -10}, {10, 10}})));

@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.ElectricDrives;
 
 package Internal
+
   extends BobLibVehicleInterfaces.Icons.BobLibInternalPackageBackground;
   annotation(
     Documentation(info = "<html>

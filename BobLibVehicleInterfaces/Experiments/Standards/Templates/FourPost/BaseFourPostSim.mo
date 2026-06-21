@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Experiments.Standards.Templates.FourPost;
 
 partial model BaseFourPostSim
+
   import SI = Modelica.Units.SI;
   import Modelica.Constants.pi;
   import Modelica.Math.Vectors.norm;
@@ -23,10 +24,10 @@ partial model BaseFourPostSim
     annotation(Evaluate = true, Dialog(tab = "Animation"));
 
   replaceable record VehicleRecord = BobLibVehicleInterfaces.Records.VehicleDefn.EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord;
-  replaceable model FrAxleModel =
+  replaceable model FrAxleModel = 
     BobLibVehicleInterfaces.Chassis.Suspension.FrAxleDW_BC_Stabar
     constrainedby BobLibVehicleInterfaces.Chassis.Suspension.AxleDWBase;
-  replaceable model RrAxleModel =
+  replaceable model RrAxleModel = 
     BobLibVehicleInterfaces.Chassis.Suspension.RrAxleDW_BC_Stabar
     constrainedby BobLibVehicleInterfaces.Chassis.Suspension.AxleDWBase;
 
@@ -72,6 +73,7 @@ partial model BaseFourPostSim
                                                                redeclare Tire.TirePhysics.Wheel0DOF wheelModel(partialWheelParams = pVehicle.pFrPartialWheel),
                                                                redeclare Tire.MF52.SlipModel.NoSlip slipModel)) annotation(
     Placement(transformation(origin = {0.25, 52.4444}, extent = {{-37.25, -16.5556}, {37.25, 16.5556}})));
+
   // Rear axle
   RrAxleModel rrAxleDW(pAxle = pVehicle.pRrAxleDW,
                               pRack = pVehicle.pRrRack,
@@ -85,16 +87,17 @@ partial model BaseFourPostSim
                                                                redeclare Tire.TirePhysics.Wheel0DOF wheelModel(partialWheelParams = pVehicle.pRrPartialWheel),
                                                                redeclare Tire.MF52.SlipModel.NoSlip slipModel)) annotation(
     Placement(transformation(origin = {-0.285728, -49.8887}, extent = {{-36.5715, -14.2222}, {36.5715, 14.2222}})));
+
   // Front chassis actuator
-  BobLibVehicleInterfaces.Utilities.Mechanics.MultiBody.Actuators.ChassisActuator frChassisActuator(axleRef = frAxleDW.effectiveCenter)  annotation(
+  BobLibVehicleInterfaces.Utilities.Mechanics.MultiBody.Actuators.ChassisActuator frChassisActuator(axleRef = frAxleDW.effectiveCenter) annotation(
     Placement(transformation(origin = {0, 24}, extent = {{10, -10}, {-10, 10}})));
 
   // Rear chassis actuator
-  BobLibVehicleInterfaces.Utilities.Mechanics.MultiBody.Actuators.ChassisActuator rrChassisActuator(axleRef = rrAxleDW.effectiveCenter)  annotation(
+  BobLibVehicleInterfaces.Utilities.Mechanics.MultiBody.Actuators.ChassisActuator rrChassisActuator(axleRef = rrAxleDW.effectiveCenter) annotation(
     Placement(transformation(origin = {0, -76}, extent = {{10, -10}, {-10, 10}})));
 
   // Front steer input
-  Modelica.Mechanics.Rotational.Sources.Position steerPosition(exact = true)  annotation(
+  Modelica.Mechanics.Rotational.Sources.Position steerPosition(exact = true) annotation(
     Placement(transformation(origin = {-30, 80}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Blocks.Sources.Ramp steerExpression(height = steerMagnitude,
                                                duration = 1,
@@ -103,45 +106,58 @@ partial model BaseFourPostSim
 
   // Rear steer lock
   Modelica.Mechanics.MultiBody.Parts.Mounting1D rrLock annotation(
-    Placement(transformation(origin = {0, -30}, extent = {{10, -10}, {-10, 10}})));
+    Placement(transformation(origin = {0, -25}, extent = {{5, -5}, {-5, 5}})));
 
   // Contact patch fixtures
-  BobLibVehicleInterfaces.Utilities.Mechanics.MultiBody.Actuators.ContactPatchFixture FL_fixture(CP_init = cpInitFL)  annotation(
-    Placement(transformation(origin = {-50, 40}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
-  BobLibVehicleInterfaces.Utilities.Mechanics.MultiBody.Actuators.ContactPatchFixture FR_fixture(CP_init = cpInitFR)  annotation(
-    Placement(transformation(origin = {50, 40}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
-  BobLibVehicleInterfaces.Utilities.Mechanics.MultiBody.Actuators.ContactPatchFixture RL_fixture(CP_init = cpInitRL)  annotation(
-    Placement(transformation(origin = {-50, -60}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
-  BobLibVehicleInterfaces.Utilities.Mechanics.MultiBody.Actuators.ContactPatchFixture RR_fixture(CP_init = cpInitRR)  annotation(
-    Placement(transformation(origin = {50, -60}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
+  BobLibVehicleInterfaces.Utilities.Mechanics.MultiBody.Actuators.ContactPatchFixture FL_fixture(CP_init = cpInitFL) annotation(
+    Placement(transformation(origin = {-40, 20}, extent = {{-20, -20}, {20, 20}})));
+  BobLibVehicleInterfaces.Utilities.Mechanics.MultiBody.Actuators.ContactPatchFixture FR_fixture(CP_init = cpInitFR) annotation(
+    Placement(transformation(origin = {40, 20}, extent = {{-20, -20}, {20, 20}})));
+  BobLibVehicleInterfaces.Utilities.Mechanics.MultiBody.Actuators.ContactPatchFixture RL_fixture(CP_init = cpInitRL) annotation(
+    Placement(transformation(origin = {-40, -80}, extent = {{-20, -20}, {20, 20}})));
+  BobLibVehicleInterfaces.Utilities.Mechanics.MultiBody.Actuators.ContactPatchFixture RR_fixture(CP_init = cpInitRR) annotation(
+    Placement(transformation(origin = {40, -80}, extent = {{-20, -20}, {20, 20}})));
 
   // Force actuators
-  BobLibVehicleInterfaces.Utilities.Mechanics.MultiBody.Actuators.ContactPatchForceActuator FL_ForceActuator(fxTable = fxTable, fyTable = fyTable, forceMagnitude = forceMagnitude / 2)  annotation(
-    Placement(transformation(origin = {-70, 30}, extent = {{-10, -10}, {10, 10}})));
-  BobLibVehicleInterfaces.Utilities.Mechanics.MultiBody.Actuators.ContactPatchForceActuator FR_ForceActuator(fxTable = fxTable, fyTable = fyTable, forceMagnitude = forceMagnitude / 2)  annotation(
-    Placement(transformation(origin = {70, 30}, extent = {{10, -10}, {-10, 10}})));
-  BobLibVehicleInterfaces.Utilities.Mechanics.MultiBody.Actuators.ContactPatchForceActuator RL_ForceActuator(fxTable = fxTable, fyTable = fyTable, forceMagnitude = forceMagnitude / 2)  annotation(
-    Placement(transformation(origin = {-70, -70}, extent = {{-10, -10}, {10, 10}})));
-  BobLibVehicleInterfaces.Utilities.Mechanics.MultiBody.Actuators.ContactPatchForceActuator RR_ForceActuator(fxTable = fxTable, fyTable = fyTable, forceMagnitude = forceMagnitude / 2)  annotation(
-    Placement(transformation(origin = {70, -70}, extent = {{10, -10}, {-10, 10}})));
+  BobLibVehicleInterfaces.Utilities.Mechanics.MultiBody.Actuators.ContactPatchForceActuator FL_ForceActuator(
+    fxTable = fxTable,
+    fyTable = fyTable,
+    forceMagnitude = forceMagnitude / 2) annotation(
+    Placement(transformation(origin = {-60, 40}, extent = {{-10, -10}, {10, 10}})));
+  BobLibVehicleInterfaces.Utilities.Mechanics.MultiBody.Actuators.ContactPatchForceActuator FR_ForceActuator(
+    fxTable = fxTable,
+    fyTable = fyTable,
+    forceMagnitude = forceMagnitude / 2) annotation(
+    Placement(transformation(origin = {60, 40}, extent = {{10, -10}, {-10, 10}})));
+  BobLibVehicleInterfaces.Utilities.Mechanics.MultiBody.Actuators.ContactPatchForceActuator RL_ForceActuator(
+    fxTable = fxTable,
+    fyTable = fyTable,
+    forceMagnitude = forceMagnitude / 2) annotation(
+    Placement(transformation(origin = {-60, -60}, extent = {{-10, -10}, {10, 10}})));
+  BobLibVehicleInterfaces.Utilities.Mechanics.MultiBody.Actuators.ContactPatchForceActuator RR_ForceActuator(
+    fxTable = fxTable,
+    fyTable = fyTable,
+    forceMagnitude = forceMagnitude / 2) annotation(
+    Placement(transformation(origin = {60, -60}, extent = {{10, -10}, {-10, 10}})));
 
   // Heave input
   Modelica.Blocks.Sources.CombiTimeTable heaveSource(table = heaveTable) annotation(
-    Placement(transformation(origin = {150, 58}, extent = {{10, -10}, {-10, 10}})));
+    Placement(transformation(origin = {-90, 20}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Blocks.Sources.RealExpression heaveCommand(y = heaveMagnitude * heaveSource.y[1]) annotation(
-    Placement(transformation(origin = {120, 58}, extent = {{5, -5}, {-5, 5}})));
+    Placement(transformation(origin = {90, 70}, extent = {{10, -10}, {-10, 10}})));
 
   // Roll input
   Modelica.Blocks.Sources.CombiTimeTable rollSource(table = rollTable) annotation(
-    Placement(transformation(origin = {150, 30}, extent = {{10, -10}, {-10, 10}})));
+    Placement(transformation(origin = {-90, -20}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Blocks.Sources.RealExpression rollCommand(y = rollMagnitude * rollSource.y[1]) annotation(
-    Placement(transformation(origin = {120, 30}, extent = {{5, -5}, {-5, 5}})));
+    Placement(transformation(origin = {90, 38}, extent = {{10, -10}, {-10, 10}})));
 
   // FourPostEval records
   FourPostEvalRecord frKnC;
   FourPostEvalRecord rrKnC;
 
 protected
+
   // Front quantities
   Real frLeftDeltaVec[3];
   Real frLeftKingpinVec[3];
@@ -264,47 +280,50 @@ equation
   rrKnC.fy = RL_ForceActuator.worldForce.force[2] + RR_ForceActuator.worldForce.force[2];
 
   connect(FL_fixture.frame_a, frAxleDW.leftCP) annotation(
-    Line(points = {{-48, 40}, {-37, 40}}, color = {95, 95, 95}));
+    Line(points = {{-40, 28}, {-40.5, 28}, {-40.5, 40}, {-37, 40}}, color = {95, 95, 95}));
   connect(FR_fixture.frame_a, frAxleDW.rightCP) annotation(
-    Line(points = {{48, 40}, {37.5, 40}}, color = {95, 95, 95}));
+    Line(points = {{40, 28}, {39.75, 28}, {39.75, 40}, {37.5, 40}}, color = {95, 95, 95}));
   connect(steerExpression.y, steerPosition.phi_ref) annotation(
     Line(points = {{-59, 80}, {-42, 80}}, color = {0, 0, 127}));
   connect(frAxleDW.axleFrame, frChassisActuator.chassisFrame) annotation(
     Line(points = {{0, 50}, {0, 32}}, color = {95, 95, 95}));
-  connect(heaveCommand.y, frChassisActuator.heaveInput) annotation(
-    Line(points = {{114.5, 58}, {112, 58}, {112, 18}, {4, 18}, {4, 30}}, color = {0, 0, 127}));
-  connect(rollCommand.y, frChassisActuator.rollInput) annotation(
-    Line(points = {{114.5, 30}, {104, 30}, {104, 12}, {4, 12}, {4, 18}}, color = {0, 0, 127}));
   connect(steerPosition.flange, frAxleDW.steerFlange) annotation(
     Line(points = {{-20, 80}, {0, 80}, {0, 60}}));
   connect(FL_ForceActuator.chassisFrame, frAxleDW.leftCP) annotation(
-    Line(points = {{-60, 30}, {-36, 30}, {-36, 40}}, color = {95, 95, 95}));
+    Line(points = {{-50, 40}, {-36, 40}}, color = {95, 95, 95}));
   connect(FR_ForceActuator.chassisFrame, frAxleDW.rightCP) annotation(
-    Line(points = {{60, 30}, {38, 30}, {38, 40}}, color = {95, 95, 95}));
+    Line(points = {{50, 40}, {38, 40}}, color = {95, 95, 95}));
   connect(rrLock.flange_b, rrAxleDW.steerFlange) annotation(
-    Line(points = {{-10, -30}, {-16, -30}, {-16, -54}, {0, -54}}));
+    Line(points = {{-5, -25}, {-20, -25}, {-20, -54}, {0, -54}}));
   connect(rrLock.frame_a, rrAxleDW.axleFrame) annotation(
-    Line(points = {{0, -40}, {0, -50}}, color = {95, 95, 95}));
+    Line(points = {{0, -30}, {0, -50}}, color = {95, 95, 95}));
   connect(RL_fixture.frame_a, rrAxleDW.leftCP) annotation(
-    Line(points = {{-48, -60}, {-36, -60}}, color = {95, 95, 95}));
-  connect(RR_fixture.frame_a, rrAxleDW.rightCP) annotation(
-    Line(points = {{48, -60}, {36, -60}}, color = {95, 95, 95}));
+    Line(points = {{-40, -72}, {-40, -60}, {-36, -60}}, color = {95, 95, 95}));
   connect(RL_ForceActuator.chassisFrame, rrAxleDW.leftCP) annotation(
-    Line(points = {{-60, -70}, {-36, -70}, {-36, -60}}, color = {95, 95, 95}));
-  connect(RR_ForceActuator.chassisFrame, rrAxleDW.rightCP) annotation(
-    Line(points = {{60, -70}, {36, -70}, {36, -60}}, color = {95, 95, 95}));
+    Line(points = {{-50, -60}, {-36, -60}}, color = {95, 95, 95}));
   connect(rrChassisActuator.chassisFrame, rrAxleDW.axleFrame) annotation(
     Line(points = {{0, -68}, {0, -50}}, color = {95, 95, 95}));
+  connect(RR_fixture.frame_a, rrAxleDW.rightCP) annotation(
+    Line(points = {{40, -72}, {40, -60}, {36, -60}}, color = {95, 95, 95}));
+  connect(RR_ForceActuator.chassisFrame, rrAxleDW.rightCP) annotation(
+    Line(points = {{50, -60}, {36, -60}}, color = {95, 95, 95}));
+  connect(heaveCommand.y, frChassisActuator.heaveInput) annotation(
+    Line(points = {{80, 70}, {60, 70}, {60, 30}, {4, 30}}, color = {0, 0, 127}));
   connect(heaveCommand.y, rrChassisActuator.heaveInput) annotation(
-    Line(points = {{114.5, 58}, {112, 58}, {112, -92}, {4, -92}, {4, -70}}, color = {0, 0, 127}));
+    Line(points = {{80, 70}, {60, 70}, {60, -70}, {4, -70}}, color = {0, 0, 127}));
+  connect(rollCommand.y, frChassisActuator.rollInput) annotation(
+    Line(points = {{80, 38}, {70, 38}, {70, 18}, {4, 18}}, color = {0, 0, 127}));
   connect(rollCommand.y, rrChassisActuator.rollInput) annotation(
-    Line(points = {{114.5, 30}, {104, 30}, {104, -100}, {4, -100}, {4, -82}}, color = {0, 0, 127}));
-
+    Line(points = {{80, 38}, {70, 38}, {70, -82}, {4, -82}}, color = {0, 0, 127}));
   annotation(
-    Diagram(coordinateSystem(extent = {{-120, -110}, {170, 100}})),
+    Diagram,
     experiment(StartTime = 0, StopTime = 118, Tolerance = 1e-06, Interval = 1),
     __OpenModelica_commandLineOptions = "--matchingAlgorithm=PFPlusExt --indexReductionMethod=dynamicStateSelection -d=initialization,NLSanalyticJacobian --maxSizeLinearTearing=5000 --generateDynamicJacobian=none",
-    __OpenModelica_simulationFlags(jacobian = "internalNumerical", lv = "LOG_STDOUT,LOG_ASSERT,LOG_STATS", s = "dassl", variableFilter = ".*"),
+    __OpenModelica_simulationFlags(
+      jacobian = "internalNumerical",
+      lv = "LOG_STDOUT,LOG_ASSERT,LOG_STATS",
+      s = "dassl",
+      variableFilter = ".*"),
     Documentation(info = "<html>
 <p>
 Partial model <code>BaseFourPostSim</code> is the shared four-post rig template.

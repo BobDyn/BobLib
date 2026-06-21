@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.CombinedSlip;
 
 record MzCombinedRecord
+
   // Fx-induced moment arm (s)
   Real SSZ1 "Nominal moment arm of longitudinal force contribution";
   Real SSZ2 "Lateral force dependency of moment arm";

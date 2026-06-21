@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52;
 
 record RelaxationRecord
+
   import SI = Modelica.Units.SI;
 
   SI.Force FNOMIN = 650

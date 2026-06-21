@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Chassis.Suspension;
 package Tires
+
   "Tire, wheel, slip, and contact-patch frame models used by suspension axles"
   extends BobLibVehicleInterfaces.Icons.BobLibPackageBackground;
 

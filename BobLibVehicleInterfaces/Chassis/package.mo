@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces;
 package Chassis
+
   "Chassis-domain models built from VehicleInterfaces chassis contracts"
   extends Modelica.Icons.Package;
 

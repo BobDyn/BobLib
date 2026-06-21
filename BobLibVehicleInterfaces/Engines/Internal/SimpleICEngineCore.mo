@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Engines.Internal;
 block SimpleICEngineCore
+
   "Simple throttle-to-torque law for an internal-combustion engine sample"
   import SI = Modelica.Units.SI;
   import Modelica.Constants.pi;
@@ -17,13 +18,19 @@ block SimpleICEngineCore
 
   Modelica.Blocks.Interfaces.RealInput throttle
     "Driver accelerator request, clamped internally to 0..1" annotation(
-      Placement(transformation(extent = {{-120, 40}, {-80, 80}})));
+      Placement(
+        transformation(origin = {-20, 0}, extent = {{-120, 40}, {-80, 80}}),
+        iconTransformation(origin = {-20, 0}, extent = {{-120, 40}, {-80, 80}})));
   Modelica.Blocks.Interfaces.RealInput w(unit = "rad/s")
     "Engine shaft speed" annotation(
-      Placement(transformation(extent = {{-120, -80}, {-80, -40}})));
+      Placement(
+        transformation(origin = {-20, 0}, extent = {{-120, -80}, {-80, -40}}),
+        iconTransformation(origin = {-20, 0}, extent = {{-120, -80}, {-80, -40}})));
   Modelica.Blocks.Interfaces.RealOutput tau(unit = "N.m")
     "Commanded crankshaft torque" annotation(
-      Placement(transformation(extent = {{100, -10}, {120, 10}})));
+      Placement(
+        transformation(origin = {-100, 0}, extent = {{200, -20}, {240, 20}}),
+        iconTransformation(extent = {{100, -10}, {120, 10}})));
 
 protected
   Real throttleLimited(unit = "1");

@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Records.StandardRecord;
 
 record FourPostEvalRecord
+
   import SI = Modelica.Units.SI;
 
   SI.Length heave "Sprung mass heave";

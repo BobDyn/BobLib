@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip;
 
 record MyPureRecord
+
   // Rolling resistance coefficients
   Real QSY1 "Base rolling resistance coefficient";
   Real QSY2 "Longitudinal force influence on rolling resistance";

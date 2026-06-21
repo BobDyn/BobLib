@@ -1,6 +1,7 @@
 within BobLibVehicleInterfacesTests.Regression;
 
 model VehicleSimAnimationOn
+
   extends BobLibVehicleInterfaces.Experiments.Standards.VehicleSim(headless = false);
 
   annotation(

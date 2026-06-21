@@ -1,9 +1,16 @@
 within BobLibVehicleInterfacesTests.TestVehicle.TestPowertrain;
 model TestBatteryInverterMotor
+
   import SI = Modelica.Units.SI;
+
   // Battery
-  BobLibVehicleInterfaces.EnergyStorage.Internal.TheveninBatteryPack batt(Ns = 140, Np = 4, SOC_start = 1.0, E_cell = 38880) annotation(
+  BobLibVehicleInterfaces.EnergyStorage.Internal.TheveninBatteryPack batt(
+    Ns = 140,
+    Np = 4,
+    SOC_start = 1.0,
+    E_cell = 38880) annotation(
     Placement(transformation(origin = {-50, -10}, extent = {{-10, -10}, {10, 10}})));
+
   // Inverter
   BobLibVehicleInterfaces.PowerElectronics.InverterDC inv annotation(
     Placement(transformation(origin = {-50, 40}, extent = {{-10, -10}, {10, 10}})));
@@ -11,15 +18,16 @@ model TestBatteryInverterMotor
     Placement(transformation(origin = {-80, 40}, extent = {{-10, -10}, {10, 10}})));
   VehicleInterfaces.Interfaces.ElectricMotorControlBus electricMotorControlBus annotation(
     Placement(transformation(origin = {-80, 50}, extent = {{-10, -10}, {10, 10}})));
+
   // Power command
   // Electrical reference
   Modelica.Electrical.Analog.Basic.Ground g annotation(
     Placement(transformation(origin = {-80, -40}, extent = {{-10, -10}, {10, 10}})));
-  BobLibVehicleInterfaces.ElectricDrives.Internal.PowerLimitedMotor motor annotation(
+  BobLibVehicleInterfaces.ElectricDrives.Motor motor annotation(
     Placement(transformation(origin = {-10, 10}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.Rotational.Sensors.TorqueSensor torqueSensor annotation(
     Placement(transformation(origin = {20, 10}, extent = {{-10, -10}, {10, 10}})));
-  Modelica.Mechanics.Rotational.Components.Inertia inertia(J = 2)  annotation(
+  Modelica.Mechanics.Rotational.Components.Inertia inertia(J = 2) annotation(
     Placement(transformation(origin = {50, 10}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Blocks.Sources.CombiTimeTable combiTimeTable(table = [
   0.000000, 0.000000;
@@ -4229,11 +4237,14 @@ model TestBatteryInverterMotor
   41.353210, 225.337500;
   41.362243, 225.337500;
   41.370605, 225.337500;
-  41.378845, 225.337500])  annotation(
+  41.378845, 225.337500]) annotation(
     Placement(transformation(origin = {-70, 70}, extent = {{-10, -10}, {10, 10}})));
+
 equation
   connect(controlBus, inv.controlBus) annotation(
     Line(points = {{-80, 40}, {-60, 40}, {-60, 46}}, color = {255, 204, 51}, thickness = 0.5));
+  connect(controlBus, motor.controlBus) annotation(
+    Line(points = {{-80, 40}, {-32, 40}, {-32, 4}, {-20, 4}}, color = {255, 204, 51}, thickness = 0.5));
   connect(controlBus.electricMotorControlBus, electricMotorControlBus) annotation(
     Line(points = {{-80, 40}, {-80, 50}}, color = {255, 204, 51}, thickness = 0.5));
   connect(g.p, batt.p) annotation(
@@ -4242,9 +4253,11 @@ equation
     Line(points = {{-60, 40}, {-70, 40}, {-70, -10}, {-60, -10}}, color = {0, 0, 255}));
   connect(inv.n, batt.n) annotation(
     Line(points = {{-40, 40}, {-30, 40}, {-30, -10}, {-40, -10}}, color = {0, 0, 255}));
-  connect(inv.P_out, motor.P_elec) annotation(
-    Line(points = {{-50, 29}, {-50, 9}, {-22, 9}}, color = {0, 0, 127}));
-  connect(torqueSensor.flange_a, motor.shaft) annotation(
+  connect(inv.motor_p, motor.pin_p) annotation(
+    Line(points = {{-40, 44}, {-28, 44}, {-28, 14.4}, {-20, 14.4}}, color = {0, 0, 255}));
+  connect(inv.motor_n, motor.pin_n) annotation(
+    Line(points = {{-40, 36}, {-26, 36}, {-26, 12}, {-20, 12}}, color = {0, 0, 255}));
+  connect(torqueSensor.flange_a, motor.shaft_b.flange) annotation(
     Line(points = {{10, 10}, {0, 10}}));
   connect(torqueSensor.flange_b, inertia.flange_a) annotation(
     Line(points = {{30, 10}, {40, 10}}));

@@ -1,6 +1,7 @@
 within BobLib.Resources.Icons;
 
 partial model InverterDCIcon "Reusable inverter dc icon"
+
   annotation(
     Icon(coordinateSystem(extent = {{-100, -70}, {100, 70}}), graphics = {
       Rectangle(extent = {{-72, 46}, {72, -46}}, lineColor = {35, 35, 35}, fillColor = {240, 243, 248}, fillPattern = FillPattern.Solid),

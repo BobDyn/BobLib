@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Drivelines.Internal;
 model LockedDifferential1D
+
   "1D spool/locked differential with kinematically tied outputs"
   import SI = Modelica.Units.SI;
 

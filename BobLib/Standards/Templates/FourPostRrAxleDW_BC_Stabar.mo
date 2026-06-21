@@ -1,6 +1,7 @@
 within BobLib.Standards.Templates;
 
 model FourPostRrAxleDW_BC_Stabar
+
   import SI = Modelica.Units.SI;
 
   extends BobLib.Vehicle.Chassis.Suspension.RrAxleDW_BC_Stabar;

@@ -1,6 +1,7 @@
 within BobLib.Utilities.Math.Vector;
 
 function angle_between
+
   import BobLib.Utilities.Math.Vector.cross;
   import BobLib.Utilities.Math.Vector.dot;
 
@@ -15,6 +16,7 @@ protected
   Real eps = 1e-8;  // hard numerical floor
 
 algorithm
+
   // Signed angle using atan2 formulation
   // theta = atan2( n · (a × b), a · b )
   //

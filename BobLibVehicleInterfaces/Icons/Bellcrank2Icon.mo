@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Icons;
 
 partial model Bellcrank2Icon "Reusable bellcrank2 icon"
+
   annotation(
     Icon(graphics = {
       Line(points = {{-80, 0}, {0, -80}, {80, 0}, {2, 0}, {-80, 0}}, thickness = 3),

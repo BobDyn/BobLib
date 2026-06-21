@@ -1,6 +1,7 @@
 within BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.CombinedSlip;
 
 record FyCombinedRecord
+
   // Reduction (Gy)
   Real RBY1 "Slope factor for combined slip reduction [-]";
   Real RBY2 "Slip angle influence on reduction [-]";

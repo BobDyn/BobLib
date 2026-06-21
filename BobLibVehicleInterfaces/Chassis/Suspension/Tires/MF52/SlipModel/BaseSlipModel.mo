@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Chassis.Suspension.Tires.MF52.SlipModel;
 
 partial model BaseSlipModel
+
   import SI = Modelica.Units.SI;
 
   // Inputs (from BaseTire)

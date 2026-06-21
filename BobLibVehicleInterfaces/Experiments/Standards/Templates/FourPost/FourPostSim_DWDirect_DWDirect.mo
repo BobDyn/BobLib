@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Experiments.Standards.Templates.FourPost;
 
 model FourPostSim_DWDirect_DWDirect
+
   extends BaseFourPostSim(
     redeclare record VehicleRecord = BobLibVehicleInterfaces.Records.VehicleDefn.EVBatInvMotDiff_DWDirect_DWDirectRecord,
     redeclare model FrAxleModel = BobLibVehicleInterfaces.Chassis.Suspension.FrAxleDW_Direct,

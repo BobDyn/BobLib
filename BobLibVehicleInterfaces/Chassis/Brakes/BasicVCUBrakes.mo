@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Chassis.Brakes;
 model BasicVCUBrakes
+
   "Basic VCU-commanded mechanical brakes opposing wheel angular velocity"
   extends VehicleInterfaces.Icons.Brakes;
   extends VehicleInterfaces.Brakes.Interfaces.TwoAxleBase(
@@ -40,20 +41,21 @@ protected
   Modelica.Blocks.Interfaces.RealInput mechanicalBrakeTorqueRequestBusTap(
     quantity = "Torque",
     unit = "N.m")
-    "Combined mechanical brake torque request from brakesControlBus";
+    "Combined mechanical brake torque request from brakesControlBus" annotation(
+      Placement(transformation(origin = {-58, 46}, extent = {{-6, -6}, {6, 6}})));
 
-  Modelica.Blocks.Interfaces.RealOutput wheelSpeed_1BusSignal(
-    quantity = "AngularVelocity",
-    unit = "rad/s") "Front-left wheel speed published to brakesBus";
-  Modelica.Blocks.Interfaces.RealOutput wheelSpeed_2BusSignal(
-    quantity = "AngularVelocity",
-    unit = "rad/s") "Front-right wheel speed published to brakesBus";
-  Modelica.Blocks.Interfaces.RealOutput wheelSpeed_3BusSignal(
-    quantity = "AngularVelocity",
-    unit = "rad/s") "Rear-left wheel speed published to brakesBus";
-  Modelica.Blocks.Interfaces.RealOutput wheelSpeed_4BusSignal(
-    quantity = "AngularVelocity",
-    unit = "rad/s") "Rear-right wheel speed published to brakesBus";
+  Modelica.Blocks.Sources.RealExpression wheelSpeed_1BusSignal(
+    y = wheelSpeed_1.w) "Front-left wheel speed published to brakesBus" annotation(
+      Placement(transformation(origin = {-52, 20}, extent = {{-8, -4}, {8, 4}})));
+  Modelica.Blocks.Sources.RealExpression wheelSpeed_2BusSignal(
+    y = wheelSpeed_2.w) "Front-right wheel speed published to brakesBus" annotation(
+      Placement(transformation(origin = {-52, 10}, extent = {{-8, -4}, {8, 4}})));
+  Modelica.Blocks.Sources.RealExpression wheelSpeed_3BusSignal(
+    y = wheelSpeed_3.w) "Rear-left wheel speed published to brakesBus" annotation(
+      Placement(transformation(origin = {-52, 0}, extent = {{-8, -4}, {8, 4}})));
+  Modelica.Blocks.Sources.RealExpression wheelSpeed_4BusSignal(
+    y = wheelSpeed_4.w) "Rear-right wheel speed published to brakesBus" annotation(
+      Placement(transformation(origin = {-52, -10}, extent = {{-8, -4}, {8, 4}})));
 
   Modelica.Mechanics.Rotational.Sensors.SpeedSensor wheelSpeed_1 annotation(
     Placement(transformation(origin = {-44, -72}, extent = {{-6, -6}, {6, 6}}, rotation = 90)));
@@ -79,12 +81,12 @@ protected
   Real wheelDirection_4(unit = "1");
 
 equation
-  mechanicalBrakeTorqueRequest =
+  mechanicalBrakeTorqueRequest = 
     noEvent(min(maxTorque, max(0, mechanicalBrakeTorqueRequestBusTap)));
 
-  frontCircuitBrakeTorqueRequest =
+  frontCircuitBrakeTorqueRequest = 
     frontBrakeBias*mechanicalBrakeTorqueRequest;
-  rearCircuitBrakeTorqueRequest =
+  rearCircuitBrakeTorqueRequest = 
     (1 - frontBrakeBias)*mechanicalBrakeTorqueRequest;
 
   brakeTorque_1 = frontCircuitBrakeTorqueRequest/2;
@@ -92,22 +94,22 @@ equation
   brakeTorque_3 = rearCircuitBrakeTorqueRequest/2;
   brakeTorque_4 = rearCircuitBrakeTorqueRequest/2;
 
-  wheelDirection_1 =
+  wheelDirection_1 = 
     noEvent(
       if wheelSpeed_1.w > wRegularization then 1
       elseif wheelSpeed_1.w < -wRegularization then -1
       else wheelSpeed_1.w/max(wRegularization, 1e-6));
-  wheelDirection_2 =
+  wheelDirection_2 = 
     noEvent(
       if wheelSpeed_2.w > wRegularization then 1
       elseif wheelSpeed_2.w < -wRegularization then -1
       else wheelSpeed_2.w/max(wRegularization, 1e-6));
-  wheelDirection_3 =
+  wheelDirection_3 = 
     noEvent(
       if wheelSpeed_3.w > wRegularization then 1
       elseif wheelSpeed_3.w < -wRegularization then -1
       else wheelSpeed_3.w/max(wRegularization, 1e-6));
-  wheelDirection_4 =
+  wheelDirection_4 = 
     noEvent(
       if wheelSpeed_4.w > wRegularization then 1
       elseif wheelSpeed_4.w < -wRegularization then -1
@@ -117,11 +119,6 @@ equation
   brakeTorqueSource_2.tau = -brakeTorque_2*wheelDirection_2;
   brakeTorqueSource_3.tau = -brakeTorque_3*wheelDirection_3;
   brakeTorqueSource_4.tau = -brakeTorque_4*wheelDirection_4;
-
-  wheelSpeed_1BusSignal = wheelSpeed_1.w;
-  wheelSpeed_2BusSignal = wheelSpeed_2.w;
-  wheelSpeed_3BusSignal = wheelSpeed_3.w;
-  wheelSpeed_4BusSignal = wheelSpeed_4.w;
 
   connect(controlBus.brakesControlBus, brakesControlBus) annotation(
     Line(points = {{-100, 60}, {-80, 60}, {-80, 46}}, color = {255, 204, 51}, thickness = 0.5));
@@ -148,14 +145,14 @@ equation
   connect(brakeTorqueSource_4.flange, wheelHub_4.flange) annotation(
     Line(points = {{18, 72}, {18, 100}, {60, 100}}));
 
-  connect(wheelSpeed_1BusSignal, brakesBus.wheelSpeed_1) annotation(
-    Line(points = {{0, 0}, {-80, 20}}, color = {0, 0, 127}));
-  connect(wheelSpeed_2BusSignal, brakesBus.wheelSpeed_2) annotation(
-    Line(points = {{0, 0}, {-80, 20}}, color = {0, 0, 127}));
-  connect(wheelSpeed_3BusSignal, brakesBus.wheelSpeed_3) annotation(
-    Line(points = {{0, 0}, {-80, 20}}, color = {0, 0, 127}));
-  connect(wheelSpeed_4BusSignal, brakesBus.wheelSpeed_4) annotation(
-    Line(points = {{0, 0}, {-80, 20}}, color = {0, 0, 127}));
+  connect(wheelSpeed_1BusSignal.y, brakesBus.wheelSpeed_1) annotation(
+    Line(points = {{-43.2, 20}, {-80, 20}}, color = {0, 0, 127}));
+  connect(wheelSpeed_2BusSignal.y, brakesBus.wheelSpeed_2) annotation(
+    Line(points = {{-43.2, 10}, {-80, 10}, {-80, 20}}, color = {0, 0, 127}));
+  connect(wheelSpeed_3BusSignal.y, brakesBus.wheelSpeed_3) annotation(
+    Line(points = {{-43.2, 0}, {-82, 0}, {-82, 20}, {-80, 20}}, color = {0, 0, 127}));
+  connect(wheelSpeed_4BusSignal.y, brakesBus.wheelSpeed_4) annotation(
+    Line(points = {{-43.2, -10}, {-84, -10}, {-84, 20}, {-80, 20}}, color = {0, 0, 127}));
 
   annotation(
     Documentation(info = "<html>

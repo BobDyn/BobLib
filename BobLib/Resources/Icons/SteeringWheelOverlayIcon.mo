@@ -1,6 +1,7 @@
 within BobLib.Resources.Icons;
 
 partial model SteeringWheelOverlayIcon "Reusable steering-wheel overlay for steerable axles"
+
   annotation(
     Icon(coordinateSystem(extent = {{-180, -20}, {180, 140}}, preserveAspectRatio = true), graphics = {
       Ellipse(origin = {0, 100}, lineThickness = 5, extent = {{-26, 26}, {26, -26}}),

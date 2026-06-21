@@ -1,6 +1,7 @@
 within BobLibVehicleInterfacesTests.TestVehicle.TestChassis.TestSuspension.TestTemplates.TestStabar;
 
 model TestStabar
+
   import BobLibVehicleInterfaces.Records.VehicleDefn.EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord;
 
   parameter EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord pVehicle;
@@ -12,10 +13,15 @@ model TestStabar
   inner Modelica.Mechanics.MultiBody.World world(n = {0, 0, -1}) annotation(
     Placement(transformation(origin = {-130, -50}, extent = {{-10, -10}, {10, 10}})));
 
-  Modelica.Mechanics.MultiBody.Parts.Fixed mountFixture(r = {pVehicle.pFrStabar.leftBarEnd[1], 0, pVehicle.pFrStabar.leftBarEnd[3]}, animation = false) annotation(
+  Modelica.Mechanics.MultiBody.Parts.Fixed mountFixture(
+    r = {pVehicle.pFrStabar.leftBarEnd[1], 0, pVehicle.pFrStabar.leftBarEnd[3]},
+    animation = false) annotation(
     Placement(transformation(origin = {0, -40}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
 
-  Vehicle.Chassis.Suspension.Templates.Stabar.Stabar stabar(pStabar = pVehicle.pFrStabar, linkDiameter = linkDiameter, jointDiameter = jointDiameter) annotation(
+  Vehicle.Chassis.Suspension.Templates.Stabar.Stabar stabar(
+    pStabar = pVehicle.pFrStabar,
+    linkDiameter = linkDiameter,
+    jointDiameter = jointDiameter) annotation(
     Placement(transformation(origin = {0, -4}, extent = {{-20, -20}, {20, 20}})));
 
   Modelica.Mechanics.MultiBody.Parts.Body body(r_CM = {0, 0, 0}, m = 1, sphereDiameter = jointDiameter) annotation(

@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Icons;
 
 partial model CFDAeroMapIcon "Reusable CFD aero map icon overlay"
+
   annotation(
     Icon(coordinateSystem(extent = {{-100, -100}, {100, 100}}), graphics = {
       Rectangle(

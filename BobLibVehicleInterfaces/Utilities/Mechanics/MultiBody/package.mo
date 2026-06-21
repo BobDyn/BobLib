@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Utilities.Mechanics;
 package MultiBody
+
   "Reusable MultiBody helpers shared across vehicle domains"
   extends BobLibVehicleInterfaces.Icons.BobLibPackageBackground;
 

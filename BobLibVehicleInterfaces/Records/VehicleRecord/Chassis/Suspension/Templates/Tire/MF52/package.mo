@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates.Tire;
 package MF52
+
   extends BobLibVehicleInterfaces.Icons.RecordsPackageIcon;
 
   annotation(

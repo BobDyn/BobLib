@@ -1,10 +1,12 @@
 within BobLibVehicleInterfaces.Chassis.Suspension.Linkages;
 
 model ForceOnlyRod
+
   extends BobLibVehicleInterfaces.Icons.RodIcon;
 
   import SI = Modelica.Units.SI;
   import Modelica.Math.Vectors.norm;
+
   // Geometry parameters
   parameter SI.Position r_a[3] "Vector from origin to frame_a, expressed in world frame" annotation(
     Evaluate = false,
@@ -20,6 +22,7 @@ model ForceOnlyRod
   parameter Boolean kinematicConstraint = false annotation(
     Evaluate = false,
     Dialog(group = "Geometry"));
+
   // Visual parameters
   parameter SI.Length linkDiameter annotation(
     Evaluate = true,
@@ -30,15 +33,25 @@ model ForceOnlyRod
   parameter Boolean show_universal_axes = true annotation(
     Evaluate = true,
     Dialog(tab = "Animation"));
+
   // Frames
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a frame_a annotation(
-    Placement(transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}})));
+    Placement(
+      transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}),
+      iconTransformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}})));
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b frame_b annotation(
-    Placement(transformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}})));
+    Placement(
+      transformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}}),
+      iconTransformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}})));
   Modelica.Mechanics.MultiBody.Forces.LineForceWithMass lineForceWithMass annotation(
     Placement(transformation(extent = {{-20, -20}, {20, 20}})));
-  Modelica.Mechanics.Translational.Components.SpringDamper springDamper(s_rel0 = norm(r_b - r_a), c = EA/norm(r_b - r_a), d = d, s_rel(start = norm(r_b - r_a), fixed = true)) annotation(
+  Modelica.Mechanics.Translational.Components.SpringDamper springDamper(
+    s_rel0 = norm(r_b - r_a),
+    c = EA/norm(r_b - r_a),
+    d = d,
+    s_rel(start = norm(r_b - r_a), fixed = true)) annotation(
     Placement(transformation(origin = {0, 40}, extent = {{-10, -10}, {10, 10}})));
+
 equation
   connect(frame_a, lineForceWithMass.frame_a) annotation(
     Line(points = {{-100, 0}, {-20, 0}}));
@@ -48,7 +61,7 @@ equation
     Line(points = {{-10, 40}, {-12, 40}, {-12, 20}}, color = {0, 127, 0}));
   connect(springDamper.flange_b, lineForceWithMass.flange_b) annotation(
     Line(points = {{10, 40}, {12, 40}, {12, 20}}, color = {0, 127, 0}));
-  annotation(Diagram(coordinateSystem(extent = {{-120, -120}, {120, 120}})),
+  annotation(Diagram,
     experiment(StartTime = 0, StopTime = 1, Tolerance = 1e-06, Interval = 0.002),
     Icon(graphics = {
       Line(origin = {-92, 0}, points = {{-8, 0}, {8, 0}, {8, 0}}),

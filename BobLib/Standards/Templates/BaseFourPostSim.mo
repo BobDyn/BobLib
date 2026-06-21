@@ -1,6 +1,7 @@
 within BobLib.Standards.Templates;
 
 partial model BaseFourPostSim
+
   import SI = Modelica.Units.SI;
   import Modelica.Constants.pi;
   import Modelica.Math.Vectors.norm;
@@ -23,10 +24,10 @@ partial model BaseFourPostSim
     annotation(Evaluate = true, Dialog(tab = "Animation"));
 
   replaceable record VehicleRecord = BobLib.Resources.VehicleDefn.DWBCStabar_DWBCStabarRecord;
-  replaceable model FrAxleModel =
+  replaceable model FrAxleModel = 
     BobLib.Standards.Templates.FourPostFrAxleDW_BC_Stabar
     constrainedby BobLib.Vehicle.Chassis.Suspension.AxleDWBase;
-  replaceable model RrAxleModel =
+  replaceable model RrAxleModel = 
     BobLib.Standards.Templates.FourPostRrAxleDW_BC_Stabar
     constrainedby BobLib.Vehicle.Chassis.Suspension.AxleDWBase;
 
@@ -72,6 +73,7 @@ partial model BaseFourPostSim
                                                                redeclare Tire.TirePhysics.Wheel0DOF wheelModel(partialWheelParams = pVehicle.pFrPartialWheel),
                                                                redeclare Tire.MF52.SlipModel.NoSlip slipModel)) annotation(
     Placement(transformation(origin = {0.25, 52.4444}, extent = {{-37.25, -16.5556}, {37.25, 16.5556}})));
+
   // Rear axle
   RrAxleModel rrAxleDW(pAxle = pVehicle.pRrAxleDW,
                               pRack = pVehicle.pRrRack,
@@ -86,16 +88,17 @@ partial model BaseFourPostSim
                                                                redeclare Tire.TirePhysics.Wheel0DOF wheelModel(partialWheelParams = pVehicle.pRrPartialWheel),
                                                                redeclare Tire.MF52.SlipModel.NoSlip slipModel)) annotation(
     Placement(transformation(origin = {-0.285728, -49.8887}, extent = {{-36.5715, -14.2222}, {36.5715, 14.2222}})));
+
   // Front chassis actuator
-  Utilities.Mechanics.Multibody.ChassisActuator frChassisActuator(axleRef = frAxleDW.effectiveCenter)  annotation(
+  Utilities.Mechanics.Multibody.ChassisActuator frChassisActuator(axleRef = frAxleDW.effectiveCenter) annotation(
     Placement(transformation(origin = {0, 30}, extent = {{10, -10}, {-10, 10}})));
 
   // Rear chassis actuator
-  Utilities.Mechanics.Multibody.ChassisActuator rrChassisActuator(axleRef = rrAxleDW.effectiveCenter)  annotation(
+  Utilities.Mechanics.Multibody.ChassisActuator rrChassisActuator(axleRef = rrAxleDW.effectiveCenter) annotation(
     Placement(transformation(origin = {0, -70}, extent = {{10, -10}, {-10, 10}})));
 
   // Front steer input
-  Modelica.Mechanics.Rotational.Sources.Position steerPosition(exact = true)  annotation(
+  Modelica.Mechanics.Rotational.Sources.Position steerPosition(exact = true) annotation(
     Placement(transformation(origin = {-30, 80}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Blocks.Sources.Ramp steerExpression(height = steerMagnitude,
                                                duration = 1,
@@ -107,23 +110,35 @@ partial model BaseFourPostSim
     Placement(transformation(origin = {0, -30}, extent = {{10, -10}, {-10, 10}})));
 
   // Contact patch fixtures
-  Utilities.Mechanics.Multibody.ContactPatchFixture FL_fixture(CP_init = cpInitFL)  annotation(
+  Utilities.Mechanics.Multibody.ContactPatchFixture FL_fixture(CP_init = cpInitFL) annotation(
     Placement(transformation(origin = {-50, 40}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
-  Utilities.Mechanics.Multibody.ContactPatchFixture FR_fixture(CP_init = cpInitFR)  annotation(
+  Utilities.Mechanics.Multibody.ContactPatchFixture FR_fixture(CP_init = cpInitFR) annotation(
     Placement(transformation(origin = {50, 40}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
-  Utilities.Mechanics.Multibody.ContactPatchFixture RL_fixture(CP_init = cpInitRL)  annotation(
+  Utilities.Mechanics.Multibody.ContactPatchFixture RL_fixture(CP_init = cpInitRL) annotation(
     Placement(transformation(origin = {-50, -60}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
-  Utilities.Mechanics.Multibody.ContactPatchFixture RR_fixture(CP_init = cpInitRR)  annotation(
+  Utilities.Mechanics.Multibody.ContactPatchFixture RR_fixture(CP_init = cpInitRR) annotation(
     Placement(transformation(origin = {50, -60}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
 
   // Force actuators
-  Utilities.Mechanics.Multibody.CP_ForceActuator FL_ForceActuator(fxTable = fxTable, fyTable = fyTable, forceMagnitude = forceMagnitude / 2)  annotation(
+  Utilities.Mechanics.Multibody.CP_ForceActuator FL_ForceActuator(
+    fxTable = fxTable,
+    fyTable = fyTable,
+    forceMagnitude = forceMagnitude / 2) annotation(
     Placement(transformation(origin = {-70, 30}, extent = {{-10, -10}, {10, 10}})));
-  Utilities.Mechanics.Multibody.CP_ForceActuator FR_ForceActuator(fxTable = fxTable, fyTable = fyTable, forceMagnitude = forceMagnitude / 2)  annotation(
+  Utilities.Mechanics.Multibody.CP_ForceActuator FR_ForceActuator(
+    fxTable = fxTable,
+    fyTable = fyTable,
+    forceMagnitude = forceMagnitude / 2) annotation(
     Placement(transformation(origin = {70, 30}, extent = {{10, -10}, {-10, 10}})));
-  Utilities.Mechanics.Multibody.CP_ForceActuator RL_ForceActuator(fxTable = fxTable, fyTable = fyTable, forceMagnitude = forceMagnitude / 2)  annotation(
+  Utilities.Mechanics.Multibody.CP_ForceActuator RL_ForceActuator(
+    fxTable = fxTable,
+    fyTable = fyTable,
+    forceMagnitude = forceMagnitude / 2) annotation(
     Placement(transformation(origin = {-70, -70}, extent = {{-10, -10}, {10, 10}})));
-  Utilities.Mechanics.Multibody.CP_ForceActuator RR_ForceActuator(fxTable = fxTable, fyTable = fyTable, forceMagnitude = forceMagnitude / 2)  annotation(
+  Utilities.Mechanics.Multibody.CP_ForceActuator RR_ForceActuator(
+    fxTable = fxTable,
+    fyTable = fyTable,
+    forceMagnitude = forceMagnitude / 2) annotation(
     Placement(transformation(origin = {70, -70}, extent = {{10, -10}, {-10, 10}})));
 
   // Heave input
@@ -143,6 +158,7 @@ partial model BaseFourPostSim
   FourPostEvalRecord rrKnC;
 
 protected
+
   // Front quantities
   Real frLeftDeltaVec[3];
   Real frLeftKingpinVec[3];
@@ -300,5 +316,9 @@ equation
   annotation(
     experiment(StartTime = 0, StopTime = 118, Tolerance = 1e-06, Interval = 1),
     __OpenModelica_commandLineOptions = "--matchingAlgorithm=PFPlusExt --indexReductionMethod=dynamicStateSelection -d=initialization,NLSanalyticJacobian --maxSizeLinearTearing=5000 --generateDynamicJacobian=none",
-    __OpenModelica_simulationFlags(jacobian = "internalNumerical", lv = "LOG_STDOUT,LOG_ASSERT,LOG_STATS", s = "dassl", variableFilter = ".*"));
+    __OpenModelica_simulationFlags(
+      jacobian = "internalNumerical",
+      lv = "LOG_STDOUT,LOG_ASSERT,LOG_STATS",
+      s = "dassl",
+      variableFilter = ".*"));
 end BaseFourPostSim;

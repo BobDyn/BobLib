@@ -1,6 +1,7 @@
 within BobLib.Resources.Icons;
 
 partial model RodIcon "Reusable rod icon"
+
   annotation(
     Icon(graphics = {
       Line(origin = {-25.8, 3.2}, points = {{-54.2, -3.2}, {25.8, -3.2}, {105.8, -3.2}}, thickness = 5),

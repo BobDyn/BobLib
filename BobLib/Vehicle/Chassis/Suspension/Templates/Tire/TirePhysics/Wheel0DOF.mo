@@ -1,7 +1,10 @@
 within BobLib.Vehicle.Chassis.Suspension.Templates.Tire.TirePhysics;
 
 model Wheel0DOF
-  extends BobLib.Vehicle.Chassis.Suspension.Templates.Tire.TirePhysics.Templates.PartialWheel(inertia(J = 0.01), prismatic_z(stateSelect = StateSelect.never));
+
+  extends BobLib.Vehicle.Chassis.Suspension.Templates.Tire.TirePhysics.Templates.PartialWheel(
+    inertia(J = 0.01),
+    prismatic_z(stateSelect = StateSelect.never));
 
   Modelica.Mechanics.Translational.Components.Rod fixedRadius(L = partialWheelParams.R0) annotation(
     Placement(transformation(origin = {-30, -46}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));

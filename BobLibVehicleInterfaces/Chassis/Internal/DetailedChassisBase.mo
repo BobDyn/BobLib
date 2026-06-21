@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Chassis.Internal;
 
 partial model DetailedChassisBase
+
   extends BobLibVehicleInterfaces.Icons.TwoAxleVehicleCoreIcon;
 
   import SI = Modelica.Units.SI;
@@ -22,32 +23,56 @@ partial model DetailedChassisBase
 
   // Interfaces
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b frameFL annotation(
-    Placement(transformation(origin = {-100, 42}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-180, 70}, extent = {{-16, -16}, {16, 16}})));
+    Placement(
+      transformation(origin = {-100, 42}, extent = {{-16, -16}, {16, 16}}),
+      iconTransformation(origin = {-180, 70}, extent = {{-16, -16}, {16, 16}})));
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b frameFR annotation(
-    Placement(transformation(origin = {100, 42}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {180, 70}, extent = {{-16, -16}, {16, 16}})));
+    Placement(
+      transformation(origin = {100, 42}, extent = {{-16, -16}, {16, 16}}),
+      iconTransformation(origin = {180, 70}, extent = {{-16, -16}, {16, 16}})));
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b frameRL annotation(
-    Placement(transformation(origin = {-100, -90}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-180, -170}, extent = {{-16, -16}, {16, 16}})));
+    Placement(
+      transformation(origin = {-100, -90}, extent = {{-16, -16}, {16, 16}}),
+      iconTransformation(origin = {-180, -170}, extent = {{-16, -16}, {16, 16}})));
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b frameRR annotation(
-    Placement(transformation(origin = {100, -90}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {180, -170}, extent = {{-16, -16}, {16, 16}})));
+    Placement(
+      transformation(origin = {100, -90}, extent = {{-16, -16}, {16, 16}}),
+      iconTransformation(origin = {180, -170}, extent = {{-16, -16}, {16, 16}})));
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b cgFrame annotation(
-    Placement(transformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {180, 0}, extent = {{-16, -16}, {16, 16}})));
+    Placement(
+      transformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}}),
+      iconTransformation(origin = {180, 0}, extent = {{-16, -16}, {16, 16}})));
 
   Modelica.Mechanics.Rotational.Interfaces.Flange_b flangeFL annotation(
-    Placement(transformation(origin = {-100, 70}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {-180, 120}, extent = {{-10, -10}, {10, 10}})));
+    Placement(
+      transformation(origin = {-100, 70}, extent = {{-10, -10}, {10, 10}}),
+      iconTransformation(origin = {-180, 120}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.Rotational.Interfaces.Flange_b flangeFR annotation(
-    Placement(transformation(origin = {100, 70}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {180, 120}, extent = {{-10, -10}, {10, 10}})));
+    Placement(
+      transformation(origin = {100, 70}, extent = {{-10, -10}, {10, 10}}),
+      iconTransformation(origin = {180, 120}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.Rotational.Interfaces.Flange_b flangeRL annotation(
-    Placement(transformation(origin = {-100, -60}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {-180, -120}, extent = {{-10, -10}, {10, 10}})));
+    Placement(
+      transformation(origin = {-100, -60}, extent = {{-10, -10}, {10, 10}}),
+      iconTransformation(origin = {-180, -120}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.Rotational.Interfaces.Flange_b flangeRR annotation(
-    Placement(transformation(origin = {100, -60}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {180, -120}, extent = {{-10, -10}, {10, 10}})));
+    Placement(
+      transformation(origin = {100, -60}, extent = {{-10, -10}, {10, 10}}),
+      iconTransformation(origin = {180, -120}, extent = {{-10, -10}, {10, 10}})));
 
   Modelica.Mechanics.Rotational.Interfaces.Flange_a frSteerFlange annotation(
-    Placement(transformation(origin = {0, 100}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {0, 166}, extent = {{-10, -10}, {10, 10}})));
+    Placement(
+      transformation(origin = {0, 100}, extent = {{-10, -10}, {10, 10}}),
+      iconTransformation(origin = {0, 166}, extent = {{-10, -10}, {10, 10}})));
 
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b frAxleFrame annotation(
-    Placement(transformation(origin = {-40, 100}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {0, 118}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
+    Placement(
+      transformation(origin = {-40, 100}, extent = {{-16, -16}, {16, 16}}, rotation = -90),
+      iconTransformation(origin = {0, 118}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b rrAxleFrame annotation(
-    Placement(transformation(origin = {-40, -100}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {0, -120}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
+    Placement(
+      transformation(origin = {-40, -100}, extent = {{-16, -16}, {16, 16}}, rotation = -90),
+      iconTransformation(origin = {0, -120}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
 
 equation
   connect(spaceFrame.rearFrame, rrAxleDW.axleFrame) annotation(

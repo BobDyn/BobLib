@@ -1,15 +1,20 @@
 within BobLibVehicleInterfaces.Chassis.Suspension.Linkages.Templates;
 
 partial model TabularCompliant "Base compliant element"
+
   import SI = Modelica.Units.SI;
 
-  final parameter Real eps = 1e-12 "regularization (m)" annotation(Dialog(group="Numerical"));
+  final parameter Real eps = 1e-12 "regularization (m)" annotation(Dialog(group = "Numerical"));
 
   // Frames
   Modelica.Mechanics.Translational.Interfaces.Flange_a flange_a annotation(
-    Placement(transformation(origin = {-100, 0}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {-100, 0}, extent = {{-10, -10}, {10, 10}})));
+    Placement(
+      transformation(origin = {-100, 0}, extent = {{-10, -10}, {10, 10}}),
+      iconTransformation(origin = {-100, 0}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.Translational.Interfaces.Flange_b flange_b annotation(
-    Placement(transformation(origin = {100, 0}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {100, 0}, extent = {{-10, -10}, {10, 10}})));
+    Placement(
+      transformation(origin = {100, 0}, extent = {{-10, -10}, {10, 10}}),
+      iconTransformation(origin = {100, 0}, extent = {{-10, -10}, {10, 10}})));
 
   // Force generation
   Modelica.Mechanics.Translational.Sources.Force2 force annotation(
@@ -18,6 +23,7 @@ partial model TabularCompliant "Base compliant element"
   Real s_rel;
 
 equation
+
   // Deflection calc
   s_rel = flange_b.s - flange_a.s;
 

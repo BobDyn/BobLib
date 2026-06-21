@@ -1,6 +1,7 @@
 within BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.Templates;
 
 record PartialWheelRecord
+
   import SI = Modelica.Units.SI;
 
   // Dimensions

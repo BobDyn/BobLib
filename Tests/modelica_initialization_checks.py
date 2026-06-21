@@ -29,7 +29,7 @@ MODELICA_VERSION = "4.1.0"
 OMC_COMMAND_LINE_OPTIONS = (
     "--matchingAlgorithm=PFPlusExt "
     "--indexReductionMethod=dynamicStateSelection "
-    "-d=initialization,NLSanalyticJacobian "
+    "-d=initialization,NLSanalyticJacobian,disableStartCalc "
     "--maxSizeLinearTearing=5000 "
     "--generateDynamicJacobian=none"
 )

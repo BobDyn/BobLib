@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates;
 
 record AxleMassRecord
+
   import BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates.MassRecord;
 
   parameter MassRecord unsprungMass "Left unsprung mass record" annotation(

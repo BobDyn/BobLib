@@ -1,6 +1,7 @@
 within BobLib.Tests.TestVehicle.TestAero;
 
 model TestBilinear2D
+
   discrete Real zInterior;
   discrete Real zClamped;
 

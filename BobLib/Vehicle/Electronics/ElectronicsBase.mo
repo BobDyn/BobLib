@@ -1,6 +1,7 @@
 within BobLib.Vehicle.Electronics;
 
 partial model ElectronicsBase
+
   "Vehicle-level electronics interface contract"
   extends BobLib.Resources.Icons.ElectronicsBaseIcon;
 
@@ -63,6 +64,5 @@ partial model ElectronicsBase
   output SI.Power P_req "VCU power request";
   output SI.Torque tau_cmd_limited "VCU limited torque command";
   output Boolean active "Electronics enable state";
-
 
 end ElectronicsBase;

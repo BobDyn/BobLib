@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Records.VehicleRecord.PowerElectronics;
 
 record InverterDCRecord
+
   import SI = Modelica.Units.SI;
 
   parameter Real eta_mot = 0.97 "Inverter efficiency (motoring)";

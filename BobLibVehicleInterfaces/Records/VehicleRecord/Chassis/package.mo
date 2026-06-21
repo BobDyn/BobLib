@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Records.VehicleRecord;
 package Chassis
+
   extends BobLibVehicleInterfaces.Icons.RecordsPackageIcon;
 
   annotation(

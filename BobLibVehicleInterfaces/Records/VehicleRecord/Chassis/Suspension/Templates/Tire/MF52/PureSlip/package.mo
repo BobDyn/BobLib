@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52;
 package PureSlip
+
   extends BobLibVehicleInterfaces.Icons.RecordsPackageIcon;
 
   annotation(

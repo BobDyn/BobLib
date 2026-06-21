@@ -1,6 +1,7 @@
 within BobLibVehicleInterfacesTests.TestVehicle.TestAero;
 
 model TestBilinear2D
+
   discrete Real zInterior;
   discrete Real zClamped;
 

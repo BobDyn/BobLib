@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces;
 package Drivelines
+
   "Driveline models extending VehicleInterfaces driveline contracts"
   extends Modelica.Icons.Package;
 

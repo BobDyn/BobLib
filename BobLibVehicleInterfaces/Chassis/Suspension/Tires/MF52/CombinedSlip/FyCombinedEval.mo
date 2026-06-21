@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Chassis.Suspension.Tires.MF52.CombinedSlip;
 
 function FyCombinedEval
+
   import SI = Modelica.Units.SI;
 
   import BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.FyPureRecord;
@@ -46,6 +47,7 @@ algorithm
     S_HySR := pComb.RHY1 + pComb.RHY2 * dfz;
 
     D_VySR := (pPure.PDY1 + pPure.PDY2 * dfz) * (1 - pPure.PDY3 * (gamma * pPure.LGAY)^2)
+
               * pPure.LMUY * Fz
               * (pComb.RVY1 + pComb.RVY2 * dfz + pComb.RVY3 * gamma)
               * cos(atan(pComb.RVY4 * alpha));

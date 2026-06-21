@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Chassis.Suspension.Tires.MF52.CombinedSlip;
 
 function MzCombinedEval
+
   import SI = Modelica.Units.SI;
 
   import BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.MzPureRecord;
@@ -47,6 +48,7 @@ algorithm
     dfz := (Fz - setup.FNOMIN * pFy.LFZO) / (setup.FNOMIN * pFy.LFZO);
 
     mu_y := (pFy.PDY1 + pFy.PDY2 * dfz)
+
             * (1 - pFy.PDY3 * (gamma * pFy.LGAY)^2)
             * pFy.LMUY;
 
@@ -54,10 +56,12 @@ algorithm
     // Combined Fy shift
     // ------------------------------------------------------------
     D_VySR := mu_y * Fz
+
               * (pComb.RVY1 + pComb.RVY2 * dfz + pComb.RVY3 * gamma)
               * cos(atan(pComb.RVY4 * alpha));
 
     S_VySR := D_VySR
+
               * sin(pComb.RVY5 * atan(pComb.RVY6 * kappa))
               * pFy.LVYKA;
 
@@ -94,6 +98,7 @@ algorithm
     s := (pComb.SSZ1
          + pComb.SSZ2 * (Fy / setup.FNOMIN)
          + (pComb.SSZ3 + pComb.SSZ4 * dfz) * gamma)
+
          * setup.UNLOADED_RADIUS * pComb.LS;
 
     // ------------------------------------------------------------

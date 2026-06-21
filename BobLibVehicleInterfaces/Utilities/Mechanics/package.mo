@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Utilities;
 package Mechanics
+
   "Mechanical helper functions and MultiBody utilities"
   extends BobLibVehicleInterfaces.Icons.BobLibPackageBackground;
 

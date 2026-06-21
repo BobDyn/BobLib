@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates.Tire;
 
 record Wheel1DOF_YRecord
+
   import SI = Modelica.Units.SI;
 
   // Mass properties

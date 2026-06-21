@@ -11,10 +11,10 @@ record AxleDW_BC_ARB_VisualRecord
   Real leftBellcrankPickup3[3];
   Real leftRodMount[3];
   Real leftShockMount[3];
-  
+
   Real leftBarEnd[3];
   Real leftArmEnd[3];
-  
+
   // Right
   Real rightBellcrankPivot[3];
   Real rightBellcrankPickup1[3];
@@ -22,9 +22,8 @@ record AxleDW_BC_ARB_VisualRecord
   Real rightBellcrankPickup3[3];
   Real rightRodMount[3];
   Real rightShockMount[3];
-  
+
   Real rightBarEnd[3];
   Real rightArmEnd[3];
-  
 
 end AxleDW_BC_ARB_VisualRecord;

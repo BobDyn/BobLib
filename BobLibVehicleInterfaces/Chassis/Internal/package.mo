@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Chassis;
 package Internal
+
   "Detailed chassis implementation cores used by VehicleInterfaces-facing chassis adapters"
   extends BobLibVehicleInterfaces.Icons.BobLibInternalPackageBackground;
 

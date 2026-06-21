@@ -26,7 +26,6 @@ record AxleDW_BC_ARB_VisualRecord
   Real rightBarEnd[3];
   Real rightArmEnd[3];
 
-
   annotation(
     Documentation(info = "<html>
 <p>

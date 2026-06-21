@@ -1,6 +1,7 @@
 within BobLib.Tests.TestVehicle.TestPowertrain;
 
 model TestPowertrainBatInvMotDiff
+
   inner Modelica.Mechanics.MultiBody.World world(n = {0, 0, -1}) annotation(
     Placement(transformation(origin = {-90, 70}, extent = {{-10, -10}, {10, 10}})));
 
@@ -39,7 +40,7 @@ model TestPowertrainBatInvMotDiff
       Placement(transformation(origin = {-60, -40}, extent = {{-10, -10}, {10, 10}})));
 
 equation
-  elc.cmd_torque_motor =
+  elc.cmd_torque_motor = 
     60*(1 + Modelica.Math.tanh((time - 0.275)/0.03))
     - 80*(1 + Modelica.Math.tanh((time - 1.175)/0.03))
     + 20*(1 + Modelica.Math.tanh((time - 1.875)/0.03));

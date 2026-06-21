@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Icons;
 
 partial model AxleDWBaseIcon "Reusable double-wishbone axle icon"
+
   annotation(
     Icon(coordinateSystem(extent = {{-180, -20}, {180, 140}}, preserveAspectRatio = true, grid = {4, 2}), graphics = {
       Line(origin = {-25, 35}, points = {{-35, -15}, {25, 15}}),

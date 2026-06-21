@@ -1,6 +1,7 @@
 within BobLib.Resources.StandardRecord;
 
 record SteadyStateEvalRecord
+
   import SI = Modelica.Units.SI;
 
   // Inputs

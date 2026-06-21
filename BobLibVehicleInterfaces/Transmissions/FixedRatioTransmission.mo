@@ -1,8 +1,9 @@
 within BobLibVehicleInterfaces.Transmissions;
 model FixedRatioTransmission
-  "Fixed-ratio automatic transmission exposed through VehicleInterfaces"
+
+  "Fixed-ratio transmission exposed through the neutral VehicleInterfaces contract"
   extends VehicleInterfaces.Icons.Transmission;
-  extends VehicleInterfaces.Transmissions.Interfaces.BaseAutomaticTransmission;
+  extends VehicleInterfaces.Transmissions.Interfaces.Base;
 
   import SI = Modelica.Units.SI;
 
@@ -39,15 +40,16 @@ equation
   annotation(Documentation(info = "<html>
 <p>
 Model <code>FixedRatioTransmission</code> is the BobLib fixed-ratio
-transmission adapter for the VehicleInterfaces transmission contract.
+transmission adapter for the neutral VehicleInterfaces transmission contract.
 </p>
 <p>
 It is intentionally small: the public model owns the VI engine/driveline
 flanges and control-bus publishing, while
 <code>Transmissions.Internal.FixedRatioGear</code> owns the gear relation.
 Battery-electric architectures can use this as the single-speed reducer;
-internal-combustion references can use it as the first simple automatic
-transmission before a richer gearbox, clutch, or launch-device model exists.
+internal-combustion references can replace it with an automatic or manual
+adapter when gearbox mode, clutch, launch-device, or gear-selection behavior is
+actually modeled.
 </p>
 </html>"));
 end FixedRatioTransmission;

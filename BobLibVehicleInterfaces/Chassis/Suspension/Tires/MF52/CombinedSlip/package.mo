@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Chassis.Suspension.Tires.MF52;
 package CombinedSlip
+
   extends BobLibVehicleInterfaces.Icons.BobLibPackageBackground;
 
   annotation(

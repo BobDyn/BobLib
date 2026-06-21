@@ -1,6 +1,7 @@
 within BobLib.Vehicle.Powertrain.Drivetrain;
 
 model Differential "Parameterized limited-slip differential with regularized bounded clutch lockup"
+
   extends BobLib.Resources.Icons.DifferentialIcon;
 
   import SI = Modelica.Units.SI;
@@ -9,15 +10,21 @@ model Differential "Parameterized limited-slip differential with regularized bou
 
   Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft_in
     "Input from chain/gearbox" annotation(
-      Placement(transformation(origin={-100,0}, extent={{-10,-10},{10,10}}), iconTransformation(origin = {-100, 0}, extent = {{-10, -10}, {10, 10}})));
+      Placement(
+        transformation(origin = {-100, 0}, extent = {{-10, -10}, {10, 10}}),
+        iconTransformation(origin = {-100, 0}, extent = {{-10, -10}, {10, 10}})));
 
   Modelica.Mechanics.Rotational.Interfaces.Flange_b shaft_left
     "Left halfshaft output" annotation(
-      Placement(transformation(origin={100,40}, extent={{-10,-10},{10,10}}), iconTransformation(origin = {100, 38}, extent = {{-10, -10}, {10, 10}})));
+      Placement(
+        transformation(origin = {100, 40}, extent = {{-10, -10}, {10, 10}}),
+        iconTransformation(origin = {100, 38}, extent = {{-10, -10}, {10, 10}})));
 
   Modelica.Mechanics.Rotational.Interfaces.Flange_b shaft_right
     "Right halfshaft output" annotation(
-      Placement(transformation(origin={100,-40}, extent={{-10,-10},{10,10}}), iconTransformation(origin = {100, -38}, extent = {{-10, -10}, {10, 10}})));
+      Placement(
+        transformation(origin = {100, -40}, extent = {{-10, -10}, {10, 10}}),
+        iconTransformation(origin = {100, -38}, extent = {{-10, -10}, {10, 10}})));
 
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a mountFrame
     "Differential case reaction frame" annotation(
@@ -81,12 +88,12 @@ equation
   assert(T_capacity_max >= 0, "Differential: T_capacity_max must be non-negative");
 
   w_in = der(shaft_in.phi - support.phi);
-  w_l  = der(shaft_left.phi - support.phi);
-  w_r  = der(shaft_right.phi - support.phi);
-  dw   = w_l - w_r;
+  w_l = der(shaft_left.phi - support.phi);
+  w_r = der(shaft_right.phi - support.phi);
+  dw = w_l - w_r;
 
   // Ideal open-diff kinematics.
-  shaft_in.phi - support.phi =
+  shaft_in.phi - support.phi = 
     ((shaft_left.phi - support.phi) + (shaft_right.phi - support.phi))/2;
 
   // Input torque sign follows the local flange convention. Positive T_in
@@ -94,7 +101,8 @@ equation
   T_in = shaft_in.tau;
   T_open = T_in/2;
 
-  lockFraction =
+  lockFraction = 
+
     if noEvent(driveSideTorqueSign*T_in >= 0) then
       lockFractionAccel
     else
@@ -103,7 +111,8 @@ equation
   // For a plate/ramp LSD, the locking value S limits the output torque
   // difference: |T_left - T_right| <= S*|T_in|. Since T_lock is half of
   // that difference, the ramp contribution to lock capacity is 0.5*S*|T_in|.
-  T_lock_capacity_raw =
+  T_lock_capacity_raw = 
+
     if use_lsd then
       T_preload + 0.5*lockFraction*abs(T_in)
     else
@@ -115,7 +124,8 @@ equation
 
   // Regularized plate friction: static capacity near zero slip blends down to
   // kinetic capacity as relative wheel speed grows, then remains torque-capped.
-  T_lock_friction_capacity =
+  T_lock_friction_capacity = 
+
     if use_lsd then
       T_lock_kinetic_capacity +
         (T_lock_capacity - T_lock_kinetic_capacity)*
@@ -123,12 +133,14 @@ equation
     else
       0;
 
-  T_lock_viscous =
+  T_lock_viscous = 
+
     if use_lsd then
       c_viscous*(-dw)
     else
       0;
-  T_lock =
+  T_lock = 
+
     if use_lsd then
       noEvent(max(
         min(T_lock_friction_capacity*tanh(-dw/w_transition) + T_lock_viscous, T_lock_capacity),

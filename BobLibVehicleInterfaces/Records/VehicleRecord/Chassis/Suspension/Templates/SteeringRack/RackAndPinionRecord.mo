@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates.SteeringRack;
 
 record RackAndPinionRecord
+
   import SI = Modelica.Units.SI;
 
   parameter SI.Position leftPickup[3]

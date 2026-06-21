@@ -1,9 +1,11 @@
 within BobLibVehicleInterfaces.Chassis.Suspension.Linkages;
 
 model Rod
+
   extends BobLibVehicleInterfaces.Icons.RodIcon;
 
   import SI = Modelica.Units.SI;
+
   // Geometry parameters
   parameter SI.Position r_a[3] "Vector from origin to frame_a, expressed in world frame" annotation(
     Evaluate = false, Dialog(group = "Geometry"));
@@ -17,18 +19,24 @@ model Rod
 
   // Visual parameters
   parameter SI.Length linkDiameter annotation(
-    Evaluate = true, Dialog(tab="Animation"));
+    Evaluate = true, Dialog(tab = "Animation"));
   parameter SI.Length jointDiameter annotation(
-    Evaluate = true, Dialog(tab="Animation"));
+    Evaluate = true, Dialog(tab = "Animation"));
   parameter Boolean show_universal_axes = true annotation(
-    Evaluate = true, Dialog(tab="Animation"));
+    Evaluate = true, Dialog(tab = "Animation"));
+
   // Frames
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a frame_a annotation(
-    Placement(transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}})));
+    Placement(
+      transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}),
+      iconTransformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}})));
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b frame_b annotation(
-    Placement(transformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}})));
+    Placement(
+      transformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}}),
+      iconTransformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}})));
 
 protected
+
   // Kinematics
   Modelica.Mechanics.MultiBody.Joints.UniversalSpherical rod(n1_a = n1_a,
                                                              rRod_ia = r_b - r_a,
@@ -38,14 +46,15 @@ protected
                                                              cylinderLength = jointDiameter,
                                                              cylinderDiameter = jointDiameter,
                                                              kinematicConstraint = kinematicConstraint,
-                                                             showUniversalAxes = show_universal_axes)  annotation(
+                                                             showUniversalAxes = show_universal_axes) annotation(
     Placement(transformation(extent = {{-20, -20}, {20, 20}})));
+
 equation
   connect(rod.frame_a, frame_a) annotation(
     Line(points = {{-20, 0}, {-100, 0}}, color = {95, 95, 95}));
   connect(rod.frame_b, frame_b) annotation(
     Line(points = {{20, 0}, {100, 0}}, color = {95, 95, 95}));
-  annotation(Diagram(coordinateSystem(extent = {{-120, -120}, {120, 120}})),
+  annotation(Diagram,
     experiment(StartTime = 0, StopTime = 1, Tolerance = 1e-06, Interval = 0.002),
     Icon(graphics = {
       Line(origin = {-92, 0}, points = {{-8, 0}, {8, 0}, {8, 0}}),

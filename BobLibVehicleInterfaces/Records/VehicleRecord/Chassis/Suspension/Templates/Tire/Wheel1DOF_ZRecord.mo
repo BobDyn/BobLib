@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates.Tire;
 
 record Wheel1DOF_ZRecord
+
   import SI = Modelica.Units.SI;
 
   // Rate properties

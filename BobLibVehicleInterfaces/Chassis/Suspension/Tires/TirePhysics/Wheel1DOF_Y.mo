@@ -1,14 +1,17 @@
 within BobLibVehicleInterfaces.Chassis.Suspension.Tires.TirePhysics;
 
 model Wheel1DOF_Y
+
   import BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.Wheel1DOF_YRecord;
 
   // Record parameters
   parameter Wheel1DOF_YRecord wheel1DOF_YParams;
 
-  extends BobLibVehicleInterfaces.Chassis.Suspension.Tires.TirePhysics.Templates.PartialWheel(inertia(J = wheel1DOF_YParams.wheelJ), prismatic_z(stateSelect = StateSelect.never));
+  extends BobLibVehicleInterfaces.Chassis.Suspension.Tires.TirePhysics.Templates.PartialWheel(
+    inertia(J = wheel1DOF_YParams.wheelJ),
+    prismatic_z(stateSelect = StateSelect.never));
 
-  Modelica.Mechanics.Translational.Components.Rod fixedRadius(L = partialWheelParams.R0)  annotation(
+  Modelica.Mechanics.Translational.Components.Rod fixedRadius(L = partialWheelParams.R0) annotation(
     Placement(transformation(origin = {-30, -46}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
 
 equation
@@ -19,7 +22,7 @@ equation
 
   annotation(experiment(StartTime = 0, StopTime = 1, Tolerance = 1e-06, Interval = 0.002),
   Diagram(coordinateSystem(extent = {{-120, -120}, {120, 120}})),
-    Icon(graphics = {Ellipse(fillColor = {0, 170, 0},fillPattern = FillPattern.Solid, lineThickness = 2, extent = {{-15, -15}, {15, 15}}), Line(origin = {0, -81}, points = {{0, -19}, {0, 19}}, thickness = 5), Text( origin = {-2, 4},textColor = {255, 0, 0}, extent = {{-83, 100}, {83, -100}}, textString = "1DOF")}),
+    Icon(graphics = {Ellipse(fillColor = {0, 170, 0}, fillPattern = FillPattern.Solid, lineThickness = 2, extent = {{-15, -15}, {15, 15}}), Line(origin = {0, -81}, points = {{0, -19}, {0, 19}}, thickness = 5), Text( origin = {-2, 4}, textColor = {255, 0, 0}, extent = {{-83, 100}, {83, -100}}, textString = "1DOF")}),
     Documentation(info = "<html>
 <p>
 Model <code>Wheel1DOF_Y</code> represents a wheel physics variant with 1DOF Y behavior.

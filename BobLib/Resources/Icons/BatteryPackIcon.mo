@@ -1,6 +1,7 @@
 within BobLib.Resources.Icons;
 
 partial model BatteryPackIcon "Reusable battery pack icon"
+
   annotation(
     Icon(coordinateSystem(extent = {{-100, -60}, {100, 60}}), graphics = {
       Rectangle(extent = {{-74, 34}, {74, -34}}, lineColor = {32, 32, 32}, fillColor = {235, 245, 239}, fillPattern = FillPattern.Solid),

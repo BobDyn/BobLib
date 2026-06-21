@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates;
 package DoubleWishbone
+
   extends BobLibVehicleInterfaces.Icons.RecordsPackageIcon;
 
   annotation(

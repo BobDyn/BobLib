@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Chassis.Suspension.Tires.MF52.SlipModel;
 
 model KinematicSlip
+
   extends BaseSlipModel;
 
   parameter Real V_min = 0.5 "Low-speed regularization velocity";

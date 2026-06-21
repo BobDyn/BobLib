@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Utilities.Math;
 package Vector
+
   extends BobLibVehicleInterfaces.Icons.BobLibPackageBackground;
 
   annotation(

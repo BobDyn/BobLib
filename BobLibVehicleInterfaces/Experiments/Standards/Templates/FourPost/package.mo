@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Experiments.Standards.Templates;
 
 package FourPost
+
   extends BobLibVehicleInterfaces.Icons.BobLibPackageBackground;
   annotation(
     Documentation(info = "<html>

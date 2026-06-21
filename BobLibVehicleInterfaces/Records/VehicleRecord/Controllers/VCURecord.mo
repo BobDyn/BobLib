@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Records.VehicleRecord.Controllers;
 
 record VCURecord
+
   import SI = Modelica.Units.SI;
 
   parameter SI.Torque tau_max = 220

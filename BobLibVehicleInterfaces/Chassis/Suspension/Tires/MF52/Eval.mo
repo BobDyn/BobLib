@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Chassis.Suspension.Tires.MF52;
 
 function Eval
+
   import SI = Modelica.Units.SI;
 
   import BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.*;
@@ -30,6 +31,7 @@ function Eval
   output SI.Length s;
 
 protected
+
   // Unpacked records
   FxPureRecord pFxPure;
   FxCombinedRecord pFxComb;
@@ -52,6 +54,7 @@ protected
   Real loadScale;
 
 algorithm
+
   // Unpack once (clean + fast)
   pFxPure := tire.fxPure;
   pFxComb := tire.fxCombined;

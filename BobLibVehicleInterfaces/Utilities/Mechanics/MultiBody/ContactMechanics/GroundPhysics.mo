@@ -1,15 +1,16 @@
 within BobLibVehicleInterfaces.Utilities.Mechanics.MultiBody.ContactMechanics;
 
 model GroundPhysics
+
   extends BobLibVehicleInterfaces.Icons.GroundPhysicsIcon;
 
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a frame_a annotation(
-    Placement(transformation(origin={-100,0}, extent={{-16,-16},{16,16}}),
-    iconTransformation(origin={-100,0}, extent={{-16,-16},{16,16}})));
+    Placement(transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}),
+    iconTransformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}})));
 
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b frame_b annotation(
-    Placement(transformation(origin={100,0}, extent={{-16,-16},{16,16}}),
-    iconTransformation(origin={0,100}, extent={{-16,-16},{16,16}}, rotation=90)));
+    Placement(transformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}}),
+    iconTransformation(origin = {0, 100}, extent = {{-16, -16}, {16, 16}}, rotation = 90)));
 
   parameter Real c = 100000 "Vertical contact stiffness";
   parameter Real d = 750 "Vertical contact damping";

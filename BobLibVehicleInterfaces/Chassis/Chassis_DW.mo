@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Chassis;
 
 model Chassis_DW
+
   "Detailed BobLib chassis configured by replaceable double-wishbone axle variants"
   import Modelica.Constants.pi;
   import Modelica.Mechanics.MultiBody.Frames;
@@ -9,12 +10,12 @@ model Chassis_DW
   import Tire = BobLibVehicleInterfaces.Chassis.Suspension.Tires;
   import BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates.Stabar.StabarRecord;
 
-  replaceable record VehicleRecord =
+  replaceable record VehicleRecord = 
     BobLibVehicleInterfaces.Records.VehicleDefn.EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord;
-  replaceable model FrAxleModel =
+  replaceable model FrAxleModel = 
     BobLibVehicleInterfaces.Chassis.Suspension.FrAxleDW_BC_Stabar
     constrainedby BobLibVehicleInterfaces.Chassis.Suspension.AxleDWBase;
-  replaceable model RrAxleModel =
+  replaceable model RrAxleModel = 
     BobLibVehicleInterfaces.Chassis.Suspension.RrAxleDW_BC_Stabar
     constrainedby BobLibVehicleInterfaces.Chassis.Suspension.AxleDWBase;
 
@@ -29,7 +30,7 @@ model Chassis_DW
     leftBarEnd = {0, 0, 0},
     barRate = 0);
 
-  final parameter SI.Mass pTotalMass =
+  final parameter SI.Mass pTotalMass = 
     pVehicle.pSprungMass.m +
     pVehicle.pFrAxleMass.unsprungMass.m +
     pVehicle.pFrAxleMass.ucaMass.m +
@@ -81,7 +82,7 @@ model Chassis_DW
     final chassisReferencePosition = pVehicleCG,
     final frontWheelRadius = pVehicle.pFrPartialWheel.R0,
     final rearWheelRadius = pVehicle.pRrPartialWheel.R0,
-    final contactPatchPosition_1 =
+    final contactPatchPosition_1 = 
       pVehicle.pFrDW.wheelCenter +
       Frames.resolve1(
         Frames.axesRotations(
@@ -93,7 +94,7 @@ model Chassis_DW
           },
           {0, 0, 0}),
         {0, 0, -pVehicle.pFrPartialWheel.R0}),
-    final contactPatchPosition_2 =
+    final contactPatchPosition_2 = 
       Vector.mirrorXZ(
         pVehicle.pFrDW.wheelCenter +
         Frames.resolve1(
@@ -106,7 +107,7 @@ model Chassis_DW
             },
             {0, 0, 0}),
           {0, 0, -pVehicle.pFrPartialWheel.R0})),
-    final contactPatchPosition_3 =
+    final contactPatchPosition_3 = 
       pVehicle.pRrDW.wheelCenter +
       Frames.resolve1(
         Frames.axesRotations(
@@ -118,7 +119,7 @@ model Chassis_DW
           },
           {0, 0, 0}),
         {0, 0, -pVehicle.pRrPartialWheel.R0}),
-    final contactPatchPosition_4 =
+    final contactPatchPosition_4 = 
       Vector.mirrorXZ(
         pVehicle.pRrDW.wheelCenter +
         Frames.resolve1(
@@ -131,17 +132,17 @@ model Chassis_DW
             },
             {0, 0, 0}),
           {0, 0, -pVehicle.pRrPartialWheel.R0})),
-    final frontLeftRideHeightOffset =
+    final frontLeftRideHeightOffset = 
       pVehicle.pAero.FL_RideHeightRef -
       {pVehicle.pFrDW.wheelCenter[1], 0, pVehicle.pFrDW.wheelCenter[3]},
-    final frontRightRideHeightOffset =
+    final frontRightRideHeightOffset = 
       Vector.mirrorXZ(
         pVehicle.pAero.FL_RideHeightRef -
         {pVehicle.pFrDW.wheelCenter[1], 0, pVehicle.pFrDW.wheelCenter[3]}),
-    final rearLeftRideHeightOffset =
+    final rearLeftRideHeightOffset = 
       pVehicle.pAero.RL_RideHeightRef -
       {pVehicle.pRrDW.wheelCenter[1], 0, pVehicle.pRrDW.wheelCenter[3]},
-    final rearRightRideHeightOffset =
+    final rearRightRideHeightOffset = 
       Vector.mirrorXZ(
         pVehicle.pAero.RL_RideHeightRef -
         {pVehicle.pRrDW.wheelCenter[1], 0, pVehicle.pRrDW.wheelCenter[3]}),

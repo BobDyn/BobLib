@@ -1,16 +1,18 @@
 within BobLib.Tests.TestVehicle.TestChassis.TestSuspension.TestTemplates.TestDoubleWishbone;
 
 model TestDoubleWishbone
+
   import BobLib.Resources.VehicleDefn.DWBCStabar_DWBCStabarRecord;
-  
+
   parameter DWBCStabar_DWBCStabarRecord pVehicle;
-  
+
   inner parameter Real linkDiameter = 0.020;
   inner parameter Real jointDiameter = 0.030;
   inner parameter Boolean enableAnimation = false;
-  
+
   inner Modelica.Mechanics.MultiBody.World world(n = {0, 0, -1}) annotation(
     Placement(transformation(origin = {-90, -90}, extent = {{-10, -10}, {10, 10}})));
+
   // Steer input
   Modelica.Blocks.Sources.Ramp steerRamp(duration = 1,
                                          height = 100*Modelica.Constants.pi/180,
@@ -18,6 +20,7 @@ model TestDoubleWishbone
     Placement(transformation(origin = {-20, 80}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.Rotational.Sources.Position steerjouncePosition(exact = true) annotation(
     Placement(transformation(origin = {20, 80}, extent = {{-10, -10}, {10, 10}})));
+
   // Jounce input
   Modelica.Mechanics.MultiBody.Parts.Fixed jounceRef(r = pVehicle.pFrDW.lower_o, animation = false) annotation(
     Placement(transformation(origin = {90, -90}, extent = {{10, -10}, {-10, 10}}, rotation = -0)));
@@ -27,17 +30,26 @@ model TestDoubleWishbone
     Placement(transformation(origin = {-90, -50}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.Translational.Sources.Position jouncePosition(useSupport = true, exact = true) annotation(
     Placement(transformation(origin = {-50, -50}, extent = {{-10, -10}, {10, 10}})));
+
   // Inboard fixtures
-  Modelica.Mechanics.MultiBody.Parts.Fixed upperFixed_i(r = (pVehicle.pFrDW.upperFore_i + pVehicle.pFrDW.upperAft_i) / 2, animation = false) annotation(
+  Modelica.Mechanics.MultiBody.Parts.Fixed upperFixed_i(
+    r = (pVehicle.pFrDW.upperFore_i + pVehicle.pFrDW.upperAft_i) / 2,
+    animation = false) annotation(
     Placement(transformation(origin = {90, 10}, extent = {{10, -10}, {-10, 10}})));
-  Modelica.Mechanics.MultiBody.Parts.Fixed lowerFixed_i(r = (pVehicle.pFrDW.lowerFore_i + pVehicle.pFrDW.lowerAft_i) / 2, animation = false) annotation(
+  Modelica.Mechanics.MultiBody.Parts.Fixed lowerFixed_i(
+    r = (pVehicle.pFrDW.lowerFore_i + pVehicle.pFrDW.lowerAft_i) / 2,
+    animation = false) annotation(
     Placement(transformation(origin = {90, -30}, extent = {{10, -10}, {-10, 10}})));
-  Modelica.Mechanics.MultiBody.Parts.Fixed rackFixed(r = {pVehicle.pFrRack.leftPickup[1], 0, pVehicle.pFrRack.leftPickup[3]}, animation = false) annotation(
+  Modelica.Mechanics.MultiBody.Parts.Fixed rackFixed(
+    r = {pVehicle.pFrRack.leftPickup[1], 0, pVehicle.pFrRack.leftPickup[3]},
+    animation = false) annotation(
     Placement(transformation(origin = {90, 50}, extent = {{-10, -10}, {10, 10}}, rotation = -180)));
+
   // Rack
   BobLib.Vehicle.Chassis.Suspension.Templates.SteeringRack.RackAndPinion rackAndPinion(pRack = pVehicle.pFrRack,
-                                                                                       linkDiameter = linkDiameter)  annotation(
+                                                                                       linkDiameter = linkDiameter) annotation(
     Placement(transformation(origin = {50, 60}, extent = {{-20, -20}, {20, 20}})));
+
   // Kinematic wishbone-upright loop
   BobLib.Vehicle.Chassis.Suspension.Templates.DoubleWishbone.WishboneUprightLoop wishboneUprightLoop(pDW = pVehicle.pFrDW,
                                                                                                      linkDiameter = linkDiameter,
@@ -45,25 +57,30 @@ model TestDoubleWishbone
     Placement(transformation(origin = {0, 10}, extent = {{30, -30}, {-30, 30}})));
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation tieConnection(r = pVehicle.pFrDW.lower_o - pVehicle.pFrDW.tie_o) annotation(
     Placement(transformation(origin = {-40, 10}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
+
   // Tie rod
   BobLib.Vehicle.Chassis.Suspension.Linkages.Rod tieRod(r_a = pVehicle.pFrRack.leftPickup,
                                                         r_b = pVehicle.pFrDW.tie_o,
                                                         n1_a = {1, 0, 0},
                                                         linkDiameter = linkDiameter,
-                                                        jointDiameter = jointDiameter)  annotation(
+                                                        jointDiameter = jointDiameter) annotation(
     Placement(transformation(origin = {-10, 60}, extent = {{20, -20}, {-20, 20}}, rotation = -0)));
-  
+
 protected
+
   // Jounce DOFs
   Modelica.Mechanics.MultiBody.Joints.Prismatic DOF_x(n = {1, 0, 0}, animation = false) annotation(
     Placement(transformation(origin = {50, -90}, extent = {{10, -10}, {-10, 10}}, rotation = -0)));
   Modelica.Mechanics.MultiBody.Joints.Prismatic DOF_y(n = {0, 1, 0}, animation = false) annotation(
     Placement(transformation(origin = {20, -90}, extent = {{10, -10}, {-10, 10}}, rotation = -0)));
-  Modelica.Mechanics.MultiBody.Joints.Prismatic DOF_z(n = {0, 0, 1}, useAxisFlange = true, animation = false) annotation(
+  Modelica.Mechanics.MultiBody.Joints.Prismatic DOF_z(
+    n = {0, 0, 1},
+    useAxisFlange = true,
+    animation = false) annotation(
     Placement(transformation(origin = {0, -70}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
   Modelica.Mechanics.MultiBody.Joints.Spherical DOF_xyz(animation = false) annotation(
     Placement(transformation(origin = {0, -40}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
-  
+
 equation
   connect(tieConnection.frame_b, wishboneUprightLoop.steeringFrame) annotation(
     Line(points = {{-40, 0}, {-40, -11.375}, {-30, -11.375}, {-30, -11}}, color = {95, 95, 95}));

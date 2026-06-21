@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Chassis.Suspension;
 
 model FrAxleDW_BC_Stabar "Double wishbone axle with bellcranks mounting to shock, push/pullrod, and stabar"
+
   import SI = Modelica.Units.SI;
   import Modelica.Math.Vectors;
   import BobLibVehicleInterfaces.Utilities.Math.Vector.mirrorXZ;
@@ -78,9 +79,14 @@ model FrAxleDW_BC_Stabar "Double wishbone axle with bellcranks mounting to shock
     Placement(transformation(origin = {-70, -90}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
 
   Modelica.Mechanics.Rotational.Interfaces.Flange_a steerFlange annotation(
-    Placement(transformation(origin = {0, 140}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {0, 100}, extent = {{-10, -10}, {10, 10}})));
+    Placement(
+      transformation(origin = {0, 140}, extent = {{-10, -10}, {10, 10}}),
+      iconTransformation(origin = {0, 100}, extent = {{-10, -10}, {10, 10}})));
 
 protected
+  final parameter SI.Position leftRodWishboneMount[3] = if pAxle.rodToLower then pLeftDW.lower_o else pLeftDW.upper_o
+    "Outboard wishbone joint used as the push/pullrod apex reference";
+
   // Kinematics
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation toLeftBellcrank(
     r = pAxle.bellcrankPivot - effectiveCenter,
@@ -99,11 +105,11 @@ protected
     animation = false) annotation(
     Placement(transformation(origin = {20, -70}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation toLeftApex(
-    r = pAxle.rodMount - pLeftDW.lower_o,
+    r = pAxle.rodMount - leftRodWishboneMount,
     animation = false) annotation(
     Placement(transformation(origin = {-80, -20}, extent = {{10, -10}, {-10, 10}})));
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRightApex(
-    r = mirrorXZ(pAxle.rodMount - pLeftDW.lower_o),
+    r = mirrorXZ(pAxle.rodMount - leftRodWishboneMount),
     animation = false) annotation(
     Placement(transformation(origin = {90, -10}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation toStabar(
@@ -134,10 +140,17 @@ equation
   rightSpringLength = rightShockLinkage.lineForceWithMass.s;
   stabarAngle = stabar.spring.phi_rel;
 
-  connect(toLeftApex.frame_a, leftWishboneUprightLoop.lowerFrame_o) annotation(
-    Line(points = {{-70, -20}, {-68, -20}, {-68, 22}}, color = {95, 95, 95}));
-  connect(toRightApex.frame_a, rightWishboneUprightLoop.lowerFrame_o) annotation(
-    Line(points = {{80, -10}, {70, -10}, {70, 22}}, color = {95, 95, 95}));
+  if pAxle.rodToLower then
+    connect(toLeftApex.frame_a, leftWishboneUprightLoop.lowerFrame_o) annotation(
+      Line(points = {{-70, -20}, {-68, -20}, {-68, 22}}, color = {95, 95, 95}));
+    connect(toRightApex.frame_a, rightWishboneUprightLoop.lowerFrame_o) annotation(
+      Line(points = {{80, -10}, {70, -10}, {70, 22}}, color = {95, 95, 95}));
+  else
+    connect(toLeftApex.frame_a, leftWishboneUprightLoop.upperFrame_o) annotation(
+      Line(points = {{-70, -20}, {-68, -20}, {-68, 78}}, color = {95, 95, 95}));
+    connect(toRightApex.frame_a, rightWishboneUprightLoop.upperFrame_o) annotation(
+      Line(points = {{80, -10}, {70, -10}, {70, 78}}, color = {95, 95, 95}));
+  end if;
   connect(leftPushrod.frame_a, leftBellcrank.pickupFrame1) annotation(
     Line(points = {{-100, -30}, {-70, -30}, {-70, -10}, {-50, -10}}, color = {95, 95, 95}));
   connect(rightPushrod.frame_a, rightBellcrank.pickupFrame1) annotation(

@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces;
 package DriverEnvironments
+
   "Driver-environment models extending VehicleInterfaces driver contracts"
   extends Modelica.Icons.Package;
 
@@ -10,9 +11,11 @@ driver-environment models exposed through the standard VehicleInterfaces driver
 environment boundary.
 </p>
 <p>
-EV-specific driver models may add BobLib command outputs for VCU integration,
-while still publishing standard driver signals on the VehicleInterfaces
-<code>driverBus</code> and using the standard steering/chassis connectors.
+The minimal driver publisher handles the architecture-neutral commands:
+steering wheel, accelerator pedal, and brake pedal. Public adapters may add
+architecture-specific pins only when the target vehicle actually needs them, so
+EV templates do not inherit manual gear-selection or automatic gearbox-mode
+commands by accident.
 </p>
 </html>"));
 end DriverEnvironments;

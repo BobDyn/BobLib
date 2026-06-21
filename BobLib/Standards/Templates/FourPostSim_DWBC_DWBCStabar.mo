@@ -1,6 +1,7 @@
 within BobLib.Standards.Templates;
 
 model FourPostSim_DWBC_DWBCStabar
+
   extends BaseFourPostSim(
     redeclare record VehicleRecord = BobLib.Resources.VehicleDefn.DWBC_DWBCStabarRecord,
     redeclare model FrAxleModel = BobLib.Standards.Templates.FourPostFrAxleDW_BC,

@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Icons;
 
 partial package FMIIcon
+
   "Reusable package icon for FMI utilities"
   extends BobLibVehicleInterfaces.Icons.BobLibPackageFrame;
 

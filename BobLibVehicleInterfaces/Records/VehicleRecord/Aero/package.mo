@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Records.VehicleRecord;
 package Aero
+
   extends BobLibVehicleInterfaces.Icons.RecordsPackageIcon;
 
   annotation(

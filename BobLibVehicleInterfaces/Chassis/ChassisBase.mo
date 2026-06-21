@@ -1,7 +1,9 @@
 within BobLibVehicleInterfaces.Chassis;
 partial model ChassisBase
+
   "BobLib detailed chassis exposed through the VehicleInterfaces chassis contract"
   extends VehicleInterfaces.Icons.Chassis;
+
   extends VehicleInterfaces.Chassis.Interfaces.TwoAxleBase(
     final includeChassisFrame = true,
     final includeSteeringWheel = true);
@@ -73,30 +75,36 @@ protected
     "VehicleInterfaces chassis signal bus tap" annotation(
       Placement(transformation(extent = {{-130, 30}, {-110, 50}})));
 
-  Modelica.Blocks.Interfaces.RealOutput rideHeight_1BusSignal(
-    quantity = "Length",
-    unit = "m") "Front-left ride height published to chassisBus";
-  Modelica.Blocks.Interfaces.RealOutput rideHeight_2BusSignal(
-    quantity = "Length",
-    unit = "m") "Front-right ride height published to chassisBus";
-  Modelica.Blocks.Interfaces.RealOutput rideHeight_3BusSignal(
-    quantity = "Length",
-    unit = "m") "Rear-left ride height published to chassisBus";
-  Modelica.Blocks.Interfaces.RealOutput rideHeight_4BusSignal(
-    quantity = "Length",
-    unit = "m") "Rear-right ride height published to chassisBus";
-  Modelica.Blocks.Interfaces.RealOutput vehicleSpeedBusSignal(
-    quantity = "Velocity",
-    unit = "m/s") "Vehicle speed published to chassisBus";
+  Modelica.Blocks.Sources.RealExpression rideHeight_1BusSignal(
+    y = rideHeight_1) "Front-left ride height published to chassisBus" annotation(
+      Placement(transformation(origin = {-94, 16}, extent = {{-8, -4}, {8, 4}})));
+
+  Modelica.Blocks.Sources.RealExpression rideHeight_2BusSignal(
+    y = rideHeight_2) "Front-right ride height published to chassisBus" annotation(
+      Placement(transformation(origin = {-94, 6}, extent = {{-8, -4}, {8, 4}})));
+
+  Modelica.Blocks.Sources.RealExpression rideHeight_3BusSignal(
+    y = rideHeight_3) "Rear-left ride height published to chassisBus" annotation(
+      Placement(transformation(origin = {-94, -4}, extent = {{-8, -4}, {8, 4}})));
+
+  Modelica.Blocks.Sources.RealExpression rideHeight_4BusSignal(
+    y = rideHeight_4) "Rear-right ride height published to chassisBus" annotation(
+      Placement(transformation(origin = {-94, -14}, extent = {{-8, -4}, {8, 4}})));
+
+  Modelica.Blocks.Sources.RealExpression vehicleSpeedBusSignal(
+    y = vehicleSpeed) "Vehicle speed published to chassisBus" annotation(
+      Placement(transformation(origin = {-94, -24}, extent = {{-8, -4}, {8, 4}})));
 
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation chassisFrameToCG(
     r = {0, 0, 0},
     animation = false) annotation(
       Placement(transformation(origin = {-30, -30}, extent = {{-10, -10}, {10, 10}})));
+
   Modelica.Mechanics.MultiBody.Parts.Fixed cgFixed(
     r = chassisReferencePosition,
     animation = false) annotation(
       Placement(transformation(origin = {-110, -86}, extent = {{-10, -10}, {10, 10}})));
+
   Modelica.Mechanics.MultiBody.Joints.FreeMotion cgFreeMotion(
     animation = false,
     r_rel_a(start = {0, 0, 0}, each fixed = true),
@@ -113,14 +121,17 @@ protected
     r = contactPatchPosition_1,
     animation = false) annotation(
       Placement(transformation(origin = {-130, 10}, extent = {{-10, -10}, {10, 10}})));
+
   Modelica.Mechanics.MultiBody.Parts.Fixed fixedContactPatch_2(
     r = contactPatchPosition_2,
     animation = false) annotation(
       Placement(transformation(origin = {130, 10}, extent = {{10, -10}, {-10, 10}})));
+
   Modelica.Mechanics.MultiBody.Parts.Fixed fixedContactPatch_3(
     r = contactPatchPosition_3,
     animation = false) annotation(
       Placement(transformation(origin = {-130, -50}, extent = {{-10, -10}, {10, 10}})));
+
   Modelica.Mechanics.MultiBody.Parts.Fixed fixedContactPatch_4(
     r = contactPatchPosition_4,
     animation = false) annotation(
@@ -135,25 +146,12 @@ protected
   BobLibVehicleInterfaces.Utilities.Mechanics.MultiBody.ContactMechanics.GroundPhysics ground_4 annotation(
     Placement(transformation(origin = {100, -50}, extent = {{10, -10}, {-10, 10}})));
 
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRideHeight_1(
-    r = frontLeftRideHeightOffset,
-    animation = false) annotation(
-      Placement(transformation(origin = {-40, 70}, extent = {{10, -10}, {-10, 10}})));
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRideHeight_2(
-    r = frontRightRideHeightOffset,
-    animation = false) annotation(
-      Placement(transformation(origin = {40, 70}, extent = {{-10, -10}, {10, 10}})));
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRideHeight_3(
-    r = rearLeftRideHeightOffset,
-    animation = false) annotation(
-      Placement(transformation(origin = {-40, -70}, extent = {{10, -10}, {-10, 10}})));
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRideHeight_4(
-    r = rearRightRideHeightOffset,
-    animation = false) annotation(
-      Placement(transformation(origin = {40, -70}, extent = {{-10, -10}, {10, 10}})));
-
   Real leftWheelVector[3];
   Real rightWheelVector[3];
+  SI.Position rideHeightPoint_1[3];
+  SI.Position rideHeightPoint_2[3];
+  SI.Position rideHeightPoint_3[3];
+  SI.Position rideHeightPoint_4[3];
   SI.Velocity chassisVelocity[3];
 
 initial equation
@@ -184,10 +182,22 @@ equation
   rightSteerAngle = -1*atan(rightWheelVector[2] / rightWheelVector[1]);
   avgSteerAngle = (leftSteerAngle + rightSteerAngle) / 2;
 
-  rideHeight_1 = toRideHeight_1.frame_b.r_0[3];
-  rideHeight_2 = toRideHeight_2.frame_b.r_0[3];
-  rideHeight_3 = toRideHeight_3.frame_b.r_0[3];
-  rideHeight_4 = toRideHeight_4.frame_b.r_0[3];
+  rideHeightPoint_1 = detailedChassis.frAxleFrame.r_0 + Frames.resolve1(
+    detailedChassis.frAxleFrame.R,
+    frontLeftRideHeightOffset);
+  rideHeightPoint_2 = detailedChassis.frAxleFrame.r_0 + Frames.resolve1(
+    detailedChassis.frAxleFrame.R,
+    frontRightRideHeightOffset);
+  rideHeightPoint_3 = detailedChassis.rrAxleFrame.r_0 + Frames.resolve1(
+    detailedChassis.rrAxleFrame.R,
+    rearLeftRideHeightOffset);
+  rideHeightPoint_4 = detailedChassis.rrAxleFrame.r_0 + Frames.resolve1(
+    detailedChassis.rrAxleFrame.R,
+    rearRightRideHeightOffset);
+  rideHeight_1 = rideHeightPoint_1[3];
+  rideHeight_2 = rideHeightPoint_2[3];
+  rideHeight_3 = rideHeightPoint_3[3];
+  rideHeight_4 = rideHeightPoint_4[3];
   bodyVelocity =
     Frames.resolve2(cgFreeMotion.frame_b.R, cgFreeMotion.v_rel_a);
   bodyAngularVelocity =
@@ -200,24 +210,18 @@ equation
       chassisVelocity[1]^2 +
       chassisVelocity[2]^2 +
       chassisVelocity[3]^2);
-  rideHeight_1BusSignal = rideHeight_1;
-  rideHeight_2BusSignal = rideHeight_2;
-  rideHeight_3BusSignal = rideHeight_3;
-  rideHeight_4BusSignal = rideHeight_4;
-  vehicleSpeedBusSignal = vehicleSpeed;
-
   connect(controlBus.chassisBus, chassisBus) annotation(
     Line(points = {{-158, 60}, {-120, 60}, {-120, 40}}, color = {255, 204, 51}, thickness = 0.5));
-  connect(rideHeight_1BusSignal, chassisBus.rideHeight_1) annotation(
-    Line(points = {{0, 0}, {-120, 40}}, color = {0, 0, 127}));
-  connect(rideHeight_2BusSignal, chassisBus.rideHeight_2) annotation(
-    Line(points = {{0, 0}, {-120, 40}}, color = {0, 0, 127}));
-  connect(rideHeight_3BusSignal, chassisBus.rideHeight_3) annotation(
-    Line(points = {{0, 0}, {-120, 40}}, color = {0, 0, 127}));
-  connect(rideHeight_4BusSignal, chassisBus.rideHeight_4) annotation(
-    Line(points = {{0, 0}, {-120, 40}}, color = {0, 0, 127}));
-  connect(vehicleSpeedBusSignal, chassisBus.vehicleSpeed) annotation(
-    Line(points = {{0, 0}, {-120, 40}}, color = {0, 0, 127}));
+  connect(rideHeight_1BusSignal.y, chassisBus.rideHeight_1) annotation(
+    Line(points = {{-85.2, 16}, {-112, 16}, {-112, 40}, {-120, 40}}, color = {0, 0, 127}));
+  connect(rideHeight_2BusSignal.y, chassisBus.rideHeight_2) annotation(
+    Line(points = {{-85.2, 6}, {-114, 6}, {-114, 40}, {-120, 40}}, color = {0, 0, 127}));
+  connect(rideHeight_3BusSignal.y, chassisBus.rideHeight_3) annotation(
+    Line(points = {{-85.2, -4}, {-116, -4}, {-116, 40}, {-120, 40}}, color = {0, 0, 127}));
+  connect(rideHeight_4BusSignal.y, chassisBus.rideHeight_4) annotation(
+    Line(points = {{-85.2, -14}, {-118, -14}, {-118, 40}, {-120, 40}}, color = {0, 0, 127}));
+  connect(vehicleSpeedBusSignal.y, chassisBus.vehicleSpeed) annotation(
+    Line(points = {{-85.2, -24}, {-120, -24}, {-120, 40}}, color = {0, 0, 127}));
 
   connect(cgFixed.frame_b, cgFreeMotion.frame_a) annotation(
     Line(points = {{-100, -86}, {-120, -86}, {-120, -70}}, color = {95, 95, 95}));
@@ -257,15 +261,6 @@ equation
     Line(points = {{-90, -50}, {-72, -50}, {-72, -49}, {-58, -49}}, color = {95, 95, 95}));
   connect(ground_4.frame_b, detailedChassis.frameRR) annotation(
     Line(points = {{90, -50}, {72, -50}, {72, -49}, {58, -49}}, color = {95, 95, 95}));
-
-  connect(toRideHeight_1.frame_a, detailedChassis.frAxleFrame) annotation(
-    Line(points = {{-30, 70}, {-20, 70}, {-20, 34}, {0, 34}}, color = {95, 95, 95}));
-  connect(toRideHeight_2.frame_a, detailedChassis.frAxleFrame) annotation(
-    Line(points = {{30, 70}, {20, 70}, {20, 34}, {0, 34}}, color = {95, 95, 95}));
-  connect(toRideHeight_3.frame_a, detailedChassis.rrAxleFrame) annotation(
-    Line(points = {{-30, -70}, {-20, -70}, {-20, -35}, {0, -35}}, color = {95, 95, 95}));
-  connect(toRideHeight_4.frame_a, detailedChassis.rrAxleFrame) annotation(
-    Line(points = {{30, -70}, {20, -70}, {20, -35}, {0, -35}}, color = {95, 95, 95}));
 
   annotation(Documentation(info = "<html>
 <p>

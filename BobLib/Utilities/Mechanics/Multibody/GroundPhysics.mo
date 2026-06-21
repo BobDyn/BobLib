@@ -1,15 +1,16 @@
 within BobLib.Utilities.Mechanics.Multibody;
 
 model GroundPhysics
+
   extends BobLib.Resources.Icons.GroundPhysicsIcon;
 
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a frame_a annotation(
-    Placement(transformation(origin={-100,0}, extent={{-16,-16},{16,16}}),
-    iconTransformation(origin={-100,0}, extent={{-16,-16},{16,16}})));
+    Placement(transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}),
+    iconTransformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}})));
 
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b frame_b annotation(
-    Placement(transformation(origin={100,0}, extent={{-16,-16},{16,16}}),
-    iconTransformation(origin={0,100}, extent={{-16,-16},{16,16}}, rotation=90)));
+    Placement(transformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}}),
+    iconTransformation(origin = {0, 100}, extent = {{-16, -16}, {16, 16}}, rotation = 90)));
 
   parameter Real c = 100000 "Vertical contact stiffness";
   parameter Real d = 750 "Vertical contact damping";
@@ -39,6 +40,5 @@ equation
 
   frame_a.t = zeros(3);
   frame_b.t = zeros(3);
-
 
 end GroundPhysics;

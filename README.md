@@ -77,6 +77,7 @@ make test-python
 make test-pytest
 make modelica-translation
 make modelica-initialization
+make modelica-physics
 make modelica-regression
 ```
 
@@ -86,6 +87,10 @@ integration branches receive the same basic validation as `main`.
 Modelica translation, initialization, and signal regressions are collected as
 individual pytest cases. A failing model should appear directly in the pytest
 node id, for example `Tests/test_modelica_translation.py::test_modelica_model_translates[BobLib.Standards.VehicleSim]`.
+Physical validation baselines also run through pytest and compare small
+simulation outputs against checked-in signal baselines. Runtime budgets are
+checked with a hardware-tolerant scale factor; override it with
+`BOBLIB_RUNTIME_SCALE` or `--boblib-runtime-scale` for strict benchmarking.
 
 ## Adoption Guidance
 

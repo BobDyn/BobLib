@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces;
 package EnergyStorage
+
   "Energy-storage models extending VehicleInterfaces energy-storage contracts"
   extends Modelica.Icons.Package;
   annotation(

@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Controllers;
 model VCU
+
   "BobLib VCU exposed inside the VehicleInterfaces controller domain"
   extends VehicleInterfaces.Controllers.Interfaces.Base;
 
@@ -63,11 +64,12 @@ protected
   SI.Torque speedControlTorqueCmd;
   SI.Torque positiveDriveTorqueCmd;
   SI.Torque brakingTorqueDemand;
+  SI.Torque driverDriveTorqueDemand;
+  SI.Torque driverMechanicalBrakeTorqueDemand;
   SI.Angle cmd_steering_angle;
+  Real cmd_accelerator_pedal(unit = "1");
+  Real cmd_brake_pedal(unit = "1");
   Boolean cmd_inverter_enable;
-  Integer cmd_requested_gear;
-  Integer cmd_gearbox_mode;
-  Integer cmd_ignition;
   SI.AngularVelocity sens_motor_speed;
   SI.Voltage sens_hv_bus_voltage;
   SI.Current sens_hv_bus_current;
@@ -76,54 +78,67 @@ protected
   Modelica.Blocks.Interfaces.RealInput steeringAngleBusTap(
     quantity = "Angle",
     unit = "rad")
-    "Driver steering-wheel command from driverBus";
+    "Driver steering-wheel command from driverBus" annotation(
+      Placement(transformation(origin = {-100, 80}, extent = {{-6, -6}, {6, 6}})));
+
+  Modelica.Blocks.Interfaces.RealInput acceleratorPedalBusTap(unit = "1")
+    "Driver accelerator-pedal command from driverBus" annotation(
+      Placement(transformation(origin = {-98, 76}, extent = {{-6, -6}, {6, 6}})));
+
+  Modelica.Blocks.Interfaces.RealInput brakePedalBusTap(unit = "1")
+    "Driver brake-pedal command from driverBus" annotation(
+      Placement(transformation(origin = {-96, 72}, extent = {{-6, -6}, {6, 6}})));
   Modelica.Blocks.Interfaces.BooleanInput inverterEnableBusTap
-    "Inverter enable / R2D command from driverBus";
-  Modelica.Blocks.Interfaces.IntegerInput requestedGearBusTap
-    "Driver requested gear from driverBus";
-  Modelica.Blocks.Interfaces.IntegerInput gearboxModeBusTap
-    "Driver requested gearbox mode from driverBus";
-  Modelica.Blocks.Interfaces.IntegerInput ignitionBusTap
-    "Driver ignition command from driverBus";
+    "Inverter enable / R2D command from driverBus" annotation(
+      Placement(transformation(origin = {-94, 68}, extent = {{-6, -6}, {6, 6}})));
+
   Modelica.Blocks.Interfaces.RealInput motorSpeedBusTap(
     quantity = "AngularVelocity",
     unit = "rad/s")
-    "Motor speed from electricMotorBus";
+    "Motor speed from electricMotorBus" annotation(
+      Placement(transformation(origin = {-100, 2}, extent = {{-6, -6}, {6, 6}})));
+
   Modelica.Blocks.Interfaces.RealInput hvBusVoltageBusTap(
     quantity = "ElectricPotential",
     unit = "V")
-    "HV bus voltage from batteryBus";
+    "HV bus voltage from batteryBus" annotation(
+      Placement(transformation(origin = {-100, 28}, extent = {{-6, -6}, {6, 6}})));
+
   Modelica.Blocks.Interfaces.RealInput hvBusCurrentBusTap(
     quantity = "ElectricCurrent",
     unit = "A")
-    "HV bus current from batteryBus";
+    "HV bus current from batteryBus" annotation(
+      Placement(transformation(origin = {-96, 20}, extent = {{-6, -6}, {6, 6}})));
+
   Modelica.Blocks.Interfaces.RealInput vehicleSpeedBusTap(
     quantity = "Velocity",
     unit = "m/s")
-    "Vehicle speed from chassisBus";
+    "Vehicle speed from chassisBus" annotation(
+      Placement(transformation(origin = {-100, 54}, extent = {{-6, -6}, {6, 6}})));
 
-  Modelica.Blocks.Interfaces.RealOutput powerRequestBusSignal(
-    quantity = "Power",
-    unit = "W")
-    "Power request published to electricMotorControlBus";
-  Modelica.Blocks.Interfaces.RealOutput limitedTorqueBusSignal(
-    quantity = "Torque",
-    unit = "N.m")
-    "Limited motor torque command published to electricMotorControlBus";
-  Modelica.Blocks.Interfaces.BooleanOutput vcuActiveBusSignal
-    "VCU active state published to electricMotorControlBus";
-  Modelica.Blocks.Interfaces.RealOutput driveTorqueCommandBusSignal(
-    quantity = "Torque",
-    unit = "N.m")
-    "Rear-axle drive torque command published to drivelineControlBus";
-  Modelica.Blocks.Interfaces.RealOutput regenLimitBusSignal(
-    quantity = "Torque",
-    unit = "N.m")
-    "Regenerative torque limit published to electricMotorControlBus";
-  Modelica.Blocks.Interfaces.RealOutput mechanicalBrakeTorqueBusSignal(
-    quantity = "Torque",
-    unit = "N.m")
-    "Mechanical brake torque request published to brakesControlBus";
+  Modelica.Blocks.Sources.RealExpression powerRequestBusSignal(
+    y = P_req) "Power request published to electricMotorControlBus" annotation(
+      Placement(transformation(origin = {54, 42}, extent = {{-8, -4}, {8, 4}})));
+
+  Modelica.Blocks.Sources.RealExpression limitedTorqueBusSignal(
+    y = tau_cmd_limited) "Limited motor torque command published to electricMotorControlBus" annotation(
+      Placement(transformation(origin = {54, 32}, extent = {{-8, -4}, {8, 4}})));
+
+  Modelica.Blocks.Sources.BooleanExpression vcuActiveBusSignal(
+    y = vcu_active) "VCU active state published to electricMotorControlBus" annotation(
+      Placement(transformation(origin = {54, 22}, extent = {{-8, -4}, {8, 4}})));
+
+  Modelica.Blocks.Sources.RealExpression driveTorqueCommandBusSignal(
+    y = driveTorqueCmd) "Rear-axle drive torque command published to drivelineControlBus" annotation(
+      Placement(transformation(origin = {54, 12}, extent = {{-8, -4}, {8, 4}})));
+
+  Modelica.Blocks.Sources.RealExpression regenLimitBusSignal(
+    y = regenLimitCmd) "Regenerative torque limit published to electricMotorControlBus" annotation(
+      Placement(transformation(origin = {54, 2}, extent = {{-8, -4}, {8, 4}})));
+
+  Modelica.Blocks.Sources.RealExpression mechanicalBrakeTorqueBusSignal(
+    y = mechanicalBrakeTorqueCmd) "Mechanical brake torque request published to brakesControlBus" annotation(
+      Placement(transformation(origin = {54, -8}, extent = {{-8, -4}, {8, 4}})));
 
   Modelica.Blocks.Continuous.LimPID speedPI(
     controllerType = Modelica.Blocks.Types.SimpleController.PI,
@@ -174,10 +189,9 @@ equation
     regenTorqueLimit * max(finalDriveRatio, 1e-6);
 
   cmd_steering_angle = steeringAngleBusTap;
+  cmd_accelerator_pedal = acceleratorPedalBusTap;
+  cmd_brake_pedal = brakePedalBusTap;
   cmd_inverter_enable = inverterEnableBusTap;
-  cmd_requested_gear = requestedGearBusTap;
-  cmd_gearbox_mode = gearboxModeBusTap;
-  cmd_ignition = ignitionBusTap;
   sens_motor_speed = motorSpeedBusTap;
   sens_hv_bus_voltage = hvBusVoltageBusTap;
   sens_hv_bus_current = hvBusCurrentBusTap;
@@ -191,42 +205,65 @@ equation
     else
       0;
 
+  driverDriveTorqueDemand =
+    noEvent(min(1, max(0, cmd_accelerator_pedal)))*rearAxleTorqueCapacity;
+
+  driverMechanicalBrakeTorqueDemand =
+    noEvent(min(1, max(0, cmd_brake_pedal)))*mechanicalBrakeTorqueLimit;
+
   positiveDriveTorqueCmd =
+
     if enablePTNDriveSpeedControl then
       noEvent(max(speedControlTorqueCmd, 0))
     else
-      0;
+      driverDriveTorqueDemand;
 
   brakingTorqueDemand =
+
     if enablePTNRegenSpeedControl or enablePTNMechanicalBrakeSpeedControl then
       noEvent(max(0, -speedControlTorqueCmd))
     else
-      0;
+      driverMechanicalBrakeTorqueDemand;
 
   regenBrakeTorqueCmd =
+
     if enablePTNRegenSpeedControl then
       noEvent(min(rearAxleRegenTorqueCapacity, regenBrakeBlend*brakingTorqueDemand))
     else
       0;
 
   mechanicalBrakeTorqueCmd =
+
     if enablePTNMechanicalBrakeSpeedControl then
       noEvent(min(
         mechanicalBrakeTorqueLimit,
         max(0, brakingTorqueDemand - regenBrakeTorqueCmd)))
+    elseif enablePTNRegenSpeedControl then
+      0
     else
-      0;
+      driverMechanicalBrakeTorqueDemand;
 
   driveTorqueCmd =
     positiveDriveTorqueCmd - regenBrakeTorqueCmd;
 
   acceleratorPedalCmd =
-    noEvent(min(1, max(0, positiveDriveTorqueCmd / max(rearAxleTorqueCapacity, 1e-6))));
+
+    if enablePTNDriveSpeedControl then
+      noEvent(min(1, max(0, positiveDriveTorqueCmd / max(rearAxleTorqueCapacity, 1e-6))))
+    else
+      noEvent(min(1, max(0, cmd_accelerator_pedal)));
 
   brakePedalCmd =
-    noEvent(min(1, max(0, mechanicalBrakeTorqueCmd / max(mechanicalBrakeTorqueLimit, 1e-6))));
+
+    if enablePTNMechanicalBrakeSpeedControl then
+      noEvent(min(1, max(0, mechanicalBrakeTorqueCmd / max(mechanicalBrakeTorqueLimit, 1e-6))))
+    elseif enablePTNRegenSpeedControl then
+      0
+    else
+      noEvent(min(1, max(0, cmd_brake_pedal)));
 
   regenLimitCmd =
+
     if enablePTNRegenSpeedControl then
       regenTorqueLimit
     else
@@ -236,44 +273,35 @@ equation
   tau_cmd_limited = vcu.tau_cmd_limited;
   vcu_active = vcu.vcu_active;
 
-  powerRequestBusSignal = P_req;
-  limitedTorqueBusSignal = tau_cmd_limited;
-  vcuActiveBusSignal = vcu_active;
-  driveTorqueCommandBusSignal = driveTorqueCmd;
-  regenLimitBusSignal = regenLimitCmd;
-  mechanicalBrakeTorqueBusSignal = mechanicalBrakeTorqueCmd;
-
   connect(controlBus.driverBus.steeringWheelAngle, steeringAngleBusTap) annotation(
     Line(points = {{0, -100}, {-100, -100}, {-100, 80}}, color = {0, 0, 127}));
+  connect(controlBus.driverBus.acceleratorPedalPosition, acceleratorPedalBusTap) annotation(
+    Line(points = {{0, -100}, {-98, -100}, {-98, 76}}, color = {0, 0, 127}));
+  connect(controlBus.driverBus.brakePedalPosition, brakePedalBusTap) annotation(
+    Line(points = {{0, -100}, {-96, -100}, {-96, 72}}, color = {0, 0, 127}));
   connect(controlBus.driverBus.inverterEnable, inverterEnableBusTap) annotation(
-    Line(points = {{0, -100}, {-96, -100}, {-96, 80}}, color = {255, 0, 255}));
-  connect(controlBus.driverBus.requestedGear, requestedGearBusTap) annotation(
-    Line(points = {{0, -100}, {-92, -100}, {-92, 80}}, color = {255, 127, 0}));
-  connect(controlBus.driverBus.gearboxMode, gearboxModeBusTap) annotation(
-    Line(points = {{0, -100}, {-88, -100}, {-88, 80}}, color = {255, 127, 0}));
-  connect(controlBus.driverBus.ignition, ignitionBusTap) annotation(
-    Line(points = {{0, -100}, {-84, -100}, {-84, 80}}, color = {255, 127, 0}));
+    Line(points = {{0, -100}, {-94, -100}, {-94, 68}}, color = {255, 0, 255}));
   connect(controlBus.electricMotorBus.speed, motorSpeedBusTap) annotation(
     Line(points = {{0, -100}, {-100, -100}, {-100, 2}}, color = {0, 0, 127}));
   connect(controlBus.batteryBus.voltage, hvBusVoltageBusTap) annotation(
     Line(points = {{0, -100}, {-100, -100}, {-100, 28}}, color = {0, 0, 127}));
   connect(controlBus.batteryBus.current, hvBusCurrentBusTap) annotation(
-    Line(points = {{0, -100}, {-96, -100}, {-96, 28}}, color = {0, 0, 127}));
+    Line(points = {{0, -100}, {-96, -100}, {-96, 20}}, color = {0, 0, 127}));
   connect(controlBus.chassisBus.vehicleSpeed, vehicleSpeedBusTap) annotation(
     Line(points = {{0, -100}, {-100, -100}, {-100, 54}}, color = {0, 0, 127}));
 
-  connect(powerRequestBusSignal, controlBus.electricMotorControlBus.powerRequest) annotation(
-    Line(points = {{0, 0}, {94, 0}, {94, -100}, {0, -100}}, color = {0, 0, 127}));
-  connect(limitedTorqueBusSignal, controlBus.electricMotorControlBus.limitedTorqueCommand) annotation(
-    Line(points = {{0, 0}, {94, 0}, {94, -100}, {0, -100}}, color = {0, 0, 127}));
-  connect(vcuActiveBusSignal, controlBus.electricMotorControlBus.vcuActive) annotation(
-    Line(points = {{0, 0}, {94, 0}, {94, -100}, {0, -100}}, color = {255, 0, 255}));
-  connect(driveTorqueCommandBusSignal, controlBus.drivelineControlBus.driveTorqueCommand) annotation(
-    Line(points = {{0, 0}, {98, 0}, {98, -100}, {0, -100}}, color = {0, 0, 127}));
-  connect(regenLimitBusSignal, controlBus.electricMotorControlBus.regenTorqueLimit) annotation(
-    Line(points = {{0, 0}, {90, 0}, {90, -100}, {0, -100}}, color = {0, 0, 127}));
-  connect(mechanicalBrakeTorqueBusSignal, controlBus.brakesControlBus.mechanicalBrakeTorqueRequest) annotation(
-    Line(points = {{0, 0}, {102, 0}, {102, -100}, {0, -100}}, color = {0, 0, 127}));
+  connect(powerRequestBusSignal.y, controlBus.electricMotorControlBus.powerRequest) annotation(
+    Line(points = {{62.8, 42}, {94, 42}, {94, -100}, {0, -100}}, color = {0, 0, 127}));
+  connect(limitedTorqueBusSignal.y, controlBus.electricMotorControlBus.limitedTorqueCommand) annotation(
+    Line(points = {{62.8, 32}, {96, 32}, {96, -100}, {0, -100}}, color = {0, 0, 127}));
+  connect(vcuActiveBusSignal.y, controlBus.electricMotorControlBus.vcuActive) annotation(
+    Line(points = {{62.8, 22}, {98, 22}, {98, -100}, {0, -100}}, color = {255, 0, 255}));
+  connect(driveTorqueCommandBusSignal.y, controlBus.drivelineControlBus.driveTorqueCommand) annotation(
+    Line(points = {{62.8, 12}, {100, 12}, {100, -100}, {0, -100}}, color = {0, 0, 127}));
+  connect(regenLimitBusSignal.y, controlBus.electricMotorControlBus.regenTorqueLimit) annotation(
+    Line(points = {{62.8, 2}, {102, 2}, {102, -100}, {0, -100}}, color = {0, 0, 127}));
+  connect(mechanicalBrakeTorqueBusSignal.y, controlBus.brakesControlBus.mechanicalBrakeTorqueRequest) annotation(
+    Line(points = {{62.8, -8}, {104, -8}, {104, -100}, {0, -100}}, color = {0, 0, 127}));
 
   connect(velSetpointExpression.y, speedPI.u_s) annotation(
     Line(points = {{-59, -50}, {-40, -50}, {-40, -60}, {-32, -60}}, color = {0, 0, 127}));
@@ -290,19 +318,13 @@ equation
   connect(regenLimitRequest.y, vcu.cmd_regen_limit) annotation(
     Line(points = {{-38.5, -16}, {-28, -16}, {-28, -8}, {-24, -8}}, color = {0, 0, 127}));
   connect(inverterEnableBusTap, vcu.cmd_inverter_enable) annotation(
-    Line(points = {{-96, 80}, {-36, 80}, {-36, 0}, {-24, 0}}, color = {255, 0, 255}));
-  connect(requestedGearBusTap, vcu.cmd_requested_gear) annotation(
-    Line(points = {{-92, 80}, {-44, 80}, {-44, -12.8}, {-24, -12.8}}, color = {255, 127, 0}));
-  connect(gearboxModeBusTap, vcu.cmd_gearbox_mode) annotation(
-    Line(points = {{-88, 80}, {-40, 80}, {-40, -17.6}, {-24, -17.6}}, color = {255, 127, 0}));
-  connect(ignitionBusTap, vcu.cmd_ignition) annotation(
-    Line(points = {{-84, 80}, {-36, 80}, {-36, -22.4}, {-24, -22.4}}, color = {255, 127, 0}));
+    Line(points = {{-94, 68}, {-36, 68}, {-36, 0}, {-24, 0}}, color = {255, 0, 255}));
   connect(motorSpeedBusTap, vcu.sens_motor_speed) annotation(
     Line(points = {{-100, 2}, {-52, 2}, {-52, 16}, {-24, 16}}, color = {0, 0, 127}));
   connect(hvBusVoltageBusTap, vcu.sens_hv_bus_voltage) annotation(
     Line(points = {{-100, 28}, {-32, 28}, {-32, -16}, {-24, -16}}, color = {0, 0, 127}));
   connect(hvBusCurrentBusTap, vcu.sens_hv_bus_current) annotation(
-    Line(points = {{-96, 28}, {-28, 28}, {-28, -24}, {-24, -24}}, color = {0, 0, 127}));
+    Line(points = {{-96, 20}, {-28, 20}, {-28, -24}, {-24, -24}}, color = {0, 0, 127}));
 
   annotation(
     Documentation(info = "<html>
@@ -320,11 +342,19 @@ driver-environment intent; the VCU's normalized pedal outputs are diagnostics
 for the controller-generated actuator requests.
 </p>
 <p>
+When the PTN speed-control drive path is disabled, the VCU maps
+<code>driverBus.acceleratorPedalPosition</code> to rear-axle drive torque. When
+both speed-control brake paths are disabled, it maps
+<code>driverBus.brakePedalPosition</code> to a mechanical brake request. This
+keeps driver-in-the-loop and software-in-the-loop vehicles on the same bus
+publish/subscribe interface as the autonomous maneuver templates.
+</p>
+<p>
 When PTN speed control is enabled, positive PI torque demand is sent to the
 electric drive path. Negative demand is first assigned to regenerative braking
 according to <code>regenBrakeBlend</code>, then the remaining demand is
 published on <code>controlBus.brakesControlBus.mechanicalBrakeTorqueRequest</code>.
-The default <code>regenBrakeBlend=0</code> therefore sends all speed-control
+The default <code>regenBrakeBlend = 0</code> therefore sends all speed-control
 braking demand to the mechanical brake subscribers.
 </p>
 <p>

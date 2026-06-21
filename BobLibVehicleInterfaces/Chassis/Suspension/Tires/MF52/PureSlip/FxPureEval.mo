@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Chassis.Suspension.Tires.MF52.PureSlip;
 
 function FxPureEval
+
   // Modelica units
   import SI = Modelica.Units.SI;
 
@@ -33,6 +34,7 @@ protected
 
 algorithm
   if Fz > 1e-3 then
+
     // Camber influence
     IA_x := gamma * p.LGAX;
 
@@ -58,6 +60,7 @@ algorithm
 
     // Curvature
     E := (p.PEX1 + p.PEX2 * dfz + p.PEX3 * dfz^2)
+
          * (1 - p.PEX4 * sign(SR_x))
          * p.LEX;
     E := min(E, 1);
@@ -79,4 +82,3 @@ The function is intentionally narrow so each tire force or moment equation can b
 </p>
 </html>"));
 end FxPureEval;
-

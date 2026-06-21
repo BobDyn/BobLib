@@ -1,6 +1,7 @@
 within BobLibVehicleInterfacesTests.TestVehicle.TestChassis.TestBody;
 
 model TestFrameRigid
+
   import BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates.MassRecord;
 
   inner parameter Real linkDiameter = 0.020;

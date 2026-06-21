@@ -1,6 +1,7 @@
 within BobLib.Vehicle.Chassis.Suspension.Templates.Tire;
 
 model MF52Tire
+
   import SI = Modelica.Units.SI;
 
   import BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52;
@@ -26,8 +27,9 @@ model MF52Tire
   SI.Length s;
 
 equation
+
   // MF52 force and moment evaluation
-  (Fx, Fy, Mx, My, Mz, t, s) =
+  (Fx, Fy, Mx, My, Mz, t, s) = 
     MF52.Eval(Fz, alpha, kappa, gamma, Vx, pTireModel);
 
 end MF52Tire;

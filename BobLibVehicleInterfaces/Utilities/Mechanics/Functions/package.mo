@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Utilities.Mechanics;
 package Functions
+
   "General mechanics calculations that are not tied to MultiBody frames"
   extends BobLibVehicleInterfaces.Icons.BobLibPackageBackground;
 

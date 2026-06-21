@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Chassis.Suspension.Tires.TirePhysics.Templates;
 
 partial model PartialWheel
+
   extends BobLibVehicleInterfaces.Icons.PartialWheelIcon;
 
   import BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.Templates.PartialWheelRecord;
@@ -15,24 +16,40 @@ partial model PartialWheel
 
   // Frames
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a cpFrame annotation(
-    Placement(transformation(origin = {0, -100}, extent = {{-16, -16}, {16, 16}}, rotation = -90), iconTransformation(origin = {0, -100}, extent = {{-16, -16}, {16, 16}}, rotation = 90)));
+    Placement(
+      transformation(origin = {0, -100}, extent = {{-16, -16}, {16, 16}}, rotation = -90),
+      iconTransformation(origin = {0, -100}, extent = {{-16, -16}, {16, 16}}, rotation = 90)));
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b chassisFrame annotation(
-    Placement(transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}, rotation = 0)));
+    Placement(
+      transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}),
+      iconTransformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}, rotation = 0)));
 
   Modelica.Mechanics.Rotational.Interfaces.Flange_b hubFlange annotation(
-    Placement(transformation(origin = {-100, 40}, extent = {{-10, -10}, {10, 10}}), iconTransformation(extent = {{-10, -10}, {10, 10}})));
+    Placement(
+      transformation(origin = {-100, 40}, extent = {{-10, -10}, {10, 10}}),
+      iconTransformation(extent = {{-10, -10}, {10, 10}})));
 
   // Tire attitude
   Modelica.Mechanics.MultiBody.Parts.FixedRotation toHub(rotationType = Modelica.Mechanics.MultiBody.Types.RotationTypes.PlanarRotationSequence,
-                                                         sequence = {1, 2, 3}, angles = {partialWheelParams.staticGamma, 0, partialWheelParams.staticAlpha})  annotation(
+                                                         sequence = {1, 2, 3}, angles = {partialWheelParams.staticGamma, 0, partialWheelParams.staticAlpha}) annotation(
     Placement(transformation(origin = {-50, 0}, extent = {{-10, -10}, {10, 10}})));
 
   // Rotational physics (wheel rotation about the hub axis)
-  Modelica.Mechanics.MultiBody.Joints.Revolute hubAxis(n = {0, 1, 0}, useAxisFlange = true, animation = not headless, phi(start = 0, fixed = true, nominal = 0.1), w(start = 0, nominal = 100)) annotation(
+  Modelica.Mechanics.MultiBody.Joints.Revolute hubAxis(
+    n = {0, 1, 0},
+    useAxisFlange = true,
+    animation = not headless,
+    phi(start = 0, fixed = true, nominal = 0.1),
+    w(start = 0, nominal = 100)) annotation(
     Placement(transformation(origin = {20, 0}, extent = {{-10, -10}, {10, 10}})));
 
   // Translational physics (wheel vertical deflection)
-  Modelica.Mechanics.MultiBody.Joints.Prismatic prismatic_z(useAxisFlange = true, n = {0, 0, -1}, animation = not headless, boxWidth = linkDiameter, boxHeight = linkDiameter) annotation(
+  Modelica.Mechanics.MultiBody.Joints.Prismatic prismatic_z(
+    useAxisFlange = true,
+    n = {0, 0, -1},
+    animation = not headless,
+    boxWidth = linkDiameter,
+    boxHeight = linkDiameter) annotation(
     Placement(transformation(origin = {0, -40}, extent = {{10, -10}, {-10, 10}}, rotation = 90)));
 
   // Rotational dynamics
@@ -56,7 +73,11 @@ partial model PartialWheel
     Placement(transformation(origin = {70, -50}, extent = {{-10, -10}, {10, 10}})));
 
   // Visualizers
-  Modelica.Mechanics.MultiBody.Visualizers.VoluminousWheel voluminousWheel(rRim = partialWheelParams.rimR0, rTire = partialWheelParams.R0, width = partialWheelParams.rimWidth, animation = not headless) annotation(
+  Modelica.Mechanics.MultiBody.Visualizers.VoluminousWheel voluminousWheel(
+    rRim = partialWheelParams.rimR0,
+    rTire = partialWheelParams.R0,
+    width = partialWheelParams.rimWidth,
+    animation = not headless) annotation(
     Placement(transformation(origin = {70, 0}, extent = {{-10, -10}, {10, 10}}, rotation = -0)));
 
 equation

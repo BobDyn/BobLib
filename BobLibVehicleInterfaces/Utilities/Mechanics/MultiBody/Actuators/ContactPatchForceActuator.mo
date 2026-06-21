@@ -32,7 +32,9 @@ model ContactPatchForceActuator
 
   // Output
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b chassisFrame annotation(
-    Placement(transformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}}, rotation = 180)));
+    Placement(
+      transformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}}),
+      iconTransformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}}, rotation = 180)));
 
 equation
   connect(leftFxSource.y[1], leftFxGain.u) annotation(
@@ -58,5 +60,6 @@ a MultiBody frame, typically a tire contact patch in a rig-level test.
 It is used by four-post and suspension experiments to excite the tire or
 chassis through tabulated contact-patch loads.
 </p>
-</html>"));
+</html>"),
+  Icon(graphics = {Text(origin = {0, 2}, extent = {{-60, 20}, {60, -20}}, textString = "Fx, Fy"), Rectangle(lineThickness = 1, extent = {{-60, 20}, {60, -20}}), Line(origin = {77, 0}, points = {{-17, 0}, {17, 0}}, thickness = 1), Line(origin = {87, 5}, points = {{7, -5}, {-7, 1}}, thickness = 1), Line(origin = {87, -5}, points = {{7, 5}, {-7, -1}}, thickness = 1)}));
 end ContactPatchForceActuator;

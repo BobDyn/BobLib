@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Utilities.Math.Vector;
 
 function mirrorXZ
+
   input Real r[3] "Position vector {x, y, z}";
   output Real r_m[3] "Mirrored vector about X-Z plane (flip Y)";
 

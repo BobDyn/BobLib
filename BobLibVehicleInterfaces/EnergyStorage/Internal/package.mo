@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.EnergyStorage;
 
 package Internal
+
   extends BobLibVehicleInterfaces.Icons.BobLibInternalPackageBackground;
   annotation(
     Documentation(info = "<html>

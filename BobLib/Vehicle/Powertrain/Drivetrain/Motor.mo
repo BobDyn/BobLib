@@ -1,16 +1,23 @@
 within BobLib.Vehicle.Powertrain.Drivetrain;
 
 model Motor
+
   import SI = Modelica.Units.SI;
   import Modelica.Constants.pi;
 
   // Power command
-  Modelica.Blocks.Interfaces.RealInput P_elec "Electrical power into motor [W] (+motoring, −regen)  (connect from inverter P_out)" annotation(
-    Placement(transformation(origin = {-120, 0}, extent = {{-20, -20}, {20, 20}}), iconTransformation(origin = {-120, 0}, extent = {{-20, -20}, {20, 20}})));
+  Modelica.Blocks.Interfaces.RealInput P_elec "Electrical power into motor [W](
+    +motoring,
+    −regen)  (connect from inverter P_out)" annotation(
+    Placement(
+      transformation(origin = {-120, 0}, extent = {{-20, -20}, {20, 20}}),
+      iconTransformation(origin = {-120, 0}, extent = {{-20, -20}, {20, 20}})));
 
   // Torque output
   Modelica.Mechanics.Rotational.Interfaces.Flange_b shaft annotation(
-    Placement(transformation(origin={100, 0}, extent={{-10, -10}, {10, 10}}), iconTransformation(origin = {100, 0}, extent = {{-10, -10}, {10, 10}})));
+    Placement(
+      transformation(origin = {100, 0}, extent = {{-10, -10}, {10, 10}}),
+      iconTransformation(origin = {100, 0}, extent = {{-10, -10}, {10, 10}})));
 
   // Datasheet specs
   parameter SI.Voltage Vdc_max = 630 "Max battery voltage (EMRAX 228 MV) [Vdc]";
@@ -26,9 +33,9 @@ model Motor
   parameter SI.Power P_mech_peak = 124e3 "Peak motor mechanical power capability [W]";
   parameter SI.Power P_cont_low = 75e3 "Low end continuous power band [W]";
   parameter SI.Power P_cont_high = 75e3 "High end continuous power band [W]";
-  parameter Real eta_mot = 0.96 "Motoring efficiency placeholder (swap to 2D map later)";
-  parameter Real eta_reg = 0.95 "Regen efficiency placeholder";
-  parameter Real lossTable[:,2] = [
+  parameter Real eta_mot = 0.96 "Constant motoring efficiency approximation";
+  parameter Real eta_reg = 0.95 "Constant regen efficiency approximation";
+  parameter Real lossTable[:, 2] = [
     0,    0;
     1000, 200;
     2000, 550;
@@ -58,11 +65,13 @@ model Motor
 
 protected
   function interp1
-    input Real tbl[:,2];
+
+    input Real tbl[:, 2];
     input Real xq;
     output Real yq;
+
   algorithm
-    yq := Modelica.Math.Vectors.interpolate(tbl[:,1], tbl[:,2], xq);
+    yq := Modelica.Math.Vectors.interpolate(tbl[:, 1], tbl[:, 2], xq);
   end interp1;
 
   Real peakFactor "1 -> allow peak, 0 -> only continuous";
@@ -76,17 +85,17 @@ protected
 
   parameter SI.Time tau_tau = 0.002 "Torque actuator time constant";
 
-
 equation
+
   // Shaft speed
-  w   = der(shaft.phi);
+  w = der(shaft.phi);
   rpm = abs(w) * 60 / (2*pi);
 
   // Free-run losses (always dissipative)
   P_loss_free = interp1(lossTable, rpm);
 
   // Peak allowance factor (simple time-based derate)
-  peakFactor =
+  peakFactor = 
     if not enablePeakTimer then 1
     else if time <= peakTime then 1
     else 0;
@@ -96,7 +105,8 @@ equation
   I_allow = peakFactor*I_peak_2min + (1 - peakFactor)*I_cont;
 
   // Continuous power envelope vs speed
-  P_cont_env =
+  P_cont_env = 
+
     if noEvent(rpm <= 3000) then
       P_cont_low*(0.2 + 0.8*rpm/3000)   // mild floor at low rpm
     elseif noEvent(rpm <= 5000) then
@@ -107,27 +117,28 @@ equation
   // Electrical -> mechanical power command (incl. losses)
   // Motoring: electrical supplies mech + losses
   // Regen: mechanical produces electrical, losses reduce recovery
-  P_mech_cmd =
+  P_mech_cmd = 
+
     if noEvent(P_elec >= 0) then
       noEvent(max(0, P_elec*eta_mot - P_loss_free))
     else
       noEvent(min(0, P_elec/eta_reg - P_loss_free));
 
   // Allowed mechanical power (peak vs continuous)
-  P_allow =
+  P_allow = 
     peakFactor*P_mech_peak
     + (1 - peakFactor)*P_cont_env;
 
   // Enforce power envelope (symmetric for motoring/regen)
-  P_mech_limited =
+  P_mech_limited = 
     noEvent(max(min(P_mech_cmd,  P_allow), -P_allow));
 
   // Torque limits
-  tau_lim_from_power   = P_allow / max(abs(w), w_eps);
+  tau_lim_from_power = P_allow / max(abs(w), w_eps);
   tau_lim_from_current = Kt_Nm_per_A * I_allow;
 
   // Combined torque limit
-  tau_lim =
+  tau_lim = 
     noEvent(min(T_allow,
         min(tau_lim_from_power,
             tau_lim_from_current)));

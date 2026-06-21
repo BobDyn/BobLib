@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Icons;
 
 partial package BobLibPackageFrame
+
   "BobDocs-themed package frame for BobLib-owned content"
 
   annotation(

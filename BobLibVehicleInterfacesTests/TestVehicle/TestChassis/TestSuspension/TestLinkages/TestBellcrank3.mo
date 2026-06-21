@@ -1,7 +1,9 @@
 within BobLibVehicleInterfacesTests.TestVehicle.TestChassis.TestSuspension.TestLinkages;
 
 model TestBellcrank3
+
   inner parameter Boolean headless = false;
+
   inner Modelica.Mechanics.MultiBody.World world(
     n = {0, 0, -1},
     enableAnimation = not headless) annotation(

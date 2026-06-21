@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Records.VehicleRecord;
 package ElectricDrives
+
   extends BobLibVehicleInterfaces.Icons.RecordsPackageIcon;
 
   annotation(

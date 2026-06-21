@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension;
 
 record AxleDW_BC_StabarRecord
+
   import SI = Modelica.Units.SI;
 
   // Geometry
@@ -37,11 +38,11 @@ record AxleDW_BC_StabarRecord
   parameter SI.Position shockMount[3] "Vector from origin to shock chassis mount, resolved in world frame" annotation(
     Evaluate = false,
     Dialog(group = "Geometry"));
-  parameter SI.Position springTable[:,2] "Table of spring force vs deflection, [dx1, F1; dx1, F2; ...]" annotation(
+  parameter SI.Position springTable[:, 2] "Table of spring force vs deflection, [dx1, F1; dx1, F2; ...]" annotation(
     Evaluate = false, Dialog(group = "Geometry"));
   parameter SI.Length springFreeLength "Spring free length (zero-force length) = installed length + static compression" annotation(
     Evaluate = false, Dialog(group = "Geometry"));
-  parameter SI.Position damperTable[:,2] "Table of damper force vs velocity, [v1, F1; v2, F2; ...]" annotation(
+  parameter SI.Position damperTable[:, 2] "Table of damper force vs velocity, [v1, F1; v2, F2; ...]" annotation(
     Evaluate = false, Dialog(group = "Geometry"));
 
   annotation(

@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces;
 package Aero
+
   "Aerodynamic interfaces and chassis mount adapters"
   extends Modelica.Icons.Package;
 

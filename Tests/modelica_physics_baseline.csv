@@ -1,0 +1,17 @@
+model,stop_time,signal,expected,abs_tol,rel_tol,description
+BobLib.Tests.Regression.MF52PureSlipSmoke,0.01,Fx,0,1e-9,1e-9,MF52 pure slip smoke longitudinal force at zero kappa
+BobLib.Tests.Regression.MF52PureSlipSmoke,0.01,Fy,1367.049907523304,1e-6,1e-9,MF52 pure slip smoke lateral force
+BobLib.Tests.Regression.MF52PureSlipSmoke,0.01,Mx,-18.283297449124898,1e-6,1e-9,MF52 pure slip smoke overturning moment
+BobLib.Tests.Regression.MF52PureSlipSmoke,0.01,My,0,1e-9,1e-9,MF52 pure slip smoke rolling resistance moment
+BobLib.Tests.Regression.MF52PureSlipSmoke,0.01,Mz,-28.781188544190439,1e-6,1e-9,MF52 pure slip smoke aligning moment
+BobLib.Tests.Regression.MF52PureSlipSmoke,0.01,pneumaticTrail,0.021053502425769931,1e-9,1e-9,MF52 pure slip smoke pneumatic trail
+BobLib.Tests.Regression.MF52PureSlipSmoke,0.01,residualScrub,0,1e-9,1e-9,MF52 pure slip smoke residual scrub
+BobLib.Tests.Regression.MF52PureSlipSmoke,0.01,MzReconstructed,-28.781188544190439,1e-6,1e-9,MF52 aligning moment reconstruction
+BobLib.Tests.TestVehicle.TestAero.TestCFDAeroMap,0.01,aero.drag,52,1e-9,1e-9,CFD aero map drag interpolation
+BobLib.Tests.TestVehicle.TestAero.TestCFDAeroMap,0.01,aero.downforce,520,1e-9,1e-9,CFD aero map downforce interpolation
+BobLib.Tests.TestVehicle.TestPowertrain.TestVCU,0.01,vcu.P_req,20000,1e-6,1e-9,VCU requested motor power
+BobLib.Tests.TestVehicle.TestPowertrain.TestVCU,0.01,vcu.tau_cmd_limited,200,1e-9,1e-9,VCU torque limit command
+BobLib.Tests.TestVehicle.TestPowertrain.TestPowertrainBatInvMotDiff,2.0,ptn.SOE,0.84071065153659907,1e-6,1e-9,Powertrain normalized state of energy after torque schedule
+BobLib.Tests.TestVehicle.TestPowertrain.TestPowertrainBatInvMotDiff,2.0,ptn.diffLockTorque,-0.53097478500566209,1e-5,1e-8,Powertrain differential lock torque after torque schedule
+BobLib.Tests.TestVehicle.TestPowertrain.TestPowertrainBatInvMotDiff,2.0,ptn.diffLockCapacity,25.94853934511081,1e-5,1e-8,Powertrain differential lock capacity after torque schedule
+BobLib.Tests.TestVehicle.TestPowertrain.TestPowertrainBatInvMotDiff,2.0,elc.tau_cmd_limited,-0.0096124685127563225,1e-4,1e-8,Powertrain VCU limited torque after torque schedule

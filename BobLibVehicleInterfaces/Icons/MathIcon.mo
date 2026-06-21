@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Icons;
 
 partial package MathIcon
+
   "Reusable package icon for math utilities"
   extends BobLibVehicleInterfaces.Icons.BobLibPackageFrame;
 

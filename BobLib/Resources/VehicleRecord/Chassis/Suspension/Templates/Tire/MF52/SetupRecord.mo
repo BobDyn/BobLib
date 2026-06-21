@@ -1,6 +1,7 @@
 within BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52;
 
 record SetupRecord
+
   import SI = Modelica.Units.SI;
 
   parameter SI.Force FNOMIN

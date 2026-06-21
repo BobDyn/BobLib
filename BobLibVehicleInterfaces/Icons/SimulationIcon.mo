@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Icons;
 partial model SimulationIcon
+
   "BobLib simulation model icon"
   annotation(
     Icon(coordinateSystem(preserveAspectRatio = false, extent = {{-100, -100}, {100, 100}}), graphics = {

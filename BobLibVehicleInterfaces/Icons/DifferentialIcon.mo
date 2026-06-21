@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Icons;
 
 partial model DifferentialIcon "Reusable differential icon"
+
   annotation(
     Icon(coordinateSystem(extent = {{-100, -100}, {100, 100}}), graphics = {
       Ellipse(extent = {{-42, 42}, {42, -42}}, lineColor = {45, 45, 45}, fillColor = {238, 238, 238}, fillPattern = FillPattern.Solid),

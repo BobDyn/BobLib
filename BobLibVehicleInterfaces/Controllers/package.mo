@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces;
 package Controllers
+
   "Controller models extending VehicleInterfaces controller contracts"
   extends Modelica.Icons.Package;
   annotation(

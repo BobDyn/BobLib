@@ -1,6 +1,7 @@
 within BobLib.Vehicle.Chassis.Suspension.Templates.Tire;
 
 model BaseTire
+
   extends BobLib.Resources.Icons.BaseTireIcon;
 
   import SI = Modelica.Units.SI;
@@ -17,10 +18,14 @@ model BaseTire
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a cpFrame annotation(
     Placement(transformation(origin = {0, -100}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b chassisFrame annotation(
-    Placement(transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}})));
+    Placement(
+      transformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}}),
+      iconTransformation(origin = {-100, 0}, extent = {{-16, -16}, {16, 16}})));
 
   Modelica.Mechanics.Rotational.Interfaces.Flange_b hubFlange annotation(
-    Placement(transformation(origin = {100, 0}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {100, 0}, extent = {{-10, -10}, {10, 10}})));
+    Placement(
+      transformation(origin = {100, 0}, extent = {{-10, -10}, {10, 10}}),
+      iconTransformation(origin = {100, 0}, extent = {{-10, -10}, {10, 10}})));
 
   // Base states
   SI.Force Fz;
@@ -50,7 +55,9 @@ model BaseTire
     Placement(transformation(origin = {-90, 40}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Blocks.Sources.RealExpression realExpressionMz(y = 0) annotation(
     Placement(transformation(origin = {-90, 26}, extent = {{-10, -10}, {10, 10}})));
-  Modelica.Mechanics.MultiBody.Forces.WorldForceAndTorque forceAndTorque(resolveInFrame = Modelica.Mechanics.MultiBody.Types.ResolveInFrameB.frame_b, animation = enableAnimation) annotation(
+  Modelica.Mechanics.MultiBody.Forces.WorldForceAndTorque forceAndTorque(
+    resolveInFrame = Modelica.Mechanics.MultiBody.Types.ResolveInFrameB.frame_b,
+    animation = enableAnimation) annotation(
     Placement(transformation(origin = {-30, -50}, extent = {{-10, -10}, {10, 10}})));
 
 protected
@@ -68,6 +75,7 @@ protected
   SI.Velocity Vy "Lateral velocity at contact patch";
 
 equation
+
   // Normal load
   Fz = noEvent(max(0, cpFrame.f[3]));
 

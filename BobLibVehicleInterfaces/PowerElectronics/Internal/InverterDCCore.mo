@@ -1,22 +1,29 @@
 within BobLibVehicleInterfaces.PowerElectronics.Internal;
 
 model InverterDCCore "DC-side inverter/load physics with efficiency and bus limits"
+
   import SI = Modelica.Units.SI;
   import Modelica.Math.Vectors.interpolate;
 
   // Electrical ports
   Modelica.Electrical.Analog.Interfaces.PositivePin p "DC bus positive" annotation(
-    Placement(transformation(origin={-100,0}, extent={{-10,-10},{10,10}})));
+    Placement(transformation(origin = {-100, 0}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Electrical.Analog.Interfaces.NegativePin n "DC bus negative" annotation(
-    Placement(transformation(origin={100,0}, extent={{-10,-10},{10,10}})));
+    Placement(transformation(origin = {100, 0}, extent = {{-10, -10}, {10, 10}})));
 
   // Control input
-  Modelica.Blocks.Interfaces.RealInput P_req "Requested mechanical/electrical output power [W] (+motoring, −regen)" annotation(
-    Placement(transformation(origin = {0, 120}, extent = {{-20, -20}, {20, 20}}, rotation = -90), iconTransformation(origin = {0, 120}, extent = {{-20, -20}, {20, 20}}, rotation=-90)));
+  Modelica.Blocks.Interfaces.RealInput P_req "Requested mechanical/electrical output power [W](
+    +motoring,
+    −regen)" annotation(
+    Placement(
+      transformation(origin = {0, 120}, extent = {{-20, -20}, {20, 20}}, rotation = -90),
+      iconTransformation(origin = {0, 120}, extent = {{-20, -20}, {20, 20}}, rotation = -90)));
 
   // Output
   Modelica.Blocks.Interfaces.RealOutput P_out(start = 0) "Electrical power delivered to motor side [W] (+motoring, −regen)" annotation(
-    Placement(transformation(origin = {0, -120}, extent={{-20,-20},{20,20}}, rotation = -90), iconTransformation(origin={0,-110}, extent={{-10,-10},{10,10}}, rotation=-90)));
+    Placement(
+      transformation(origin = {0, -120}, extent = {{-20, -20}, {20, 20}}, rotation = -90),
+      iconTransformation(origin = {0, -110}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
 
   // Parameters
   parameter Real eta_mot = 0.97 "Inverter efficiency (motoring)";
@@ -55,7 +62,7 @@ model InverterDCCore "DC-side inverter/load physics with efficiency and bus limi
     "Regen efficiency vs normalized output power";
 
   // Internal current source
-  Modelica.Electrical.Analog.Sources.SignalCurrent I_dc_source annotation(Placement(transformation(origin={0,0}, extent={{-10,-10},{10,10}})));
+  Modelica.Electrical.Analog.Sources.SignalCurrent I_dc_source annotation(Placement(transformation(origin = {0, 0}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Blocks.Sources.RealExpression dcCurrentCommand(
     y = I_dc) annotation(
       Placement(transformation(origin = {-30, 30}, extent = {{-8, -8}, {8, 8}})));
@@ -88,8 +95,12 @@ equation
   assert(P_nominal > 0, "InverterDC: P_nominal must be positive");
   assert(eta_min > 0 and eta_max <= 1 and eta_min <= eta_max, "InverterDC: invalid efficiency bounds");
   assert(size(powerFractionTable, 1) >= 2, "InverterDC: powerFractionTable must contain at least two breakpoints");
-  assert(size(eta_mot_table, 1) == size(powerFractionTable, 1), "InverterDC: eta_mot_table size must match powerFractionTable");
-  assert(size(eta_reg_table, 1) == size(powerFractionTable, 1), "InverterDC: eta_reg_table size must match powerFractionTable");
+  assert(
+    size(eta_mot_table, 1) == size(powerFractionTable, 1),
+    "InverterDC: eta_mot_table size must match powerFractionTable");
+  assert(
+    size(eta_reg_table, 1) == size(powerFractionTable, 1),
+    "InverterDC: eta_reg_table size must match powerFractionTable");
 
   // DC bus measurement
   V_dc = p.v - n.v;

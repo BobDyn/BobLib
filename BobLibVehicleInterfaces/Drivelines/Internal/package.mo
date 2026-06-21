@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Drivelines;
 package Internal
+
   "Internal driveline-domain helper models"
   extends BobLibVehicleInterfaces.Icons.BobLibInternalPackageBackground;
   annotation(

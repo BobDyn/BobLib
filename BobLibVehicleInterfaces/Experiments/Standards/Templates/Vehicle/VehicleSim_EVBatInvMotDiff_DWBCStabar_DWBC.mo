@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Experiments.Standards.Templates.Vehicle;
 
 model VehicleSim_EVBatInvMotDiff_DWBCStabar_DWBC
+
   extends BaseVehicleSim(
     redeclare record VehicleRecord = BobLibVehicleInterfaces.Records.VehicleDefn.EVBatInvMotDiff_DWBCStabar_DWBCRecord,
     redeclare BobLibVehicleInterfaces.Chassis.Chassis_DW chassis(

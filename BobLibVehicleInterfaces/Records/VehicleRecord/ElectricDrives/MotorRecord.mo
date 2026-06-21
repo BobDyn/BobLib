@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Records.VehicleRecord.ElectricDrives;
 
 record MotorRecord
+
   import SI = Modelica.Units.SI;
 
   parameter SI.Voltage Vdc_max = 630

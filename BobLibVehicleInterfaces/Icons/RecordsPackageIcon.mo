@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Icons;
 
 partial package RecordsPackageIcon
+
   "Reusable package icon for record collections"
   extends BobLibVehicleInterfaces.Icons.BobLibPackageFrame;
 

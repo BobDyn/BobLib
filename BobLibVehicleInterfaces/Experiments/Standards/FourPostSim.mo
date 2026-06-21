@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Experiments.Standards;
 
 model FourPostSim
+
   extends Templates.FourPost.FourPostSim_DWBCStabar_DWBCStabar;
   extends BobLibVehicleInterfaces.Icons.SimulationIcon;
 

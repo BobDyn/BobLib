@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Chassis.Suspension.Tires.MF52.SlipModel;
 
 model NoSlip
+
   extends BobLibVehicleInterfaces.Chassis.Suspension.Tires.MF52.SlipModel.BaseSlipModel;
 
 equation

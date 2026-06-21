@@ -1,17 +1,22 @@
 within BobLib.Tests.TestVehicle.TestPowertrain;
 
 model TestBatteryInverter
+
   import SI = Modelica.Units.SI;
+
   // Battery
   BobLib.Vehicle.Powertrain.Battery.BatteryPack batt(Ns = 140, Np = 4, SOC_start = 1.0) annotation(
     Placement(transformation(origin = {0, -10}, extent = {{-10, -10}, {10, 10}})));
+
   // Inverter
   BobLib.Vehicle.Electronics.PowerElectronics.InverterDC inv annotation(
     Placement(transformation(origin = {0, 40}, extent = {{-10, -10}, {10, 10}})));
+
   // Power command
   Modelica.Blocks.Sources.Step P_step(height = 80e3,  // 80 kW
   startTime = 1.0) annotation(
     Placement(transformation(origin = {-30, 60}, extent = {{-10, -10}, {10, 10}})));
+
   // Electrical reference
   Modelica.Electrical.Analog.Basic.Ground g annotation(
     Placement(transformation(origin = {-30, -40}, extent = {{-10, -10}, {10, 10}})));

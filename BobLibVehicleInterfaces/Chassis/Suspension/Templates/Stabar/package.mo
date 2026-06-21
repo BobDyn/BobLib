@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Chassis.Suspension.Templates;
 package Stabar
+
   extends BobLibVehicleInterfaces.Icons.BobLibPackageBackground;
 
   annotation(

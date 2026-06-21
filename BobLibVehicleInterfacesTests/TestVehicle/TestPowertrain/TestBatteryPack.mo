@@ -25,6 +25,7 @@ model TestBatteryPack
   // Electrical reference
   Modelica.Electrical.Analog.Basic.Ground g annotation(
     Placement(transformation(origin = {-70, -70}, extent = {{-10, -10}, {10, 10}})));
+
 equation
   connect(load.p, g.p) annotation(
     Line(points = {{40, -30}, {60, -30}, {60, -60}, {-70, -60}}, color = {0, 0, 255}));

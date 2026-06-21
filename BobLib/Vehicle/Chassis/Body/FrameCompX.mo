@@ -1,6 +1,7 @@
 within BobLib.Vehicle.Chassis.Body;
 
 model FrameCompX
+
   extends BobLib.Vehicle.Chassis.Body.FrameBase;
   import SI = Modelica.Units.SI;
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.MassRecord;
@@ -9,11 +10,15 @@ model FrameCompX
   parameter MassRecord pSprungMass;
   parameter SI.RotationalDampingConstant torsionalDamp = 2 * sqrt(torsionalStiff * pSprungMass.inertia[1, 1]);
 
-  Modelica.Mechanics.MultiBody.Joints.Revolute torsionalRevolute(n = {1, 0, 0}, useAxisFlange = true, phi(nominal=1e-4), w(start = 0, fixed = true, nominal = 1)) annotation(
+  Modelica.Mechanics.MultiBody.Joints.Revolute torsionalRevolute(
+    n = {1, 0, 0},
+    useAxisFlange = true,
+    phi(nominal = 1e-4),
+    w(start = 0, fixed = true, nominal = 1)) annotation(
     Placement(transformation(extent = {{-10, -10}, {10, 10}}, rotation = -180)));
   Modelica.Mechanics.Rotational.Components.Spring spring(c = torsionalStiff, phi_rel0 = 0) annotation(
     Placement(transformation(origin = {20, -30}, extent = {{10, -10}, {-10, 10}}, rotation = -0)));
-  Modelica.Mechanics.Rotational.Components.Damper damper(d = torsionalDamp)  annotation(
+  Modelica.Mechanics.Rotational.Components.Damper damper(d = torsionalDamp) annotation(
     Placement(transformation(origin = {20, -50}, extent = {{10, -10}, {-10, 10}}, rotation = -0)));
 
 equation

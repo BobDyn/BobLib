@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Drivelines.Internal;
 model Differential1D
+
   "1D limited-slip differential using BobLib differential equations"
   import SI = Modelica.Units.SI;
   import Modelica.Math.exp;
@@ -73,13 +74,15 @@ equation
   T_in = shaft_in.tau;
   T_open = T_in/2;
 
-  lockFraction =
+  lockFraction = 
+
     if noEvent(driveSideTorqueSign*T_in >= 0) then
       lockFractionAccel
     else
       lockFractionDecel;
 
-  T_lock_capacity_raw =
+  T_lock_capacity_raw = 
+
     if use_lsd then
       T_preload + 0.5*lockFraction*abs(T_in)
     else
@@ -89,7 +92,8 @@ equation
   clutchNormalForceEquivalent = T_lock_capacity/clutchEffectiveRadius;
   locked = use_lsd and noEvent(abs(dw) <= w_transition);
 
-  T_lock_friction_capacity =
+  T_lock_friction_capacity = 
+
     if use_lsd then
       T_lock_kinetic_capacity +
         (T_lock_capacity - T_lock_kinetic_capacity)*
@@ -97,13 +101,15 @@ equation
     else
       0;
 
-  T_lock_viscous =
+  T_lock_viscous = 
+
     if use_lsd then
       c_viscous*(-dw)
     else
       0;
 
-  T_lock =
+  T_lock = 
+
     if use_lsd then
       noEvent(max(
         min(T_lock_friction_capacity*tanh(-dw/w_transition) + T_lock_viscous, T_lock_capacity),

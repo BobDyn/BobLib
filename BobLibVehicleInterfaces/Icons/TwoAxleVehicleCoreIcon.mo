@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Icons;
 
 partial model TwoAxleVehicleCoreIcon "Reusable two-axle vehicle core icon"
+
   annotation(
     Icon(graphics = {
       Line(origin = {-25, 105}, points = {{-35, -15}, {25, 15}}),
@@ -58,8 +59,15 @@ partial model TwoAxleVehicleCoreIcon "Reusable two-axle vehicle core icon"
       Ellipse(origin = {60, 0}, fillColor = {255, 255, 255}, fillPattern = FillPattern.Solid, lineThickness = 1, extent = {{-10, 10}, {10, -10}}),
       Line(origin = {60, 0}, points = {{0, -10}, {0, 10}}),
       Line(origin = {60, 0}, points = {{-10, 0}, {10, 0}}),
-      Polygon(origin = {65, 5}, fillPattern = FillPattern.Solid, points = {{-5, -5}, {-5, 5}, {-3, 5}, {1, 3}, {3, 1}, {5, -3}, {5, -5}, {-5, -5}}),
-      Polygon(origin = {55, -5}, rotation = 180, fillPattern = FillPattern.Solid, points = {{-5, -5}, {-5, 5}, {-3, 5}, {1, 3}, {3, 1}, {5, -3}, {5, -5}, {-5, -5}}),
+      Polygon(
+        origin = {65, 5},
+        fillPattern = FillPattern.Solid,
+        points = {{-5, -5}, {-5, 5}, {-3, 5}, {1, 3}, {3, 1}, {5, -3}, {5, -5}, {-5, -5}}),
+      Polygon(
+        origin = {55, -5},
+        rotation = 180,
+        fillPattern = FillPattern.Solid,
+        points = {{-5, -5}, {-5, 5}, {-3, 5}, {1, 3}, {3, 1}, {5, -3}, {5, -5}, {-5, -5}}),
       Line(origin = {120, 0}, points = {{-60, 0}, {60, 0}})
     }, coordinateSystem(extent = {{-180, -200}, {180, 200}})),
     Documentation(info = "<html>

@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Icons;
 
 partial model StabarIcon "Reusable stabar icon"
+
   annotation(
     Icon(graphics = {
       Line(origin = {0, -10}, points = {{-80, 0}, {80, 0}}, thickness = 5),

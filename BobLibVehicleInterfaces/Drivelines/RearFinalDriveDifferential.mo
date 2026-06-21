@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Drivelines;
 
 model RearFinalDriveDifferential
+
   "Rear final-drive, differential, and halfshaft driveline"
   extends VehicleInterfaces.Icons.Driveline;
   extends VehicleInterfaces.Drivelines.Interfaces.TwoAxleBase(
@@ -16,7 +17,7 @@ model RearFinalDriveDifferential
     "Differential input/ring inertia";
   parameter SI.AngularVelocity initialOutputAngularVelocity = 0
     "Initial differential output and rear wheel angular speed";
-  parameter Boolean diff_lockedKinematics = false
+  parameter Boolean diff_lockedKinematics = true
     "Use structural spool kinematics instead of open differential kinematics";
   parameter Boolean diff_use_lsd = true
     "Enable differential limited-slip locking torque";
@@ -68,25 +69,25 @@ model RearFinalDriveDifferential
     kineticFrictionRatio = diff_kineticFrictionRatio,
     w_transition = diff_w_transition,
     c_viscous = diff_c_viscous) if not diff_lockedKinematics annotation(
-      Placement(transformation(origin = {10, 0}, extent = {{-10, -10}, {10, 10}})));
+      Placement(transformation(origin = {10, 0}, extent = {{10, -10}, {-10, 10}}, rotation = -180)));
 
   BobLibVehicleInterfaces.Drivelines.Internal.LockedDifferential1D lockedDifferential
     if diff_lockedKinematics annotation(
-      Placement(transformation(origin = {10, 0}, extent = {{-10, -10}, {10, 10}})));
+      Placement(transformation(origin = {10, 0}, extent = {{10, -10}, {-10, 10}}, rotation = -180)));
 
   Modelica.Mechanics.Rotational.Components.SpringDamper leftHalfshaft(
     c = halfshaftLeftC,
     d = halfshaftLeftD,
     phi_rel(start = 0),
     stateSelect = StateSelect.never) annotation(
-      Placement(transformation(origin = {34, 24}, extent = {{-8, -8}, {8, 8}})));
+      Placement(transformation(origin = {34, -28}, extent = {{-8, -8}, {8, 8}})));
 
   Modelica.Mechanics.Rotational.Components.SpringDamper rightHalfshaft(
     c = halfshaftRightC,
     d = halfshaftRightD,
     phi_rel(start = 0),
     stateSelect = StateSelect.never) annotation(
-      Placement(transformation(origin = {34, -24}, extent = {{-8, -8}, {8, 8}})));
+      Placement(transformation(origin = {34, 28}, extent = {{-8, -8}, {8, 8}})));
 
   output SI.AngularVelocity motorSideSpeed
     "Input shaft speed at the motor side of the final drive";
@@ -103,14 +104,18 @@ protected
   VehicleInterfaces.Interfaces.DrivelineBus drivelineBus annotation(
     Placement(transformation(extent = {{-90, 10}, {-70, 30}}), iconTransformation(extent = {{-90, 10}, {-70, 30}})));
 
-  Modelica.Blocks.Interfaces.RealOutput motorSideSpeedBusSignal
-    "Motor-side speed published to VehicleInterfaces driveline bus";
-  Modelica.Blocks.Interfaces.RealOutput diffInputSpeedBusSignal
-    "Differential input speed published to VehicleInterfaces driveline bus";
-  Modelica.Blocks.Interfaces.RealOutput leftHalfshaftTorqueBusSignal
-    "Left halfshaft torque published to VehicleInterfaces driveline bus";
-  Modelica.Blocks.Interfaces.RealOutput rightHalfshaftTorqueBusSignal
-    "Right halfshaft torque published to VehicleInterfaces driveline bus";
+  Modelica.Blocks.Sources.RealExpression motorSideSpeedBusSignal(
+    y = motorSideSpeed) "Motor-side speed published to VehicleInterfaces driveline bus" annotation(
+      Placement(transformation(origin = {-46, 44}, extent = {{-8, -4}, {8, 4}})));
+  Modelica.Blocks.Sources.RealExpression diffInputSpeedBusSignal(
+    y = diffInputSpeed) "Differential input speed published to VehicleInterfaces driveline bus" annotation(
+      Placement(transformation(origin = {-46, 34}, extent = {{-8, -4}, {8, 4}})));
+  Modelica.Blocks.Sources.RealExpression leftHalfshaftTorqueBusSignal(
+    y = leftHalfshaftTorque) "Left halfshaft torque published to VehicleInterfaces driveline bus" annotation(
+      Placement(transformation(origin = {-46, 24}, extent = {{-8, -4}, {8, 4}})));
+  Modelica.Blocks.Sources.RealExpression rightHalfshaftTorqueBusSignal(
+    y = rightHalfshaftTorque) "Right halfshaft torque published to VehicleInterfaces driveline bus" annotation(
+      Placement(transformation(origin = {-46, 14}, extent = {{-8, -4}, {8, 4}})));
 
 initial equation
   leftHalfshaft.phi_rel = 0;
@@ -118,6 +123,7 @@ initial equation
 
 equation
   motorSideSpeed = der(transmissionFlange.flange.phi);
+
   if diff_lockedKinematics then
     diffInputSpeed = lockedDifferential.w_in;
     diffLockTorque = lockedDifferential.T_lock;
@@ -128,26 +134,22 @@ equation
   leftHalfshaftTorque = leftHalfshaft.tau;
   rightHalfshaftTorque = rightHalfshaft.tau;
 
-  motorSideSpeedBusSignal = motorSideSpeed;
-  diffInputSpeedBusSignal = diffInputSpeed;
-  leftHalfshaftTorqueBusSignal = leftHalfshaftTorque;
-  rightHalfshaftTorqueBusSignal = rightHalfshaftTorque;
-
   connect(controlBus.drivelineBus, drivelineBus) annotation(
     Line(points = {{-100, 60}, {-80, 60}, {-80, 20}}, color = {255, 204, 51}, thickness = 0.5));
-  connect(motorSideSpeedBusSignal, drivelineBus.motorSideSpeed) annotation(
-    Line(points = {{0, 0}, {0, 44}, {-80, 44}, {-80, 20}}, color = {0, 0, 127}));
-  connect(diffInputSpeedBusSignal, drivelineBus.diffInputSpeed) annotation(
-    Line(points = {{0, 0}, {0, 38}, {-80, 38}, {-80, 20}}, color = {0, 0, 127}));
-  connect(leftHalfshaftTorqueBusSignal, drivelineBus.leftHalfshaftTorque) annotation(
-    Line(points = {{0, 0}, {0, 32}, {-80, 32}, {-80, 20}}, color = {0, 0, 127}));
-  connect(rightHalfshaftTorqueBusSignal, drivelineBus.rightHalfshaftTorque) annotation(
-    Line(points = {{0, 0}, {0, 26}, {-80, 26}, {-80, 20}}, color = {0, 0, 127}));
+  connect(motorSideSpeedBusSignal.y, drivelineBus.motorSideSpeed) annotation(
+    Line(points = {{-37.2, 44}, {-80, 44}, {-80, 20}}, color = {0, 0, 127}));
+  connect(diffInputSpeedBusSignal.y, drivelineBus.diffInputSpeed) annotation(
+    Line(points = {{-37.2, 34}, {-80, 34}, {-80, 20}}, color = {0, 0, 127}));
+  connect(leftHalfshaftTorqueBusSignal.y, drivelineBus.leftHalfshaftTorque) annotation(
+    Line(points = {{-37.2, 24}, {-80, 24}, {-80, 20}}, color = {0, 0, 127}));
+  connect(rightHalfshaftTorqueBusSignal.y, drivelineBus.rightHalfshaftTorque) annotation(
+    Line(points = {{-37.2, 14}, {-80, 14}, {-80, 20}}, color = {0, 0, 127}));
 
   connect(transmissionFlange.flange, finalDrive.flange_a) annotation(
     Line(points = {{-100, 0}, {-54, 0}}));
   connect(finalDrive.flange_b, diffInputRotor.flange_a) annotation(
     Line(points = {{-34, 0}, {-26, 0}}));
+
   if diff_lockedKinematics then
     connect(diffInputRotor.flange_b, lockedDifferential.shaft_in) annotation(
       Line(points = {{-10, 0}, {0, 0}}));
@@ -163,11 +165,11 @@ equation
     connect(differential.shaft_right, rightHalfshaft.flange_a) annotation(
       Line(points = {{20, -4}, {20, -14}, {26, -14}, {26, -24}}));
   end if;
-  connect(leftHalfshaft.flange_b, wheelHub_3.flange) annotation(
-    Line(points = {{42, 24}, {60, 24}, {60, -100}}));
-  connect(rightHalfshaft.flange_b, wheelHub_4.flange) annotation(
-    Line(points = {{42, -24}, {60, -24}, {60, 100}}));
 
+  connect(leftHalfshaft.flange_b, wheelHub_3.flange) annotation(
+    Line(points = {{42, -28}, {60, -28}, {60, -100}}));
+  connect(rightHalfshaft.flange_b, wheelHub_4.flange) annotation(
+    Line(points = {{42, 28}, {60, 28}, {60, 100}}));
   annotation(Documentation(info = "<html>
 <p>
 VehicleInterfaces rear driveline containing only the mechanical reduction,

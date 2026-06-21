@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Atmospheres;
 model ConstantAtmosphere
+
   "Constant atmosphere that publishes measurements on an atmosphere bus"
   extends VehicleInterfaces.Icons.Atmosphere;
   extends VehicleInterfaces.Atmospheres.Interfaces.Base(
@@ -23,68 +24,76 @@ model ConstantAtmosphere
 
   BobLibVehicleInterfaces.Atmospheres.Interfaces.AtmosphereBus atmosphereBus
     "Atmosphere signal bus" annotation(
-      Placement(transformation(origin = {-100, 60}, extent = {{-20, -20}, {20, 20}}, rotation = 90),
-        iconTransformation(origin = {-100, 60}, extent = {{-20, -20}, {20, 20}}, rotation = 90)));
+      Placement(transformation(origin = {-100, 40}, extent = {{-20, -20}, {20, 20}}, rotation = 90),
+        iconTransformation(origin = {-149.5, 100.5}, extent = {{-39.5, -39.5}, {39.5, 39.5}})));
 
 protected
   parameter SI.Density rho = ambientPressure/(R*T);
 
-  Modelica.Blocks.Interfaces.RealOutput windVelocityWorldBusSignal[3](
-    each quantity = "Velocity",
-    each unit = "m/s") "Wind velocity published to atmosphereBus";
-  Modelica.Blocks.Interfaces.RealOutput airDensityBusSignal(
-    quantity = "Density",
-    unit = "kg/m3") "Air density published to atmosphereBus";
-  Modelica.Blocks.Interfaces.RealOutput airTemperatureBusSignal(
-    quantity = "ThermodynamicTemperature",
-    unit = "K") "Air temperature published to atmosphereBus";
-  Modelica.Blocks.Interfaces.RealOutput relativeHumidityBusSignal(unit = "1")
-    "Relative humidity published to atmosphereBus";
-  Modelica.Blocks.Interfaces.RealOutput pressureBusSignal(
-    quantity = "Pressure",
-    unit = "Pa") "Ambient pressure published to atmosphereBus";
+  Modelica.Blocks.Sources.RealExpression windVelocityWorldBusSignal[3](
+    y = v) "Wind velocity published to atmosphereBus" annotation(
+      Placement(transformation(origin = {30, 40}, extent = {{10, -10}, {-10, 10}}, rotation = -0)));
+  Modelica.Blocks.Sources.RealExpression airDensityBusSignal(
+    y = rho) "Air density published to atmosphereBus" annotation(
+      Placement(transformation(origin = {30, 20}, extent = {{10, -10}, {-10, 10}}, rotation = -0)));
+  Modelica.Blocks.Sources.RealExpression airTemperatureBusSignal(
+    y = T) "Air temperature published to atmosphereBus" annotation(
+      Placement(transformation(origin = {30, 0}, extent = {{10, -10}, {-10, 10}}, rotation = -0)));
+  Modelica.Blocks.Sources.RealExpression relativeHumidityBusSignal(
+    y = h) "Relative humidity published to atmosphereBus" annotation(
+      Placement(transformation(origin = {30, -20}, extent = {{10, -10}, {-10, 10}}, rotation = -0)));
+  Modelica.Blocks.Sources.RealExpression pressureBusSignal(
+    y = ambientPressure) "Ambient pressure published to atmosphereBus" annotation(
+      Placement(transformation(origin = {30, -40}, extent = {{10, -10}, {-10, 10}}, rotation = -0)));
 
   function constantWindVelocity
+
     extends VehicleInterfaces.Atmospheres.Interfaces.windVelocityBase;
     input SI.Velocity windVelocity[3] = {0, 0, 0};
+
   algorithm
     v := windVelocity;
   end constantWindVelocity;
 
   function constantDensity
+
     extends VehicleInterfaces.Atmospheres.Interfaces.densityBase;
     input SI.Density density = 1.18;
+
   algorithm
     rho := density;
   end constantDensity;
 
   function constantTemperature
+
     extends VehicleInterfaces.Atmospheres.Interfaces.temperatureBase;
     input SI.Temperature T0 = 293;
+
   algorithm
     T := T0;
   end constantTemperature;
 
   function constantHumidity
+
     extends VehicleInterfaces.Atmospheres.Interfaces.humidityBase;
     input Real h0 = 0.5;
+
   algorithm
     h := h0;
   end constantHumidity;
 
 equation
-  windVelocityWorldBusSignal = v;
-  airDensityBusSignal = rho;
-  airTemperatureBusSignal = T;
-  relativeHumidityBusSignal = h;
-  pressureBusSignal = ambientPressure;
 
-  connect(windVelocityWorldBusSignal, atmosphereBus.windVelocityWorld);
-  connect(airDensityBusSignal, atmosphereBus.airDensity);
-  connect(airTemperatureBusSignal, atmosphereBus.airTemperature);
-  connect(relativeHumidityBusSignal, atmosphereBus.relativeHumidity);
-  connect(pressureBusSignal, atmosphereBus.pressure);
-
+  connect(windVelocityWorldBusSignal.y, atmosphereBus.windVelocityWorld) annotation(
+    Line(points = {{19, 40}, {-100, 40}}, color = {0, 0, 127}));
+  connect(airDensityBusSignal.y, atmosphereBus.airDensity) annotation(
+    Line(points = {{19, 20}, {-86, 20}, {-86, 40}, {-100, 40}}, color = {0, 0, 127}));
+  connect(airTemperatureBusSignal.y, atmosphereBus.airTemperature) annotation(
+    Line(points = {{19, 0}, {-86, 0}, {-86, 40}, {-100, 40}}, color = {0, 0, 127}));
+  connect(relativeHumidityBusSignal.y, atmosphereBus.relativeHumidity) annotation(
+    Line(points = {{19, -20}, {-86, -20}, {-86, 40}, {-100, 40}}, color = {0, 0, 127}));
+  connect(pressureBusSignal.y, atmosphereBus.pressure) annotation(
+    Line(points = {{19, -40}, {-86, -40}, {-86, 40}, {-100, 40}}, color = {0, 0, 127}));
   annotation(
     defaultComponentName = "atmosphere",
     defaultComponentPrefixes = "inner",

@@ -1,6 +1,7 @@
 within BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip;
 
 record MxPureRecord
+
   // Base overturning moment
   Real QSX1 "Base overturning moment coefficient";
 

@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Chassis.Suspension;
 
 partial model AxleDWBase
+
   extends BobLibVehicleInterfaces.Icons.AxleDWBaseIcon;
 
   import SI = Modelica.Units.SI;
@@ -47,12 +48,14 @@ partial model AxleDWBase
                                           tieMass(m = pLeftAxleMass.tieMass.m,
                                                   rCM = Vector.mirrorXZ(pLeftAxleMass.tieMass.rCM),
                                                   inertia = Tensor.mirrorXZ(pLeftAxleMass.tieMass.inertia)));
+
   // Visual parameters
   outer parameter SI.Length linkDiameter annotation(
     Dialog(tab = "Animation", group = "Sizing"));
   outer parameter SI.Length jointDiameter annotation(
     Dialog(tab = "Animation", group = "Sizing"));
   outer parameter Boolean headless;
+
   // Effective center for internal calculations
   final parameter SI.Position[3] effectiveCenter = {pLeftDW.wheelCenter[1], 0, pLeftDW.wheelCenter[3]};
   SI.Length leftSpringLength "Left spring/damper length";
@@ -70,6 +73,7 @@ partial model AxleDWBase
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b rightCP annotation(
     Placement(transformation(origin = {160, 0}, extent = {{16, -16}, {-16, 16}}, rotation = -90),
     iconTransformation(origin = {180, 0}, extent = {{-16, -16}, {16, 16}})));
+
   // Wheel torque inputs
   Modelica.Mechanics.Rotational.Interfaces.Flange_b leftTorque annotation(
     Placement(transformation(origin = {-180, 50}, extent = {{-10, -10}, {10, 10}}),
@@ -77,47 +81,89 @@ partial model AxleDWBase
   Modelica.Mechanics.Rotational.Interfaces.Flange_b rightTorque annotation(
     Placement(transformation(origin = {180, 50}, extent = {{-10, -10}, {10, 10}}),
     iconTransformation(origin = {180, 50}, extent = {{-10, -10}, {10, 10}})));
+
   // Tires
   replaceable BobLibVehicleInterfaces.Chassis.Suspension.Tires.BaseTire leftTire(pPartialWheel = pLeftPartialWheel) annotation(
     Placement(transformation(origin = {-160, 50}, extent = {{10, -10}, {-10, 10}})));
   replaceable BobLibVehicleInterfaces.Chassis.Suspension.Tires.BaseTire rightTire(pPartialWheel = pRightPartialWheel) annotation(
     Placement(transformation(origin = {160, 50}, extent = {{-10, -10}, {10, 10}})));
+
   // Double wishbones
-  BobLibVehicleInterfaces.Chassis.Suspension.Templates.DoubleWishbone.WishboneUprightLoop leftWishboneUprightLoop(pDW = pLeftDW, final linkDiameter = linkDiameter, final jointDiameter = jointDiameter) annotation(
+  BobLibVehicleInterfaces.Chassis.Suspension.Templates.DoubleWishbone.WishboneUprightLoop leftWishboneUprightLoop(
+    pDW = pLeftDW,
+    final linkDiameter = linkDiameter,
+    final jointDiameter = jointDiameter) annotation(
     Placement(transformation(origin = {-69, 50}, extent = {{29, -29}, {-29, 29}})));
-  BobLibVehicleInterfaces.Chassis.Suspension.Templates.DoubleWishbone.WishboneUprightLoop rightWishboneUprightLoop(pDW = pRightDW, final linkDiameter = linkDiameter, final jointDiameter = jointDiameter) annotation(
+  BobLibVehicleInterfaces.Chassis.Suspension.Templates.DoubleWishbone.WishboneUprightLoop rightWishboneUprightLoop(
+    pDW = pRightDW,
+    final linkDiameter = linkDiameter,
+    final jointDiameter = jointDiameter) annotation(
     Placement(transformation(origin = {69, 50}, extent = {{-29, -29}, {29, 29}})));
-  BobLibVehicleInterfaces.Chassis.Suspension.Linkages.Rod leftTieRod(r_a = pRack.leftPickup, r_b = pLeftDW.tie_o, show_universal_axes = false, kinematicConstraint = true, final linkDiameter = linkDiameter, final jointDiameter = jointDiameter) annotation(
+  BobLibVehicleInterfaces.Chassis.Suspension.Linkages.Rod leftTieRod(
+    r_a = pRack.leftPickup,
+    r_b = pLeftDW.tie_o,
+    show_universal_axes = false,
+    kinematicConstraint = true,
+    final linkDiameter = linkDiameter,
+    final jointDiameter = jointDiameter) annotation(
     Placement(transformation(origin = {-60, 100}, extent = {{20, -20}, {-20, 20}})));
-  BobLibVehicleInterfaces.Chassis.Suspension.Linkages.Rod rightTieRod(r_a = Vector.mirrorXZ(pRack.leftPickup), r_b = pRightDW.tie_o, show_universal_axes = false, kinematicConstraint = true, final linkDiameter = linkDiameter, final jointDiameter = jointDiameter) annotation(
+  BobLibVehicleInterfaces.Chassis.Suspension.Linkages.Rod rightTieRod(
+    r_a = Vector.mirrorXZ(pRack.leftPickup),
+    r_b = pRightDW.tie_o,
+    show_universal_axes = false,
+    kinematicConstraint = true,
+    final linkDiameter = linkDiameter,
+    final jointDiameter = jointDiameter) annotation(
     Placement(transformation(origin = {60, 100}, extent = {{-20, -20}, {20, 20}})));
 
-  BobLibVehicleInterfaces.Chassis.Suspension.Templates.SteeringRack.RackAndPinion rackAndPinion(pRack = pRack, final linkDiameter = linkDiameter) annotation(
+  BobLibVehicleInterfaces.Chassis.Suspension.Templates.SteeringRack.RackAndPinion rackAndPinion(
+    pRack = pRack,
+    final linkDiameter = linkDiameter) annotation(
     Placement(transformation(origin = {0, 110}, extent = {{-20, -20}, {20, 20}})));
 
 protected
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRack(r = {pRack.leftPickup[1], 0, pRack.leftPickup[3]} - effectiveCenter, animation = false) annotation(
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRack(
+    r = {pRack.leftPickup[1], 0, pRack.leftPickup[3]} - effectiveCenter,
+    animation = false) annotation(
     Placement(transformation(origin = {0, 90}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
 
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation leftTieConnection(r = pLeftDW.lower_o - pLeftDW.tie_o, animation = false) annotation(
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation leftTieConnection(
+    r = pLeftDW.lower_o - pLeftDW.tie_o,
+    animation = false) annotation(
     Placement(transformation(origin = {-100, 70}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation rightTieConnection(r = pRightDW.lower_o - pRightDW.tie_o, animation = false) annotation(
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation rightTieConnection(
+    r = pRightDW.lower_o - pRightDW.tie_o,
+    animation = false) annotation(
     Placement(transformation(origin = {100, 70}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
 
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toLeftWheelCenter(r = pLeftDW.wheelCenter - pLeftDW.lower_o, animation = false) annotation(
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toLeftWheelCenter(
+    r = pLeftDW.wheelCenter - pLeftDW.lower_o,
+    animation = false) annotation(
     Placement(transformation(origin = {-120, 30}, extent = {{10, -10}, {-10, 10}})));
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRightWheelCenter(r = pRightDW.wheelCenter - pRightDW.lower_o, animation = false) annotation(
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRightWheelCenter(
+    r = pRightDW.wheelCenter - pRightDW.lower_o,
+    animation = false) annotation(
     Placement(transformation(origin = {120, 30}, extent = {{-10, -10}, {10, 10}})));
+
   // Fixed geometry from effective center to nodes
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toLeftUpper_i(r = (pLeftDW.upperFore_i + pLeftDW.upperAft_i)/2 - effectiveCenter, animation = false) annotation(
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toLeftUpper_i(
+    r = (pLeftDW.upperFore_i + pLeftDW.upperAft_i)/2 - effectiveCenter,
+    animation = false) annotation(
     Placement(transformation(origin = {-20, 70}, extent = {{10, -10}, {-10, 10}})));
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toLeftLower_i(r = (pLeftDW.lowerFore_i + pLeftDW.lowerAft_i)/2 - effectiveCenter, animation = false) annotation(
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toLeftLower_i(
+    r = (pLeftDW.lowerFore_i + pLeftDW.lowerAft_i)/2 - effectiveCenter,
+    animation = false) annotation(
     Placement(transformation(origin = {-20, 30}, extent = {{10, -10}, {-10, 10}})));
 
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRightUpper_i(r = (pRightDW.upperFore_i + pRightDW.upperAft_i)/2 - effectiveCenter, animation = false) annotation(
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRightUpper_i(
+    r = (pRightDW.upperFore_i + pRightDW.upperAft_i)/2 - effectiveCenter,
+    animation = false) annotation(
     Placement(transformation(origin = {20, 70}, extent = {{-10, -10}, {10, 10}})));
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRightLower_i(r = (pRightDW.lowerFore_i + pRightDW.lowerAft_i)/2 - effectiveCenter, animation = false) annotation(
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRightLower_i(
+    r = (pRightDW.lowerFore_i + pRightDW.lowerAft_i)/2 - effectiveCenter,
+    animation = false) annotation(
     Placement(transformation(origin = {20, 30}, extent = {{-10, -10}, {10, 10}})));
+
   // Left-half bodies
   Modelica.Mechanics.MultiBody.Parts.Body leftUCABody(m = pLeftAxleMass.ucaMass.m,
                                                       r_CM = pLeftAxleMass.ucaMass.rCM - pLeftDW.upper_o,
@@ -155,6 +201,7 @@ protected
                                                            cylinderDiameter = linkDiameter,
                                                            useQuaternions = false) annotation(
     Placement(transformation(origin = {-170, 80}, extent = {{10, -10}, {-10, 10}})));
+
   // Right-half bodies
   Modelica.Mechanics.MultiBody.Parts.Body rightUCABody(m = pRightAxleMass.ucaMass.m,
                                                        r_CM = pRightAxleMass.ucaMass.rCM - pRightDW.upper_o,

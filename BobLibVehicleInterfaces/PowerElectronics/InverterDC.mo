@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.PowerElectronics;
 
 model InverterDC
+
   "Vehicle-level power-electronics subsystem backed by the internal DC inverter core"
   extends BobLibVehicleInterfaces.Icons.InverterDCIcon;
 
@@ -8,21 +9,28 @@ model InverterDC
 
   Modelica.Electrical.Analog.Interfaces.PositivePin p
     "DC bus positive" annotation(
-      Placement(transformation(origin = {-100, 0}, extent = {{-10, -10}, {10, 10}})));
+      Placement(transformation(origin = {-100, 70}, extent = {{-10, -10}, {10, 10}}),
+        iconTransformation(origin = {-100, 62}, extent = {{-10, -10}, {10, 10}})));
 
   Modelica.Electrical.Analog.Interfaces.NegativePin n
     "DC bus negative" annotation(
-      Placement(transformation(origin = {100, 0}, extent = {{-10, -10}, {10, 10}})));
+      Placement(transformation(origin = {-100, -70}, extent = {{-10, -10}, {10, 10}}),
+        iconTransformation(origin = {-100, -60}, extent = {{-10, -10}, {10, 10}})));
 
-  Modelica.Blocks.Interfaces.RealOutput P_out(start = 0)
-    "Electrical power delivered to motor side [W] (+motoring, -regen)" annotation(
-      Placement(transformation(origin = {0, -120}, extent = {{-20, -20}, {20, 20}}, rotation = -90),
-        iconTransformation(origin = {0, -110}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
+  Modelica.Electrical.Analog.Interfaces.PositivePin motor_p
+    "Motor-side positive pin" annotation(
+      Placement(transformation(origin = {100, 70}, extent = {{-10, -10}, {10, 10}}),
+        iconTransformation(origin = {100, 60}, extent = {{-10, -10}, {10, 10}})));
+
+  Modelica.Electrical.Analog.Interfaces.NegativePin motor_n
+    "Motor-side negative pin" annotation(
+      Placement(transformation(origin = {100, -70}, extent = {{-10, -10}, {10, 10}}),
+        iconTransformation(origin = {100, -60}, extent = {{-10, -10}, {10, 10}})));
 
   VehicleInterfaces.Interfaces.ControlBus controlBus
     "VehicleInterfaces control bus carrying electric-drive controller commands" annotation(
-      Placement(transformation(origin = {-100, 60}, extent = {{-20, -20}, {20, 20}}, rotation = 90),
-        iconTransformation(origin = {-100, 60}, extent = {{-20, -20}, {20, 20}}, rotation = 90)));
+      Placement(transformation(origin = {0, 100}, extent = {{-20, -20}, {20, 20}}),
+        iconTransformation(origin = {-60, 100}, extent = {{-20, -20}, {20, 20}})));
 
   parameter Real eta_mot = 0.97 "Inverter efficiency (motoring)";
   parameter Real eta_reg = 0.95 "Inverter efficiency (regen)";
@@ -67,8 +75,13 @@ model InverterDC
   SI.Current I_dc(start = 0) "DC current drawn from battery (+discharge)";
   SI.Power P_dc(start = 0) "DC electrical power from battery";
   SI.Power P_loss(start = 0) "Inverter losses";
+  output SI.Power P_out(start = 0)
+    "Electrical power delivered to motor side [W] (+motoring, -regen)";
   output SI.Power P_req(start = 0)
     "Power request received from electricMotorControlBus";
+  output SI.Voltage V_motor(start = 500) "Motor-side DC voltage";
+  output SI.Current I_motor(start = 0)
+    "Motor-side current delivered to the motor positive pin";
   SI.Power P_req_limited(start = 0)
     "Power request after bus, current, and nameplate limits";
   SI.Power P_mot_max_active(start = 0) "Active motoring power limit";
@@ -82,7 +95,13 @@ protected
   Modelica.Blocks.Interfaces.RealInput powerRequestBusTap(
     quantity = "Power",
     unit = "W")
-    "Power request tap from electricMotorControlBus";
+    "Power request tap from electricMotorControlBus" annotation(
+      Placement(
+        transformation(origin = {0, 80}, extent = {{-6, -6}, {6, 6}}, rotation = -90),
+        iconTransformation(origin = {-40, 28}, extent = {{-6, -6}, {6, 6}})));
+
+  SI.Voltage V_motor_eff
+    "Regularized motor-side voltage used for power-source current";
 
   BobLibVehicleInterfaces.PowerElectronics.Internal.InverterDCCore inverter(
     eta_mot = eta_mot,
@@ -112,23 +131,33 @@ equation
   I_dc = inverter.I_dc;
   P_dc = inverter.P_dc;
   P_loss = inverter.P_loss;
+  P_out = inverter.P_out;
   P_req_limited = inverter.P_req_limited;
   P_mot_max_active = inverter.P_mot_max_active;
   P_reg_max_active = inverter.P_reg_max_active;
   eta_eff = inverter.eta_eff;
   powerFraction = inverter.powerFraction;
+  V_motor = motor_p.v - motor_n.v;
+  V_motor = V_dc;
+  motor_n.v = n.v;
+  V_motor_eff = 
+
+    if noEvent(V_motor >= 0) then
+      noEvent(max(V_motor, V_eps))
+    else
+      noEvent(min(V_motor, -V_eps));
+  I_motor = -motor_p.i;
+  motor_p.i = -P_out/V_motor_eff;
 
   connect(p, inverter.p) annotation(
-    Line(points = {{-100, 0}, {-20, 0}}, color = {0, 0, 255}));
+    Line(points = {{-100, 70}, {-60, 70}, {-60, 0}, {-20, 0}}, color = {0, 0, 255}));
   connect(inverter.n, n) annotation(
-    Line(points = {{20, 0}, {100, 0}}, color = {0, 0, 255}));
-  connect(controlBus.electricMotorControlBus.powerRequest, powerRequestBusTap) annotation(
-    Line(points = {{-100, 60}, {-44, 60}, {-44, 22}, {0, 22}}, color = {0, 0, 127}));
-  connect(powerRequestBusTap, inverter.P_req) annotation(
-    Line(points = {{0, 22}, {0, 20}}, color = {0, 0, 127}));
-  connect(inverter.P_out, P_out) annotation(
-    Line(points = {{0, -20}, {0, -120}}, color = {0, 0, 127}));
+    Line(points = {{20, 0}, {40, 0}, {40, -70}, {-100, -70}}, color = {0, 0, 255}));
 
+  connect(controlBus.electricMotorControlBus.powerRequest, powerRequestBusTap) annotation(
+    Line(points = {{0, 100}, {0, 80}}, color = {0, 0, 127}));
+  connect(powerRequestBusTap, inverter.P_req) annotation(
+    Line(points = {{0, 80}, {0, 24}}, color = {0, 0, 127}));
   annotation(Documentation(info = "<html>
 <p>
 Vehicle-level power-electronics adapter for the BobLib DC inverter model.
@@ -136,7 +165,10 @@ The public model owns the subsystem boundary used by vehicle experiments;
 the conversion equations and electrical current source live in
 <code>Internal.InverterDCCore</code>. The inverter subscribes to
 <code>controlBus.electricMotorControlBus.powerRequest</code> instead of
-receiving a direct controller pin.
+receiving a direct controller pin, and delivers the resulting motor-side power
+through electrical pins instead of a public raw signal output.
 </p>
-</html>"));
+</html>"),
+  Icon,
+  Diagram(coordinateSystem(preserveAspectRatio = false)));
 end InverterDC;

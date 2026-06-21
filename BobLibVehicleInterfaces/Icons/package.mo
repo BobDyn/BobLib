@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces;
 package Icons
+
   "Reusable icon definitions"
   extends Modelica.Icons.IconsPackage;
 

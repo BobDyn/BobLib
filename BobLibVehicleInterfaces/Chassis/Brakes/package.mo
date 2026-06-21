@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Chassis;
 package Brakes
+
   "Simple brake models owned by the chassis domain"
   extends Modelica.Icons.Package;
 

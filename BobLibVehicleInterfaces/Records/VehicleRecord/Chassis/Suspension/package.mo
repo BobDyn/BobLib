@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Records.VehicleRecord.Chassis;
 package Suspension
+
   extends BobLibVehicleInterfaces.Icons.RecordsPackageIcon;
 
   annotation(

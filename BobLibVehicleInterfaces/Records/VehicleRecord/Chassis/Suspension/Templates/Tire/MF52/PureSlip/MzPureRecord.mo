@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip;
 
 record MzPureRecord
+
   // Pneumatic trail (t)
   Real QBZ1 "Slope factor for pneumatic trail (Bpt at Fznom)";
   Real QBZ2 "Variation of trail slope with load";

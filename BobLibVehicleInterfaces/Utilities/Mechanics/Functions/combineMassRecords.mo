@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Utilities.Mechanics.Functions;
 
 function combineMassRecords
+
   import SI = Modelica.Units.SI;
   import BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates.MassRecord;
 
@@ -14,6 +15,7 @@ protected
   SI.Inertia translatedInertia[3, 3];
   SI.Inertia totalInertia[3, 3];
   Integer count = size(masses, 1);
+
 algorithm
   totalMass := 0;
   weightedCM := {0, 0, 0};

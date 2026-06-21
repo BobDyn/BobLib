@@ -1,6 +1,7 @@
 within BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.CombinedSlip;
 
 function FxCombinedEval
+
   // Modelica units
   import SI = Modelica.Units.SI;
 
@@ -36,6 +37,7 @@ protected
 
 algorithm
   if Fz > 1e-3 then
+
     // Pure slip
     Fx_pure := FxPureEval(Fz, kappa, gamma, pPure, setup);
 

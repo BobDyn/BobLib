@@ -1,6 +1,7 @@
 within BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.PureSlip;
 
 function MyPureEval
+
   import SI = Modelica.Units.SI;
 
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.MyPureRecord;
@@ -34,16 +35,19 @@ algorithm
       dfz := (Fz - setup.FNOMIN * pFx.LFZO) / (setup.FNOMIN * pFx.LFZO);
 
       K_x := Fz * (pFx.PKX1 + pFx.PKX2 * dfz)
+
              * exp(pFx.PKX3 * dfz)
              * pFx.LKX;
 
       S_Hx := (pFx.PHX1 + pFx.PHX2 * dfz) * pFx.LHX;
 
       S_Vx := Fz * (pFx.PVX1 + pFx.PVX2 * dfz)
+
               * pFx.LVX * pFx.LMUX;
 
       My := setup.UNLOADED_RADIUS * (S_Vx + K_x * S_Hx);
     else
+
       // Normalized velocity
       Vx_n := Vx / max(abs(p.Vref), eps);
 
@@ -55,6 +59,7 @@ algorithm
           + p.QSY3 * abs(Vx_n)
           + p.QSY4 * Vx_n^4
         )
+
         * p.LMY;
     end if;
 

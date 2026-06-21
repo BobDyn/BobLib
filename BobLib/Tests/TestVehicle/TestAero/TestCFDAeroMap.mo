@@ -1,6 +1,7 @@
 within BobLib.Tests.TestVehicle.TestAero;
 
 model TestCFDAeroMap
+
   import BobLib.Resources.VehicleRecord.Aero.CFDAeroMapRecord;
 
   parameter CFDAeroMapRecord pAero(

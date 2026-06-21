@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces;
 package Transmissions
+
   "Transmission models extending VehicleInterfaces transmission contracts"
   extends Modelica.Icons.Package;
 

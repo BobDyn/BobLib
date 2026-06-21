@@ -1,6 +1,7 @@
 within BobLib.Resources.VehicleRecord.Aero;
 
 record CFDAeroMapRecord
+
   import SI = Modelica.Units.SI;
 
   parameter SI.Velocity referenceSpeed

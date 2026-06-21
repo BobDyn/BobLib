@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Records.VehicleRecord;
 package EnergyStorage
+
   extends BobLibVehicleInterfaces.Icons.RecordsPackageIcon;
 
   annotation(

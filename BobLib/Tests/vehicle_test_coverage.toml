@@ -439,12 +439,6 @@ tests = ["BobLib.Tests.TestVehicle.TestPowertrain.TestPowertrainBatInvMotDiff"]
 reason = "Dedicated assembly fixture drives the battery, motor, final drive, differential, MBD mount, and halfshaft outputs from an external ELC assembly."
 
 [[model_tests]]
-model = "BobLib.Vehicle.Powertrain.PTNPlaceholder"
-status = "direct"
-tests = ["BobLib.Tests.TestVehicle.TestPowertrain.TestPTNPlaceholder"]
-reason = "Retained compatibility shim is covered by a dedicated mount-frame and split-torque fixture now that generated vehicles use PowertrainBatInvMotDiff."
-
-[[model_tests]]
 model = "BobLib.Vehicle.VehicleBase"
 status = "partial"
 tests = ["BobLib.Tests.Regression.VehicleSimAnimationOn"]

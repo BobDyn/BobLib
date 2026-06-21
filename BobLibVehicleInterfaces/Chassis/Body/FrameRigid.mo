@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Chassis.Body;
 
 model FrameRigid
+
   extends BobLibVehicleInterfaces.Chassis.Body.FrameBase;
 
 equation

@@ -1,6 +1,7 @@
 within BobLib.Vehicle;
 
 partial model VehicleBase
+
   extends BobLib.Resources.Icons.TwoAxleVehicleCoreIcon;
 
   import SI = Modelica.Units.SI;
@@ -20,7 +21,7 @@ partial model VehicleBase
   parameter MassRecord pSprungMass;
   parameter AxleMassRecord pFrAxleMass;
   parameter AxleMassRecord pRrAxleMass;
-  final parameter SI.Mass pTotalMass =
+  final parameter SI.Mass pTotalMass = 
     pSprungMass.m +
     pFrAxleMass.unsprungMass.m + pFrAxleMass.ucaMass.m + pFrAxleMass.lcaMass.m + pFrAxleMass.tieMass.m +
     pRrAxleMass.unsprungMass.m + pRrAxleMass.ucaMass.m + pRrAxleMass.lcaMass.m + pRrAxleMass.tieMass.m;
@@ -59,7 +60,7 @@ partial model VehicleBase
       pRrAxleMass.tieMass.m * pRrAxleMass.tieMass.rCM[3]
     ) / pTotalMass
   };
-  final parameter SI.Inertia pVehicleInertia[3, 3] =
+  final parameter SI.Inertia pVehicleInertia[3, 3] = 
     BobLib.Utilities.Mechanics.translateInertia(
       pSprungMass.inertia,
       pSprungMass.m,
@@ -101,39 +102,67 @@ partial model VehicleBase
     Placement(transformation(origin = {-0.2, -0.333347}, extent = {{-58.8, -65.3333}, {58.8, 65.3333}})));
 
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b frameFL annotation(
-    Placement(transformation(origin = {-100, 40}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-180, 70}, extent = {{-16, -16}, {16, 16}})));
+    Placement(
+      transformation(origin = {-100, 40}, extent = {{-16, -16}, {16, 16}}),
+      iconTransformation(origin = {-180, 70}, extent = {{-16, -16}, {16, 16}})));
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b frameFR annotation(
-    Placement(transformation(origin = {100, 40}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {180, 70}, extent = {{-16, -16}, {16, 16}})));
+    Placement(
+      transformation(origin = {100, 40}, extent = {{-16, -16}, {16, 16}}),
+      iconTransformation(origin = {180, 70}, extent = {{-16, -16}, {16, 16}})));
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b frameRL annotation(
-    Placement(transformation(origin = {-100, -70}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {-180, -170}, extent = {{-16, -16}, {16, 16}})));
+    Placement(
+      transformation(origin = {-100, -70}, extent = {{-16, -16}, {16, 16}}),
+      iconTransformation(origin = {-180, -170}, extent = {{-16, -16}, {16, 16}})));
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b frameRR annotation(
-    Placement(transformation(origin = {100, -70}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {180, -170}, extent = {{-16, -16}, {16, 16}})));
+    Placement(
+      transformation(origin = {100, -70}, extent = {{-16, -16}, {16, 16}}),
+      iconTransformation(origin = {180, -170}, extent = {{-16, -16}, {16, 16}})));
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b cgFrame annotation(
-    Placement(transformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}}), iconTransformation(origin = {180, 0}, extent = {{-16, -16}, {16, 16}})));
+    Placement(
+      transformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}}),
+      iconTransformation(origin = {180, 0}, extent = {{-16, -16}, {16, 16}})));
   Modelica.Mechanics.Rotational.Interfaces.Flange_a steerFlange annotation(
-    Placement(transformation(origin = {0, 100}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {0, 166}, extent = {{-10, -10}, {10, 10}})));
+    Placement(
+      transformation(origin = {0, 100}, extent = {{-10, -10}, {10, 10}}),
+      iconTransformation(origin = {0, 166}, extent = {{-10, -10}, {10, 10}})));
 
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toAeroFrame(r = pAero.aeroRef - pVehicleCG, animation = false) annotation(
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toAeroFrame(
+    r = pAero.aeroRef - pVehicleCG,
+    animation = false) annotation(
     Placement(transformation(origin = {-30, 0}, extent = {{10, -10}, {-10, 10}})));
-  Modelica.Mechanics.MultiBody.Forces.WorldForceAndTorque aeroLoads(resolveInFrame = Modelica.Mechanics.MultiBody.Types.ResolveInFrameB.frame_b, animation = enableAnimation)  annotation(
+  Modelica.Mechanics.MultiBody.Forces.WorldForceAndTorque aeroLoads(
+    resolveInFrame = Modelica.Mechanics.MultiBody.Types.ResolveInFrameB.frame_b,
+    animation = enableAnimation) annotation(
     Placement(transformation(origin = {-70, 0}, extent = {{-10, -10}, {10, 10}})));
   BobLib.Vehicle.Aero.CFDAeroMap aeroModel(pAero = pAero) annotation(
     Placement(transformation(origin = {-90, 90}, extent = {{-10, -10}, {10, 10}}, rotation = -0)));
 
   // Ride height references
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toFL_RH(r = pAero.FL_RideHeightRef - chassis.frAxleDW.effectiveCenter, animation = false) annotation(
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toFL_RH(
+    r = pAero.FL_RideHeightRef - chassis.frAxleDW.effectiveCenter,
+    animation = false) annotation(
     Placement(transformation(origin = {-40, 70}, extent = {{10, -10}, {-10, 10}})));
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toFR_RH(r = mirrorXZ(pAero.FL_RideHeightRef - chassis.frAxleDW.effectiveCenter), animation = false) annotation(
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toFR_RH(
+    r = mirrorXZ(pAero.FL_RideHeightRef - chassis.frAxleDW.effectiveCenter),
+    animation = false) annotation(
     Placement(transformation(origin = {40, 70}, extent = {{-10, -10}, {10, 10}}, rotation = -0)));
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRL_RH(r = pAero.RL_RideHeightRef - chassis.rrAxleDW.effectiveCenter, animation = false) annotation(
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRL_RH(
+    r = pAero.RL_RideHeightRef - chassis.rrAxleDW.effectiveCenter,
+    animation = false) annotation(
     Placement(transformation(origin = {-40, -70}, extent = {{10, -10}, {-10, 10}})));
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRR_RH(r = mirrorXZ(pAero.RL_RideHeightRef - chassis.rrAxleDW.effectiveCenter), animation = false) annotation(
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRR_RH(
+    r = mirrorXZ(pAero.RL_RideHeightRef - chassis.rrAxleDW.effectiveCenter),
+    animation = false) annotation(
     Placement(transformation(origin = {40, -70}, extent = {{-10, -10}, {10, 10}}, rotation = -0)));
 
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b frAxleFrame annotation(
-    Placement(transformation(origin = {20, 100}, extent = {{16, -16}, {-16, 16}}, rotation = 90), iconTransformation(origin = {0, 120}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
+    Placement(
+      transformation(origin = {20, 100}, extent = {{16, -16}, {-16, 16}}, rotation = 90),
+      iconTransformation(origin = {0, 120}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b rrAxleFrame annotation(
-    Placement(transformation(origin = {20, -100}, extent = {{16, -16}, {-16, 16}}, rotation = 90), iconTransformation(origin = {0, -120}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
+    Placement(
+      transformation(origin = {20, -100}, extent = {{16, -16}, {-16, 16}}, rotation = 90),
+      iconTransformation(origin = {0, -120}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
 
 equation
   aeroModel.rideHeight_1 = toFL_RH.frame_b.r_0[3];
@@ -183,7 +212,11 @@ annotation(Diagram(graphics),
       Line(origin = {0, 133}, points = {{0, -33}, {0, 33}}, thickness = 5)
     }),
     Icon(graphics = {
-      Line(origin = {1.03, 0}, points = {{-1.02758, -20}, {-1.02758, -6}, {-5.02758, -4}, {2.97242, 0}, {-5.02758, 4}, {2.97242, 8}, {-1.02758, 10}, {-1.02758, 20}}, color = {0, 170, 0}, thickness = 2),
+      Line(
+        origin = {1.03, 0},
+        points = {{-1.02758, -20}, {-1.02758, -6}, {-5.02758, -4}, {2.97242, 0}, {-5.02758, 4}, {2.97242, 8}, {-1.02758, 10}, {-1.02758, 20}},
+        color = {0, 170, 0},
+        thickness = 2),
       Text(rotation = 90, textColor = {255, 0, 0}, extent = {{-14, 14}, {14, -14}}, textString = "rxDOF")
     }));
 end VehicleBase;

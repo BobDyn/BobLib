@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Transmissions.Internal;
 model FixedRatioGear
+
   "Reusable fixed-ratio rotational gear core"
   parameter Real gearRatio = 3.31
     "Input speed divided by output speed";

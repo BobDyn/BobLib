@@ -1,13 +1,18 @@
 within BobLibVehicleInterfaces.Chassis.Suspension.Tires.TirePhysics;
 
 model Wheel1DOF_Z
+
   import BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.Wheel1DOF_ZRecord;
+
   // Record parameters
   parameter Wheel1DOF_ZRecord wheel1DOF_ZParams;
 
   extends BobLibVehicleInterfaces.Chassis.Suspension.Tires.TirePhysics.Templates.PartialWheel(inertia(J = 0.01));
 
-  Modelica.Mechanics.Translational.Components.SpringDamper springDamper(c = wheel1DOF_ZParams.wheelC, d = wheel1DOF_ZParams.wheelD, s_rel0 = partialWheelParams.R0)  annotation(
+  Modelica.Mechanics.Translational.Components.SpringDamper springDamper(
+    c = wheel1DOF_ZParams.wheelC,
+    d = wheel1DOF_ZParams.wheelD,
+    s_rel0 = partialWheelParams.R0) annotation(
     Placement(transformation(origin = {-30, -46}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
 
 equation

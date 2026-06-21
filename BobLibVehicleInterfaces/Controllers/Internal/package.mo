@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Controllers;
 
 package Internal
+
   extends BobLibVehicleInterfaces.Icons.BobLibInternalPackageBackground;
   annotation(
     Documentation(info = "<html>

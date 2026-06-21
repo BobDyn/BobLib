@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Atmospheres.Interfaces;
 expandable connector AtmosphereBus
+
   "BobLib atmosphere signal bus"
   extends Modelica.Icons.SignalSubBus;
 

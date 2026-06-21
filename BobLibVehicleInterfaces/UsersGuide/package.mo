@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces;
 package UsersGuide
+
   "User guide for BobLibVehicleInterfaces"
   extends Modelica.Icons.Information;
 
@@ -74,9 +75,10 @@ weather, altitude, or noise models can vary them without changing subscribers.
 </p>
 <p>
 Reusable redeclare stacks for standard experiments live in
-<code>Experiments.Standards.Templates</code>. Full-vehicle EV
-battery-inverter-motor-differential simulations live under
-<code>Templates.Vehicle</code>; four-post suspension fixture simulations live
+<code>Experiments.Standards.Templates</code>. FMU/export-oriented driver-input
+vehicles live under <code>Templates.FMI</code>, full-vehicle EV
+battery-inverter-motor-differential maneuver simulations live under
+<code>Templates.Vehicle</code>, and four-post suspension fixture simulations live
 under <code>Templates.FourPost</code> and remain PTN-agnostic at the model-name
 level.
 </p>
@@ -91,8 +93,8 @@ relative airspeed. The inverter subscribes to
 receiving a direct VCU connector.
 </p>
 <p>
-Simulation templates use <code>headless=false</code> by default so examples open
-with MultiBody animation geometry visible. Set <code>headless=true</code> for
+Simulation templates use <code>headless = false</code> by default so examples open
+with MultiBody animation geometry visible. Set <code>headless = true</code> for
 batch runs where visualization geometry is not needed.
 </p>
 <h4>Validation expectation</h4>

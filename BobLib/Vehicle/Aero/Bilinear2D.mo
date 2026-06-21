@@ -7,6 +7,7 @@ pure function Bilinear2D "Clamped bilinear interpolation on a regular grid"
   input Real yGrid[:] "Monotonic second-axis breakpoints";
   input Real table[size(xGrid, 1), size(yGrid, 1)] "Data table";
   output Real z "Interpolated value";
+
 protected
   Integer ix;
   Integer iy;
@@ -16,6 +17,7 @@ protected
   Real yHi;
   Real xFrac;
   Real yFrac;
+
 algorithm
   ix := 1;
   while ix < size(xGrid, 1) - 1 and x > xGrid[ix + 1] loop

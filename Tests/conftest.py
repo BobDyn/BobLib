@@ -31,3 +31,17 @@ def pytest_addoption(parser) -> None:
         type=int,
         help="Per-model OpenModelica initialization timeout in seconds.",
     )
+    group.addoption(
+        "--boblib-runtime-scale",
+        action="store",
+        default=os.environ.get("BOBLIB_RUNTIME_SCALE", "4.0"),
+        type=float,
+        help="Multiplier applied to runtime baseline budgets before failing.",
+    )
+    group.addoption(
+        "--boblib-runtime-strict",
+        action="store_true",
+        default=os.environ.get("BOBLIB_RUNTIME_STRICT", "").lower()
+        in {"1", "true", "yes", "on"},
+        help="Fail when runtime exceeds the unscaled baseline budget.",
+    )

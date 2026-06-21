@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Chassis.Suspension.Tires;
 package MF52
+
   extends BobLibVehicleInterfaces.Icons.BobLibPackageBackground;
 
   annotation(

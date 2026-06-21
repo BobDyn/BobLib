@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Utilities.Mechanics.MultiBody;
 package ContactMechanics
+
   "MultiBody contact helpers for chassis-level contact-patch wiring"
   extends BobLibVehicleInterfaces.Icons.BobLibPackageBackground;
 

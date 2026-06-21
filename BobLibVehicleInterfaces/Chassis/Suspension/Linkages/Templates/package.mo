@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Chassis.Suspension.Linkages;
 package Templates
+
   extends BobLibVehicleInterfaces.Icons.BobLibPackageBackground;
 
   annotation(

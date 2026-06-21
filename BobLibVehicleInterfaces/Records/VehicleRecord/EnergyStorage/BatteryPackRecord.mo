@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Records.VehicleRecord.EnergyStorage;
 
 record BatteryPackRecord
+
   parameter Integer Ns(min = 1) = 140 "Battery cells in series";
   parameter Integer Np(min = 1) = 4 "Battery cells in parallel";
   parameter Real SOC_start(unit = "1", min = 0, max = 1) = 1

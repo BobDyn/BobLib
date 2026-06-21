@@ -1,6 +1,7 @@
 within BobLib.Standards.Templates;
 
 model FourPostRrAxleDW_Direct
+
   import SI = Modelica.Units.SI;
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Stabar.StabarRecord;
 

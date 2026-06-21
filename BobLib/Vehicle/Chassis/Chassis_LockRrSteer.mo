@@ -1,7 +1,7 @@
 within BobLib.Vehicle.Chassis;
 
 model Chassis_LockRrSteer "Chassis with locked rear steering"
-  
+
   extends BobLib.Vehicle.Chassis.ChassisBase;
 
 protected

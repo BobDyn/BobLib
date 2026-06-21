@@ -1,6 +1,7 @@
 within BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52.PureSlip;
 
 function MzPureEval
+
   import SI = Modelica.Units.SI;
 
   import BobLib.Resources.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.MzPureRecord;
@@ -67,6 +68,7 @@ algorithm
     C_y := pFy.PCY1 * pFy.LCY;
 
     mu_y := (pFy.PDY1 + pFy.PDY2 * dfz)
+
             * (1 - pFy.PDY3 * IA_y^2)
             * pFy.LMUY;
 
@@ -87,6 +89,7 @@ algorithm
     // Fx stiffness
     // ------------------------------------------------------------
     K_x := Fz * (pFx.PKX1 + pFx.PKX2 * dfz)
+
            * exp(pFx.PKX3 * dfz)
            * pFx.LKX;
 
@@ -96,6 +99,7 @@ algorithm
     IA_z := gamma;
 
     D_t := Fz * (p.QDZ1 + p.QDZ2 * dfz)
+
            * (1 + p.QDZ3 * IA_z * p.LGAZ + p.QDZ4 * (IA_z * p.LGAZ)^2)
            * (setup.UNLOADED_RADIUS / setup.FNOMIN)
            * p.LTR;
@@ -103,6 +107,7 @@ algorithm
     C_t := p.QCZ1;
 
     B_t := (p.QBZ1 + p.QBZ2 * dfz + p.QBZ3 * dfz^2)
+
            * (1 + p.QBZ4 * IA_z * p.LGAZ + p.QBZ5 * abs(IA_z * p.LGAZ))
            * p.LKY / p.LMUY;
 
@@ -112,15 +117,18 @@ algorithm
     SA_t := alpha + S_Ht;
 
     E_t := (p.QEZ1 + p.QEZ2 * dfz + p.QEZ3 * dfz^2)
+
            * (1 + (p.QEZ4 + p.QEZ5 * IA_z * p.LGAZ)
            * (2 / Modelica.Constants.pi) * atan(B_t * C_t * SA_t));
     E_t := min(E_t, 1);
 
     SA_t_eq :=
       atan(sqrt((tan(SA_t))^2 + (K_x / (K_y + eps))^2 * kappa^2))
+
       * sign(SA_t);
 
     t := D_t
+
          * cos(C_t * atan(B_t * SA_t_eq - E_t * (B_t * SA_t_eq - atan(B_t * SA_t_eq))))
          * cos(alpha);
 
@@ -131,10 +139,12 @@ algorithm
 
     SA_r_eq :=
       atan(sqrt((tan(SA_r))^2 + (K_x / (K_y + eps))^2 * kappa^2))
+
       * sign(SA_r);
 
     D_r := Fz * ((p.QDZ6 + p.QDZ7 * dfz) * p.LRES
            + (p.QDZ8 + p.QDZ9 * dfz) * IA_z * p.LGAZ)
+
            * setup.UNLOADED_RADIUS * p.LMUY;
 
     B_r := p.QBZ9 * p.LKY / p.LMUY + p.QBZ10 * B_y * C_y;

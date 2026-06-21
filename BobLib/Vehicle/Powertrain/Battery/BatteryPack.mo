@@ -1,6 +1,7 @@
 within BobLib.Vehicle.Powertrain.Battery;
 
 model BatteryPack "Table-driven Thevenin battery pack"
+
   extends BobLib.Resources.Icons.BatteryPackIcon;
 
   extends BobLib.Vehicle.Powertrain.Battery.Templates.BatteryBase;
@@ -94,8 +95,12 @@ equation
   assert(size(R1_chg_cell_table, 1) == size(SOC_table, 1), "BatteryPack: R1_chg_cell_table size must match SOC_table");
   assert(size(tau1_dis_table, 1) == size(SOC_table, 1), "BatteryPack: tau1_dis_table size must match SOC_table");
   assert(size(tau1_chg_table, 1) == size(SOC_table, 1), "BatteryPack: tau1_chg_table size must match SOC_table");
-  assert(size(I_dis_cell_max_table, 1) == size(SOC_table, 1), "BatteryPack: I_dis_cell_max_table size must match SOC_table");
-  assert(size(I_chg_cell_max_table, 1) == size(SOC_table, 1), "BatteryPack: I_chg_cell_max_table size must match SOC_table");
+  assert(
+    size(I_dis_cell_max_table, 1) == size(SOC_table, 1),
+    "BatteryPack: I_dis_cell_max_table size must match SOC_table");
+  assert(
+    size(I_chg_cell_max_table, 1) == size(SOC_table, 1),
+    "BatteryPack: I_chg_cell_max_table size must match SOC_table");
 
   // Cell lookup values are clamped to the characterized SOC window.
   SOC_lookup = noEvent(min(max(SOC, SOC_table[1]), SOC_table[size(SOC_table, 1)]));
@@ -140,6 +145,7 @@ equation
 
   // SOC dynamics (bounded). Charge current is adjusted by coulombic efficiency.
   i_soc = if noEvent(i >= 0) then i else eta_charge_coulombic*i;
+
   if noEvent(SOC_state <= 0 and i_soc > 0) then
     der(SOC_state) = 0;
   elseif noEvent(SOC_state >= 1 and i_soc < 0) then

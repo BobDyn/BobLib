@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Records.VehicleRecord.Chassis.Suspension.Templates;
 package Tire
+
   extends BobLibVehicleInterfaces.Icons.RecordsPackageIcon;
 
   annotation(

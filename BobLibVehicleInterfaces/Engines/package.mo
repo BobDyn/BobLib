@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces;
 package Engines
+
   "Engine models extending VehicleInterfaces engine contracts"
   extends Modelica.Icons.Package;
 
@@ -16,8 +17,9 @@ deeper, then be adapted here through
 </p>
 <p>
 <code>SimpleICEngine</code> is a small sample implementation for architecture
-work. <code>ICEnginePlaceholder</code> remains the no-physics reference adapter
-for cases where the engine boundary should be visible but inactive.
+work. Inactive or omitted engine behavior should be represented by choosing an
+architecture without an engine subsystem rather than by carrying a no-physics
+adapter in the public package surface.
 </p>
 </html>"));
 end Engines;

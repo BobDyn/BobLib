@@ -1,6 +1,7 @@
 within BobLib.Tests.TestVehicle.TestPowertrain;
 
 model TestVCU
+
   BobLib.Vehicle.Electronics.Controls.VCU vcu(
     tau_max = 200,
     w_eps = 0.1) annotation(

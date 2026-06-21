@@ -1,6 +1,7 @@
 within BobLib.Vehicle.Chassis.Suspension;
 
 model RrAxleDW_BC "Double wishbone axle with bellcranks mounting to shock and push/pullrod"
+
   import SI = Modelica.Units.SI;
   import Modelica.Math.Vectors;
   import BobLib.Utilities.Math.Vector.mirrorXZ;
@@ -59,9 +60,14 @@ model RrAxleDW_BC "Double wishbone axle with bellcranks mounting to shock and pu
     Placement(transformation(origin = {50, -55}, extent = {{-15, -15}, {15, 15}}, rotation = -90)));
 
   Modelica.Mechanics.Rotational.Interfaces.Flange_a steerFlange annotation(
-    Placement(transformation(origin = {0, 140}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {0, 100}, extent = {{-10, -10}, {10, 10}})));
+    Placement(
+      transformation(origin = {0, 140}, extent = {{-10, -10}, {10, 10}}),
+      iconTransformation(origin = {0, 100}, extent = {{-10, -10}, {10, 10}})));
 
 protected
+  final parameter SI.Position leftRodWishboneMount[3] = if pAxle.rodToLower then pLeftDW.lower_o else pLeftDW.upper_o
+    "Outboard wishbone joint used as the push/pullrod apex reference";
+
   // Kinematics
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation toLeftBellcrank(
     r = pAxle.bellcrankPivot - effectiveCenter,
@@ -80,11 +86,11 @@ protected
     animation = false) annotation(
     Placement(transformation(origin = {20, -70}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation toLeftApex(
-    r = pAxle.rodMount - pLeftDW.upper_o,
+    r = pAxle.rodMount - leftRodWishboneMount,
     animation = false) annotation(
     Placement(transformation(origin = {-80, -20}, extent = {{10, -10}, {-10, 10}})));
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation toRightApex(
-    r = mirrorXZ(pAxle.rodMount - pLeftDW.upper_o),
+    r = mirrorXZ(pAxle.rodMount - leftRodWishboneMount),
     animation = false) annotation(
     Placement(transformation(origin = {90, -10}, extent = {{-10, -10}, {10, 10}})));
 
@@ -107,8 +113,13 @@ public
     Placement(transformation(origin = {120, -30}, extent = {{-20, -20}, {20, 20}})));
 
 equation
-  connect(toLeftApex.frame_a, leftWishboneUprightLoop.upperFrame_o);
-      connect(toRightApex.frame_a, rightWishboneUprightLoop.upperFrame_o);
+  if pAxle.rodToLower then
+    connect(toLeftApex.frame_a, leftWishboneUprightLoop.lowerFrame_o);
+    connect(toRightApex.frame_a, rightWishboneUprightLoop.lowerFrame_o);
+  else
+    connect(toLeftApex.frame_a, leftWishboneUprightLoop.upperFrame_o);
+    connect(toRightApex.frame_a, rightWishboneUprightLoop.upperFrame_o);
+  end if;
   connect(leftPushrod.frame_a, leftBellcrank.pickupFrame1);
       connect(rightPushrod.frame_a, rightBellcrank.pickupFrame1);
   connect(leftShockLinkage.frame_a, leftBellcrank.pickupFrame2);

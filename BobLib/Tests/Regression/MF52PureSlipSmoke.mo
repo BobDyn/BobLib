@@ -1,6 +1,7 @@
 within BobLib.Tests.Regression;
 
 model MF52PureSlipSmoke
+
   import SI = Modelica.Units.SI;
   import Tire = BobLib.Vehicle.Chassis.Suspension.Templates.Tire.MF52;
   import Vehicle = BobLib.Resources.VehicleDefn;

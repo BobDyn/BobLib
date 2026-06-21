@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Records.StandardRecord;
 
 record TransientEvalRecord
+
   import SI = Modelica.Units.SI;
 
   // Inputs

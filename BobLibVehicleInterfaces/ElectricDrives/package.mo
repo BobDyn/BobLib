@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces;
 package ElectricDrives
+
   "Electric-drive models extending VehicleInterfaces electric-drive contracts"
   extends Modelica.Icons.Package;
   annotation(

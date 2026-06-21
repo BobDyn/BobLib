@@ -1,6 +1,7 @@
 within BobLibVehicleInterfaces.Aero.Mounts;
 
 model RigidMount
+
   "Rigid aero load-frame mount from the sprung chassis frame"
   import SI = Modelica.Units.SI;
 

@@ -1,5 +1,6 @@
 within BobLibVehicleInterfaces.Utilities;
 package Math
+
   extends BobLibVehicleInterfaces.Icons.MathIcon;
 
   annotation(
