@@ -95,10 +95,19 @@ Run the full local gate before trusting a branch:
 make ci
 ```
 
+GitHub CI intentionally uses a lighter default gate for pushes and pull
+requests: Python lint/tests, Modelica formatting, and `make modelica-smoke`.
+Version tags use the same lightweight gate so releases are not blocked by a
+GitHub runner doing a full rebuild. The full OpenModelica gate is the local
+release gate (`make test`/`make ci`) and can also be attempted manually through
+workflow dispatch with the full Modelica option enabled.
+
 For narrower checks:
 
 ```sh
 make test-python
+make modelica-lint
+make modelica-smoke
 make test-pytest
 make modelica-translation
 make modelica-initialization

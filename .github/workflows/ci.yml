@@ -2,7 +2,22 @@ name: BobLib CI
 
 on:
   push:
+    branches:
+      - "**"
+    tags:
+      - "v*"
   pull_request:
+  workflow_dispatch:
+    inputs:
+      full_modelica:
+        description: "Run the full OpenModelica release gate"
+        required: false
+        default: false
+        type: boolean
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   python:
@@ -25,10 +40,15 @@ jobs:
       - name: Run Python tests
         run: make test-python
 
-  modelica:
-    name: OpenModelica Regression
+      - name: Check Modelica formatting
+        run: make modelica-lint
+
+  modelica-smoke:
+    name: OpenModelica Smoke
     runs-on: ubuntu-latest
     container: openmodelica/openmodelica:v1.26.3-ompython
+    if: github.event_name == 'pull_request' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !inputs.full_modelica)
+    needs: python
 
     steps:
       - uses: actions/checkout@v6
@@ -36,11 +56,30 @@ jobs:
       - name: Install Python test dependency
         run: python3 -m pip install --upgrade pip pytest
 
-      - name: Translate standards and test fixtures
+      - name: Translate standard smoke models
+        run: make modelica-smoke
+
+  modelica-release:
+    name: OpenModelica Release Gate
+    runs-on: ubuntu-latest
+    container: openmodelica/openmodelica:v1.26.3-ompython
+    if: github.event_name == 'workflow_dispatch' && inputs.full_modelica
+    needs: python
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Python test dependency
+        run: python3 -m pip install --upgrade pip pytest
+
+      - name: Translate standards and all test fixtures
         run: make modelica-translation
 
       - name: Check Modelica initialization baselines
         run: make modelica-initialization
 
-      - name: Run signal-level regression model
+      - name: Run physical validation baselines
+        run: make modelica-physics
+
+      - name: Run signal-level regressions
         run: make modelica-regression

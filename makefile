@@ -21,6 +21,8 @@ MODELICA_INITIALIZATION_TESTS := \
 MODELICA_PHYSICS_TESTS := \
 	Tests/test_modelica_physics_validation.py
 
+MODELICA_SMOKE_FLAGS ?= --no-test-fixtures --no-equation-counts
+
 MODELICA_TESTS := \
 	$(MODELICA_TRANSLATION_TESTS) \
 	$(MODELICA_INITIALIZATION_TESTS) \
@@ -31,7 +33,7 @@ ALL_TESTS := \
 	$(PYTHON_TESTS) \
 	$(MODELICA_TESTS)
 
-.PHONY: help lint modelica-lint modelica-format test test-python test-pytest test-modelica modelica-deps modelica-translation modelica-initialization modelica-physics modelica-regression ci check
+.PHONY: help lint modelica-lint modelica-format test test-python test-pytest test-modelica modelica-deps modelica-smoke modelica-translation modelica-initialization modelica-physics modelica-regression ci check
 
 help:
 	@printf '%s\n' \
@@ -43,6 +45,7 @@ help:
 		'  make test-python          Run pure Python pytest checks only' \
 		'  make test-pytest          Run every pytest-collected check in one invocation' \
 		'  make modelica-deps        Install OpenModelica library dependencies' \
+		'  make modelica-smoke       Translate default standards/regression models only' \
 		'  make modelica-translation Translate standards and all BobLibTest fixtures via pytest' \
 		'  make modelica-initialization Initialize all BobLibTest fixtures via pytest and compare baselines' \
 		'      MODELICA_INIT_TIMEOUT_S=600 controls the per-model OMC timeout' \
@@ -67,6 +70,9 @@ test-python:
 
 modelica-deps:
 	omc msl_setup.mos
+
+modelica-smoke: modelica-deps
+	$(PYTHON) Tests/modelica_translation_checks.py --package-root $(PACKAGE_ROOT) $(MODELICA_SMOKE_FLAGS)
 
 test-pytest: modelica-deps
 	$(PYTEST) $(PYTEST_FLAGS) $(ALL_TESTS) --boblib-package-root $(PACKAGE_ROOT) --boblib-initialization-timeout-s $(MODELICA_INIT_TIMEOUT_S)
