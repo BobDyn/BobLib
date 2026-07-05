@@ -26,7 +26,7 @@ https://bobdyn.com/boblib
 
 ## Release
 
-Current package version: `0.1.0`, dated `2026-06-21`.
+Current package version: `0.1.1`, dated `2026-07-05`.
 
 Release notes are maintained in `CHANGELOG.md` and in the `BobLib` package
 revision annotation. The in-library tutorial lives at

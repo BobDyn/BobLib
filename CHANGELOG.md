@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.1.1 - 2026-07-05
+
+Patch release for four-post solver robustness.
+
+### Fixed
+
+- Held the four-post heave input at zero through the roll phase so the standard
+  four-post template keeps a consistent time horizon for combined heave and
+  roll evaluation.
+
+### Validation
+
+- GitHub push CI and the manual full OpenModelica release gate passed during
+  the 0.1.1 release check, including translation, initialization baselines,
+  physical validation baselines, and signal-level regressions.
+
 ## 0.1.0 - 2026-06-21
 
 Initial standalone BobLib release aligned with Modelica Standard Library 4.1.0

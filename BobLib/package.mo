@@ -5,9 +5,9 @@ package BobLib
 
   annotation(
     preferredView = "info",
-    version = "0.1.0",
-    versionDate = "2026-06-21",
-    dateModified = "2026-06-21",
+    version = "0.1.1",
+    versionDate = "2026-07-05",
+    dateModified = "2026-07-05",
     uses(
       Modelica(version = "4.1.0"),
       VehicleInterfaces(version = "2.0.2")),
@@ -59,6 +59,15 @@ under <code>Utilities.Mechanics</code>.
 </p>
 </html>",
       revisions = "<html>
+<h4>Version 0.1.1 - 2026-07-05</h4>
+<p>
+Patch release for four-post solver robustness.
+</p>
+<ul>
+<li>Held the four-post heave input at zero through the roll phase so the
+standard four-post template keeps a consistent time horizon for combined
+heave and roll evaluation.</li>
+</ul>
 <h4>Version 0.1.0 - 2026-06-21</h4>
 <p>
 Initial standalone BobLib release aligned with
