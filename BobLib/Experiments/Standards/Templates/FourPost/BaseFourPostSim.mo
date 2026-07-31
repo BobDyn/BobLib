@@ -193,14 +193,14 @@ protected
 
 protected
   final parameter Real cpInitFL[3] = pVehicle.pFrDW.wheelCenter + Frames.resolve1(Frames.axesRotations({1, 2, 3},
-                                                                                                       {pVehicle.pFrPartialWheel.staticGamma*pi/180, 0, pVehicle.pFrPartialWheel.staticAlpha*pi/180},
+                                                                                                       {Modelica.Units.Conversions.from_deg(pVehicle.pFrPartialWheel.staticGamma), 0, Modelica.Units.Conversions.from_deg(pVehicle.pFrPartialWheel.staticAlpha)},
                                                                                                        {0, 0, 0}),
                                                                                   {0, 0, -pVehicle.pFrPartialWheel.R0});
 
   final parameter Real cpInitFR[3] = Vector.mirrorXZ(cpInitFL);
 
   final parameter Real cpInitRL[3] = pVehicle.pRrDW.wheelCenter + Frames.resolve1(Frames.axesRotations({1, 2, 3},
-                                                                                                       {pVehicle.pRrPartialWheel.staticGamma*pi/180, 0, pVehicle.pRrPartialWheel.staticAlpha*pi/180},
+                                                                                                       {Modelica.Units.Conversions.from_deg(pVehicle.pRrPartialWheel.staticGamma), 0, Modelica.Units.Conversions.from_deg(pVehicle.pRrPartialWheel.staticAlpha)},
                                                                                                        {0, 0, 0}),
                                                                                   {0, 0, -pVehicle.pRrPartialWheel.R0});
 
