@@ -113,6 +113,7 @@ partial model BaseVehicleFMI
     eta_mot = pVehicle.pMotor.eta_mot,
     eta_reg = pVehicle.pMotor.eta_reg,
     w_eps = pVehicle.pMotor.w_eps,
+    reverseLaunch = pVehicle.pMotor.reverseLaunch,
     rotorJ = pVehicle.pMotor.rotorJ) annotation(
     choicesAllMatching = true,
     Dialog(group = "Plant Models"),
