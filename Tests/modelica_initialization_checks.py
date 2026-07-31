@@ -12,7 +12,6 @@ import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
-
 BASELINE_COLUMNS = (
     "model",
     "numeric_count",

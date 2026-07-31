@@ -1,0 +1,21 @@
+version: 2
+
+updates:
+  # Keep the pinned Python tooling in Tests/requirements-dev.txt current.
+  # These are pinned on purpose, so the bump should arrive as a reviewable PR
+  # that CI validates rather than drifting silently on every run.
+  - package-ecosystem: pip
+    directory: "/Tests"
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: build
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: build

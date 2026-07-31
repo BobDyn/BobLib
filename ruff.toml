@@ -1,0 +1,37 @@
+# Ruff configuration for the BobLib Python test harness.
+#
+# The rule set is selected explicitly on purpose. Ruff's default selection has
+# widened between releases, and CI installs ruff unpinned, so relying on the
+# defaults turns a green pipeline red without any change to this repository.
+# Widen this list deliberately, together with a ruff version bump.
+
+target-version = "py311"
+line-length = 100
+
+[lint]
+select = [
+  "E4", # pycodestyle: imports
+  "E7", # pycodestyle: statements
+  "E9", # pycodestyle: runtime errors
+  "F",  # pyflakes
+  "I",  # import sorting
+  "B",  # bugbear
+  "SIM", # flake8-simplify
+  "PIE", # flake8-pie
+  "UP", # pyupgrade
+]
+
+# flake8-executable (EXE) is intentionally not selected. BobLib is developed on
+# Windows and gated on Linux CI; the executable bit on the helper scripts is not
+# reproducible across those two, and the scripts are always invoked through an
+# explicit interpreter from the makefile.
+
+[lint.isort]
+# Helper modules under Tests/ are imported flat, via the sys.path insert in
+# Tests/conftest.py. Declaring them first-party keeps them in their own import
+# block instead of being sorted in among third-party packages.
+known-first-party = [
+  "modelica_initialization_checks",
+  "modelica_linter",
+  "modelica_translation_checks",
+]

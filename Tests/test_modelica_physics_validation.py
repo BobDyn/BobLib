@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import csv
 import math
 import os
@@ -13,7 +14,6 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import pytest
-
 
 MODELICA_VERSION = "4.1.0"
 VEHICLE_INTERFACES_VERSION = "2.0.2"
@@ -169,10 +169,8 @@ def _run_omc(mos_text: str, model: str, *, timeout_s: int) -> str:
 def _read_result(path: Path, signals: tuple[str, ...]) -> dict[str, float]:
     text = path.read_text(encoding="utf-8")
     dialect = csv.excel
-    try:
+    with contextlib.suppress(csv.Error):
         dialect = csv.Sniffer().sniff(text[:2048], delimiters=",;")
-    except csv.Error:
-        pass
 
     rows = list(csv.DictReader(text.splitlines(), dialect=dialect))
     assert rows, f"No result rows found in {path}"

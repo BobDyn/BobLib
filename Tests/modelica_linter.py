@@ -7,7 +7,6 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-
 DEFAULT_MAX_LINE_LENGTH = 120
 SECTION_KEYWORDS = (
     "equation",
@@ -132,7 +131,7 @@ def format_modelica_text(text: str, *, max_line_length: int = DEFAULT_MAX_LINE_L
 
 def _is_comment_only_line(line: str) -> bool:
     stripped = line.lstrip()
-    return stripped.startswith("//") or stripped.startswith("/*") or stripped.startswith("*")
+    return stripped.startswith(("//", "/*", "*"))
 
 
 def _align_comment_indent(line: str, lines: list[str], index: int) -> str:
@@ -312,10 +311,7 @@ def _is_section_header(stripped: str) -> bool:
 
 def _is_control_block_start(stripped: str) -> bool:
     code = _split_line_comment(stripped)[0].strip()
-    return (
-        code.startswith(("if ", "if("))
-        or code.startswith(("when ", "when("))
-    ) and code.endswith("then")
+    return code.startswith(("if ", "if(", "when ", "when(")) and code.endswith("then")
 
 
 def _section_kind(stripped: str) -> str:
@@ -372,9 +368,7 @@ def _is_component_declaration_start(line: str) -> bool:
     if "=" in prefix:
         return False
     type_token = _declaration_type_token(prefix)
-    if _is_scalar_type(type_token):
-        return False
-    return True
+    return not _is_scalar_type(type_token)
 
 
 def _is_scalar_declaration_start(line: str) -> bool:
