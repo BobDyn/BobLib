@@ -7,6 +7,7 @@ BobLibTest.Regression.MF52PureSlipSmoke,0.01,Mz,-28.781188544190439,1e-6,1e-9,MF
 BobLibTest.Regression.MF52PureSlipSmoke,0.01,pneumaticTrail,0.021053502425769931,1e-9,1e-9,MF52 pure slip smoke pneumatic trail
 BobLibTest.Regression.MF52PureSlipSmoke,0.01,residualScrub,0,1e-9,1e-9,MF52 pure slip smoke residual scrub
 BobLibTest.Regression.MF52PureSlipSmoke,0.01,MzReconstructed,-28.781188544190439,1e-6,1e-9,MF52 aligning moment reconstruction
+BobLibTest.Regression.TransientSlipReverseSmoke,0.1,symmetryError,0,1e-10,1e-10,Mirrored forward and reverse kinematics produce mirrored transient slip
 BobLibTest.TestVehicle.TestAero.TestCFDAeroMap,0.01,aero.drag,52,1e-9,1e-9,CFD aero map drag interpolation
 BobLibTest.TestVehicle.TestAero.TestCFDAeroMap,0.01,aero.downforce,520,1e-9,1e-9,CFD aero map downforce interpolation
 BobLibTest.TestVehicle.TestPowertrain.TestVCU,0.01,vcu.P_req,3000,1e-6,1e-9,VCU requested motor power

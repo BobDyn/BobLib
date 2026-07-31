@@ -1,4 +1,5 @@
 model,budget_s,description
 BobLibTest.Regression.MF52PureSlipSmoke,8,MF52 smoke physical baseline simulation
+BobLibTest.Regression.TransientSlipReverseSmoke,5,Transient reverse-slip regression simulation
 BobLibTest.TestVehicle.TestAero.TestCFDAeroMap,5,CFD aero map physical baseline simulation
 BobLibTest.TestVehicle.TestPowertrain.TestVCU,5,VCU physical baseline simulation
