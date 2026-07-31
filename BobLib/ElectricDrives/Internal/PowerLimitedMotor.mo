@@ -6,9 +6,7 @@ model PowerLimitedMotor
   import Modelica.Constants.pi;
 
   // Power command
-  Modelica.Blocks.Interfaces.RealInput P_elec "Electrical power into motor [W](
-    +motoring,
-    −regen)  (connect from inverter P_out)" annotation(
+  Modelica.Blocks.Interfaces.RealInput P_elec "Electrical power into motor [W], positive motoring and negative regen (connect from inverter P_out)" annotation(
     Placement(
       transformation(origin = {-120, 0}, extent = {{-20, -20}, {20, 20}}),
       iconTransformation(origin = {-120, 0}, extent = {{-20, -20}, {20, 20}})));

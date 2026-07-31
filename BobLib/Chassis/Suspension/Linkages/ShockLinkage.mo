@@ -33,8 +33,8 @@ model ShockLinkage
     Dialog(tab = "Animation"));
 
   // Advanced parameters
-  parameter Boolean fixedRotationAtFrame_a = false annotation(tab = "Advanced");
-  parameter Boolean fixedRotationAtFrame_b = false annotation(tab = "Advanced");
+  parameter Boolean fixedRotationAtFrame_a = false annotation(Dialog(tab = "Advanced"));
+  parameter Boolean fixedRotationAtFrame_b = false annotation(Dialog(tab = "Advanced"));
 
   // Frames
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a frame_a annotation(
