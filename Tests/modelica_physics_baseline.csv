@@ -1,4 +1,8 @@
 model,stop_time,signal,expected,abs_tol,rel_tol,description
+BobLibTest.Regression.AngleBetweenSmoke,0.001,tinyAntiparallel,3.141592653589793,1e-12,1e-12,Tiny antiparallel vectors retain their pi angle
+BobLibTest.Regression.AngleBetweenSmoke,0.001,scaledQuarterTurn,1.5707963267948966,1e-12,1e-12,Angle is invariant to vector and axis magnitude
+BobLibTest.Regression.AngleBetweenSmoke,0.001,negativeQuarterTurn,-1.5707963267948966,1e-12,1e-12,Signed negative quarter turn is preserved
+BobLibTest.Regression.AngleBetweenSmoke,0.001,zeroVectorAngle,0,1e-12,1e-12,Zero-length vectors use the documented neutral angle
 BobLibTest.Regression.MF52PureSlipSmoke,0.01,Fx,0,1e-9,1e-9,MF52 pure slip smoke longitudinal force at zero kappa
 BobLibTest.Regression.MF52PureSlipSmoke,0.01,Fy,1367.049907523304,1e-6,1e-9,MF52 pure slip smoke lateral force
 BobLibTest.Regression.MF52PureSlipSmoke,0.01,Mx,-18.283297449124898,1e-6,1e-9,MF52 pure slip smoke overturning moment
