@@ -2,6 +2,10 @@
 # https://modelica.org/
 # Ignore temporary files, build results, simulation files
 
+## Vibecoding files
+*.claude
+*dump.md
+
 ## Modelica-specific files
 *~
 *.bak
@@ -17,6 +21,11 @@
 *.o
 *.pyc
 *venv
+
+## Python tooling caches
+__pycache__/
+.pytest_cache/
+.ruff_cache/
 
 ## Simulation files
 *.mat
