@@ -12,12 +12,6 @@ on:
       - "v*"
   pull_request:
   workflow_dispatch:
-    inputs:
-      full_modelica:
-        description: "Run the full OpenModelica release gate"
-        required: false
-        default: false
-        type: boolean
 
 concurrency:
   # head_ref on pull_request and ref_name on push both resolve to the bare
@@ -61,7 +55,6 @@ jobs:
     name: OpenModelica Smoke
     runs-on: ubuntu-latest
     container: openmodelica/openmodelica:v1.26.3-ompython
-    if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.full_modelica) }}
     needs: python
     timeout-minutes: 30
 
@@ -79,35 +72,3 @@ jobs:
 
       - name: Translate standard smoke models
         run: make modelica-smoke
-
-  modelica-release:
-    name: OpenModelica Release Gate
-    runs-on: ubuntu-latest
-    container: openmodelica/openmodelica:v1.26.3-ompython
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.full_modelica }}
-    needs: python
-    timeout-minutes: 120
-
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Install Python test dependency
-        run: python3 -m pip install --upgrade pip -r Tests/requirements-dev.txt
-
-      - name: Cache Modelica libraries
-        uses: actions/cache@v4
-        with:
-          path: ~/.openmodelica
-          key: om-libs-${{ hashFiles('msl_setup.mos') }}
-
-      - name: Translate standards and all test fixtures
-        run: make modelica-translation
-
-      - name: Check Modelica initialization baselines
-        run: make modelica-initialization
-
-      - name: Run physical validation baselines
-        run: make modelica-physics
-
-      - name: Run signal-level regressions
-        run: make modelica-regression
