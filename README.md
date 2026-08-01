@@ -120,8 +120,11 @@ make modelica-physics
 make modelica-regression
 ```
 
-The CI workflow runs on pull requests and on pushes to every branch so large
-integration branches receive the same basic validation as `main`.
+The CI workflow runs on pull requests and on pushes to `main` and version tags.
+Feature branches are validated through their pull request; open it as a draft if
+you want signal before the branch is ready for review. Running on both events
+for the same branch produced two runs per commit writing to the same commit SHA,
+which made required status checks resolve unpredictably.
 
 Modelica translation, initialization, and signal regressions are collected as
 individual pytest cases. A failing model should appear directly in the pytest

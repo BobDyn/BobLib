@@ -1,9 +1,13 @@
 name: BobLib CI
 
 on:
+  # Feature branches are covered by pull_request. Firing on both events for the
+  # same branch produced two runs per commit that wrote check results to the
+  # same SHA under the same names, so a required status check could resolve to
+  # the cancelled run and block the merge.
   push:
     branches:
-      - "**"
+      - main
     tags:
       - "v*"
   pull_request:
