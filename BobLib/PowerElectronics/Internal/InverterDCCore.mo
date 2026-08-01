@@ -12,15 +12,13 @@ model InverterDCCore "DC-side inverter/load physics with efficiency and bus limi
     Placement(transformation(origin = {100, 0}, extent = {{-10, -10}, {10, 10}})));
 
   // Control input
-  Modelica.Blocks.Interfaces.RealInput P_req "Requested mechanical/electrical output power [W](
-    +motoring,
-    −regen)" annotation(
+  Modelica.Blocks.Interfaces.RealInput P_req "Requested mechanical/electrical output power [W], positive motoring and negative regen" annotation(
     Placement(
       transformation(origin = {0, 120}, extent = {{-20, -20}, {20, 20}}, rotation = -90),
       iconTransformation(origin = {0, 120}, extent = {{-20, -20}, {20, 20}}, rotation = -90)));
 
   // Output
-  Modelica.Blocks.Interfaces.RealOutput P_out(start = 0) "Electrical power delivered to motor side [W] (+motoring, −regen)" annotation(
+  Modelica.Blocks.Interfaces.RealOutput P_out(start = 0) "Electrical power delivered to motor side [W], positive motoring and negative regen" annotation(
     Placement(
       transformation(origin = {0, -120}, extent = {{-20, -20}, {20, 20}}, rotation = -90),
       iconTransformation(origin = {0, -110}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));

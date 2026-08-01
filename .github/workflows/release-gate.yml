@@ -1,0 +1,51 @@
+name: Release Gate
+
+# The full OpenModelica gate is a release activity, not a per-commit check.
+# It lives in its own workflow so that pull requests never report it: any job
+# in a triggered workflow produces a check run even when its `if` skips it, so
+# keeping this in BobLib CI meant every PR showed a permanently skipped
+# "OpenModelica Release Gate" entry.
+#
+# Run it from Actions -> Release Gate -> Run workflow, against the branch or
+# tag you are about to release. `make test` / `make ci` is the local equivalent.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  modelica-release:
+    name: OpenModelica Release Gate
+    runs-on: ubuntu-latest
+    container: openmodelica/openmodelica:v1.26.3-ompython
+    timeout-minutes: 120
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Python test dependency
+        run: python3 -m pip install --upgrade pip -r Tests/requirements-dev.txt
+
+      - name: Cache Modelica libraries
+        uses: actions/cache@v4
+        with:
+          path: ~/.openmodelica
+          key: om-libs-${{ hashFiles('msl_setup.mos') }}
+
+      - name: Translate standards and all test fixtures
+        run: make modelica-translation
+
+      - name: Check Modelica initialization baselines
+        run: make modelica-initialization
+
+      - name: Run physical validation baselines
+        run: make modelica-physics
+
+      - name: Run signal-level regressions
+        run: make modelica-regression

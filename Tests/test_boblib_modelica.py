@@ -8,7 +8,6 @@ from pathlib import Path
 
 import pytest
 
-
 MODELICA_VERSION = "4.1.0"
 VEHICLE_INTERFACES_VERSION = "2.0.2"
 OMC_COMMAND_LINE_OPTIONS = (

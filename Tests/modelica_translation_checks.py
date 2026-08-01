@@ -8,7 +8,6 @@ import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
-
 MODELICA_VERSION = "4.1.0"
 VEHICLE_INTERFACES_VERSION = "2.0.2"
 

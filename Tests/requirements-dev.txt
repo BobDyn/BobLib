@@ -1,0 +1,8 @@
+# Python tooling for the BobLib test harness.
+#
+# Pinned deliberately. CI previously installed these unpinned, so an upstream
+# release could turn the pipeline red with no change to this repository -- which
+# is exactly what happened when ruff widened its default rule selection.
+# Bump these intentionally (dependabot can raise the PR) rather than drifting.
+pytest==9.1.1
+ruff==0.16.1

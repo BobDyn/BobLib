@@ -9,7 +9,6 @@ from pathlib import Path
 
 import pytest
 
-
 MF52_REGRESSION_MODEL = "BobLibTest.Regression.MF52PureSlipSmoke"
 MF52_RESULT_SIGNALS = (
     "Fx",

@@ -98,9 +98,13 @@ make ci
 GitHub CI intentionally uses a lighter default gate for pushes and pull
 requests: Python lint/tests, Modelica formatting, and `make modelica-smoke`.
 Version tags use the same lightweight gate so releases are not blocked by a
-GitHub runner doing a full rebuild. The full OpenModelica gate is the local
-release gate (`make test`/`make ci`) and can also be attempted manually through
-workflow dispatch with the full Modelica option enabled.
+GitHub runner doing a full rebuild. The full OpenModelica gate is a release
+activity: run it locally with `make test`/`make ci`, or on a runner through the
+separate `Release Gate` workflow (Actions -> Release Gate -> Run workflow).
+
+Python tooling versions are pinned in `Tests/requirements-dev.txt` and the ruff
+rule selection is pinned in `ruff.toml`, so a new ruff or pytest release cannot
+turn CI red without a deliberate bump.
 
 For narrower checks:
 
@@ -115,8 +119,11 @@ make modelica-physics
 make modelica-regression
 ```
 
-The CI workflow runs on pull requests and on pushes to every branch so large
-integration branches receive the same basic validation as `main`.
+The CI workflow runs on pull requests and on pushes to `main` and version tags.
+Feature branches are validated through their pull request; open it as a draft if
+you want signal before the branch is ready for review. Running on both events
+for the same branch produced two runs per commit writing to the same commit SHA,
+which made required status checks resolve unpredictably.
 
 Modelica translation, initialization, and signal regressions are collected as
 individual pytest cases. A failing model should appear directly in the pytest
