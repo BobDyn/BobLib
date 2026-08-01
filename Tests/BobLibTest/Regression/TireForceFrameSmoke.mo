@@ -17,6 +17,7 @@ model TireForceFrameSmoke
       staticGamma = 10);
 
   model InclinedTire
+
     parameter
       BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.Templates.PartialWheelRecord
       pTestWheel;
