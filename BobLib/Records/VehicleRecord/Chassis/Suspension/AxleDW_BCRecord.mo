@@ -32,7 +32,7 @@ record AxleDW_BCRecord
   parameter SI.Position shockMount[3] "Vector from origin to shock chassis mount, expressed in chassis frame" annotation(
     Evaluate = false,
     Dialog(group = "Geometry"));
-  parameter SI.Position springTable[:, 2] "Table of spring force [N] vs deflection [m], [dx1, F1; dx2, F2; ...]" annotation(
+  parameter Real springTable[:, 2] "Table of spring force [N] vs deflection [m], [dx1, F1; dx2, F2; ...]" annotation(
     Evaluate = false, Dialog(group = "Spring Params"));
   parameter SI.Length springFreeLength "Spring free length (zero-force length) = installed length + static compression" annotation(
     Evaluate = false, Dialog(group = "Spring Params"));
