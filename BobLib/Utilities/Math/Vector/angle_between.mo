@@ -47,6 +47,7 @@ algorithm
     den := dot(aUnit, bUnit);
     theta := atan2(num, den);
   else
+
     // The angle of a zero-length vector or about a zero-length axis is
     // undefined. Return the neutral angle explicitly instead of perturbing
     // every valid result with a numerical floor.

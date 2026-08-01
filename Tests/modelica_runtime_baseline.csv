@@ -1,5 +1,5 @@
 model,budget_s,description
-BobLibTest.Regression.AngleBetweenSmoke,5,Vector angle scale-invariance regression simulation
+BobLibTest.Regression.AngleBetweenSmoke,10,Vector angle scale-invariance regression simulation
 BobLibTest.Regression.MF52PureSlipSmoke,8,MF52 smoke physical baseline simulation
 BobLibTest.TestVehicle.TestAero.TestCFDAeroMap,5,CFD aero map physical baseline simulation
 BobLibTest.TestVehicle.TestPowertrain.TestVCU,5,VCU physical baseline simulation
