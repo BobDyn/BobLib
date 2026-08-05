@@ -74,7 +74,7 @@ protected
   Real[3] e_spin "Unit vector along wheel spin axis, resolved in world frame";
   Real[3] e_zw "Unit vector along wheel z-axis, resolved in world frame";
   Real[3] e_xg "e_xw projected on the xy-plane (ground) and normalized";
-  Real[3] e_yg "e_yw projected on the xy-plane (ground) and normalized";
+  Real[3] e_yg "Road-plane lateral axis orthogonal to e_xg";
 
   // Velocity quantities (for slip calculation)
   Real[3] v_cp "Contact patch velocity in world frame";
@@ -97,7 +97,7 @@ equation
 
   // Ground-projected tire basis
   e_xg = normalize({e_xw[1], e_xw[2], 0});
-  e_yg = normalize({e_yw[1], e_yw[2], 0});
+  e_yg = {-e_xg[2], e_xg[1], 0};
 
   // Inclination angle
   gamma = Modelica.Math.asin(noEvent(max(-1.0, min(1.0, e_zw[2]))));

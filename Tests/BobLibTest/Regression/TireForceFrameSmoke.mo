@@ -29,6 +29,14 @@ model TireForceFrameSmoke
 
     output SI.Force appliedForceWorld[3] = tireForceWorld;
     output SI.Torque appliedTorqueWorld[3] = tireTorqueWorld;
+
+  initial equation
+    assert(
+      abs(e_xg*e_yg) < 1e-12,
+      "Ground-projected tire axes must be orthogonal");
+    assert(
+      abs(sqrt((600*e_xg + 800*e_yg)*(600*e_xg + 800*e_yg)) - 1000) < 1e-8,
+      "Combined road-plane force magnitude must be basis invariant");
   end InclinedTire;
 
   output SI.Force appliedForceWorld[3] = tire.appliedForceWorld;
