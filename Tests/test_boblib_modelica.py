@@ -158,6 +158,25 @@ model RightWheelChassisProbe
     frAxleDW.rightTire.pPartialWheel.staticGamma;
   output Real frontRightWheelGamma =
     frAxleDW.rightTire.wheelModel.partialWheelParams.staticGamma;
+  output Real frontHubXMirrorError[3] =
+    Modelica.Mechanics.MultiBody.Frames.resolve1(
+      frAxleDW.rightTire.wheelModel.hubAxis.frame_b.R,
+      {1, 0, 0}) -
+    BobLib.Utilities.Math.Vector.mirrorXZ(
+      Modelica.Mechanics.MultiBody.Frames.resolve1(
+        frAxleDW.leftTire.wheelModel.hubAxis.frame_b.R,
+        {1, 0, 0}));
+  output Real frontOutwardNormalMirrorError[3] =
+    -Modelica.Mechanics.MultiBody.Frames.resolve1(
+      frAxleDW.rightTire.wheelModel.hubAxis.frame_b.R,
+      {0, 1, 0}) -
+    BobLib.Utilities.Math.Vector.mirrorXZ(
+      Modelica.Mechanics.MultiBody.Frames.resolve1(
+        frAxleDW.leftTire.wheelModel.hubAxis.frame_b.R,
+        {0, 1, 0}));
+  output Real frontContactPatchMirrorError[3] =
+    frAxleDW.rightCP.r_0 -
+    BobLib.Utilities.Math.Vector.mirrorXZ(frAxleDW.leftCP.r_0);
 
 end RightWheelChassisProbe;
 
@@ -193,6 +212,44 @@ model RightWheelFourPostProbe
     rrAxleDW.rightTire.pPartialWheel.staticGamma;
   output Real rearRightWheelGamma =
     rrAxleDW.rightTire.wheelModel.partialWheelParams.staticGamma;
+  output Real frontHubXMirrorError[3] =
+    Modelica.Mechanics.MultiBody.Frames.resolve1(
+      frAxleDW.rightTire.wheelModel.hubAxis.frame_b.R,
+      {1, 0, 0}) -
+    BobLib.Utilities.Math.Vector.mirrorXZ(
+      Modelica.Mechanics.MultiBody.Frames.resolve1(
+        frAxleDW.leftTire.wheelModel.hubAxis.frame_b.R,
+        {1, 0, 0}));
+  output Real frontOutwardNormalMirrorError[3] =
+    -Modelica.Mechanics.MultiBody.Frames.resolve1(
+      frAxleDW.rightTire.wheelModel.hubAxis.frame_b.R,
+      {0, 1, 0}) -
+    BobLib.Utilities.Math.Vector.mirrorXZ(
+      Modelica.Mechanics.MultiBody.Frames.resolve1(
+        frAxleDW.leftTire.wheelModel.hubAxis.frame_b.R,
+        {0, 1, 0}));
+  output Real frontContactPatchMirrorError[3] =
+    frAxleDW.rightCP.r_0 -
+    BobLib.Utilities.Math.Vector.mirrorXZ(frAxleDW.leftCP.r_0);
+  output Real rearHubXMirrorError[3] =
+    Modelica.Mechanics.MultiBody.Frames.resolve1(
+      rrAxleDW.rightTire.wheelModel.hubAxis.frame_b.R,
+      {1, 0, 0}) -
+    BobLib.Utilities.Math.Vector.mirrorXZ(
+      Modelica.Mechanics.MultiBody.Frames.resolve1(
+        rrAxleDW.leftTire.wheelModel.hubAxis.frame_b.R,
+        {1, 0, 0}));
+  output Real rearOutwardNormalMirrorError[3] =
+    -Modelica.Mechanics.MultiBody.Frames.resolve1(
+      rrAxleDW.rightTire.wheelModel.hubAxis.frame_b.R,
+      {0, 1, 0}) -
+    BobLib.Utilities.Math.Vector.mirrorXZ(
+      Modelica.Mechanics.MultiBody.Frames.resolve1(
+        rrAxleDW.leftTire.wheelModel.hubAxis.frame_b.R,
+        {0, 1, 0}));
+  output Real rearContactPatchMirrorError[3] =
+    rrAxleDW.rightCP.r_0 -
+    BobLib.Utilities.Math.Vector.mirrorXZ(rrAxleDW.leftCP.r_0);
 
 end RightWheelFourPostProbe;
 """.strip()
@@ -248,7 +305,31 @@ getErrorString();
                     if signal != "time"
                 }
 
-    assert results["RightWheelChassisProbe"] == pytest.approx(
+    geometry_errors = {
+        model: {
+            signal: value
+            for signal, value in signals.items()
+            if "MirrorError[" in signal
+        }
+        for model, signals in results.items()
+    }
+    for model, errors in geometry_errors.items():
+        assert errors, f"{model} did not publish geometry errors"
+        assert errors == pytest.approx(
+            {signal: 0.0 for signal in errors},
+            abs=1e-10,
+        )
+
+    parameter_results = {
+        model: {
+            signal: value
+            for signal, value in signals.items()
+            if "MirrorError[" not in signal
+        }
+        for model, signals in results.items()
+    }
+
+    assert parameter_results["RightWheelChassisProbe"] == pytest.approx(
         {
             "frontLeftAlpha": 1.25,
             "frontRightAlpha": -1.25,
@@ -258,7 +339,7 @@ getErrorString();
             "frontRightWheelGamma": -2.5,
         }
     )
-    assert results["RightWheelFourPostProbe"] == pytest.approx(
+    assert parameter_results["RightWheelFourPostProbe"] == pytest.approx(
         {
             "frontLeftAlpha": 1.25,
             "frontRightAlpha": -1.25,
