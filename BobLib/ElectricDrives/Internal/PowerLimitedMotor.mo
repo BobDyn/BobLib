@@ -81,7 +81,8 @@ protected
 
   Real P_allow;
   Real P_mech_limited;
-  Real tau_act;
+  SI.Torque tau_act(start = 0, fixed = true)
+    "Actuated shaft torque";
   discrete Real shaftDirection(start = 1, fixed = true)
     "Latched shaft direction (+1 forward, -1 reverse)";
   SI.AngularVelocity w_eff
