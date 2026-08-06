@@ -7,6 +7,7 @@ model Chassis_DW
   import Modelica.Mechanics.MultiBody.Frames;
   import SI = Modelica.Units.SI;
   import BobLib.Utilities.Math.Vector;
+  import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.MassRecord;
   import Tire = BobLib.Chassis.Suspension.Tires;
   import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Stabar.StabarRecord;
 
@@ -32,7 +33,26 @@ model Chassis_DW
     leftBarEnd = {0, 0, 0},
     barRate = 0);
 
-  final parameter SI.Mass pTotalMass =
+  parameter Boolean fixInitialSuspensionAngles = false
+    "Initialize suspension states from four-post-solved lower-arm angles";
+  parameter SI.Angle initialFrontLeftLowerArmAngle = 0;
+  parameter SI.Angle initialFrontRightLowerArmAngle = 0;
+  parameter SI.Angle initialRearLeftLowerArmAngle = 0;
+  parameter SI.Angle initialRearRightLowerArmAngle = 0;
+
+  final parameter MassRecord pVehicleMass =
+    BobLib.Utilities.Mechanics.Functions.combineSymmetricAxleMassRecords(
+      pVehicle.pSprungMass,
+      {pVehicle.pFrAxleMass, pVehicle.pRrAxleMass})
+    "Complete vehicle mass properties including both axle sides";
+
+  final parameter SI.Mass pTotalMass = pVehicleMass.m
+    "Complete vehicle mass";
+
+  final parameter SI.Position pVehicleCG[3] = pVehicleMass.rCM
+    "Complete vehicle center of gravity";
+
+  final parameter SI.Mass pInitializationMass =
     pVehicle.pSprungMass.m +
     pVehicle.pFrAxleMass.unsprungMass.m +
     pVehicle.pFrAxleMass.ucaMass.m +
@@ -42,46 +62,46 @@ model Chassis_DW
     pVehicle.pRrAxleMass.ucaMass.m +
     pVehicle.pRrAxleMass.lcaMass.m +
     pVehicle.pRrAxleMass.tieMass.m
-    "Mass used for the initial chassis reference position";
+    "Mass used only by the legacy start-pose estimate";
 
-  final parameter SI.Position pVehicleCG[3] = {
+  final parameter SI.Position pInitializationCG[3] = {
     (
-      pVehicle.pSprungMass.m * pVehicle.pSprungMass.rCM[1] +
-      pVehicle.pFrAxleMass.unsprungMass.m * pVehicle.pFrAxleMass.unsprungMass.rCM[1] +
-      pVehicle.pFrAxleMass.ucaMass.m * pVehicle.pFrAxleMass.ucaMass.rCM[1] +
-      pVehicle.pFrAxleMass.lcaMass.m * pVehicle.pFrAxleMass.lcaMass.rCM[1] +
-      pVehicle.pFrAxleMass.tieMass.m * pVehicle.pFrAxleMass.tieMass.rCM[1] +
-      pVehicle.pRrAxleMass.unsprungMass.m * pVehicle.pRrAxleMass.unsprungMass.rCM[1] +
-      pVehicle.pRrAxleMass.ucaMass.m * pVehicle.pRrAxleMass.ucaMass.rCM[1] +
-      pVehicle.pRrAxleMass.lcaMass.m * pVehicle.pRrAxleMass.lcaMass.rCM[1] +
-      pVehicle.pRrAxleMass.tieMass.m * pVehicle.pRrAxleMass.tieMass.rCM[1]
-    ) / pTotalMass,
+      pVehicle.pSprungMass.m*pVehicle.pSprungMass.rCM[1] +
+      pVehicle.pFrAxleMass.unsprungMass.m*pVehicle.pFrAxleMass.unsprungMass.rCM[1] +
+      pVehicle.pFrAxleMass.ucaMass.m*pVehicle.pFrAxleMass.ucaMass.rCM[1] +
+      pVehicle.pFrAxleMass.lcaMass.m*pVehicle.pFrAxleMass.lcaMass.rCM[1] +
+      pVehicle.pFrAxleMass.tieMass.m*pVehicle.pFrAxleMass.tieMass.rCM[1] +
+      pVehicle.pRrAxleMass.unsprungMass.m*pVehicle.pRrAxleMass.unsprungMass.rCM[1] +
+      pVehicle.pRrAxleMass.ucaMass.m*pVehicle.pRrAxleMass.ucaMass.rCM[1] +
+      pVehicle.pRrAxleMass.lcaMass.m*pVehicle.pRrAxleMass.lcaMass.rCM[1] +
+      pVehicle.pRrAxleMass.tieMass.m*pVehicle.pRrAxleMass.tieMass.rCM[1]
+    )/pInitializationMass,
     (
-      pVehicle.pSprungMass.m * pVehicle.pSprungMass.rCM[2] +
-      pVehicle.pFrAxleMass.unsprungMass.m * pVehicle.pFrAxleMass.unsprungMass.rCM[2] +
-      pVehicle.pFrAxleMass.ucaMass.m * pVehicle.pFrAxleMass.ucaMass.rCM[2] +
-      pVehicle.pFrAxleMass.lcaMass.m * pVehicle.pFrAxleMass.lcaMass.rCM[2] +
-      pVehicle.pFrAxleMass.tieMass.m * pVehicle.pFrAxleMass.tieMass.rCM[2] +
-      pVehicle.pRrAxleMass.unsprungMass.m * pVehicle.pRrAxleMass.unsprungMass.rCM[2] +
-      pVehicle.pRrAxleMass.ucaMass.m * pVehicle.pRrAxleMass.ucaMass.rCM[2] +
-      pVehicle.pRrAxleMass.lcaMass.m * pVehicle.pRrAxleMass.lcaMass.rCM[2] +
-      pVehicle.pRrAxleMass.tieMass.m * pVehicle.pRrAxleMass.tieMass.rCM[2]
-    ) / pTotalMass,
+      pVehicle.pSprungMass.m*pVehicle.pSprungMass.rCM[2] +
+      pVehicle.pFrAxleMass.unsprungMass.m*pVehicle.pFrAxleMass.unsprungMass.rCM[2] +
+      pVehicle.pFrAxleMass.ucaMass.m*pVehicle.pFrAxleMass.ucaMass.rCM[2] +
+      pVehicle.pFrAxleMass.lcaMass.m*pVehicle.pFrAxleMass.lcaMass.rCM[2] +
+      pVehicle.pFrAxleMass.tieMass.m*pVehicle.pFrAxleMass.tieMass.rCM[2] +
+      pVehicle.pRrAxleMass.unsprungMass.m*pVehicle.pRrAxleMass.unsprungMass.rCM[2] +
+      pVehicle.pRrAxleMass.ucaMass.m*pVehicle.pRrAxleMass.ucaMass.rCM[2] +
+      pVehicle.pRrAxleMass.lcaMass.m*pVehicle.pRrAxleMass.lcaMass.rCM[2] +
+      pVehicle.pRrAxleMass.tieMass.m*pVehicle.pRrAxleMass.tieMass.rCM[2]
+    )/pInitializationMass,
     (
-      pVehicle.pSprungMass.m * pVehicle.pSprungMass.rCM[3] +
-      pVehicle.pFrAxleMass.unsprungMass.m * pVehicle.pFrAxleMass.unsprungMass.rCM[3] +
-      pVehicle.pFrAxleMass.ucaMass.m * pVehicle.pFrAxleMass.ucaMass.rCM[3] +
-      pVehicle.pFrAxleMass.lcaMass.m * pVehicle.pFrAxleMass.lcaMass.rCM[3] +
-      pVehicle.pFrAxleMass.tieMass.m * pVehicle.pFrAxleMass.tieMass.rCM[3] +
-      pVehicle.pRrAxleMass.unsprungMass.m * pVehicle.pRrAxleMass.unsprungMass.rCM[3] +
-      pVehicle.pRrAxleMass.ucaMass.m * pVehicle.pRrAxleMass.ucaMass.rCM[3] +
-      pVehicle.pRrAxleMass.lcaMass.m * pVehicle.pRrAxleMass.lcaMass.rCM[3] +
-      pVehicle.pRrAxleMass.tieMass.m * pVehicle.pRrAxleMass.tieMass.rCM[3]
-    ) / pTotalMass
-  } "Initial chassis reference position";
+      pVehicle.pSprungMass.m*pVehicle.pSprungMass.rCM[3] +
+      pVehicle.pFrAxleMass.unsprungMass.m*pVehicle.pFrAxleMass.unsprungMass.rCM[3] +
+      pVehicle.pFrAxleMass.ucaMass.m*pVehicle.pFrAxleMass.ucaMass.rCM[3] +
+      pVehicle.pFrAxleMass.lcaMass.m*pVehicle.pFrAxleMass.lcaMass.rCM[3] +
+      pVehicle.pFrAxleMass.tieMass.m*pVehicle.pFrAxleMass.tieMass.rCM[3] +
+      pVehicle.pRrAxleMass.unsprungMass.m*pVehicle.pRrAxleMass.unsprungMass.rCM[3] +
+      pVehicle.pRrAxleMass.ucaMass.m*pVehicle.pRrAxleMass.ucaMass.rCM[3] +
+      pVehicle.pRrAxleMass.lcaMass.m*pVehicle.pRrAxleMass.lcaMass.rCM[3] +
+      pVehicle.pRrAxleMass.tieMass.m*pVehicle.pRrAxleMass.tieMass.rCM[3]
+    )/pInitializationMass
+  } "Default chassis start position when no QSS pose is supplied";
 
   extends BobLib.Chassis.Chassis_LockRrSteer(
-    final chassisReferencePosition = pVehicleCG,
+    chassisReferencePosition = pInitializationCG,
     final frontWheelRadius = pVehicle.pFrPartialWheel.R0,
     final rearWheelRadius = pVehicle.pRrPartialWheel.R0,
     final contactPatchPosition_1 =
@@ -150,6 +170,11 @@ model Chassis_DW
         {pVehicle.pRrDW.wheelCenter[1], 0, pVehicle.pRrDW.wheelCenter[3]}),
     detailedChassis(
       redeclare FrAxleModel frAxleDW(
+        fixInitialLeftLowerArmAngle = fixInitialSuspensionAngles,
+        fixInitialRightLowerArmAngle = fixInitialSuspensionAngles,
+        fixInitialLowerArmAngularVelocities = fixInitialSuspensionAngles,
+        initialLeftLowerArmAngle = initialFrontLeftLowerArmAngle,
+        initialRightLowerArmAngle = initialFrontRightLowerArmAngle,
         pAxle = pVehicle.pFrAxleDW,
         pRack = pVehicle.pFrRack,
         pStabar = pFrStabar,
@@ -195,6 +220,11 @@ model Chassis_DW
             LSGKP = pVehicle.pFrTireModel.relaxation.LSGKP,
             LSGAL = pVehicle.pFrTireModel.relaxation.LSGAL))),
       redeclare RrAxleModel rrAxleDW(
+        fixInitialLeftLowerArmAngle = fixInitialSuspensionAngles,
+        fixInitialRightLowerArmAngle = fixInitialSuspensionAngles,
+        fixInitialLowerArmAngularVelocities = fixInitialSuspensionAngles,
+        initialLeftLowerArmAngle = initialRearLeftLowerArmAngle,
+        initialRightLowerArmAngle = initialRearRightLowerArmAngle,
         pAxle = pVehicle.pRrAxleDW,
         pRack = pVehicle.pRrRack,
         pStabar = pRrStabar,
