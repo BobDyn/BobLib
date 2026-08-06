@@ -504,6 +504,19 @@ record EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord
 
   parameter MassRecord pSprungMass = BobLib.Utilities.Mechanics.Functions.combineMassRecords({pBaseSprungMass, pDriverMass});
 
+  parameter BobLib.Records.VehicleRecord.Chassis.QSSInitializationRecord pQSSInitialization(
+      referenceVelocity = 15,
+      chassisReferencePosition = {-0.810146083618726, 1.742472521734604e-6, 0.281770875605249},
+      chassisReferenceAngles = {0, 0.00104599750922714, 0},
+      frontLeftLowerArmAngle = 0.0125840337509824,
+      frontRightLowerArmAngle = -0.0125840337509825,
+      rearLeftLowerArmAngle = 0.00868319343639186,
+      rearRightLowerArmAngle = -0.00868319343639172,
+      frontSpringLength = 0.175156854188570,
+      rearSpringLength = 0.244911388707023,
+      frontNormalLoad = 710.509308664321,
+      rearNormalLoad = 721.422043064354);
+
   parameter Aero.CFDAeroMapRecord pAero(
       referenceSpeed = 15.0,
       aeroRef = {1.0, 0.0, 0.0},

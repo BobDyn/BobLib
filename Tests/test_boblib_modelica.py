@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import csv
 import re
 import shutil
 import subprocess
@@ -124,6 +125,119 @@ def _check_model(model: str) -> tuple[int, int]:
 def test_boblib_model_translates(model: str) -> None:
     equation_count, variable_count = _check_model(model)
     print(f"{model}: {equation_count} equations, {variable_count} variables")
+
+
+def test_default_vehicle_mass_properties_include_both_axle_sides() -> None:
+    omc = shutil.which("omc")
+    if omc is None:
+        pytest.skip("OpenModelica omc is not installed")
+
+    repo_root = _repo_root()
+    library_root = repo_root / "BobLib"
+    with tempfile.TemporaryDirectory() as temporary_directory:
+        work_dir = Path(temporary_directory)
+        probe_path = work_dir / "ChassisMassPropertiesProbe.mo"
+        result_path = work_dir / "ChassisMassPropertiesProbe_res.csv"
+        probe_path.write_text(
+            """
+model ChassisMassPropertiesProbe
+
+  import BobLib.Records.VehicleDefn.EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord;
+  import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.MassRecord;
+
+  parameter EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord pVehicle =
+    EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord();
+  final parameter MassRecord pVehicleMass =
+    BobLib.Utilities.Mechanics.Functions.combineSymmetricAxleMassRecords(
+      pVehicle.pSprungMass,
+      {pVehicle.pFrAxleMass, pVehicle.pRrAxleMass});
+
+  output Real totalMass = pVehicleMass.m;
+  output Real vehicleCG[3] = pVehicleMass.rCM;
+
+end ChassisMassPropertiesProbe;
+""".strip()
+            + "\n"
+        )
+        mos_path = work_dir / "chassis_mass_properties_probe.mos"
+        mos_path.write_text(
+            f"""
+clear();
+setCommandLineOptions("{OMC_COMMAND_LINE_OPTIONS}");
+loadModel(Modelica, {{"{MODELICA_VERSION}"}});
+loadModel(VehicleInterfaces, {{"{VEHICLE_INTERFACES_VERSION}"}});
+loadFile("{library_root.as_posix()}/package.mo");
+loadFile("{probe_path.as_posix()}");
+cd("{work_dir.as_posix()}");
+simulate(
+  ChassisMassPropertiesProbe,
+  startTime=0,
+  stopTime=0,
+  numberOfIntervals=1,
+  outputFormat="csv",
+  variableFilter="time|totalMass|vehicleCG.*");
+getErrorString();
+""".strip()
+            + "\n"
+        )
+
+        completed = subprocess.run(
+            [omc, str(mos_path)],
+            check=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+        )
+        assert completed.returncode == 0, completed.stdout
+        assert result_path.is_file(), completed.stdout
+
+        with result_path.open(newline="") as stream:
+            final = list(csv.DictReader(stream))[-1]
+
+    assert float(final["totalMass"]) == pytest.approx(261.0726511400001, abs=1e-10)
+    assert float(final["vehicleCG[1]"]) == pytest.approx(
+        -0.800270849913269,
+        abs=1e-12,
+    )
+    assert float(final["vehicleCG[2]"]) == pytest.approx(
+        1.511554237018939e-6,
+        abs=1e-15,
+    )
+    assert float(final["vehicleCG[3]"]) == pytest.approx(
+        0.2796156783777441,
+        abs=1e-12,
+    )
+
+
+def test_vehicle_sim_qss_initialization_is_wired_from_vehicle_record() -> None:
+    repo_root = _repo_root()
+    vehicle_sim = (
+        repo_root / "BobLib" / "Experiments" / "Standards" / "VehicleSim.mo"
+    ).read_text()
+    axle = (
+        repo_root / "BobLib" / "Chassis" / "Suspension" / "AxleDWBase.mo"
+    ).read_text()
+    record = (
+        repo_root
+        / "BobLib"
+        / "Records"
+        / "VehicleDefn"
+        / "EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord.mo"
+    ).read_text()
+
+    required_vehicle_sim = (
+        "chassisReferencePosition = pVehicle.pQSSInitialization.chassisReferencePosition",
+        "chassisReferenceAngles = pVehicle.pQSSInitialization.chassisReferenceAngles",
+        "fixInitialSuspensionAngles = true",
+        "initialFrontLeftLowerArmAngle = pVehicle.pQSSInitialization.frontLeftLowerArmAngle",
+        "initialRearRightLowerArmAngle = pVehicle.pQSSInitialization.rearRightLowerArmAngle",
+    )
+    assert all(fragment in vehicle_sim for fragment in required_vehicle_sim)
+    assert "fixed = fixInitialLeftLowerArmAngle" in axle
+    assert "fixed = fixInitialRightLowerArmAngle" in axle
+    assert "fixed = fixInitialLowerArmAngularVelocities" in axle
+    assert "frontSpringLength = 0.175156854188570" in record
+    assert "rearSpringLength = 0.244911388707023" in record
 
 
 def test_base_vehicle_sim_replaceable_placements_are_canonical() -> None:

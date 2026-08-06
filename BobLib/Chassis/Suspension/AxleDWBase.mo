@@ -40,6 +40,17 @@ partial model AxleDWBase
                                                wheelCenter = Vector.mirrorXZ(pLeftDW.wheelCenter));
   parameter AxleMassRecord pLeftAxleMass;
 
+  parameter Boolean fixInitialLeftLowerArmAngle = false
+    "Use the supplied left lower-arm angle as a fixed initial suspension state";
+  parameter Boolean fixInitialRightLowerArmAngle = false
+    "Use the supplied right lower-arm angle as a fixed initial suspension state";
+  parameter Boolean fixInitialLowerArmAngularVelocities = false
+    "Initialize both lower-arm angular velocities to zero";
+  parameter SI.Angle initialLeftLowerArmAngle = 0
+    "Four-post-solved initial left lower-arm angle";
+  parameter SI.Angle initialRightLowerArmAngle = 0
+    "Four-post-solved initial right lower-arm angle";
+
   parameter AxleMassRecord pRightAxleMass(unsprungMass(m = pLeftAxleMass.unsprungMass.m,
                                                        rCM = Vector.mirrorXZ(pLeftAxleMass.unsprungMass.rCM),
                                                        inertia = Tensor.mirrorXZ(pLeftAxleMass.unsprungMass.inertia)),
@@ -97,13 +108,19 @@ partial model AxleDWBase
   BobLib.Chassis.Suspension.Templates.DoubleWishbone.WishboneUprightLoop leftWishboneUprightLoop(
     pDW = pLeftDW,
     final linkDiameter = linkDiameter,
-    final jointDiameter = jointDiameter) annotation(
+    final jointDiameter = jointDiameter,
+    lowerJoint_i(
+      phi(start = initialLeftLowerArmAngle, fixed = fixInitialLeftLowerArmAngle),
+      w(start = 0, fixed = fixInitialLowerArmAngularVelocities))) annotation(
     Placement(transformation(origin = {-69, 50}, extent = {{29, -29}, {-29, 29}})));
 
   BobLib.Chassis.Suspension.Templates.DoubleWishbone.WishboneUprightLoop rightWishboneUprightLoop(
     pDW = pRightDW,
     final linkDiameter = linkDiameter,
-    final jointDiameter = jointDiameter) annotation(
+    final jointDiameter = jointDiameter,
+    lowerJoint_i(
+      phi(start = initialRightLowerArmAngle, fixed = fixInitialRightLowerArmAngle),
+      w(start = 0, fixed = fixInitialLowerArmAngularVelocities))) annotation(
     Placement(transformation(origin = {69, 50}, extent = {{-29, -29}, {29, 29}})));
 
   BobLib.Chassis.Suspension.Linkages.Rod leftTieRod(
