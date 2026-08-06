@@ -37,7 +37,7 @@ equation
     abs(negativeQuarterTurn + Modelica.Constants.pi/2) < 1e-12,
     "Signed negative rotation must be preserved");
   assert(
-    zeroVectorAngle == 0,
+    abs(zeroVectorAngle) < 1e-12,
     "Zero-length inputs must use the documented neutral result");
 
   annotation(
