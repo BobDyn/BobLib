@@ -71,8 +71,8 @@ partial model BaseFourPostSim
                               redeclare Tire.BaseTire leftTire(pPartialWheel = pVehicle.pFrPartialWheel,
                                                                redeclare Tire.TirePhysics.Wheel0DOF wheelModel(partialWheelParams = pVehicle.pFrPartialWheel),
                                                                redeclare Tire.MF52.SlipModel.NoSlip slipModel),
-                              redeclare Tire.BaseTire rightTire(pPartialWheel = pVehicle.pFrPartialWheel,
-                                                               redeclare Tire.TirePhysics.Wheel0DOF wheelModel(partialWheelParams = pVehicle.pFrPartialWheel),
+                              redeclare Tire.BaseTire rightTire(
+                                                               redeclare Tire.TirePhysics.Wheel0DOF wheelModel,
                                                                redeclare Tire.MF52.SlipModel.NoSlip slipModel)) annotation(
     Placement(transformation(origin = {0.25, 52.4444}, extent = {{-37.25, -16.5556}, {37.25, 16.5556}})));
 
@@ -85,8 +85,8 @@ partial model BaseFourPostSim
                               redeclare Tire.BaseTire leftTire(pPartialWheel = pVehicle.pRrPartialWheel,
                                                                redeclare Tire.TirePhysics.Wheel0DOF wheelModel(partialWheelParams = pVehicle.pRrPartialWheel),
                                                                redeclare Tire.MF52.SlipModel.NoSlip slipModel),
-                              redeclare Tire.BaseTire rightTire(pPartialWheel = pVehicle.pRrPartialWheel,
-                                                               redeclare Tire.TirePhysics.Wheel0DOF wheelModel(partialWheelParams = pVehicle.pRrPartialWheel),
+                              redeclare Tire.BaseTire rightTire(
+                                                               redeclare Tire.TirePhysics.Wheel0DOF wheelModel,
                                                                redeclare Tire.MF52.SlipModel.NoSlip slipModel)) annotation(
     Placement(transformation(origin = {-0.285728, -49.8887}, extent = {{-36.5715, -14.2222}, {36.5715, 14.2222}})));
 
