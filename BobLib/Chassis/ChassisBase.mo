@@ -20,11 +20,17 @@ partial model ChassisBase
     "Initial longitudinal speed used to initialize tire spin";
   parameter SI.Position chassisReferencePosition[3] = {0, 0, 0}
     "Initial world position of the chassis reference frame";
+  parameter SI.Angle chassisReferenceAngles[3] = {0, 0, 0}
+    "Initial chassis orientation using the FreeMotion rotation sequence";
 
   output SI.Force Fz_1 "Front-left tire normal load";
   output SI.Force Fz_2 "Front-right tire normal load";
   output SI.Force Fz_3 "Rear-left tire normal load";
   output SI.Force Fz_4 "Rear-right tire normal load";
+  output SI.Length frontLeftSpringLength "Front-left suspension spring length";
+  output SI.Length frontRightSpringLength "Front-right suspension spring length";
+  output SI.Length rearLeftSpringLength "Rear-left suspension spring length";
+  output SI.Length rearRightSpringLength "Rear-right suspension spring length";
   output SI.Angle leftSteerAngle "Front-left road wheel steer angle";
   output SI.Angle rightSteerAngle "Front-right road wheel steer angle";
   output SI.Angle avgSteerAngle "Average front road wheel steer angle";
@@ -129,7 +135,7 @@ protected
     animation = false,
     r_rel_a(start = {0, 0, 0}, each fixed = true),
     angles_fixed = true,
-    angles_start = {0, 0, 0},
+    angles_start = chassisReferenceAngles,
     enforceStates = true,
     useQuaternions = false,
     w_rel_a_fixed = true,
@@ -189,6 +195,10 @@ equation
   Fz_2 = detailedChassis.frAxleDW.rightTire.Fz;
   Fz_3 = detailedChassis.rrAxleDW.leftTire.Fz;
   Fz_4 = detailedChassis.rrAxleDW.rightTire.Fz;
+  frontLeftSpringLength = detailedChassis.frAxleDW.leftSpringLength;
+  frontRightSpringLength = detailedChassis.frAxleDW.rightSpringLength;
+  rearLeftSpringLength = detailedChassis.rrAxleDW.leftSpringLength;
+  rearRightSpringLength = detailedChassis.rrAxleDW.rightSpringLength;
 
   leftWheelVector =
     Frames.resolve1(
