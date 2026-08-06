@@ -7,6 +7,9 @@ BobLibTest.Regression.MF52PureSlipSmoke,0.01,Mz,-28.781188544190439,1e-6,1e-9,MF
 BobLibTest.Regression.MF52PureSlipSmoke,0.01,pneumaticTrail,0.021053502425769931,1e-9,1e-9,MF52 pure slip smoke pneumatic trail
 BobLibTest.Regression.MF52PureSlipSmoke,0.01,residualScrub,0,1e-9,1e-9,MF52 pure slip smoke residual scrub
 BobLibTest.Regression.MF52PureSlipSmoke,0.01,MzReconstructed,-28.781188544190439,1e-6,1e-9,MF52 aligning moment reconstruction
+BobLibTest.TestUtilities.TestMechanics.TestMultiBody.TestContactMechanics.TestGroundPhysicsRotatedFrame,0.01,contactForceWorld[1],0,1e-9,1e-9,rotated contact-frame force has no world x component
+BobLibTest.TestUtilities.TestMechanics.TestMultiBody.TestContactMechanics.TestGroundPhysicsRotatedFrame,0.01,contactForceWorld[2],0,1e-9,1e-9,rotated contact-frame force has no world y component
+BobLibTest.TestUtilities.TestMechanics.TestMultiBody.TestContactMechanics.TestGroundPhysicsRotatedFrame,0.01,contactForceWorld[3],-1000.000252499937,1e-6,1e-9,rotated contact-frame force remains world vertical
 BobLibTest.TestVehicle.TestAero.TestCFDAeroMap,0.01,aero.drag,52,1e-9,1e-9,CFD aero map drag interpolation
 BobLibTest.TestVehicle.TestAero.TestCFDAeroMap,0.01,aero.downforce,520,1e-9,1e-9,CFD aero map downforce interpolation
 BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor,0.01,forwardMotoringPower,9345.61646995376,0.01,1e-9,Positive power produces positive mechanical power at positive speed
