@@ -7,6 +7,8 @@ BobLibTest.Regression.MF52PureSlipSmoke,0.01,Mz,-28.781188544190439,1e-6,1e-9,MF
 BobLibTest.Regression.MF52PureSlipSmoke,0.01,pneumaticTrail,0.021053502425769931,1e-9,1e-9,MF52 pure slip smoke pneumatic trail
 BobLibTest.Regression.MF52PureSlipSmoke,0.01,residualScrub,0,1e-9,1e-9,MF52 pure slip smoke residual scrub
 BobLibTest.Regression.MF52PureSlipSmoke,0.01,MzReconstructed,-28.781188544190439,1e-6,1e-9,MF52 aligning moment reconstruction
+BobLibTest.Regression.TireForceFrameSmoke,0.001,appliedForceWorld[3],0,1e-9,1e-9,Tire shear force remains in the road plane
+BobLibTest.Regression.TireForceFrameSmoke,0.001,appliedTorqueWorld[3],100,1e-9,1e-9,Tire aligning moment acts about the road normal
 BobLibTest.TestUtilities.TestMechanics.TestMultiBody.TestContactMechanics.TestGroundPhysicsRotatedFrame,0.01,contactForceWorld[1],0,1e-9,1e-9,rotated contact-frame force has no world x component
 BobLibTest.TestUtilities.TestMechanics.TestMultiBody.TestContactMechanics.TestGroundPhysicsRotatedFrame,0.01,contactForceWorld[2],0,1e-9,1e-9,rotated contact-frame force has no world y component
 BobLibTest.TestUtilities.TestMechanics.TestMultiBody.TestContactMechanics.TestGroundPhysicsRotatedFrame,0.01,contactForceWorld[3],-1000.000252499937,1e-6,1e-9,rotated contact-frame force remains world vertical
