@@ -33,6 +33,7 @@ CHECK_MODELS = (
     "BobLib.DriverEnvironments.EVDriveByWire",
     "BobLibTest.TestVehicle.TestPowertrain.TestBatteryInverter",
     "BobLibTest.TestVehicle.TestPowertrain.TestBatteryInverterMotor",
+    "BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor",
     "BobLibTest.TestVehicle.TestAero.TestCFDAeroMap",
     "BobLibTest.TestVehicle.TestPowertrain.TestVCU",
     "BobLibTest.TestVehicle.TestPowertrain.TestStandardVCU",

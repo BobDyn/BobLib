@@ -32,6 +32,8 @@ record MotorRecord
     "Motor regen efficiency reference";
   parameter SI.AngularVelocity w_eps = 1.0
     "Low-speed regularization for power-to-torque conversion";
+  parameter Boolean reverseLaunch = false
+    "Select reverse torque direction when starting exactly from standstill";
   parameter SI.Inertia rotorJ = 0.02521
     "Motor rotor inertia";
 

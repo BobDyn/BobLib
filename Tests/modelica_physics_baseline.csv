@@ -12,5 +12,15 @@ BobLibTest.TestUtilities.TestMechanics.TestMultiBody.TestContactMechanics.TestGr
 BobLibTest.TestUtilities.TestMechanics.TestMultiBody.TestContactMechanics.TestGroundPhysicsRotatedFrame,0.01,contactForceWorld[3],-1000.000252499937,1e-6,1e-9,rotated contact-frame force remains world vertical
 BobLibTest.TestVehicle.TestAero.TestCFDAeroMap,0.01,aero.drag,52,1e-9,1e-9,CFD aero map drag interpolation
 BobLibTest.TestVehicle.TestAero.TestCFDAeroMap,0.01,aero.downforce,520,1e-9,1e-9,CFD aero map downforce interpolation
+BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor,0.01,forwardMotoringPower,9345.61646995376,0.01,1e-9,Positive power produces positive mechanical power at positive speed
+BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor,0.01,reverseMotoringPower,9345.61646995376,0.01,1e-9,Positive power produces positive mechanical power at negative speed
+BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor,0.01,forwardRegenPower,-10645.08892770384,0.01,1e-9,Negative power produces negative mechanical power at positive speed
+BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor,0.01,reverseRegenPower,-10645.08892770384,0.01,1e-9,Negative power produces negative mechanical power at negative speed
+BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor,0.01,forwardMotoringTorque,94.09014067819274,1e-6,1e-9,Motoring torque follows positive shaft direction
+BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor,0.01,reverseMotoringTorque,-94.09014067819274,1e-6,1e-9,Motoring torque follows negative shaft direction
+BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor,0.01,forwardRegenTorque,-107.1730172064809,1e-6,1e-9,Regeneration opposes positive shaft direction
+BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor,0.01,reverseRegenTorque,107.1730172064809,1e-6,1e-9,Regeneration opposes negative shaft direction
+BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor,0.01,forwardLaunchTorque,219.6,1e-9,1e-9,Standstill defaults to the forward launch direction
+BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor,0.01,reverseLaunchTorque,-219.6,1e-9,1e-9,Configured reverse launch uses reverse torque direction
 BobLibTest.TestVehicle.TestPowertrain.TestVCU,0.01,vcu.P_req,3000,1e-6,1e-9,VCU requested motor power
 BobLibTest.TestVehicle.TestPowertrain.TestVCU,0.01,vcu.tau_cmd_limited,30,1e-9,1e-9,VCU torque limit command
