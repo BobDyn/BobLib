@@ -20,6 +20,12 @@ model AngleBetweenSmoke
       {0, -1, 0},
       {0, 0, 1}) + 0*time;
 
+  output Real skewAxisAngle =
+    BobLib.Utilities.Math.Vector.angle_between(
+      {1, 0, 0},
+      {1, 1, 0},
+      {0, 1, 1}) + 0*time;
+
   output Real zeroVectorAngle =
     BobLib.Utilities.Math.Vector.angle_between(
       {0, 0, 0},
@@ -36,6 +42,9 @@ equation
   assert(
     abs(negativeQuarterTurn + Modelica.Constants.pi/2) < 1e-12,
     "Signed negative rotation must be preserved");
+  assert(
+    abs(skewAxisAngle - Modelica.Constants.pi/4) < 1e-12,
+    "Reference-axis skew must not change the angle magnitude");
   assert(
     abs(zeroVectorAngle) < 1e-12,
     "Zero-length inputs must use the documented neutral result");
