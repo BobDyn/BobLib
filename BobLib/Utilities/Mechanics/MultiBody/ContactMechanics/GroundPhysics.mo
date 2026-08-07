@@ -35,8 +35,15 @@ equation
   f_raw = c*pen + d*der(pen);
   f_z = smooth(1, 0.5*(sqrt(f_raw*f_raw + forceEps*forceEps) + f_raw));
 
-  frame_a.f = {0, 0, f_z};
-  frame_b.f = -frame_a.f;
+  // Connector forces are resolved in their respective local frames. Resolve
+  // the equal-and-opposite world-vertical contact forces separately so a raw
+  // contact-patch frame can carry arbitrary toe and camber.
+  frame_a.f = Modelica.Mechanics.MultiBody.Frames.resolve2(
+    frame_a.R,
+    {0, 0, f_z});
+  frame_b.f = Modelica.Mechanics.MultiBody.Frames.resolve2(
+    frame_b.R,
+    {0, 0, -f_z});
 
   frame_a.t = zeros(3);
   frame_b.t = zeros(3);

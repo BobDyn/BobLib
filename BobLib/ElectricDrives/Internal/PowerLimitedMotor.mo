@@ -45,7 +45,10 @@ model PowerLimitedMotor
   parameter Boolean enablePeakTimer = true "If true, peak limits ramp down after peakTime";
 
   // Numerical params
-  parameter SI.AngularVelocity w_eps = 1e-3 "Small omega";
+  parameter SI.AngularVelocity w_eps(min = Modelica.Constants.small) = 1e-3
+    "Speed regularization and direction-latch threshold";
+  parameter Boolean reverseLaunch = false
+    "Select reverse torque direction when starting exactly from standstill";
 
   // Diagnostics
   SI.AngularVelocity w "Shaft speed [rad/s]";
@@ -78,8 +81,12 @@ protected
 
   Real P_allow;
   Real P_mech_limited;
-  Real tau_act;
-  SI.AngularVelocity w_eff "Effective omega for smooth power->torque conversion";
+  SI.Torque tau_act(start = 0, fixed = true)
+    "Actuated shaft torque";
+  discrete Real shaftDirection(start = 1, fixed = true)
+    "Latched shaft direction (+1 forward, -1 reverse)";
+  SI.AngularVelocity w_eff
+    "Direction-preserving regularized omega for power-to-torque conversion";
 
   parameter SI.Time tau_tau = 0.002 "Torque actuator time constant";
 
@@ -141,8 +148,28 @@ equation
         min(tau_lim_from_power,
             tau_lim_from_current)));
 
+  // A power request alone has no direction information at standstill. Use the
+  // configured launch direction there, then latch either established shaft
+  // direction outside +/-w_eps. Holding the last direction inside the deadband
+  // avoids torque-sign chatter as the shaft crosses zero.
+  when initial() then
+    shaftDirection =
+
+      if abs(w) > w_eps then
+        if w > 0 then 1 else -1
+      else
+        if reverseLaunch then -1 else 1;
+  elsewhen w > w_eps then
+    shaftDirection = 1;
+  elsewhen w < -w_eps then
+    shaftDirection = -1;
+  end when;
+
   // Convert limited mechanical power to torque
-  w_eff = sqrt(w*w + w_eps*w_eps);
+  // The magnitude is smooth through zero while shaftDirection provides the
+  // physically required sign. At established speed tau_cmd*w therefore has
+  // the same sign as P_mech_limited for both directions of rotation.
+  w_eff = shaftDirection*sqrt(w*w + w_eps*w_eps);
   tau_cmd = noEvent(max(min(P_mech_limited / w_eff, tau_lim), -tau_lim));
 
   // Torque actuator dynamics
@@ -161,6 +188,14 @@ equation
     Documentation(info = "<html>
 <p>
 Model <code>PowerLimitedMotor</code> converts a power request and motor-speed state into limited shaft torque.
+</p>
+<p>
+Positive power denotes motoring and negative power denotes regeneration,
+independent of shaft rotation direction. The model latches the established
+shaft direction after speed exceeds <code>w_eps</code> and holds it while speed
+is inside that deadband to prevent torque-sign chatter. Since power alone does
+not encode a direction at exactly zero speed, standstill uses forward launch by
+default; set <code>reverseLaunch=true</code> for a reverse launch.
 </p>
 <p>
 It represents the BobLib motor-side behavior behind the public electric-drive adapter while keeping the VehicleInterfaces contract at the package boundary.

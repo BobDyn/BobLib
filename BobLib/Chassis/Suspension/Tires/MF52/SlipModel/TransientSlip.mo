@@ -78,7 +78,6 @@ protected
   Real alpha_raw;
   Real dfz;
   Real camber_factor;
-  Real Vx_sign;
 
 initial equation
   u = -sigma_kappa * (Vx - R0*omega) / noEvent(max(abs(Vx), V_min));
@@ -111,14 +110,13 @@ equation
 
   // Smooth regularized speed
   Vx_abs_eff = sqrt(Vx^2 + V_min^2);
-  Vx_sign = noEvent(if Vx >= 0 then 1 else -1);
 
   // Transient dynamics (MF5.2 consistent)
   der(u) = -Vsx - (Vx_abs_eff / sigma_kappa) * u;
   der(v) = Vsy - (Vx_abs_eff / sigma_alpha) * v;
 
   // Output slips
-  kappa_raw = (u / sigma_kappa) * Vx_sign;
+  kappa_raw = u / sigma_kappa;
   alpha_raw = atan2(v, sigma_alpha);
 
   kappa = noEvent(max(min(kappa_raw, kappa_max), -kappa_max));
