@@ -34,6 +34,18 @@ equation
     abs(symmetryError) < 1e-10,
     "Mirrored wheel kinematics must produce mirrored transient slip");
 
+initial equation
+  assert(
+    abs(
+      -(forward.Vx - forward.R0*forward.omega) -
+      sqrt(forward.Vx^2 + forward.V_min^2)*forward.u/forward.sigma_kappa) < 1e-12,
+    "Forward transient slip must initialize at the dynamic equilibrium");
+  assert(
+    abs(
+      -(reverse.Vx - reverse.R0*reverse.omega) -
+      sqrt(reverse.Vx^2 + reverse.V_min^2)*reverse.u/reverse.sigma_kappa) < 1e-12,
+    "Reverse transient slip must initialize at the dynamic equilibrium");
+
   annotation(
     experiment(StartTime = 0, StopTime = 0.1, Tolerance = 1e-6, Interval = 0.01));
 end TransientSlipReverseSmoke;

@@ -80,8 +80,8 @@ protected
   Real camber_factor;
 
 initial equation
-  u = -sigma_kappa * (Vx - R0*omega) / noEvent(max(abs(Vx), V_min));
-  v = sigma_alpha * (-Vy) / noEvent(max(abs(Vx), V_min));
+  u = -sigma_kappa * (Vx - R0*omega) / Vx_abs_eff;
+  v = sigma_alpha * (-Vy) / Vx_abs_eff;
 
 equation
   Fz_eff = noEvent(max(Fz, 1e-3));
