@@ -71,8 +71,8 @@ partial model BaseFourPostSim
                               redeclare Tire.BaseTire leftTire(pPartialWheel = pVehicle.pFrPartialWheel,
                                                                redeclare Tire.TirePhysics.Wheel0DOF wheelModel(partialWheelParams = pVehicle.pFrPartialWheel),
                                                                redeclare Tire.MF52.SlipModel.NoSlip slipModel),
-                              redeclare Tire.BaseTire rightTire(pPartialWheel = pVehicle.pFrPartialWheel,
-                                                               redeclare Tire.TirePhysics.Wheel0DOF wheelModel(partialWheelParams = pVehicle.pFrPartialWheel),
+                              redeclare Tire.BaseTire rightTire(
+                                                               redeclare Tire.TirePhysics.Wheel0DOF wheelModel,
                                                                redeclare Tire.MF52.SlipModel.NoSlip slipModel)) annotation(
     Placement(transformation(origin = {0.25, 52.4444}, extent = {{-37.25, -16.5556}, {37.25, 16.5556}})));
 
@@ -85,8 +85,8 @@ partial model BaseFourPostSim
                               redeclare Tire.BaseTire leftTire(pPartialWheel = pVehicle.pRrPartialWheel,
                                                                redeclare Tire.TirePhysics.Wheel0DOF wheelModel(partialWheelParams = pVehicle.pRrPartialWheel),
                                                                redeclare Tire.MF52.SlipModel.NoSlip slipModel),
-                              redeclare Tire.BaseTire rightTire(pPartialWheel = pVehicle.pRrPartialWheel,
-                                                               redeclare Tire.TirePhysics.Wheel0DOF wheelModel(partialWheelParams = pVehicle.pRrPartialWheel),
+                              redeclare Tire.BaseTire rightTire(
+                                                               redeclare Tire.TirePhysics.Wheel0DOF wheelModel,
                                                                redeclare Tire.MF52.SlipModel.NoSlip slipModel)) annotation(
     Placement(transformation(origin = {-0.285728, -49.8887}, extent = {{-36.5715, -14.2222}, {36.5715, 14.2222}})));
 
@@ -193,14 +193,14 @@ protected
 
 protected
   final parameter Real cpInitFL[3] = pVehicle.pFrDW.wheelCenter + Frames.resolve1(Frames.axesRotations({1, 2, 3},
-                                                                                                       {pVehicle.pFrPartialWheel.staticGamma*pi/180, 0, pVehicle.pFrPartialWheel.staticAlpha*pi/180},
+                                                                                                       {Modelica.Units.Conversions.from_deg(pVehicle.pFrPartialWheel.staticGamma), 0, Modelica.Units.Conversions.from_deg(pVehicle.pFrPartialWheel.staticAlpha)},
                                                                                                        {0, 0, 0}),
                                                                                   {0, 0, -pVehicle.pFrPartialWheel.R0});
 
   final parameter Real cpInitFR[3] = Vector.mirrorXZ(cpInitFL);
 
   final parameter Real cpInitRL[3] = pVehicle.pRrDW.wheelCenter + Frames.resolve1(Frames.axesRotations({1, 2, 3},
-                                                                                                       {pVehicle.pRrPartialWheel.staticGamma*pi/180, 0, pVehicle.pRrPartialWheel.staticAlpha*pi/180},
+                                                                                                       {Modelica.Units.Conversions.from_deg(pVehicle.pRrPartialWheel.staticGamma), 0, Modelica.Units.Conversions.from_deg(pVehicle.pRrPartialWheel.staticAlpha)},
                                                                                                        {0, 0, 0}),
                                                                                   {0, 0, -pVehicle.pRrPartialWheel.R0});
 
