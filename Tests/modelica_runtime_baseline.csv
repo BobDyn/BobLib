@@ -1,5 +1,8 @@
 model,budget_s,description
 BobLibTest.Regression.MF52PureSlipSmoke,8,MF52 smoke physical baseline simulation
+BobLibTest.Regression.TireForceFrameSmoke,15,Tire road-frame force regression simulation
 BobLibTest.Regression.WheelAlignmentUnitsSmoke,10,Wheel alignment degree/radian equivalence regression simulation
+BobLibTest.TestUtilities.TestMechanics.TestMultiBody.TestContactMechanics.TestGroundPhysicsRotatedFrame,5,rotated contact-frame physical baseline simulation
 BobLibTest.TestVehicle.TestAero.TestCFDAeroMap,5,CFD aero map physical baseline simulation
+BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor,25,Motor power and torque sign physical baseline simulation
 BobLibTest.TestVehicle.TestPowertrain.TestVCU,5,VCU physical baseline simulation

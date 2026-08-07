@@ -7,8 +7,23 @@ BobLibTest.Regression.MF52PureSlipSmoke,0.01,Mz,-28.781188544190439,1e-6,1e-9,MF
 BobLibTest.Regression.MF52PureSlipSmoke,0.01,pneumaticTrail,0.021053502425769931,1e-9,1e-9,MF52 pure slip smoke pneumatic trail
 BobLibTest.Regression.MF52PureSlipSmoke,0.01,residualScrub,0,1e-9,1e-9,MF52 pure slip smoke residual scrub
 BobLibTest.Regression.MF52PureSlipSmoke,0.01,MzReconstructed,-28.781188544190439,1e-6,1e-9,MF52 aligning moment reconstruction
+BobLibTest.Regression.TireForceFrameSmoke,0.001,appliedForceWorld[3],0,1e-9,1e-9,Tire shear force remains in the road plane
+BobLibTest.Regression.TireForceFrameSmoke,0.001,appliedTorqueWorld[3],100,1e-9,1e-9,Tire aligning moment acts about the road normal
 BobLibTest.Regression.WheelAlignmentUnitsSmoke,0.001,maxAxisError,0,1e-12,1e-12,Degree-typed alignment matches explicit radian conversion
+BobLibTest.TestUtilities.TestMechanics.TestMultiBody.TestContactMechanics.TestGroundPhysicsRotatedFrame,0.01,contactForceWorld[1],0,1e-9,1e-9,rotated contact-frame force has no world x component
+BobLibTest.TestUtilities.TestMechanics.TestMultiBody.TestContactMechanics.TestGroundPhysicsRotatedFrame,0.01,contactForceWorld[2],0,1e-9,1e-9,rotated contact-frame force has no world y component
+BobLibTest.TestUtilities.TestMechanics.TestMultiBody.TestContactMechanics.TestGroundPhysicsRotatedFrame,0.01,contactForceWorld[3],-1000.000252499937,1e-6,1e-9,rotated contact-frame force remains world vertical
 BobLibTest.TestVehicle.TestAero.TestCFDAeroMap,0.01,aero.drag,52,1e-9,1e-9,CFD aero map drag interpolation
 BobLibTest.TestVehicle.TestAero.TestCFDAeroMap,0.01,aero.downforce,520,1e-9,1e-9,CFD aero map downforce interpolation
+BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor,0.01,forwardMotoringPower,9345.61646995376,0.01,1e-9,Positive power produces positive mechanical power at positive speed
+BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor,0.01,reverseMotoringPower,9345.61646995376,0.01,1e-9,Positive power produces positive mechanical power at negative speed
+BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor,0.01,forwardRegenPower,-10645.08892770384,0.01,1e-9,Negative power produces negative mechanical power at positive speed
+BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor,0.01,reverseRegenPower,-10645.08892770384,0.01,1e-9,Negative power produces negative mechanical power at negative speed
+BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor,0.01,forwardMotoringTorque,94.09014067819274,1e-6,1e-9,Motoring torque follows positive shaft direction
+BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor,0.01,reverseMotoringTorque,-94.09014067819274,1e-6,1e-9,Motoring torque follows negative shaft direction
+BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor,0.01,forwardRegenTorque,-107.1730172064809,1e-6,1e-9,Regeneration opposes positive shaft direction
+BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor,0.01,reverseRegenTorque,107.1730172064809,1e-6,1e-9,Regeneration opposes negative shaft direction
+BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor,0.01,forwardLaunchTorque,219.6,1e-9,1e-9,Standstill defaults to the forward launch direction
+BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor,0.01,reverseLaunchTorque,-219.6,1e-9,1e-9,Configured reverse launch uses reverse torque direction
 BobLibTest.TestVehicle.TestPowertrain.TestVCU,0.01,vcu.P_req,3000,1e-6,1e-9,VCU requested motor power
 BobLibTest.TestVehicle.TestPowertrain.TestVCU,0.01,vcu.tau_cmd_limited,30,1e-9,1e-9,VCU torque limit command

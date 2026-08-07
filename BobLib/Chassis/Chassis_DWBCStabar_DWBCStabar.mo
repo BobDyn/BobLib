@@ -157,11 +157,9 @@ model Chassis_DWBCStabar_DWBCStabar
             LSGKP = pVehicle.pFrTireModel.relaxation.LSGKP,
             LSGAL = pVehicle.pFrTireModel.relaxation.LSGAL)),
         redeclare Tire.MF52Tire rightTire(
-          pPartialWheel = pVehicle.pFrPartialWheel,
           pTireModel = pVehicle.pFrTireModel,
           redeclare Tire.TirePhysics.Wheel1DOF_Y wheelModel(
             longitudinalTorqueSign = -1,
-            partialWheelParams = pVehicle.pFrPartialWheel,
             wheel1DOF_YParams = pVehicle.pFrTire1DOF_YParams),
           redeclare Tire.MF52.SlipModel.TransientSlip slipModel(
             FNOMIN = pVehicle.pFrTireModel.relaxation.FNOMIN,
@@ -202,11 +200,9 @@ model Chassis_DWBCStabar_DWBCStabar
             LSGKP = pVehicle.pRrTireModel.relaxation.LSGKP,
             LSGAL = pVehicle.pRrTireModel.relaxation.LSGAL)),
         redeclare Tire.MF52Tire rightTire(
-          pPartialWheel = pVehicle.pRrPartialWheel,
           pTireModel = pVehicle.pRrTireModel,
           redeclare Tire.TirePhysics.Wheel1DOF_Y wheelModel(
             longitudinalTorqueSign = -1,
-            partialWheelParams = pVehicle.pRrPartialWheel,
             wheel1DOF_YParams = pVehicle.pRrTire1DOF_YParams),
           redeclare Tire.MF52.SlipModel.TransientSlip slipModel(
             FNOMIN = pVehicle.pRrTireModel.relaxation.FNOMIN,
