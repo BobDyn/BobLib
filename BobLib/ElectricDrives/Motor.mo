@@ -35,6 +35,8 @@ model Motor
     "Motor regen efficiency reference";
   parameter SI.AngularVelocity w_eps = 1.0
     "Low-speed regularization for power-to-torque conversion";
+  parameter Boolean reverseLaunch = false
+    "Select reverse torque direction when starting exactly from standstill";
   parameter SI.Inertia rotorJ = 0.02521
     "Motor rotor inertia";
 
@@ -62,7 +64,8 @@ model Motor
     P_cont_high = P_cont_high,
     eta_mot = eta_mot,
     eta_reg = eta_reg,
-    w_eps = w_eps) annotation(
+    w_eps = w_eps,
+    reverseLaunch = reverseLaunch) annotation(
       Placement(transformation(origin = {-20, 0}, extent = {{-30, -30}, {30, 30}})));
 
   Modelica.Mechanics.Rotational.Components.Inertia rotor(

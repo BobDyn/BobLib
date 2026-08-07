@@ -47,9 +47,6 @@ model BaseTire
   Modelica.Blocks.Sources.RealExpression realExpressionFy(y = 0) annotation(
     Placement(transformation(origin = {-90, -70}, extent = {{-10, -10}, {10, 10}})));
 
-  Modelica.Blocks.Sources.Constant constantZero(k = 0) annotation(
-    Placement(transformation(origin = {-90, -90}, extent = {{-10, -10}, {10, 10}})));
-
   // Torque expressions
   Modelica.Blocks.Sources.RealExpression realExpressionMx(y = 0) annotation(
     Placement(transformation(origin = {-90, 54}, extent = {{-10, -10}, {10, 10}})));
@@ -61,17 +58,23 @@ model BaseTire
     Placement(transformation(origin = {-90, 26}, extent = {{-10, -10}, {10, 10}})));
 
   Modelica.Mechanics.MultiBody.Forces.WorldForceAndTorque forceAndTorque(
-    resolveInFrame = Modelica.Mechanics.MultiBody.Types.ResolveInFrameB.frame_b,
+    resolveInFrame = Modelica.Mechanics.MultiBody.Types.ResolveInFrameB.world,
     animation = not headless) annotation(
     Placement(transformation(origin = {-30, -50}, extent = {{-10, -10}, {10, 10}})));
 
 protected
+  SI.Force contactForceWorld[3]
+    "Contact-patch cut force resolved in the world frame";
+  SI.Force tireForceWorld[3]
+    "Tire shear force resolved in the road plane";
+  SI.Torque tireTorqueWorld[3]
+    "Tire moment resolved about the road-plane axes";
   Real[3] e_xw "Unit vector along wheel x-axis, resolved in world frame";
   Real[3] e_yw "Unit vector along wheel y-axis, resolved in world frame";
   Real[3] e_spin "Unit vector along wheel spin axis, resolved in world frame";
   Real[3] e_zw "Unit vector along wheel z-axis, resolved in world frame";
   Real[3] e_xg "e_xw projected on the xy-plane (ground) and normalized";
-  Real[3] e_yg "e_yw projected on the xy-plane (ground) and normalized";
+  Real[3] e_yg "Road-plane lateral axis orthogonal to e_xg";
 
   // Velocity quantities (for slip calculation)
   Real[3] v_cp "Contact patch velocity in world frame";
@@ -82,7 +85,9 @@ protected
 equation
 
   // Normal load
-  Fz = noEvent(max(0, cpFrame.f[3]));
+  contactForceWorld =
+    Modelica.Mechanics.MultiBody.Frames.resolve1(cpFrame.R, cpFrame.f);
+  Fz = noEvent(max(0, contactForceWorld[3]));
 
   // World basis (from cpFrame)
   e_xw = Modelica.Mechanics.MultiBody.Frames.resolve1(cpFrame.R, {1, 0, 0});
@@ -92,7 +97,7 @@ equation
 
   // Ground-projected tire basis
   e_xg = normalize({e_xw[1], e_xw[2], 0});
-  e_yg = normalize({e_yw[1], e_yw[2], 0});
+  e_yg = {-e_xg[2], e_xg[1], 0};
 
   // Inclination angle
   gamma = Modelica.Math.asin(noEvent(max(-1.0, min(1.0, e_zw[2]))));
@@ -102,6 +107,19 @@ equation
   v_g = {v_cp[1], v_cp[2], 0};
   Vx = v_g[1]*e_xg[1] + v_g[2]*e_xg[2];
   Vy = v_g[1]*e_yg[1] + v_g[2]*e_yg[2];
+
+  // MF52 shear forces are defined in the road plane, using the same
+  // ground-projected axes as the slip kinematics.  Tire moments follow the
+  // corresponding road axes, with aligning moment about the road normal.
+  tireForceWorld =
+    realExpressionFx.y*e_xg +
+    realExpressionFy.y*e_yg;
+  tireTorqueWorld =
+    realExpressionMx.y*e_xg +
+    realExpressionMy.y*e_yg +
+    realExpressionMz.y*{0, 0, 1};
+  forceAndTorque.force = tireForceWorld;
+  forceAndTorque.torque = tireTorqueWorld;
 
   // Slip model
   slipModel.Vx = Vx;
@@ -117,18 +135,6 @@ equation
     Line(points = {{-100, 0}, {-30, 0}}));
   connect(wheelModel.cpFrame, cpFrame) annotation(
     Line(points = {{0, -30}, {0, -100}}, color = {95, 95, 95}));
-  connect(realExpressionFx.y, forceAndTorque.force[1]) annotation(
-    Line(points = {{-78, -56}, {-42, -56}}, color = {0, 0, 127}));
-  connect(realExpressionFy.y, forceAndTorque.force[2]) annotation(
-    Line(points = {{-78, -70}, {-60, -70}, {-60, -56}, {-42, -56}}, color = {0, 0, 127}));
-  connect(constantZero.y, forceAndTorque.force[3]) annotation(
-    Line(points = {{-78, -90}, {-50, -90}, {-50, -56}, {-42, -56}}, color = {0, 0, 127}));
-  connect(realExpressionMx.y, forceAndTorque.torque[1]) annotation(
-    Line(points = {{-78, 54}, {-50, 54}, {-50, -44}, {-42, -44}}, color = {0, 0, 127}));
-  connect(realExpressionMy.y, forceAndTorque.torque[2]) annotation(
-    Line(points = {{-78, 40}, {-60, 40}, {-60, -44}, {-42, -44}}, color = {0, 0, 127}));
-  connect(realExpressionMz.y, forceAndTorque.torque[3]) annotation(
-    Line(points = {{-78, 26}, {-70, 26}, {-70, -44}, {-42, -44}}, color = {0, 0, 127}));
   connect(forceAndTorque.frame_b, wheelModel.cpFrame) annotation(
     Line(points = {{-20, -50}, {0, -50}, {0, -30}}, color = {95, 95, 95}));
   connect(wheelModel.hubFlange, hubFlange) annotation(
