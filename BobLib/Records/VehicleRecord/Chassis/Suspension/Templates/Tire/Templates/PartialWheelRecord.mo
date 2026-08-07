@@ -3,6 +3,7 @@ within BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.Templates;
 record PartialWheelRecord
 
   import SI = Modelica.Units.SI;
+  import NonSI = Modelica.Units.NonSI;
 
   // Dimensions
   parameter SI.Length R0 "Tire unloaded static radius" annotation(
@@ -11,9 +12,11 @@ record PartialWheelRecord
     Dialog(group = "Dimensions"));
   parameter SI.Length rimWidth = rimR0*1.4 "Rim unloaded width" annotation(
     Dialog(group = "Dimensions"));
-  parameter SI.Angle staticAlpha "Static toe angle in DEGREES, following Z-up convention" annotation(
+  parameter NonSI.Angle_deg staticAlpha
+    "Static toe angle in degrees, following Z-up convention" annotation(
     Dialog(group = "Attitude"));
-  parameter SI.Angle staticGamma "Static inclination angle in DEGREES, following Z-up convention" annotation(
+  parameter NonSI.Angle_deg staticGamma
+    "Static inclination angle in degrees, following Z-up convention" annotation(
     Dialog(group = "Attitude"));
 
   annotation(

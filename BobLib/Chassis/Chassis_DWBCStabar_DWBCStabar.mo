@@ -71,9 +71,9 @@ model Chassis_DWBCStabar_DWBCStabar
         Frames.axesRotations(
           {1, 2, 3},
           {
-            pVehicle.pFrPartialWheel.staticGamma*pi/180,
+            Modelica.Units.Conversions.from_deg(pVehicle.pFrPartialWheel.staticGamma),
             0,
-            pVehicle.pFrPartialWheel.staticAlpha*pi/180
+            Modelica.Units.Conversions.from_deg(pVehicle.pFrPartialWheel.staticAlpha)
           },
           {0, 0, 0}),
         {0, 0, -pVehicle.pFrPartialWheel.R0}),
@@ -84,9 +84,9 @@ model Chassis_DWBCStabar_DWBCStabar
           Frames.axesRotations(
             {1, 2, 3},
             {
-              pVehicle.pFrPartialWheel.staticGamma*pi/180,
+              Modelica.Units.Conversions.from_deg(pVehicle.pFrPartialWheel.staticGamma),
               0,
-              pVehicle.pFrPartialWheel.staticAlpha*pi/180
+              Modelica.Units.Conversions.from_deg(pVehicle.pFrPartialWheel.staticAlpha)
             },
             {0, 0, 0}),
           {0, 0, -pVehicle.pFrPartialWheel.R0})),
@@ -96,9 +96,9 @@ model Chassis_DWBCStabar_DWBCStabar
         Frames.axesRotations(
           {1, 2, 3},
           {
-            pVehicle.pRrPartialWheel.staticGamma*pi/180,
+            Modelica.Units.Conversions.from_deg(pVehicle.pRrPartialWheel.staticGamma),
             0,
-            pVehicle.pRrPartialWheel.staticAlpha*pi/180
+            Modelica.Units.Conversions.from_deg(pVehicle.pRrPartialWheel.staticAlpha)
           },
           {0, 0, 0}),
         {0, 0, -pVehicle.pRrPartialWheel.R0}),
@@ -109,9 +109,9 @@ model Chassis_DWBCStabar_DWBCStabar
           Frames.axesRotations(
             {1, 2, 3},
             {
-              pVehicle.pRrPartialWheel.staticGamma*pi/180,
+              Modelica.Units.Conversions.from_deg(pVehicle.pRrPartialWheel.staticGamma),
               0,
-              pVehicle.pRrPartialWheel.staticAlpha*pi/180
+              Modelica.Units.Conversions.from_deg(pVehicle.pRrPartialWheel.staticAlpha)
             },
             {0, 0, 0}),
           {0, 0, -pVehicle.pRrPartialWheel.R0})),
