@@ -5,9 +5,9 @@ package BobLib
 
   annotation(
     preferredView = "info",
-    version = "0.1.1",
-    versionDate = "2026-07-05",
-    dateModified = "2026-07-05",
+    version = "0.2.0",
+    versionDate = "2026-08-09",
+    dateModified = "2026-08-09",
     uses(
       Modelica(version = "4.1.0"),
       VehicleInterfaces(version = "2.0.2")),
@@ -59,6 +59,23 @@ under <code>Utilities.Mechanics</code>.
 </p>
 </html>",
       revisions = "<html>
+<h4>Version 0.2.0 - 2026-08-09</h4>
+<p>
+Minor release focused on physically consistent vehicle initialization and
+correct frame, direction, and left/right behavior.
+</p>
+<ul>
+<li>Initialized the standard vehicle simulation from a four-post-derived
+quasi-steady chassis and suspension pose and exposed all four spring lengths.</li>
+<li>Combined sprung mass with both mirrored axle sides for complete vehicle mass,
+center-of-gravity, and inertia properties.</li>
+<li>Corrected contact and tire force frames, reverse motor power and tire slip,
+right-wheel alignment mirroring and units, and aerodynamic drag direction.</li>
+<li>Made signed vector angles scale invariant and robust to skewed reference axes
+and degenerate inputs.</li>
+<li>Expanded pull-request CI to execute the complete initialization-baseline
+gate alongside formatting and smoke translation.</li>
+</ul>
 <h4>Version 0.1.1 - 2026-07-05</h4>
 <p>
 Patch release for four-post solver robustness.
