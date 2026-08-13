@@ -128,6 +128,80 @@ def test_boblib_model_translates(model: str) -> None:
     print(f"{model}: {equation_count} equations, {variable_count} variables")
 
 
+def test_vcu_enforces_motoring_power_limit() -> None:
+    omc = shutil.which("omc")
+    if omc is None:
+        pytest.skip("OpenModelica omc is not installed")
+
+    repo_root = _repo_root()
+    library_root = repo_root / "BobLib"
+    with tempfile.TemporaryDirectory() as temporary_directory:
+        work_dir = Path(temporary_directory)
+        probe_path = work_dir / "VCUPowerLimitProbe.mo"
+        probe_path.write_text(
+            """
+model VCUPowerLimitProbe
+
+  BobLib.Controllers.Internal.VCUCore vcu(
+    tau_max = 200,
+    P_max_mot = 80000,
+    w_eps = 0.1);
+  Modelica.Blocks.Sources.Constant torqueRequest(k = 200);
+  Modelica.Blocks.Sources.Constant zero(k = 0);
+  Modelica.Blocks.Sources.Constant motorSpeed(k = 1000);
+  Modelica.Blocks.Sources.BooleanConstant enabled(k = true);
+
+equation
+  connect(torqueRequest.y, vcu.cmd_torque_motor);
+  connect(zero.y, vcu.cmd_steering_angle);
+  connect(zero.y, vcu.cmd_accelerator_pedal);
+  connect(zero.y, vcu.cmd_brake_pedal);
+  connect(zero.y, vcu.cmd_regen_limit);
+  connect(enabled.y, vcu.cmd_inverter_enable);
+  connect(motorSpeed.y, vcu.sens_motor_speed);
+  connect(zero.y, vcu.sens_hv_bus_voltage);
+  connect(zero.y, vcu.sens_hv_bus_current);
+
+  assert(abs(vcu.tau_cmd_limited - 80) < 1e-9,
+    "VCU did not limit 200 Nm at 1000 rad/s to 80 Nm");
+  assert(abs(vcu.P_req - 80000) < 1e-6,
+    "VCU motoring request exceeded 80 kW");
+
+  annotation(
+    experiment(StartTime = 0, StopTime = 0.01, Tolerance = 1e-06, Interval = 0.01));
+end VCUPowerLimitProbe;
+""".strip()
+            + "\n",
+            encoding="utf-8",
+        )
+        mos_path = work_dir / "vcu_power_limit_probe.mos"
+        mos_path.write_text(
+            f"""
+clear();
+setCommandLineOptions("{OMC_COMMAND_LINE_OPTIONS}");
+loadModel(Modelica, {{"{MODELICA_VERSION}"}});
+loadModel(VehicleInterfaces, {{"{VEHICLE_INTERFACES_VERSION}"}});
+loadFile("{library_root.as_posix()}/package.mo");
+loadFile("{probe_path.as_posix()}");
+cd("{work_dir.as_posix()}");
+simulate(VCUPowerLimitProbe, startTime = 0, stopTime = 0.01, numberOfIntervals = 1);
+getErrorString();
+""".strip()
+            + "\n",
+            encoding="utf-8",
+        )
+        completed = subprocess.run(
+            [omc, str(mos_path)],
+            check=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+        )
+
+    assert completed.returncode == 0, completed.stdout
+    assert 'messages = "LOG_SUCCESS' in completed.stdout, completed.stdout
+
+
 def test_nonzero_right_wheel_angles_are_mirrored() -> None:
     omc = shutil.which("omc")
     if omc is None:

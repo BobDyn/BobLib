@@ -71,6 +71,8 @@ model VCUCore
    **********************/
   parameter SI.Torque tau_max = 240
     "Max motoring torque [Nm]";
+  parameter SI.Power P_max_mot = 80000
+    "Max motoring power [W]";
 
   parameter SI.AngularVelocity w_eps = 1e-2
     "Small speed for launch protection";
@@ -79,6 +81,7 @@ model VCUCore
 
 protected
   SI.Torque tau_cmd_raw;
+  SI.Torque tau_motoring_limit;
   SI.AngularVelocity sens_motor_speed_drive;
   SI.AngularVelocity w_eff;
 
@@ -86,6 +89,11 @@ equation
 
   // Safety / enable
   vcu_active = cmd_inverter_enable;
+
+  sens_motor_speed_drive = motorSpeedSign*sens_motor_speed;
+  tau_motoring_limit = min(
+    tau_max,
+    P_max_mot/max(abs(sens_motor_speed_drive), w_eps));
 
   // Raw torque command
   tau_cmd_raw =
@@ -95,13 +103,12 @@ equation
     else
       min(
         max(cmd_torque_motor, -cmd_regen_limit),
-        tau_max
+        tau_motoring_limit
       );
 
   tau_cmd_limited = tau_cmd_raw;
 
   // Effective speed (avoid zero divide)
-  sens_motor_speed_drive = motorSpeedSign*sens_motor_speed;
   w_eff =
 
     if noEvent(abs(sens_motor_speed_drive) > w_eps) then

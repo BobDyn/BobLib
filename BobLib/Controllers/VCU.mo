@@ -10,6 +10,9 @@ model VCU
   parameter SI.Torque tau_max = 240
     "Max motoring torque [Nm]" annotation(
     Dialog(tab = "Controllers", group = "Electric Drive Limits"));
+  parameter SI.Power P_max_mot = 80000
+    "Max motoring power [W]" annotation(
+    Dialog(tab = "Controllers", group = "Electric Drive Limits"));
   parameter SI.AngularVelocity w_eps = 1e-2
     "Small speed for launch protection" annotation(
     Dialog(tab = "Controllers", group = "Electric Drive Limits"));
@@ -190,6 +193,7 @@ protected
 
   BobLib.Controllers.Internal.VCUCore vcu(
     tau_max = tau_max,
+    P_max_mot = P_max_mot,
     w_eps = w_eps,
     motorSpeedSign = motorSpeedSign) annotation(
       Placement(transformation(origin = {0, 0}, extent = {{-20, -20}, {20, 20}})));
