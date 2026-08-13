@@ -6,6 +6,8 @@ record VCURecord
 
   parameter SI.Torque tau_max = 220
     "VCU motoring torque limit";
+  parameter SI.Power P_max_mot = 80000
+    "VCU motoring power limit (FSAE tractive-system power cap)";
   parameter SI.Torque regenTorqueLimit = 220
     "Default generated-vehicle regen torque limit magnitude";
   parameter SI.Torque mechanicalBrakeTorqueLimit = 1500

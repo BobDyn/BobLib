@@ -164,6 +164,7 @@ partial model BaseVehicleSim
 
   replaceable BobLib.Controllers.StandardVCU vcu(
     tau_max = pVehicle.pVCU.tau_max,
+    P_max_mot = pVehicle.pVCU.P_max_mot,
     w_eps = pVehicle.pVCU.w_eps,
     motorSpeedSign = pVehicle.pVCU.motorSpeedSign,
     finalDriveRatio = pVehicle.pDriveline.finalDriveRatio,
