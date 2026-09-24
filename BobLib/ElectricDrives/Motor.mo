@@ -39,6 +39,10 @@ model Motor
     "Select reverse torque direction when starting exactly from standstill";
   parameter SI.Inertia rotorJ = 0.02521
     "Motor rotor inertia";
+  parameter Boolean useTorqueTable = false
+    "Use a torque-vs-rpm curve as an additional peak-torque cap";
+  parameter Real torqueTable[:, 2] = [0.0, 1e9; 1.0, 1e9]
+    "Peak torque vs speed (rpm, Nm); applied as an extra cap when useTorqueTable";
 
   Modelica.Electrical.Analog.Interfaces.PositivePin pin_p
     "Motor-side DC positive pin" annotation(
@@ -64,6 +68,8 @@ model Motor
     P_cont_high = P_cont_high,
     eta_mot = eta_mot,
     eta_reg = eta_reg,
+    useTorqueTable = useTorqueTable,
+    torqueTable = torqueTable,
     w_eps = w_eps,
     reverseLaunch = reverseLaunch) annotation(
       Placement(transformation(origin = {-20, 0}, extent = {{-30, -30}, {30, 30}})));
