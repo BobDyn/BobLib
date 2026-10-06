@@ -67,7 +67,7 @@ Current checks target:
 
 - Modelica Standard Library 4.1.0
 - VehicleInterfaces 2.0.2 for `BobLib`
-- OpenModelica via the CI container `openmodelica/openmodelica:v1.26.3-ompython`
+- OpenModelica via the CI container `openmodelica/openmodelica:v1.27.1-ompython`
 - Python with `pytest` and `ruff`
 
 Install Modelica dependencies with:

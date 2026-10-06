@@ -23,7 +23,7 @@ jobs:
   modelica-release:
     name: OpenModelica Release Gate
     runs-on: ubuntu-latest
-    container: openmodelica/openmodelica:v1.26.3-ompython
+    container: openmodelica/openmodelica:v1.27.1-ompython
     timeout-minutes: 120
 
     steps:
