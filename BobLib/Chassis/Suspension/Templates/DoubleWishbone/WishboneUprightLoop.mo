@@ -44,7 +44,7 @@ model WishboneUprightLoop "Kinematic loop consisting of upright, lower wishbone,
       iconTransformation(origin = {100, -70}, extent = {{-16, -16}, {16, 16}})));
 
   // Upper wishbone + upright
-  Modelica.Mechanics.MultiBody.Joints.Assemblies.JointUSR upperWishboneUpright(
+  BobLib.Utilities.Mechanics.MultiBody.Joints.JointUSR upperWishboneUpright(
     n1_a = {1, 0, 0},
     n_b = Vectors.normalize(pDW.upperFore_i - pDW.upperAft_i),
     rRod1_ia = pDW.upper_o - pDW.lower_o,
