@@ -54,7 +54,7 @@ jobs:
   modelica-smoke:
     name: OpenModelica Smoke
     runs-on: ubuntu-latest
-    container: openmodelica/openmodelica:v1.26.3-ompython
+    container: openmodelica/openmodelica:v1.27.1-ompython
     needs: python
     timeout-minutes: 60
 
