@@ -11,12 +11,16 @@ model VehicleSim_EVBatInvMotDiff_DWBCStabar_DWBCStabar
       pFrStabar(
         leftArmEnd = pVehicle.pFrStabar.leftArmEnd,
         leftBarEnd = pVehicle.pFrStabar.leftBarEnd,
-        barRate = pVehicle.pFrStabar.barRate),
+        barRate = pVehicle.pFrStabar.barRate
+      ),
       pRrStabar(
         leftArmEnd = pVehicle.pRrStabar.leftArmEnd,
         leftBarEnd = pVehicle.pRrStabar.leftBarEnd,
-        barRate = pVehicle.pRrStabar.barRate),
+        barRate = pVehicle.pRrStabar.barRate
+      ),
       headless = headless,
       initialLongitudinalVelocity = initialVel,
-      pVehicle = pVehicle));
+      pVehicle = pVehicle
+    )
+  );
 end VehicleSim_EVBatInvMotDiff_DWBCStabar_DWBCStabar;

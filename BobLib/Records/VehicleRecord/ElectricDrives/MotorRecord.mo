@@ -36,6 +36,10 @@ record MotorRecord
     "Select reverse torque direction when starting exactly from standstill";
   parameter SI.Inertia rotorJ = 0.02521
     "Motor rotor inertia";
+  parameter Boolean useTorqueTable = false
+    "Use a torque-vs-rpm curve as an additional peak-torque cap";
+  parameter Real torqueTable[:, 2] = [0.0, 1e9; 1.0, 1e9]
+    "Peak torque vs speed (rpm, Nm); applied as an extra cap when useTorqueTable";
 
   annotation(
     Documentation(info = "<html>

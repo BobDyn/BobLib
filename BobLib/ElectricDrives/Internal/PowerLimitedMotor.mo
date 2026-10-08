@@ -33,6 +33,10 @@ model PowerLimitedMotor
   parameter SI.Power P_cont_high = 75e3 "High end continuous power band [W]";
   parameter Real eta_mot = 0.96 "Constant motoring efficiency approximation";
   parameter Real eta_reg = 0.95 "Constant regen efficiency approximation";
+  parameter Boolean useTorqueTable = false
+    "Use a torque-vs-rpm curve as an additional peak-torque cap";
+  parameter Real torqueTable[:, 2] = [0.0, 1e9; 1.0, 1e9]
+    "Peak torque vs speed (rpm, Nm); applied as an extra cap when useTorqueTable";
   parameter Real lossTable[:, 2] = [
     0,    0;
     1000, 200;
@@ -77,6 +81,7 @@ protected
 
   Real peakFactor "1 -> allow peak, 0 -> only continuous";
   SI.Torque T_allow;
+  SI.Torque T_table_cap "Torque-vs-rpm curve cap (large when table disabled)";
   SI.Current I_allow;
 
   Real P_allow;
@@ -108,6 +113,11 @@ equation
   // Allowed torque and current (peak -> continuous blend)
   T_allow = peakFactor*T_peak + (1 - peakFactor)*T_cont;
   I_allow = peakFactor*I_peak_2min + (1 - peakFactor)*I_cont;
+
+  // Optional torque-vs-rpm curve, applied as an additional cap. Disabled by
+  // default (returns a large value) so scalar-only motors are unchanged.
+  T_table_cap =
+    if useTorqueTable then interp1(torqueTable, rpm) else Modelica.Constants.inf;
 
   // Continuous power envelope vs speed
   P_cont_env =
@@ -144,7 +154,7 @@ equation
 
   // Combined torque limit
   tau_lim =
-    noEvent(min(T_allow,
+    noEvent(min(min(T_allow, T_table_cap),
         min(tau_lim_from_power,
             tau_lim_from_current)));
 

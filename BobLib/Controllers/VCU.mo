@@ -20,7 +20,7 @@ model VCU
     "Multiplier mapping sensed motor speed to drive-positive speed" annotation(
     Dialog(tab = "Controllers", group = "Electric Drive Mapping"));
   parameter Real finalDriveRatio = 1
-    "Final-drive ratio used to convert rear-axle torque command to motor torque" annotation(
+    "Fallback ratio used before the transmission publishes an engaged ratio" annotation(
     Dialog(tab = "Controllers", group = "Electric Drive Mapping"));
 
   // Longitudinal speed controller
@@ -90,6 +90,8 @@ protected
   SI.Voltage sens_hv_bus_voltage;
   SI.Current sens_hv_bus_current;
   SI.Velocity sens_vehicle_speed;
+  Real sens_gear_ratio "Engaged transmission ratio sensed from the transmission bus";
+  Real effectiveDriveRatio "Ratio used for axle/motor torque conversion";
 
   Modelica.Blocks.Interfaces.RealInput steeringAngleBusTap(
     quantity = "Angle",
@@ -131,6 +133,10 @@ protected
     unit = "m/s")
     "Vehicle speed from chassisBus" annotation(
       Placement(transformation(origin = {-100, 54}, extent = {{-6, -6}, {6, 6}})));
+
+  Modelica.Blocks.Interfaces.RealInput gearRatioBusTap
+    "Engaged transmission ratio from transmissionBus" annotation(
+      Placement(transformation(origin = {-100, 46}, extent = {{-6, -6}, {6, 6}})));
 
   Modelica.Blocks.Sources.RealExpression powerRequestBusSignal(
     y = P_req) "Power request published to electricMotorControlBus" annotation(
@@ -176,7 +182,7 @@ protected
       Placement(transformation(origin = {-70, -90}, extent = {{-10, -10}, {10, 10}})));
 
   Modelica.Blocks.Sources.RealExpression motorTorqueRequest(
-    y = driveTorqueCmd / max(finalDriveRatio, 1e-6)) annotation(
+    y = driveTorqueCmd / effectiveDriveRatio) annotation(
       Placement(transformation(origin = {-44, 16}, extent = {{-5, -2}, {5, 2}})));
 
   Modelica.Blocks.Sources.RealExpression regenLimitRequest(
@@ -200,10 +206,10 @@ protected
 
 equation
   rearAxleTorqueCapacity =
-    tau_max * max(finalDriveRatio, 1e-6);
+    tau_max * effectiveDriveRatio;
 
   rearAxleRegenTorqueCapacity =
-    regenTorqueLimit * max(finalDriveRatio, 1e-6);
+    regenTorqueLimit * effectiveDriveRatio;
 
   cmd_steering_angle = steeringAngleBusTap;
   cmd_accelerator_pedal = acceleratorPedalBusTap;
@@ -213,6 +219,11 @@ equation
   sens_hv_bus_voltage = hvBusVoltageBusTap;
   sens_hv_bus_current = hvBusCurrentBusTap;
   sens_vehicle_speed = vehicleSpeedBusTap;
+  sens_gear_ratio = gearRatioBusTap;
+  // Prefer the live engaged ratio published by the transmission; fall back to
+  // the fixed parameter only if the bus signal is not yet meaningful.
+  effectiveDriveRatio =
+    noEvent(if abs(sens_gear_ratio) > 1e-6 then sens_gear_ratio else max(finalDriveRatio, 1e-6));
 
   speedControlTorqueCmd =
     if enablePTNDriveSpeedControl or
@@ -306,6 +317,8 @@ equation
     Line(points = {{0, -100}, {-96, -100}, {-96, 20}}, color = {0, 0, 127}));
   connect(controlBus.chassisBus.vehicleSpeed, vehicleSpeedBusTap) annotation(
     Line(points = {{0, -100}, {-100, -100}, {-100, 54}}, color = {0, 0, 127}));
+  connect(controlBus.transmissionBus.gearRatio, gearRatioBusTap) annotation(
+    Line(points = {{0, -100}, {-100, -100}, {-100, 46}}, color = {0, 0, 127}));
 
   connect(powerRequestBusSignal.y, controlBus.electricMotorControlBus.powerRequest) annotation(
     Line(points = {{62.8, 42}, {94, 42}, {94, -100}, {0, -100}}, color = {0, 0, 127}));
