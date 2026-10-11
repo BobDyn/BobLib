@@ -23,7 +23,7 @@ model ShockLinkage
     Dialog(group = "Spring Params"));
 
   // Damper parameters
-  parameter SI.TranslationalDampingConstant damperTable[:, 2] "Table of damper force vs relative velocity" annotation(
+  parameter Real damperTable[:, 2] "Columns: compression-positive shaft velocity [m/s], resisting force [N]" annotation(
     Dialog(group = "Damper Params"));
 
   // Visual parameters (implement visuals later)

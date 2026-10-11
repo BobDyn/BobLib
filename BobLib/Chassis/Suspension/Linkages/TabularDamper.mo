@@ -9,12 +9,14 @@ model TabularDamper "Tabular translational damper with velocity-force curve"
   extends BobLib.Chassis.Suspension.Linkages.Templates.TabularCompliant;
 
   // Damper parameters
-  parameter SI.TranslationalDampingConstant damperTable[:, 2] "Table of Force vs Relative Velocity (m/s, N)" annotation(
+  parameter Real damperTable[:, 2] "Columns: compression-positive shaft velocity [m/s], resisting force [N]" annotation(
     Dialog(group = "Damper Parameters"));
 
-  Real v_rel;
+  SI.Velocity v_rel "Rate of increasing shock length; positive in rebound";
   Real v_abs;
   Real vel_sgn;
+  output Boolean extrapolating "True outside the supplied velocity range";
+  output SI.Power dissipatedPower "Power absorbed by the damper";
 
   // Velocity processing blocks
   Modelica.Blocks.Sources.RealExpression velExpression(y = v_abs) annotation(
@@ -33,10 +35,27 @@ model TabularDamper "Tabular translational damper with velocity-force curve"
     table = damperTable) annotation(
     Placement(transformation(origin = {-20, 30}, extent = {{-10, -10}, {10, 10}})));
 
+initial equation
+  assert(size(damperTable, 1) >= 3, "Damper table needs rebound, zero and compression rows");
+  assert(damperTable[1, 1] < 0 and damperTable[end, 1] > 0,
+    "Damper table must cover both compression and rebound");
+  assert(sum(if abs(damperTable[i, 1]) <= 0 and abs(damperTable[i, 2]) <= 0 then 1 else 0
+    for i in 1:size(damperTable, 1)) == 1, "Damper table must include one [0, 0] row");
+  for i in 1:size(damperTable, 1) loop
+    assert(damperTable[i, 1]*damperTable[i, 2] >= 0, "Damper force must resist motion");
+  end for;
+  for i in 2:size(damperTable, 1) loop
+    assert(damperTable[i, 1] > damperTable[i - 1, 1], "Damper velocities must strictly increase");
+  end for;
+  assert(damperTable[2, 2] >= damperTable[1, 2] and damperTable[end, 2] >= damperTable[end - 1, 2],
+    "Terminal slopes must be nonnegative for passive extrapolation");
+
 equation
   v_rel = der(s_rel);
   v_abs = sqrt(v_rel*v_rel + eps*eps);
   vel_sgn = v_rel/v_abs;
+  extrapolating = noEvent(-v_rel < damperTable[1, 1] or -v_rel > damperTable[end, 1]);
+  dissipatedPower = -force.f*v_rel;
 
   connect(velExpression.y, product.u1) annotation(
     Line(points = {{-79, 36}, {-73, 36}}, color = {0, 0, 127}));
@@ -55,5 +74,11 @@ Model <code>TabularDamper</code> represents a tabulated damper used by suspensio
 <p>
 Its table data comes from the owning axle or linkage record, allowing measured or tuned force curves to be changed without changing the multibody connection topology.
 </p>
+<p>The lookup input is minus the rate of increasing shock length: positive is
+compression, negative is rebound. The table stores signed resisting force,
+with a continuous zero-force origin. It uses linear segments and terminal-slope
+extrapolation. Monitor <code>extrapolating</code> to identify operation outside
+the supplied data. Settings and measured-curve provenance are resolved by BobSim
+before generating the vehicle record; this component does not model hysteresis.</p>
 </html>"));
 end TabularDamper;
