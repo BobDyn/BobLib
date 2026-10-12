@@ -9,6 +9,10 @@ model RrAxleDW_BC_Stabar "Double wishbone axle with bellcranks mounting to shock
 
   // Record parameters
   parameter AxleDW_BC_StabarRecord pAxle;
+  final parameter SI.Position bellcrankVisualPickups[3, 3] = {
+    if pAxle.rodPickup == i then pAxle.bellcrankRodPickup
+      elseif pAxle.shockPickup == i then pAxle.bellcrankShockPickup
+      else pAxle.bellcrankStabarPickup for i in 1:3};
 
   extends BobLib.Chassis.Suspension.AxleDWBase;
   extends BobLib.Icons.SteeringWheelOverlayIcon;
@@ -20,6 +24,7 @@ model RrAxleDW_BC_Stabar "Double wishbone axle with bellcranks mounting to shock
     pickup_1 = pAxle.bellcrankRodPickup,
     pickup_2 = pAxle.bellcrankShockPickup,
     pickup_3 = pAxle.bellcrankStabarPickup,
+    visualPickups = bellcrankVisualPickups,
     linkDiameter = linkDiameter,
     jointDiameter = jointDiameter) annotation(
     Placement(transformation(origin = {-50, -20}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
@@ -44,6 +49,7 @@ model RrAxleDW_BC_Stabar "Double wishbone axle with bellcranks mounting to shock
     pickup_1 = mirrorXZ(pAxle.bellcrankRodPickup),
     pickup_2 = mirrorXZ(pAxle.bellcrankShockPickup),
     pickup_3 = mirrorXZ(pAxle.bellcrankStabarPickup),
+    visualPickups = {mirrorXZ(bellcrankVisualPickups[i, :]) for i in 1:3},
     linkDiameter = linkDiameter,
     jointDiameter = jointDiameter) annotation(
     Placement(transformation(origin = {50, -20}, extent = {{10, -10}, {-10, 10}}, rotation = -180)));
