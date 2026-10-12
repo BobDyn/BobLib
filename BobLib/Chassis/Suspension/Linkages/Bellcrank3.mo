@@ -78,8 +78,8 @@ model Bellcrank3
     Placement(transformation(origin = {10, -20}, extent = {{-10, -10}, {10, 10}})));
 
   Modelica.Mechanics.MultiBody.Visualizers.FixedShape side_3(
-    lengthDirection = Vectors.normalize(pickup_3 - pickup_2),
-    length = Vectors.norm(pickup_3 - pickup_2),
+    lengthDirection = Vectors.normalize(pivot - pickup_2),
+    length = Vectors.norm(pivot - pickup_2),
     width = linkDiameter*0.75,
     height = linkDiameter*0.75,
     widthDirection = Vectors.normalize(pivotAxis),
