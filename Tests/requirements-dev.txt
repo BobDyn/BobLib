@@ -5,4 +5,4 @@
 # is exactly what happened when ruff widened its default rule selection.
 # Bump these intentionally (dependabot can raise the PR) rather than drifting.
 pytest==9.1.1
-ruff==0.16.5
+ruff==0.16.9
