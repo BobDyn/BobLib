@@ -115,13 +115,20 @@ partial model BaseVehicleFMI
     eta_reg = pVehicle.pMotor.eta_reg,
     w_eps = pVehicle.pMotor.w_eps,
     reverseLaunch = pVehicle.pMotor.reverseLaunch,
+    useTorqueTable = pVehicle.pMotor.useTorqueTable,
+    torqueTable = pVehicle.pMotor.torqueTable,
     rotorJ = pVehicle.pMotor.rotorJ) annotation(
     choicesAllMatching = true,
     Dialog(group = "Plant Models"),
     Placement(transformation(origin = {-79, -10.3334}, extent = {{-10, -10}, {10, 10}}, rotation = -180))) constrainedby VehicleInterfaces.ElectricDrives.Interfaces.Base "Traction motor subsystem";
 
-  replaceable BobLib.Transmissions.FixedRatioTransmission transmission(
-    gearRatio = pVehicle.pDriveline.finalDriveRatio) annotation(
+  replaceable BobLib.Transmissions.SpeedScheduledTransmission transmission(
+    nGears = pVehicle.pTransmission.nGears,
+    gearRatios = pVehicle.pTransmission.gearRatios,
+    upshiftSpeeds = pVehicle.pTransmission.upshiftSpeeds,
+    downshiftSpeeds = pVehicle.pTransmission.downshiftSpeeds,
+    initialGear = pVehicle.pTransmission.initialGear,
+    wheelRadius = pVehicle.pRrPartialWheel.R0) annotation(
     choicesAllMatching = true,
     Dialog(group = "Plant Models"),
     Placement(transformation(origin = {-40, -10}, extent = {{-10, -10}, {10, 10}}))) constrainedby VehicleInterfaces.Transmissions.Interfaces.Base "Transmission subsystem";
