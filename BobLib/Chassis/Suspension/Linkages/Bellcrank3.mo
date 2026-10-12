@@ -21,6 +21,8 @@ model Bellcrank3
     Dialog(group = "Geometry"));
 
   // Visual parameters
+  parameter SI.Position visualPickups[3, 3] = {pickup_1, pickup_2, pickup_3}
+    "Pickup coordinates in outline order, independent of connector numbering";
   parameter SI.Length linkDiameter annotation(
     Dialog(tab = "Animation", group = "Sizing"));
   parameter SI.Length jointDiameter annotation(
@@ -58,8 +60,8 @@ model Bellcrank3
 
   // Visualization
   Modelica.Mechanics.MultiBody.Visualizers.FixedShape side_1(
-    lengthDirection = Vectors.normalize(pickup_1 - pivot),
-    length = Vectors.norm(pickup_1 - pivot),
+    lengthDirection = Vectors.normalize(visualPickups[1, :] - pivot),
+    length = Vectors.norm(visualPickups[1, :] - pivot),
     width = linkDiameter*0.75,
     height = linkDiameter*0.75,
     widthDirection = Vectors.normalize(pivotAxis),
@@ -68,9 +70,10 @@ model Bellcrank3
     Placement(transformation(origin = {-30, -20}, extent = {{-10, -10}, {10, 10}})));
 
   Modelica.Mechanics.MultiBody.Visualizers.FixedShape side_2(
-    lengthDirection = Vectors.normalize(pickup_2 - pickup_1),
+    r_shape = visualPickups[1, :] - pickup_1,
+    lengthDirection = Vectors.normalize(visualPickups[2, :] - visualPickups[1, :]),
     widthDirection = Vectors.normalize(pivotAxis),
-    length = Vectors.norm(pickup_2 - pickup_1),
+    length = Vectors.norm(visualPickups[2, :] - visualPickups[1, :]),
     width = linkDiameter*0.75,
     height = linkDiameter*0.75,
     shapeType = "cylinder",
@@ -78,8 +81,9 @@ model Bellcrank3
     Placement(transformation(origin = {10, -20}, extent = {{-10, -10}, {10, 10}})));
 
   Modelica.Mechanics.MultiBody.Visualizers.FixedShape side_3(
-    lengthDirection = Vectors.normalize(pivot - pickup_2),
-    length = Vectors.norm(pivot - pickup_2),
+    r_shape = visualPickups[2, :] - pickup_2,
+    lengthDirection = Vectors.normalize(visualPickups[3, :] - visualPickups[2, :]),
+    length = Vectors.norm(visualPickups[3, :] - visualPickups[2, :]),
     width = linkDiameter*0.75,
     height = linkDiameter*0.75,
     widthDirection = Vectors.normalize(pivotAxis),
@@ -88,9 +92,10 @@ model Bellcrank3
     Placement(transformation(origin = {50, -20}, extent = {{-10, -10}, {10, 10}})));
 
   Modelica.Mechanics.MultiBody.Visualizers.FixedShape side_4(
-    lengthDirection = Vectors.normalize(pivot - pickup_3),
+    r_shape = visualPickups[3, :] - pickup_3,
+    lengthDirection = Vectors.normalize(pivot - visualPickups[3, :]),
     widthDirection = Vectors.normalize(pivotAxis),
-    length = Vectors.norm(pivot - pickup_3),
+    length = Vectors.norm(pivot - visualPickups[3, :]),
     width = linkDiameter*0.75,
     height = linkDiameter*0.75,
     shapeType = "cylinder",
