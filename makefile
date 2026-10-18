@@ -4,6 +4,7 @@ PYTEST_FLAGS ?=
 PACKAGE_ROOT ?= BobLib
 MODELICA_INIT_TIMEOUT_S ?= 600
 MODELICA_LINT_PATHS ?= BobLib Tests/BobLibTest
+MODELICA_FMU_OUTPUT_DIR ?= build
 
 PYTHON_TESTS := \
 	Tests/test_modelica_linter.py
@@ -33,7 +34,7 @@ ALL_TESTS := \
 	$(PYTHON_TESTS) \
 	$(MODELICA_TESTS)
 
-.PHONY: help lint modelica-lint modelica-format test test-python test-pytest test-modelica modelica-deps modelica-smoke modelica-translation modelica-initialization modelica-physics modelica-regression ci check
+.PHONY: help lint modelica-lint modelica-format test test-python test-pytest test-modelica modelica-deps modelica-smoke modelica-translation modelica-initialization modelica-physics modelica-regression modelica-fmu-export ci check
 
 help:
 	@printf '%s\n' \
@@ -51,6 +52,8 @@ help:
 		'      MODELICA_INIT_TIMEOUT_S=600 controls the per-model OMC timeout' \
 		'  make modelica-physics     Simulate physical validation baselines with scaled runtime budgets' \
 		'  make modelica-regression  Simulate signal-level regressions and smoke-check BobLib/BobLibTest' \
+		'  make modelica-fmu-export  Export VehicleFMI as an FMU' \
+		'      MODELICA_FMU_OUTPUT_DIR=build controls where VehicleFMI.fmu is written' \
 		'  make test-modelica        Run all Modelica checks' \
 		'  make ci                   Run the full local CI suite'
 
@@ -88,6 +91,9 @@ modelica-physics: modelica-deps
 
 modelica-regression: modelica-deps
 	$(PYTEST) $(PYTEST_FLAGS) $(MODELICA_REGRESSION_TESTS)
+
+modelica-fmu-export: modelica-deps
+	$(PYTHON) Tests/modelica_fmu_export.py --package-root $(PACKAGE_ROOT) --output-dir $(MODELICA_FMU_OUTPUT_DIR)
 
 test-modelica: modelica-translation modelica-initialization modelica-physics modelica-regression
 

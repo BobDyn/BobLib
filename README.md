@@ -78,7 +78,8 @@ make modelica-deps
 
 ## Primary Entrypoints
 
-- `BobLib.Experiments.Standards.VehicleFMI`: driver-input FMI/DIL/SIL vehicle boundary
+- `BobLib.Experiments.Standards.VehicleFMI`: driver-input FMI/DIL/SIL vehicle boundary;
+  `make modelica-fmu-export` exports it to `build/VehicleFMI.fmu` (Linux, CMake 3.21+)
 - `BobLib.Experiments.Standards.VehicleSim`: full-vehicle maneuver benchmark
 - `BobLib.Experiments.Standards.FourPostSim`: four-post benchmark
 

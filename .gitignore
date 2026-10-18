@@ -16,8 +16,10 @@
 *.mol
 
 ## Build artefacts
+/build/
 *.exe
 *.exp
+*.fmu
 *.o
 *.pyc
 *venv
