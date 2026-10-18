@@ -2,7 +2,20 @@ within BobLib.Experiments.Standards;
 
 model FourPostSim
 
-  extends Templates.FourPost.FourPostSim_DWBCStabar_DWBCStabar;
+  parameter Boolean useRuntimeDamperTables = false annotation(Evaluate = false);
+  parameter String damperTableFile = "damper_tables.txt" annotation(Evaluate = false);
+
+  extends Templates.FourPost.FourPostSim_DWBCStabar_DWBCStabar(
+    frAxleDW(
+      leftShockLinkage(useRuntimeDamperTable = useRuntimeDamperTables,
+        runtimeDamperTableFile = damperTableFile, runtimeDamperTableName = "front"),
+      rightShockLinkage(useRuntimeDamperTable = useRuntimeDamperTables,
+        runtimeDamperTableFile = damperTableFile, runtimeDamperTableName = "front")),
+    rrAxleDW(
+      leftShockLinkage(useRuntimeDamperTable = useRuntimeDamperTables,
+        runtimeDamperTableFile = damperTableFile, runtimeDamperTableName = "rear"),
+      rightShockLinkage(useRuntimeDamperTable = useRuntimeDamperTables,
+        runtimeDamperTableFile = damperTableFile, runtimeDamperTableName = "rear")));
   extends BobLib.Icons.SimulationIcon;
 
   annotation(

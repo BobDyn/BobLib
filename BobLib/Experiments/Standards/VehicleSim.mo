@@ -4,10 +4,15 @@ model VehicleSim
 
   "VehicleInterfaces-aligned BobLib vehicle simulation entrypoint"
 
+  parameter Boolean useRuntimeDamperTables = false annotation(Evaluate = false);
+  parameter String damperTableFile = "damper_tables.txt" annotation(Evaluate = false);
+
   extends Templates.Vehicle.VehicleSim_EVBatInvMotDiff_DWBCStabar_DWBCStabar(
     chassis(
       chassisReferencePosition = pVehicle.pQSSInitialization.chassisReferencePosition,
       chassisReferenceAngles = pVehicle.pQSSInitialization.chassisReferenceAngles,
+      useRuntimeDamperTable = useRuntimeDamperTables,
+      runtimeDamperTableFile = damperTableFile,
       fixInitialSuspensionAngles = true,
       initialFrontLeftLowerArmAngle = pVehicle.pQSSInitialization.frontLeftLowerArmAngle,
       initialFrontRightLowerArmAngle = pVehicle.pQSSInitialization.frontRightLowerArmAngle,

@@ -18,6 +18,9 @@ partial model ChassisBase
 
   parameter SI.Velocity initialLongitudinalVelocity = 0
     "Initial longitudinal speed used to initialize tire spin";
+  parameter Boolean useRuntimeDamperTable = false
+    "Read front and rear damper curves from a file at simulation start" annotation(Evaluate = false);
+  parameter String runtimeDamperTableFile = "damper_tables.txt" annotation(Evaluate = false);
   parameter SI.Position chassisReferencePosition[3] = {0, 0, 0}
     "Initial world position of the chassis reference frame";
   parameter SI.Angle chassisReferenceAngles[3] = {0, 0, 0}

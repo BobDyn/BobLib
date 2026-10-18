@@ -25,6 +25,9 @@ model ShockLinkage
   // Damper parameters
   parameter Real damperTable[:, 2] "Columns: compression-positive shaft velocity [m/s], resisting force [N]" annotation(
     Dialog(group = "Damper Params"));
+  parameter Boolean useRuntimeDamperTable = false annotation(Evaluate = false);
+  parameter String runtimeDamperTableFile = "damper_tables.txt" annotation(Evaluate = false);
+  parameter String runtimeDamperTableName = "NoName";
 
   // Visual parameters (implement visuals later)
   parameter SI.Length linkDiameter "Link diameter" annotation(
@@ -52,7 +55,11 @@ model ShockLinkage
     s_0 = s_0) annotation(
     Placement(transformation(origin = {0, 30}, extent = {{-10, -10}, {10, 10}})));
 
-  BobLib.Chassis.Suspension.Linkages.TabularDamper TabularDamper(damperTable = damperTable) annotation(
+  BobLib.Chassis.Suspension.Linkages.TabularDamper TabularDamper(
+    damperTable = damperTable,
+    useRuntimeTable = useRuntimeDamperTable,
+    runtimeTableFile = runtimeDamperTableFile,
+    runtimeTableName = runtimeDamperTableName) annotation(
     Placement(transformation(origin = {0, 50}, extent = {{-10, -10}, {10, 10}})));
 
   // Shock axis
