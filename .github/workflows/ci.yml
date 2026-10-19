@@ -75,3 +75,25 @@ jobs:
 
       - name: Check Modelica initialization baselines
         run: make modelica-initialization
+
+  fmu:
+    name: FMU Export
+    runs-on: ubuntu-latest
+    container: openmodelica/openmodelica:v1.27.1-ompython
+    needs: python
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Python test dependencies
+        run: python3 -m pip install --upgrade pip -r Tests/requirements-dev.txt
+
+      - name: Cache Modelica libraries
+        uses: actions/cache@v6
+        with:
+          path: ~/.openmodelica
+          key: om-libs-${{ hashFiles('msl_setup.mos') }}
+
+      - name: Export and drive the FMUs
+        run: make modelica-fmu

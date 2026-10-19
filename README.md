@@ -68,7 +68,7 @@ Current checks target:
 - Modelica Standard Library 4.1.0
 - VehicleInterfaces 2.0.2 for `BobLib`
 - OpenModelica via the CI container `openmodelica/openmodelica:v1.27.1-ompython`
-- Python with `pytest` and `ruff`
+- Python with `pytest` and `ruff`, plus `fmpy` for the FMU checks
 
 Install Modelica dependencies with:
 
@@ -79,7 +79,10 @@ make modelica-deps
 ## Primary Entrypoints
 
 - `BobLib.Experiments.Standards.VehicleFMI`: driver-input FMI/DIL/SIL vehicle boundary;
-  `make modelica-fmu-export` exports it to `build/VehicleFMI.fmu` (Linux, CMake 3.21+)
+  `make modelica-fmu-export` exports it to `build/VehicleFMI.fmu` (Linux, CMake 3.21+).
+  The co-simulation FMU can fail a step when the car pulls away again after
+  holding the brake at standstill (a stop-and-go drive passes); see the comments
+  in `Tests/modelica_fmu_export.py`.
 - `BobLib.Experiments.Standards.VehicleSim`: full-vehicle maneuver benchmark
 - `BobLib.Experiments.Standards.FourPostSim`: four-post benchmark
 
@@ -97,7 +100,8 @@ make ci
 ```
 
 GitHub CI intentionally uses a lighter default gate for pushes and pull
-requests: Python lint/tests, Modelica formatting, and `make modelica-smoke`.
+requests: Python lint/tests, Modelica formatting, `make modelica-smoke`,
+`make modelica-initialization` and `make modelica-fmu`.
 Version tags use the same lightweight gate so releases are not blocked by a
 GitHub runner doing a full rebuild. The full OpenModelica gate is a release
 activity: run it locally with `make test`/`make ci`, or on a runner through the
@@ -118,6 +122,7 @@ make modelica-translation
 make modelica-initialization
 make modelica-physics
 make modelica-regression
+make modelica-fmu
 ```
 
 The CI workflow runs on pull requests and on pushes to `main` and version tags.

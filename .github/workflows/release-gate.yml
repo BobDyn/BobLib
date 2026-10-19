@@ -49,3 +49,6 @@ jobs:
 
       - name: Run signal-level regressions
         run: make modelica-regression
+
+      - name: Export and drive the FMUs
+        run: make modelica-fmu
