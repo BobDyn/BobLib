@@ -33,10 +33,9 @@ EXPORT_MODEL = (
     f"end {FMU_NAME};"
 )
 DEFAULT_TIMEOUT_S = 3600
-# State events in one communication step after which the step stops searching
-# for them. An ordinary step raises a few at most (VehicleFMI: up to 4 in stress
-# runs); OpenModelica's simulation runtime warns about chattering from 100 in a
-# row.
+# Most state events one communication step may handle; one more fails the step.
+# An ordinary step raises a few at most (VehicleFMI: up to 4 in stress runs);
+# OpenModelica's simulation runtime warns about chattering from 100 in a row.
 CHATTERING_STATE_EVENTS = 100
 
 
@@ -172,62 +171,20 @@ def source_edits(name: str) -> tuple[SourceEdit, ...]:
         # ... and fmi2DoStep handles the event there, then integrates on to the
         # end of the communication step. The event flags are reset for each
         # pass through the loop, or one event would repeat in every later pass.
-        # A relation whose argument drifts slowly through its threshold can
-        # cross it again and again on solver noise. After
-        # CHATTERING_STATE_EVENTS events in one communication step, CVODE stops
-        # searching and integrates on to the end of the step without a restart,
-        # and the step's remaining events are handled at its end, as before
-        # these edits. The search resumes in the next step, after a restart that
-        # sets CVODE's root state up from scratch. This bounds the search but
-        # does not always save VehicleFMI: when it pulls away again after
-        # holding the brake at standstill, its motor speed can stay within about
-        # 2e-10 of the direction latch's threshold, the guard trips, and CVODE
-        # stops about 1 ms later (CV_TOO_MUCH_WORK), so fmi2DoStep fails. A
-        # stop-and-go drive passes.
-        SourceEdit(
-            interface,
-            "  return fmi2OK;\n"
-            "}\n"
-            "\n"
-            "/**\n"
-            " * @brief FMI 2 doStep function.\n",
-            "  return fmi2OK;\n"
-            "}\n"
-            "\n"
-            "#ifdef WITH_SUNDIALS\n"
-            "int rootsFunctionCVODE(double time, N_Vector y, double *gout, void *userData);\n"
-            "#endif\n"
-            "\n"
-            "/**\n"
-            " * @brief FMI 2 doStep function.\n",
-        ),
-        # volatile: doStep_cleanup reads it after a longjmp into the catch.
+        # A relation can cross its threshold again and again within one step.
+        # Without a limit, VehicleFMI once handled 2,725 state events in one
+        # 20 ms step, the last ones less than 1e-12 s apart, and then the
+        # process aborted inside the OpenModelica runtime. A step with more than
+        # CHATTERING_STATE_EVENTS events fails with fmi2Error instead; it does
+        # not skip events. VehicleFMI's motor direction latch can chatter like
+        # this when the car pulls away again after holding the brake at
+        # standstill.
         SourceEdit(
             interface,
             "  int i, zc_event = 0, time_event = 0;\n"
             "  int flag;\n",
-            "  int i, zc_event = 0, time_event = 0;\n"
-            "  volatile int state_events = 0;\n"
+            "  int i, zc_event = 0, time_event = 0, state_events = 0;\n"
             "  int flag;\n",
-        ),
-        SourceEdit(
-            interface,
-            "        flag = cvode_solver_fmi_step(comp, tNext, states);\n"
-            "        if (flag < 0)\n",
-            "        flag = cvode_solver_fmi_step(comp, tNext, states);\n"
-            f"        if (flag == 1 && state_events >= {CHATTERING_STATE_EVENTS})\n"
-            "        {\n"
-            "          FILTERED_LOG(comp, fmi2Warning, LOG_STATUSWARNING,\n"
-            "            \"fmi2DoStep: %d state events in one communication step at \"\n"
-            "            \"time = %.15g; \"\n"
-            "            \"the rest of the step handles events at its end.\",\n"
-            "            state_events, comp->solverInfo->currentTime)\n"
-            "          CVodeRootInit(((CVODE_SOLVER*) comp->solverInfo->solverData)->cvode_mem, "
-            "0, NULL);\n"
-            "          comp->solverInfo->didEventStep = 0;\n"
-            "          flag = cvode_solver_fmi_step(comp, tNext, states);\n"
-            "        }\n"
-            "        if (flag < 0)\n",
         ),
         SourceEdit(
             interface,
@@ -251,27 +208,20 @@ def source_edits(name: str) -> tuple[SourceEdit, ...]:
             "        }\n"
             "        if (flag == 1)\n"
             "        {\n"
+            f"          if (++state_events > {CHATTERING_STATE_EVENTS})\n"
+            "          {\n"
+            "            FILTERED_LOG(comp, fmi2Error, LOG_STATUSERROR,\n"
+            f"              \"fmi2DoStep: more than {CHATTERING_STATE_EVENTS} state events \"\n"
+            "              \"in one communication step, the last at time = %.15g.\",\n"
+            "              comp->solverInfo->currentTime)\n"
+            "            status = fmi2Error;\n"
+            "            goto doStep_cleanup;\n"
+            "          }\n"
             "          tNext = comp->solverInfo->currentTime;\n"
             "          time_event = 0;\n"
             "          zc_event = 1;\n"
-            "          state_events++;\n"
             "        }\n"
             "#else\n",
-        ),
-        SourceEdit(
-            interface,
-            "doStep_cleanup:\n"
-            "  threadData->mmc_jumper = old_jmp;\n",
-            "doStep_cleanup:\n"
-            "#ifdef WITH_SUNDIALS\n"
-            f"  if (state_events >= {CHATTERING_STATE_EVENTS})\n"
-            "  {\n"
-            "    CVodeRootInit(((CVODE_SOLVER*) comp->solverInfo->solverData)->cvode_mem,\n"
-            "                  comp->fmuData->modelData->nZeroCrossings, rootsFunctionCVODE);\n"
-            "    comp->solverInfo->didEventStep = 1;\n"
-            "  }\n"
-            "#endif\n"
-            "  threadData->mmc_jumper = old_jmp;\n",
         ),
     )
 

@@ -11,8 +11,21 @@ import modelica_fmu_export as fmu_export
 
 fmpy = pytest.importorskip("fmpy")
 np = pytest.importorskip("numpy")
+from fmpy.fmi1 import FMICallException  # noqa: E402
 
 DRIVER_INPUTS = ("steeringAngleCommand", "acceleratorPedalCommand", "brakePedalCommand")
+# Hold the brake, drive off, steer left and back. Inputs ramp, as a driver would
+# move them.
+DRIVE_OFF = [
+    (0.0, 0.0, 0.0, 0.0),
+    (0.5, 0.0, 0.0, 0.3),
+    (3.0, 0.0, 0.0, 0.3),
+    (3.5, 0.0, 0.3, 0.0),
+    (4.5, 0.0, 0.3, 0.0),
+    (5.0, 0.5, 0.3, 0.0),
+    (5.5, 0.5, 0.3, 0.0),
+    (6.0, 0.0, 0.3, 0.0),
+]
 
 # x rises at 1/s and resets at 1, so 8.5 s hold exactly 8 resets. A state event
 # found only at the end of each 0.3 s communication step makes every reset
@@ -102,20 +115,31 @@ def test_state_events_are_found_inside_a_step(reset_probe_fmu: Path) -> None:
     assert math.isclose(result["x"][-1], 0.5, abs_tol=1e-4), result["x"][-1]
 
 
-def test_chattering_guard_defers_events_to_the_end_of_a_step(reset_probe_fmu: Path) -> None:
-    # 125 resets fall in each 125 s step. After CHATTERING_STATE_EVENTS of them
-    # the step stops searching and handles the next one at its end, so each step
-    # adds one more than the limit; the search resumes in the next step.
+def test_chattering_guard_fails_the_step(reset_probe_fmu: Path) -> None:
+    from fmpy.fmi2 import fmi2Error
+
+    # 125 resets fall in a 125 s step, more than CHATTERING_STATE_EVENTS, so the
+    # step fails rather than skip any. In 0.3 s steps all 250 happen.
+    assert fmu_export.CHATTERING_STATE_EVENTS < 125
+    with pytest.raises(FMICallException) as error:
+        fmpy.simulate_fmu(
+            str(reset_probe_fmu),
+            fmi_type="CoSimulation",
+            stop_time=250.0,
+            output_interval=125.0,
+            output=["resets"],
+        )
+    assert error.value.function == "fmi2DoStep"
+    assert error.value.status == fmi2Error
+
     result = fmpy.simulate_fmu(
         str(reset_probe_fmu),
         fmi_type="CoSimulation",
-        stop_time=250.0,
-        output_interval=125.0,
+        stop_time=250.5,
+        output_interval=0.3,
         output=["resets"],
     )
-
-    per_step = fmu_export.CHATTERING_STATE_EVENTS + 1
-    assert list(result["resets"]) == [0, per_step, 2 * per_step]
+    assert result["resets"][-1] == 250
 
 
 def test_requested_tolerance_reaches_cvode(decay_probe_fmu: Path) -> None:
@@ -150,33 +174,25 @@ def test_vehicle_fmu_exposes_driver_inputs(vehicle_fmu: Path) -> None:
     assert inputs == set(DRIVER_INPUTS)
 
 
-def test_vehicle_fmu_drives_from_standstill(vehicle_fmu: Path) -> None:
-    # Hold the brake, drive off, steer left and back, then brake. Driving off
-    # after holding the brake is what failed before the CVODE edits in
-    # modelica_fmu_export. Inputs ramp, as a driver would move them.
+def _drive(vehicle_fmu: Path, rows: list[tuple[float, float, float, float]]) -> np.ndarray:
     signals = np.array(
-        [
-            (0.0, 0.0, 0.0, 0.0),
-            (0.5, 0.0, 0.0, 0.3),
-            (3.0, 0.0, 0.0, 0.3),
-            (3.5, 0.0, 0.3, 0.0),
-            (4.5, 0.0, 0.3, 0.0),
-            (5.0, 0.5, 0.3, 0.0),
-            (5.5, 0.5, 0.3, 0.0),
-            (6.0, 0.0, 0.3, 0.0),
-            (6.5, 0.0, 0.0, 0.3),
-            (7.0, 0.0, 0.0, 0.3),
-        ],
+        rows,
         dtype=[("time", np.float64)] + [(name, np.float64) for name in DRIVER_INPUTS],
     )
-    result = fmpy.simulate_fmu(
+    return fmpy.simulate_fmu(
         str(vehicle_fmu),
         fmi_type="CoSimulation",
-        stop_time=7.0,
+        stop_time=rows[-1][0],
         output_interval=0.01,
         input=signals,
         output=["vehicleSpeed", "yawVel"],
     )
+
+
+def test_vehicle_fmu_drives_from_standstill(vehicle_fmu: Path) -> None:
+    # Drive off, then brake. Driving off after holding the brake is what failed
+    # before the CVODE edits in modelica_fmu_export.
+    result = _drive(vehicle_fmu, [*DRIVE_OFF, (6.5, 0.0, 0.0, 0.3), (7.0, 0.0, 0.0, 0.3)])
 
     time = result["time"]
     speed = result["vehicleSpeed"]
@@ -192,6 +208,39 @@ def test_vehicle_fmu_drives_from_standstill(vehicle_fmu: Path) -> None:
     assert speed_at_brake > 3.0, speed_at_brake
     assert turning > 0.1, turning
     assert speed[-1] < speed_at_brake - 2.0, (speed_at_brake, speed[-1])
+
+
+@pytest.mark.xfail(
+    raises=FMICallException,
+    strict=True,
+    reason=(
+        "VehicleFMI's motor direction latch chatters: "
+        "https://github.com/BobDyn/BobLib/issues/32"
+    ),
+)
+def test_vehicle_fmu_pulls_away_again_after_stopping(vehicle_fmu: Path) -> None:
+    # Drive off, brake to a stop and hold it, then drive off again. As the car
+    # pulls away, the motor direction latch in PowerLimitedMotor raises more
+    # than CHATTERING_STATE_EVENTS state events in one step, and the step fails
+    # at the chattering guard. With the accelerator at 0.4 to 1.0 this fails on
+    # aarch64 and x86-64 (emulated); at 0.2 and 0.3, only on aarch64.
+    result = _drive(
+        vehicle_fmu,
+        [
+            *DRIVE_OFF,
+            (6.5, 0.0, 0.0, 0.4),
+            (9.0, 0.0, 0.0, 0.4),
+            (9.5, 0.0, 0.5, 0.0),
+            (11.0, 0.0, 0.5, 0.0),
+        ],
+    )
+
+    time = result["time"]
+    speed = result["vehicleSpeed"]
+    assert math.isclose(time[-1], 11.0)
+    stopped = float(np.abs(speed[(time >= 8.5) & (time <= 9.0)]).max())
+    assert stopped < 0.05, stopped
+    assert speed[-1] > 1.0, speed[-1]
 
 
 def test_vehicle_fmu_stops_and_goes_without_a_requested_tolerance(
