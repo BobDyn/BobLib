@@ -54,6 +54,35 @@ Representative test areas include:
 <li><code>Tests/test_modelica_regression.py</code>: simulation regressions and smoke checks.</li>
 <li><code>Tests/test_modelica_linter.py</code>: Modelica formatting checks.</li>
 </ul>
+<h4>Mirrored Model Coverage and Profiling</h4>
+<p>Every production model or block has a corresponding fixture at the same
+relative package path: for example, BobLib.Drivelines.Internal.Differential1D
+maps to BobLibTest.Drivelines.Internal.TestDifferential1D. Supplemental regression
+cases remain beside the relevant component. This follows the MSL convention of
+a separate ModelicaTest library, with a stricter one-to-one coverage map.</p>
+<p>Tests/model_coverage.json records each target, fixture, scope, and simulation
+stop time. Partial models and icon models receive structural
+checks. Concrete components receive simulations; fixtures requiring complete
+assemblies are explicitly marked integration tests. Coverage does not imply
+validation against measured hardware.</p>
+<p><code>make modelica-components</code> runs the concrete fixtures through pytest
+and is included in <code>make test</code>. Run <code>python3 Tests/modelica_test_library.py</code> to enforce coverage.
+With omc on PATH, add <code>--output /tmp/boblib-profile</code> to execute all
+fixtures, or <code>--model BobLib.Drivelines</code> to select a package.
+The output directory must be new. Add <code>--check-only</code> for structural
+checks without simulation. Builds use temporary native storage, C with -Os,
+DASSL, tolerance 1e-6, and 100 output intervals. Each fixture runs in a fresh
+compiler process.</p>
+<p>JSON and CSV results separate frontend, backend, simulation code, templates,
+compilation, and simulation timing. JSON includes hierarchical package rollups,
+
+compiler version, source hash, and failed cases. Early terminate() times are
+reported separately from requested stop times. Rollups sum successful fixture
+costs; integration tests repeat shared assemblies and are not exclusive
+contributions to vehicle runtime. Structural checks have no simulation timing.
+Logs and generated scripts are retained; generated binaries and result files
+are removed. Existing calibrated initialization snapshots remain an explicit,
+separate set and are never silently regenerated for new fixtures.</p>
 <h4>What FSAE Teams Should Validate</h4>
 <ul>
 <li>Mass, CG, inertia, wheelbase, track, and corner weights.</li>

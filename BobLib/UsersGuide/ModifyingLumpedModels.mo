@@ -53,9 +53,7 @@ The base
 chassis, battery, and motor buses. It publishes actuator requests to
 <code>electricMotorControlBus</code>, <code>drivelineControlBus</code>, and
 <code>brakesControlBus</code>. The standard maneuver generator
-<a href='modelica://BobLib.Controllers.StandardVCU'>StandardVCU</a> extends
-that base VCU and adds autonomous steering, pedal, inverter-enable, ramp-steer,
-step-steer, sine-steer, and steady-state lateral-acceleration modes.
+<a href='modelica://BobLib.Drivers.StandardDriver'>StandardDriver</a> supplies autonomous steering and pedal intent through VI DriverInterface; it owns ramp-steer, step-steer, sine-steer, and steady-state lateral-acceleration modes.
 </p>
 <p>
 Positive speed-control torque is sent to the electric-drive path. Negative
@@ -66,7 +64,7 @@ brakes.
 </p>
 <h4>Brake Models</h4>
 <p>
-<a href='modelica://BobLib.Chassis.Brakes.BasicVCUBrakes'>BasicVCUBrakes</a>
+<a href='modelica://BobLib.Brakes.BasicVCUBrakes'>BasicVCUBrakes</a>
 is a simple VCU-commanded brake model. It consumes
 <code>brakesControlBus.mechanicalBrakeTorqueRequest</code>, splits torque by
 mechanical brake bias, and applies torque opposite wheel angular velocity.
@@ -95,9 +93,8 @@ kinematics remain mechanical equations, not bus signals.
 Aerodynamic models should extend
 <a href='modelica://BobLib.Aero.Interfaces.Base'>Aero.Interfaces.Base</a>.
 That base model already subscribes to chassis ride heights on
-<code>controlBus.chassisBus</code>, subscribes to density and wind on
-<a href='modelica://BobLib.Atmospheres.Interfaces.AtmosphereBus'>AtmosphereBus</a>,
-computes relative airspeed from the sprung chassis frame, and applies force and
+<code>controlBus.chassisBus</code>, queries density and wind through the VI atmosphere functions,
+computes relative airspeed at the aero load point, and applies force and
 torque to the chassis through a rigid aero mount.
 </p>
 <p>
@@ -110,11 +107,9 @@ body-frame force and torque.
 <p>
 Atmosphere models should preserve the
 <a href='modelica://VehicleInterfaces.Atmospheres.Interfaces.Base'>VehicleInterfaces atmosphere function contract</a>
-and publish atmosphere-owned signals on
-<a href='modelica://BobLib.Atmospheres.Interfaces.AtmosphereBus'>AtmosphereBus</a>.
+using the shared <code>inner atmosphere</code>.
 <a href='modelica://BobLib.Atmospheres.ConstantAtmosphere'>ConstantAtmosphere</a>
-uses parameters today, but those same bus fields can later come from altitude,
-weather, track position, sensor noise, or a recorded data source.
+implements constant conditions. Position-dependent implementations can model altitude or track location; VI 2.0.2 does not provide an explicit time argument for arbitrary gust histories.
 </p>
 <h4>Compatibility Checklist</h4>
 <ul>
