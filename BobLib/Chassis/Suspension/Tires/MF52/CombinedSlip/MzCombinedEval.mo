@@ -2,15 +2,13 @@ within BobLib.Chassis.Suspension.Tires.MF52.CombinedSlip;
 
 function MzCombinedEval
 
-  import SI = Modelica.Units.SI;
-
-  import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.MzPureRecord;
-  import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.CombinedSlip.MzCombinedRecord;
-  import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.FyPureRecord;
-  import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.FxPureRecord;
-  import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.SetupRecord;
-
+  import Modelica.Units.SI;
   import BobLib.Chassis.Suspension.Tires.MF52.PureSlip.MzPureEval;
+  import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.CombinedSlip.MzCombinedRecord;
+  import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.FxPureRecord;
+  import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.FyPureRecord;
+  import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.MzPureRecord;
+  import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.SetupRecord;
 
   input SI.Force Fz;
   input SI.Force Fx;
@@ -42,19 +40,14 @@ protected
 algorithm
   if Fz > 1e-3 then
 
-    // ------------------------------------------------------------
     // Load normalization
-    // ------------------------------------------------------------
     dfz := (Fz - setup.FNOMIN * pFy.LFZO) / (setup.FNOMIN * pFy.LFZO);
 
     mu_y := (pFy.PDY1 + pFy.PDY2 * dfz)
 
             * (1 - pFy.PDY3 * (gamma * pFy.LGAY)^2)
             * pFy.LMUY;
-
-    // ------------------------------------------------------------
     // Combined Fy shift
-    // ------------------------------------------------------------
     D_VySR := mu_y * Fz
 
               * (pComb.RVY1 + pComb.RVY2 * dfz + pComb.RVY3 * gamma)
@@ -68,9 +61,7 @@ algorithm
     // Effective Fy used in Mz model
     Fy_eff := Fy - S_VySR;
 
-    // ------------------------------------------------------------
     // Pure aligning moment
-    // ------------------------------------------------------------
     Mz_pure := MzPureEval(
       Fz,
       Fy_eff,
@@ -83,27 +74,20 @@ algorithm
       setup
     );
 
-    // ------------------------------------------------------------
     // Pneumatic trail extraction
-    // ------------------------------------------------------------
     if abs(Fy_eff) > 1e-6 then
       t := -Mz_pure / Fy_eff;
     else
       t := 0;
     end if;
 
-    // ------------------------------------------------------------
     // Residual arm (already correct in your model)
-    // ------------------------------------------------------------
     s := (pComb.SSZ1
          + pComb.SSZ2 * (Fy / setup.FNOMIN)
          + (pComb.SSZ3 + pComb.SSZ4 * dfz) * gamma)
 
          * setup.UNLOADED_RADIUS * pComb.LS;
-
-    // ------------------------------------------------------------
     // Final Mz
-    // ------------------------------------------------------------
     Mz := Mz_pure + s * Fx;
 
   else

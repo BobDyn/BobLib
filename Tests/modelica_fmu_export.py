@@ -313,7 +313,19 @@ def run_command(command: list[str], *, cwd: Path, timeout_s: int) -> str:
 
 
 def apply_source_edits(sources: Path, name: str) -> None:
-    for edit in source_edits(name):
+    edits = source_edits(name)
+    # OMC 1.27.1 accepts x0 here, but returns the stale working vector x.
+    # Models without nonlinear systems omit this runtime source entirely.
+    homotopy = "simulation/solver/nonlinearSolverHomotopy.c"
+    if (sources / homotopy).is_file():
+        old = (
+            "        success = NLS_SOLVED;\n"
+            "        /* take the solution */\n"
+            "        vecCopy(homotopyData->n, homotopyData->x, nlsData->nlsx);\n"
+            "        /* reset continous flag */"
+        )
+        edits += (SourceEdit(homotopy, old, old.replace("homotopyData->x,", "homotopyData->x0,")),)
+    for edit in edits:
         path = sources / edit.path
         # Bytes keep the line endings as OpenModelica wrote them.
         text = path.read_bytes().decode("utf-8")

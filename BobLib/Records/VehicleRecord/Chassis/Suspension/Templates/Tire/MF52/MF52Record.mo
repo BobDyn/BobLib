@@ -2,7 +2,8 @@ within BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52;
 
 record MF52Record
 
-  import SI = Modelica.Units.SI;
+  parameter Real referenceRoadFriction(min = Modelica.Constants.small) = 0.5
+    "VI road coefficient at which this tire data set is calibrated" annotation(Evaluate = false);
 
   // Setup
   SetupRecord setup

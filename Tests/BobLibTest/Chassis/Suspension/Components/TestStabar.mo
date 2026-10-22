@@ -14,12 +14,12 @@ model TestStabar
     Placement(transformation(origin = {-170, -70}, extent = {{-10, -10}, {10, 10}})));
 
   Modelica.Mechanics.MultiBody.Parts.Fixed mountFixture(
-    r = {pVehicle.pFrStabar.leftBarEnd[1], 0, pVehicle.pFrStabar.leftBarEnd[3]},
+    r = {pVehicle.chassis.frontAxle.stabilizer.leftBarEnd[1], 0, pVehicle.chassis.frontAxle.stabilizer.leftBarEnd[3]},
     animation = false) annotation(
     Placement(transformation(origin = {0, -40}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
 
   BobLib.Chassis.Suspension.Components.Stabar stabar(
-    pStabar = pVehicle.pFrStabar,
+    pStabar = pVehicle.chassis.frontAxle.stabilizer,
     linkDiameter = linkDiameter,
     jointDiameter = jointDiameter) annotation(
     Placement(transformation(origin = {0, -4}, extent = {{-20, -20}, {20, 20}})));
@@ -36,7 +36,7 @@ equation
     abs(stabar.leftArmFrame.r_0[3] - stabar.rightArmFrame.r_0[3]) < 1e-7,
     "The unloaded massless arm must follow the loaded arm without bar twist");
   assert(abs(stabar.leftArmFrame.r_0[2] - stabar.rightArmFrame.r_0[2] -
-    2*pVehicle.pFrStabar.leftArmEnd[2]) < 1e-7,
+    2*pVehicle.chassis.frontAxle.stabilizer.leftArmEnd[2]) < 1e-7,
     "Stabilizer rotation must preserve the lateral pickup spacing");
   annotation(
     experiment(StartTime = 0, StopTime = 3, Tolerance = 1e-06, Interval = 0.002),

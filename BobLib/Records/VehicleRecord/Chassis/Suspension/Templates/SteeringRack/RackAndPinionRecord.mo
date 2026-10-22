@@ -2,7 +2,7 @@ within BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.SteeringRack;
 
 record RackAndPinionRecord
 
-  import SI = Modelica.Units.SI;
+  import Modelica.Units.SI;
 
   parameter SI.Position leftPickup[3]
     "Left pickup coordinate, expressed in chassis frame";

@@ -210,20 +210,9 @@ def test_vehicle_fmu_drives_from_standstill(vehicle_fmu: Path) -> None:
     assert speed[-1] < speed_at_brake - 2.0, (speed_at_brake, speed[-1])
 
 
-@pytest.mark.xfail(
-    raises=FMICallException,
-    strict=True,
-    reason=(
-        "VehicleFMI's motor direction latch chatters: "
-        "https://github.com/BobDyn/BobLib/issues/32"
-    ),
-)
 def test_vehicle_fmu_pulls_away_again_after_stopping(vehicle_fmu: Path) -> None:
-    # Drive off, brake to a stop and hold it, then drive off again. As the car
-    # pulls away, the motor direction latch in PowerLimitedMotor raises more
-    # than CHATTERING_STATE_EVENTS state events in one step, and the step fails
-    # at the chattering guard. With the accelerator at 0.4 to 1.0 this fails on
-    # aarch64 and x86-64 (emulated); at 0.2 and 0.3, only on aarch64.
+    # Regression for #32: re-launch after holding the brake must not chatter
+    # at an already-established motor-direction threshold.
     result = _drive(
         vehicle_fmu,
         [
