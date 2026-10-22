@@ -4,6 +4,7 @@ partial model ShockLinkageIcon "Reusable shock linkage icon"
 
   annotation(
     Icon(graphics = {
+      Text(extent = {{-150, 130}, {150, 105}}, textString = "%name", textColor = {0, 0, 255}, fontSize = 0),
       Line(
         origin = {1, -40},
         points = {{-61, 0}, {-41, 0}, {-31, 20}, {-11, -20}, {11, 20}, {29, -20}, {39, 0}, {59, 0}},

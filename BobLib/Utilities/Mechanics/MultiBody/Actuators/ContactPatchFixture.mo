@@ -2,8 +2,9 @@ within BobLib.Utilities.Mechanics.MultiBody.Actuators;
 
 model ContactPatchFixture
 
-  import SI = Modelica.Units.SI;
-  parameter SI.Position CP_init[3] "Vector from origin to initial contact patch location, resolved in world frame";
+  import Modelica.Units.SI;
+
+  parameter SI.Position CP_init[3] "Vector from origin to initial contact patch location, resolved in world frame" annotation(Dialog(group = "Initialization"));
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a frame_a annotation(
     Placement(
       transformation(origin = {70, 100}, extent = {{-16, -16}, {16, 16}}, rotation = -90),
@@ -29,7 +30,7 @@ model ContactPatchFixture
     Placement(transformation(origin = {50, 0}, extent = {{-10, -10}, {10, 10}})));
 
   Modelica.Mechanics.Rotational.Components.Disc AngleOffset(deltaPhi = Modelica.Constants.pi/2) annotation(
-    Placement(transformation(origin = {30, 30}, extent = {{-10, -10}, {10, 10}})));
+    Placement(transformation(origin = {30, 50}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
 
 equation
   connect(DOF_x.frame_a, CP_Fixed.frame_b) annotation(
@@ -41,9 +42,9 @@ equation
   connect(Revolute.frame_b, DOF_xyz.frame_a) annotation(
     Line(points = {{60, 0}, {70, 0}, {70, 40}}, color = {95, 95, 95}));
   connect(AngleOffset.flange_b, Revolute.axis) annotation(
-    Line(points = {{40, 30}, {50, 30}, {50, 10}}));
+    Line(points = {{30, 60}, {30, 70}, {50, 70}, {50, 10}}));
   connect(Revolute.support, AngleOffset.flange_a) annotation(
-    Line(points = {{44, 10}, {10, 10}, {10, 30}, {20, 30}}));
+    Line(points = {{44, 10}, {44, 25}, {30, 25}, {30, 40}}));
   connect(frame_a, DOF_xyz.frame_b) annotation(
     Line(points = {{70, 100}, {70, 60}}));
   annotation(
@@ -57,6 +58,6 @@ It provides a clean diagram-level component for connecting raw tire contact
 patch frames to prescribed rig motion or fixture references.
 </p>
 </html>"),
-  Icon(graphics = {Line(origin = {0, 10}, points = {{0, 30}, {0, 10}}, thickness = 1), Line(origin = {0, 11}, points = {{0, 9}, {0, -1}}, thickness = 1), Ellipse(origin = {0, 24}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-5, 5}, {5, -5}}), Line(origin = {0, -16}, points = {{-40, 0}, {40, 0}}, thickness = 1), Line(origin = {-35, -21}, points = {{5, 5}, {-5, -5}}, thickness = 1), Line(origin = {-25, -21}, points = {{5, 5}, {-5, -5}}, thickness = 1), Line(origin = {-15, -21}, points = {{5, 5}, {-5, -5}}, thickness = 1), Line(origin = {-5, -21}, points = {{5, 5}, {-5, -5}}, thickness = 1), Line(origin = {5, -21}, points = {{5, 5}, {-5, -5}}, thickness = 1), Line(origin = {15, -21}, points = {{5, 5}, {-5, -5}}, thickness = 1), Line(origin = {25, -21}, points = {{5, 5}, {-5, -5}}, thickness = 1), Line(origin = {0, 10}, points = {{-30, 0}, {30, 0}}, thickness = 1), Line(origin = {0, 6}, points = {{-30, 0}, {30, 0}}, thickness = 1), Line(origin = {0, -5}, points = {{0, -11}, {0, 11}}, thickness = 1)}),
+  Icon(graphics = {Text(extent = {{-100, 90}, {100, 65}}, textString = "%name", textColor = {0, 0, 255}, fontSize = 0), Line(origin = {0, 10}, points = {{0, 30}, {0, 10}}, thickness = 1), Line(origin = {0, 11}, points = {{0, 9}, {0, -1}}, thickness = 1), Ellipse(origin = {0, 24}, lineColor = {255, 0, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, extent = {{-5, 5}, {5, -5}}), Line(origin = {0, -16}, points = {{-40, 0}, {40, 0}}, thickness = 1), Line(origin = {-35, -21}, points = {{5, 5}, {-5, -5}}, thickness = 1), Line(origin = {-25, -21}, points = {{5, 5}, {-5, -5}}, thickness = 1), Line(origin = {-15, -21}, points = {{5, 5}, {-5, -5}}, thickness = 1), Line(origin = {-5, -21}, points = {{5, 5}, {-5, -5}}, thickness = 1), Line(origin = {5, -21}, points = {{5, 5}, {-5, -5}}, thickness = 1), Line(origin = {15, -21}, points = {{5, 5}, {-5, -5}}, thickness = 1), Line(origin = {25, -21}, points = {{5, 5}, {-5, -5}}, thickness = 1), Line(origin = {0, 10}, points = {{-30, 0}, {30, 0}}, thickness = 1), Line(origin = {0, 6}, points = {{-30, 0}, {30, 0}}, thickness = 1), Line(origin = {0, -5}, points = {{0, -11}, {0, 11}}, thickness = 1)}),
   Diagram(graphics));
 end ContactPatchFixture;

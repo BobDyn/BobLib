@@ -8,11 +8,10 @@ model UniversalSpherical
   "Universal - spherical joint aggregation (1 constraint, no potential states)"
 
   import Modelica.Units.SI;
-  import Modelica.Mechanics.MultiBody.Types;
   import Modelica.Mechanics.MultiBody.Frames;
   import Modelica.Mechanics.MultiBody.Interfaces;
+  import Modelica.Mechanics.MultiBody.Types;
   import Modelica.Mechanics.MultiBody.Visualizers;
-  import Modelica.Mechanics.MultiBody.Sensors;
 
   extends Interfaces.PartialTwoFrames;
   Interfaces.Frame_a frame_ia
@@ -21,20 +20,20 @@ model UniversalSpherical
         origin = {-40, 100},
         extent = {{-16, -16}, {16, 16}},
         rotation = 270)));
-  parameter Boolean animation = true "= true, if animation shall be enabled";
-  parameter Boolean showUniversalAxes = true
-    "= true, if universal joint shall be visualized with two cylinders, otherwise with a sphere (provided animation=true)";
   parameter Boolean computeRodLength = false
-    "= true, if distance between frame_a and frame_b shall be computed during initialization (see info)";
+    "= true, if distance between frame_a and frame_b shall be computed during initialization (see info)" annotation(Dialog(group = "Architecture"), choices(checkBox = true));
   parameter Modelica.Mechanics.MultiBody.Types.Axis n1_a = {0, 0, 1}
 
     "Axis 1 of universal joint resolved in frame_a (axis 2 is orthogonal to axis 1 and to rod)"
-    annotation(Evaluate = true);
+    annotation(Dialog(group = "Operating settings"), Evaluate = true);
   parameter SI.Position rRod_ia[3] = {1, 0, 0}
     "Vector from origin of frame_a to origin of frame_b, resolved in frame_ia(
       if computeRodLength=true,
       rRod_ia is only an axis vector along the connecting rod)"
-    annotation(Evaluate = true);
+    annotation(Dialog(group = "Operating settings"), Evaluate = true);
+  parameter Boolean animation = true "= true, if animation shall be enabled" annotation(Dialog(group = "Animation"), choices(checkBox = true));
+  parameter Boolean showUniversalAxes = true
+    "= true, if universal joint shall be visualized with two cylinders, otherwise with a sphere (provided animation=true)" annotation(Dialog(group = "Animation"), choices(checkBox = true));
   parameter SI.Diameter sphereDiameter = world.defaultJointLength
     "Diameter of spheres representing the universal and the spherical joint"
     annotation(Dialog(tab = "Animation", group = "if animation = true", enable = animation));
@@ -76,13 +75,13 @@ model UniversalSpherical
 
   parameter Boolean kinematicConstraint = true
     "= false, if no constraint shall be defined, due to analytically solving a kinematic loop"
-    annotation(Dialog(tab = "Advanced"));
+    annotation(choices(checkBox = true), Dialog(tab = "Advanced"));
   Real constraintResidue = rRod_0*rRod_0 - rodLength*rodLength
     "Constraint equation of joint in residue form: Either length constraint (= default) or equation to compute rod force (for analytic solution of loops in combination with Internal.RevoluteWithLengthConstraint/PrismaticWithLengthConstraint)"
     annotation(Dialog(tab = "Advanced", enable = not kinematicConstraint));
   parameter Boolean checkTotalPower = false
     "= true, if total power flowing into this component shall be determined (must be zero)"
-    annotation(Dialog(tab = "Advanced"));
+    annotation(choices(checkBox = true), Dialog(tab = "Advanced"));
   SI.Force f_rod
     "Constraint force in direction of the rod (positive, if rod is pressed)";
   final parameter SI.Distance rodLength(fixed = false, start = Modelica.Math.Vectors.length(rRod_ia))
@@ -497,10 +496,7 @@ the origin of frame_a to the middle of the rod, this might be defined as:
           fillPattern = FillPattern.Solid,
           startAngle = 0,
           endAngle = 360),
-        Text(
-          extent = {{-105, 118}, {-67, 86}},
-          textColor = {128, 128, 128},
-          textString = "ia"),
+
         Line(
           points = {{-40, 101}, {-40, 60}, {-60, 1}},
           color = {128, 128, 128},
@@ -526,8 +522,6 @@ the origin of frame_a to the middle of the rod, this might be defined as:
         Text(
           extent = {{-150, -50}, {150, -90}},
           textColor = {0, 0, 255},
-          textString = "%name"),
-        Text(
-          extent = {{-24, 95}, {167, 65}},
-          textString = "%rRod_ia")}));
+          textString = "%name", fontSize = 0)}));
+  annotation(Diagram(coordinateSystem(extent = {{-100, -100}, {100, 100}}, preserveAspectRatio = true)));
 end UniversalSpherical;

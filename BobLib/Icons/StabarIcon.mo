@@ -4,6 +4,7 @@ partial model StabarIcon "Reusable stabar icon"
 
   annotation(
     Icon(graphics = {
+      Text(extent = {{-150, 130}, {150, 105}}, textString = "%name", textColor = {0, 0, 255}, fontSize = 0),
       Line(origin = {0, -10}, points = {{-80, 0}, {80, 0}}, thickness = 5),
       Line(origin = {-80, 20}, points = {{0, -30}, {0, 0}}, thickness = 5),
       Line(origin = {80, 20}, points = {{0, -30}, {0, 0}}, thickness = 5),

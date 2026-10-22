@@ -4,6 +4,7 @@ partial model BaseTireIcon "Reusable base tire icon"
 
   annotation(
     Icon(coordinateSystem(extent = {{-100, -100}, {100, 100}}), graphics = {
+      Text(extent = {{-150, 130}, {150, 105}}, textString = "%name", textColor = {0, 0, 255}, fontSize = 0),
       Rectangle(fillColor = {71, 71, 71}, fillPattern = FillPattern.Solid, extent = {{-40, 80}, {40, -80}}, radius = 5),
       Line(points = {{-22, -84}, {22, -84}}, color = {20, 20, 20}, thickness = 1, arrow = {Arrow.Filled, Arrow.Filled}),
       Line(points = {{0, -98}, {0, -72}}, color = {20, 20, 20}, thickness = 1, arrow = {Arrow.Filled, Arrow.Filled})
