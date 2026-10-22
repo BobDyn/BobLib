@@ -6,7 +6,8 @@ MODELICA_INIT_TIMEOUT_S ?= 600
 MODELICA_LINT_PATHS ?= BobLib Tests/BobLibTest
 
 PYTHON_TESTS := \
-	Tests/test_modelica_linter.py
+	Tests/test_modelica_linter.py \
+	Tests/test_modelica_test_library.py
 
 MODELICA_REGRESSION_TESTS := \
 	Tests/test_modelica_regression.py \
@@ -23,15 +24,7 @@ MODELICA_PHYSICS_TESTS := \
 
 MODELICA_SMOKE_FLAGS ?= --no-test-fixtures --no-equation-counts
 
-MODELICA_TESTS := \
-	$(MODELICA_TRANSLATION_TESTS) \
-	$(MODELICA_INITIALIZATION_TESTS) \
-	$(MODELICA_PHYSICS_TESTS) \
-	$(MODELICA_REGRESSION_TESTS)
-
-ALL_TESTS := \
-	$(PYTHON_TESTS) \
-	$(MODELICA_TESTS)
+ALL_TESTS := Tests
 
 .PHONY: help lint modelica-lint modelica-format test test-python test-pytest test-modelica modelica-deps modelica-smoke modelica-translation modelica-initialization modelica-physics modelica-regression ci check
 
@@ -47,8 +40,10 @@ help:
 		'  make modelica-deps        Install OpenModelica library dependencies' \
 		'  make modelica-smoke       Translate default standards/regression models only' \
 		'  make modelica-translation Translate standards and all BobLibTest fixtures via pytest' \
-		'  make modelica-initialization Initialize all BobLibTest fixtures via pytest and compare baselines' \
+		'  make modelica-initialization Initialize calibrated fixtures and compare baselines' \
 		'      MODELICA_INIT_TIMEOUT_S=600 controls the per-model OMC timeout' \
+		'  make modelica-coverage    Check every model has a mirrored fixture' \
+		'  make modelica-profile     Run mirrored fixtures and collect package timings' \
 		'  make modelica-physics     Simulate physical validation baselines with scaled runtime budgets' \
 		'  make modelica-regression  Simulate signal-level regressions and smoke-check BobLib/BobLibTest' \
 		'  make test-modelica        Run all Modelica checks' \
@@ -63,7 +58,7 @@ modelica-lint:
 modelica-format:
 	$(PYTHON) Tests/modelica_linter.py format $(MODELICA_LINT_PATHS)
 
-test: test-python test-modelica
+test: test-pytest
 
 test-python:
 	$(PYTEST) $(PYTEST_FLAGS) $(PYTHON_TESTS)
@@ -89,8 +84,21 @@ modelica-physics: modelica-deps
 modelica-regression: modelica-deps
 	$(PYTEST) $(PYTEST_FLAGS) $(MODELICA_REGRESSION_TESTS)
 
-test-modelica: modelica-translation modelica-initialization modelica-physics modelica-regression
+test-modelica: modelica-translation modelica-initialization modelica-physics modelica-regression modelica-components
 
-ci: lint test
+ci: lint modelica-lint modelica-coverage test
 
 check: ci
+
+# PROFILE_DIR must be new; override it to preserve successive measurements.
+PROFILE_DIR ?= /tmp/boblib-profile
+.PHONY: modelica-coverage modelica-profile
+modelica-coverage:
+	$(PYTHON) Tests/modelica_test_library.py
+
+modelica-profile:
+	$(PYTHON) Tests/modelica_test_library.py --output $(PROFILE_DIR)
+
+.PHONY: modelica-components
+modelica-components: modelica-deps
+	$(PYTEST) $(PYTEST_FLAGS) Tests/test_modelica_components.py

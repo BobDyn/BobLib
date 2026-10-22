@@ -75,3 +75,14 @@ jobs:
 
       - name: Check Modelica initialization baselines
         run: make modelica-initialization
+
+      - name: Simulate mirrored model coverage and collect profiles
+        run: make modelica-profile PROFILE_DIR=/tmp/boblib-profile
+
+      - name: Retain component profiles and compiler logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: boblib-component-profiles
+          path: /tmp/boblib-profile
+          if-no-files-found: ignore

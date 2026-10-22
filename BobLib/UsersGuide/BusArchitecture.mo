@@ -58,10 +58,7 @@ BobLib-owned umbrella ports use
 <a href='modelica://BobLib.Utilities.Interfaces.ControlBus'>Utilities.Interfaces.ControlBus</a>:
 expand a subsystem such as chassisBus to browse its declared signals. Subsystem interface bases declare this same typed umbrella, so their external
 controlBus ports expose the same member names. Unused declared members remain potentially present, not new sources.</p>
-<p>Run <code>python3 Tools/bus_contracts.py</code> to reject undeclared BobLib
-control/axle member names. The Python gate also checks that these contracts are
-used by actual instances and that local subsystem buses do not use empty VI types.
-This source check does not replace compiler checks of connections and types.</p>
+<p>Declare each signal in its owning typed bus before adding a connection. Check the containing model in the Modelica compiler to verify connection types and balance. Inspect the rendered diagram separately.</p>
 <p>Axle measurements are flattened at the chassis boundary for OpenModelica compatibility:
 <code>Fz_1</code> through <code>Fz_4</code> are the front-left, front-right,
 rear-left and rear-right normal loads. Spring lengths use

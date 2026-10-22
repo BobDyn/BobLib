@@ -24,6 +24,9 @@ The web documentation lives at:
 
 https://bobdyn.com/boblib
 
+Organization changes and removed class paths are documented in [MIGRATION.md](MIGRATION.md).
+Current validation scope is recorded in [RELEASE_READINESS.md](RELEASE_READINESS.md).
+
 ## Release
 
 Current package version: `0.2.0`, dated `2026-08-09`.
@@ -81,6 +84,7 @@ make modelica-deps
 - `BobLib.Experiments.Standards.VehicleFMI`: driver-input FMI/DIL/SIL vehicle boundary
 - `BobLib.Experiments.Standards.VehicleSim`: full-vehicle maneuver benchmark
 - `BobLib.Experiments.Standards.FourPostSim`: four-post benchmark
+- `BobLib.Experiments.Standards.KnCSteerable` and `KnCLocked`: single-axle kinematics/compliance rigs
 
 `BobLib` is the forward-looking standalone package. It builds
 BobLib physics inside the public subsystem contracts from VehicleInterfaces
@@ -96,11 +100,17 @@ make ci
 ```
 
 GitHub CI intentionally uses a lighter default gate for pushes and pull
-requests: Python lint/tests, Modelica formatting, and `make modelica-smoke`.
-Version tags use the same lightweight gate so releases are not blocked by a
-GitHub runner doing a full rebuild. The full OpenModelica gate is a release
+requests: Python lint/tests, Modelica formatting, smoke translation,
+initialization baselines, and mirrored fixture simulations/profiles.
+Version tags use that same gate. The full OpenModelica gate is a release
 activity: run it locally with `make test`/`make ci`, or on a runner through the
 separate `Release Gate` workflow (Actions -> Release Gate -> Run workflow).
+
+The release workflow runs `make ci`, including formatting, coverage, and the
+complete pytest suite, and retains its test report. Inspect skipped tests:
+a passing default gate alone does not certify an FMU distribution or provide
+rendered diagram sign-off. Native/FMU export tooling and SS/GGV analysis are
+outside this change; the existing VehicleFMI Modelica entry point remains.
 
 Python tooling versions are pinned in `Tests/requirements-dev.txt` and the ruff
 rule selection is pinned in `ruff.toml`, so a new ruff or pytest release cannot
