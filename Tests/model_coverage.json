@@ -2,6 +2,27 @@
   "schema_version": 1,
   "models": [
     {
+      "model": "BobLib.Aero.CFDAeroMap",
+      "test": "BobLibTest.Aero.TestCFDAeroMap",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Aero.Interfaces.Base",
+      "test": "BobLibTest.Aero.Interfaces.TestBase",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Aero.Mounts.RigidMount",
+      "test": "BobLibTest.Aero.Mounts.TestRigidMount",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 0.01
+    },
+    {
       "model": "BobLib.Brakes.BasicVCUBrakes",
       "test": "BobLibTest.Brakes.TestBasicVCUBrakes",
       "mode": "simulate",

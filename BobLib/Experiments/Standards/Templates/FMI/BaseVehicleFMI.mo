@@ -10,7 +10,7 @@ partial model BaseVehicleFMI
     Evaluate = true,
     Dialog(tab = "Animation"));
   replaceable record VehicleRecord = BobLib.Records.VehicleDefn.EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord;
-  parameter VehicleRecord pVehicle = VehicleRecord();
+  parameter VehicleRecord pVehicle;
   parameter SI.Velocity initialVel = 0 "Initial vehicle speed" annotation(
     Evaluate = false);
 
@@ -251,8 +251,6 @@ equation
     Line(points = {{-120, -36}, {-155, -36}, {-155, -20}}, color = {0, 0, 255}));
   connect(transmission.drivelineFlange, driveline.transmissionFlange) annotation(
     Line(points = {{-30, -10}, {-30, -9.75}, {-10, -9.75}, {-10, -49.5}, {10, -49.5}, {10, -50}}, color = {135, 135, 135}, thickness = 0.5));
-  connect(atmosphere.atmosphereBus, aeroModel.atmosphereBus) annotation(
-    Line(points = {{-135, -140}, {-135, -80}, {-79, -80}}, color = {255, 204, 51}, thickness = 0.5));
   connect(driveline.wheelHub_2, chassis.wheelHub_2) annotation(
     Line(points = {{16, -35}, {16, 20}, {73, 20}, {73, -30}}, color = {135, 135, 135}));
   connect(brakes.wheelHub_2, chassis.wheelHub_2) annotation(

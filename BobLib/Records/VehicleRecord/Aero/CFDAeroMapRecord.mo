@@ -2,7 +2,7 @@ within BobLib.Records.VehicleRecord.Aero;
 
 record CFDAeroMapRecord
 
-  import SI = Modelica.Units.SI;
+  import Modelica.Units.SI;
 
   parameter SI.Velocity referenceSpeed
     "Reference speed used by the CFD data";
@@ -11,7 +11,7 @@ record CFDAeroMapRecord
     "Reference air density used by the CFD data";
 
   parameter SI.Position aeroRef[3]
-    "World-frame vector from origin to the aero force application point";
+    "Aero load reference position in vehicle design coordinates";
 
   parameter SI.Position FL_RideHeightRef[3]
     "World-frame vector from origin to front-left ride-height reference point";
@@ -19,8 +19,14 @@ record CFDAeroMapRecord
   parameter SI.Position RL_RideHeightRef[3]
     "World-frame vector from origin to rear-left ride-height reference point";
 
+  parameter Integer frontPoints(min = 2, max = size(frontRideHeightGrid, 1)) = size(frontRideHeightGrid, 1)
+    "Number of active ride-height breakpoints" annotation(Evaluate = false);
+
   parameter SI.Length frontRideHeightGrid[:]
     "Front ride-height breakpoints for the CFD sweep";
+
+  parameter Integer rearPoints(min = 2, max = size(rearRideHeightGrid, 1)) = size(rearRideHeightGrid, 1)
+    "Number of active ride-height breakpoints" annotation(Evaluate = false);
 
   parameter SI.Length rearRideHeightGrid[:]
     "Rear ride-height breakpoints for the CFD sweep";
@@ -32,13 +38,13 @@ record CFDAeroMapRecord
     "Positive downforce magnitude from CFD";
 
   parameter SI.Torque mxTable[size(frontRideHeightGrid, 1), size(rearRideHeightGrid, 1)]
-    "Roll moment from CFD";
+    "Roll moment about aeroRef at reference conditions; rows are front height, columns rear height";
 
   parameter SI.Torque myTable[size(frontRideHeightGrid, 1), size(rearRideHeightGrid, 1)]
-    "Pitch moment from CFD";
+    "Pitch moment about aeroRef at reference conditions; rows are front height, columns rear height";
 
   parameter SI.Torque mzTable[size(frontRideHeightGrid, 1), size(rearRideHeightGrid, 1)]
-    "Yaw moment from CFD";
+    "Yaw moment about aeroRef at reference conditions; rows are front height, columns rear height";
 
   annotation(
     Documentation(info = "<html>
