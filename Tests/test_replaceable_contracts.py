@@ -34,6 +34,11 @@ def test_tire_replacements_preserve_geometry(tmp_path):
   model CompliantWheel
     extends RotatingWheel(tire(
       redeclare BobLib.Chassis.Suspension.Tires.Wheels.Wheel1DOF_Z wheelModel(pWheel(vertical(wheelC=30000, wheelD=800)))));
+    // A massless free contact frame leaves the vertical DOF unsolvable at initialization.
+    Modelica.Mechanics.MultiBody.Parts.Body cpLoad(m=0.1, r_CM={0,0,0},
+      I_11=1e-4, I_22=1e-4, I_33=1e-4, animation=false);
+  equation
+    connect(tire.cpFrame, cpLoad.frame_a);
   end CompliantWheel;
 
   model RigidWheel
@@ -48,7 +53,7 @@ loadModel(VehicleInterfaces, {{"2.0.2"}});
 loadFile("{ROOT}/BobLib/package.mo");
 loadFile("{ROOT}/Tests/BobLibTest/package.mo");
 loadFile("{fixture}");
-checkModel(ReplacementContracts.CompliantWheel);
+simulate(ReplacementContracts.CompliantWheel, stopTime=0.001);
 getErrorString();
 simulate(ReplacementContracts.RotatingWheel, stopTime=0.001);
 getErrorString();
@@ -58,9 +63,8 @@ getErrorString();
     result = subprocess.run(['omc', str(mos)], cwd=tmp_path, capture_output=True,
                             text=True, timeout=180, check=True)
     (tmp_path / 'omc.log').write_text(result.stdout + result.stderr)
-    assert 'Check of ReplacementContracts.CompliantWheel completed successfully' in result.stdout
     assert 'Error:' not in result.stdout, result.stdout
-    assert result.stdout.count('The simulation finished successfully') == 2, result.stdout
+    assert result.stdout.count('The simulation finished successfully') == 3, result.stdout
 
 
 def test_compliant_laws_are_replaceable(tmp_path):
