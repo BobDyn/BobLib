@@ -18,7 +18,7 @@ record AxleDW_DirectRecord
     Evaluate = false, Dialog(group = "Spring Params"));
   parameter SI.Length springFreeLength "Spring free length (zero-force length) = installed length + static compression" annotation(
     Evaluate = false, Dialog(group = "Spring Params"));
-  parameter SI.Position damperTable[:, 2] "Table of damper force [N] vs relative velocity [m/s], [v1, F1; v2, F2; ...]" annotation(
+  parameter Real damperTable[:, 2] "Columns: compression-positive shaft velocity [m/s], resisting force [N]" annotation(
     Evaluate = false, Dialog(group = "Damper Params"));
 
   annotation(

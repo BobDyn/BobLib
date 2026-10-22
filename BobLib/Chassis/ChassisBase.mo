@@ -18,6 +18,9 @@ partial model ChassisBase
 
   parameter SI.Velocity initialLongitudinalVelocity = 0
     "Initial longitudinal speed used to initialize tire spin";
+  parameter Boolean useRuntimeDamperTable = false
+    "Read front and rear damper curves from a file at simulation start" annotation(Evaluate = false);
+  parameter String runtimeDamperTableFile = "damper_tables.txt" annotation(Evaluate = false);
   parameter SI.Position chassisReferencePosition[3] = {0, 0, 0}
     "Initial world position of the chassis reference frame";
   parameter SI.Angle chassisReferenceAngles[3] = {0, 0, 0}
@@ -31,6 +34,10 @@ partial model ChassisBase
   output SI.Length frontRightSpringLength "Front-right suspension spring length";
   output SI.Length rearLeftSpringLength "Rear-left suspension spring length";
   output SI.Length rearRightSpringLength "Rear-right suspension spring length";
+  output SI.Velocity damperCompressionVelocity[4]
+    "Compression-positive shaft speed at front-left, front-right, rear-left, rear-right";
+  output SI.Force damperForce[4]
+    "Signed damping force at front-left, front-right, rear-left, rear-right";
   output SI.Angle leftSteerAngle "Front-left road wheel steer angle";
   output SI.Angle rightSteerAngle "Front-right road wheel steer angle";
   output SI.Angle avgSteerAngle "Average front road wheel steer angle";
@@ -199,6 +206,16 @@ equation
   frontRightSpringLength = detailedChassis.frAxleDW.rightSpringLength;
   rearLeftSpringLength = detailedChassis.rrAxleDW.leftSpringLength;
   rearRightSpringLength = detailedChassis.rrAxleDW.rightSpringLength;
+  damperCompressionVelocity = -{
+    detailedChassis.frAxleDW.leftShockLinkage.TabularDamper.v_rel,
+    detailedChassis.frAxleDW.rightShockLinkage.TabularDamper.v_rel,
+    detailedChassis.rrAxleDW.leftShockLinkage.TabularDamper.v_rel,
+    detailedChassis.rrAxleDW.rightShockLinkage.TabularDamper.v_rel};
+  damperForce = {
+    detailedChassis.frAxleDW.leftShockLinkage.TabularDamper.force.f,
+    detailedChassis.frAxleDW.rightShockLinkage.TabularDamper.force.f,
+    detailedChassis.rrAxleDW.leftShockLinkage.TabularDamper.force.f,
+    detailedChassis.rrAxleDW.rightShockLinkage.TabularDamper.force.f};
 
   leftWheelVector =
     Frames.resolve1(

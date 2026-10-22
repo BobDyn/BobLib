@@ -170,6 +170,10 @@ model Chassis_DW
         {pVehicle.pRrDW.wheelCenter[1], 0, pVehicle.pRrDW.wheelCenter[3]}),
     detailedChassis(
       redeclare FrAxleModel frAxleDW(
+        leftShockLinkage(useRuntimeDamperTable = useRuntimeDamperTable,
+          runtimeDamperTableFile = runtimeDamperTableFile, runtimeDamperTableName = "front"),
+        rightShockLinkage(useRuntimeDamperTable = useRuntimeDamperTable,
+          runtimeDamperTableFile = runtimeDamperTableFile, runtimeDamperTableName = "front"),
         fixInitialLeftLowerArmAngle = fixInitialSuspensionAngles,
         fixInitialRightLowerArmAngle = fixInitialSuspensionAngles,
         fixInitialLowerArmAngularVelocities = fixInitialSuspensionAngles,
@@ -218,6 +222,10 @@ model Chassis_DW
             LSGKP = pVehicle.pFrTireModel.relaxation.LSGKP,
             LSGAL = pVehicle.pFrTireModel.relaxation.LSGAL))),
       redeclare RrAxleModel rrAxleDW(
+        leftShockLinkage(useRuntimeDamperTable = useRuntimeDamperTable,
+          runtimeDamperTableFile = runtimeDamperTableFile, runtimeDamperTableName = "rear"),
+        rightShockLinkage(useRuntimeDamperTable = useRuntimeDamperTable,
+          runtimeDamperTableFile = runtimeDamperTableFile, runtimeDamperTableName = "rear"),
         fixInitialLeftLowerArmAngle = fixInitialSuspensionAngles,
         fixInitialRightLowerArmAngle = fixInitialSuspensionAngles,
         fixInitialLowerArmAngularVelocities = fixInitialSuspensionAngles,

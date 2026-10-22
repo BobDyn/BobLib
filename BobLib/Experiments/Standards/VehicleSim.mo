@@ -4,10 +4,15 @@ model VehicleSim
 
   "VehicleInterfaces-aligned BobLib vehicle simulation entrypoint"
 
+  parameter Boolean useRuntimeDamperTables = false annotation(Evaluate = false);
+  parameter String damperTableFile = "damper_tables.txt" annotation(Evaluate = false);
+
   extends Templates.Vehicle.VehicleSim_EVBatInvMotDiff_DWBCStabar_DWBCStabar(
     chassis(
       chassisReferencePosition = pVehicle.pQSSInitialization.chassisReferencePosition,
       chassisReferenceAngles = pVehicle.pQSSInitialization.chassisReferenceAngles,
+      useRuntimeDamperTable = useRuntimeDamperTables,
+      runtimeDamperTableFile = damperTableFile,
       fixInitialSuspensionAngles = true,
       initialFrontLeftLowerArmAngle = pVehicle.pQSSInitialization.frontLeftLowerArmAngle,
       initialFrontRightLowerArmAngle = pVehicle.pQSSInitialization.frontRightLowerArmAngle,
@@ -30,7 +35,7 @@ initial equation
       noEquidistantTimeGrid = "()",
       noEventEmit = "()",
       s = "dassl",
-      variableFilter = "time|frSteerCmd|accX|accY|handwheelAngle|steerExcess|handwheelTorque|Fz_.*|leftSteerAngle|rightSteerAngle|roll|sideslip|velX|velY|yawVel|steadyState.*|linearity.*|minTireNormalLoad|chassis.(front|rear)(Left|Right)SpringLength"),
+      variableFilter = "time|frSteerCmd|accX|accY|handwheelAngle|steerExcess|handwheelTorque|Fz_.*|leftSteerAngle|rightSteerAngle|roll|sideslip|velX|velY|yawVel|steadyState.*|linearity.*|minTireNormalLoad|chassis.(front|rear)(Left|Right)SpringLength|chassis.damper(CompressionVelocity|Force).*"),
     Documentation(info = "<html>
 <p>
 Primary entrypoint for the BobLib-native EV battery-inverter-motor-differential
