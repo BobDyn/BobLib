@@ -106,8 +106,9 @@ Version tags use that same gate. The full OpenModelica gate is a release
 activity: run it locally with `make test`/`make ci`, or on a runner through the
 separate `Release Gate` workflow (Actions -> Release Gate -> Run workflow).
 
-The release workflow runs `make ci`, including formatting, coverage, and the
-complete pytest suite, and retains its test report. Inspect skipped tests:
+The release workflow separates lint, formatting, coverage, translation,
+initialization, physics, signal regressions, and component/contract tests into
+named steps and retains their individual test reports. Inspect skipped tests:
 a passing default gate alone does not certify an FMU distribution or provide
 rendered diagram sign-off. Native/FMU export tooling and SS/GGV analysis are
 outside this change; the existing VehicleFMI Modelica entry point remains.

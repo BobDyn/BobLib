@@ -38,13 +38,34 @@ jobs:
           path: ~/.openmodelica
           key: om-libs-${{ hashFiles('msl_setup.mos') }}
 
-      - name: Run the complete local gate
-        run: make ci PYTEST_FLAGS="--junitxml=/tmp/boblib-release-results.xml -ra"
+      - name: Lint Python checks
+        run: make lint
+
+      - name: Check Modelica formatting
+        run: make modelica-lint
+
+      - name: Check mirrored model coverage
+        run: make modelica-coverage
+
+      - name: Translate standards and all test fixtures
+        run: make modelica-translation PYTEST_FLAGS="--junitxml=/tmp/boblib-release-results/translation.xml -ra"
+
+      - name: Check Modelica initialization baselines
+        run: make modelica-initialization PYTEST_FLAGS="--junitxml=/tmp/boblib-release-results/initialization.xml -ra"
+
+      - name: Run physical validation baselines
+        run: make modelica-physics PYTEST_FLAGS="--junitxml=/tmp/boblib-release-results/physics.xml -ra"
+
+      - name: Run signal-level regressions
+        run: make modelica-regression PYTEST_FLAGS="--junitxml=/tmp/boblib-release-results/regression.xml -ra"
+
+      - name: Run component, contract and Python tests
+        run: make test-additional PYTEST_FLAGS="--junitxml=/tmp/boblib-release-results/components.xml -ra"
 
       - name: Retain test results including skipped checks
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: boblib-release-results
-          path: /tmp/boblib-release-results.xml
+          path: /tmp/boblib-release-results/
           if-no-files-found: warn

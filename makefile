@@ -26,7 +26,13 @@ MODELICA_SMOKE_FLAGS ?= --no-test-fixtures --no-equation-counts
 
 ALL_TESTS := Tests
 
-.PHONY: help lint modelica-lint modelica-format test test-python test-pytest test-modelica modelica-deps modelica-smoke modelica-translation modelica-initialization modelica-physics modelica-regression ci check
+# Keep the release steps disjoint while including newly added test modules.
+ADDITIONAL_TESTS := $(filter-out \
+	$(MODELICA_TRANSLATION_TESTS) $(MODELICA_INITIALIZATION_TESTS) \
+	$(MODELICA_PHYSICS_TESTS) $(MODELICA_REGRESSION_TESTS), \
+	$(wildcard Tests/test_*.py))
+
+.PHONY: help lint modelica-lint modelica-format test test-python test-pytest test-additional test-modelica modelica-deps modelica-smoke modelica-translation modelica-initialization modelica-physics modelica-regression ci check
 
 help:
 	@printf '%s\n' \
@@ -37,6 +43,7 @@ help:
 		'  make test                 Run the full local pytest gate' \
 		'  make test-python          Run pure Python pytest checks only' \
 		'  make test-pytest          Run every pytest-collected check in one invocation' \
+		'  make test-additional      Run component, contract and Python tests' \
 		'  make modelica-deps        Install OpenModelica library dependencies' \
 		'  make modelica-smoke       Translate default standards/regression models only' \
 		'  make modelica-translation Translate standards and all BobLibTest fixtures via pytest' \
@@ -71,6 +78,9 @@ modelica-smoke: modelica-deps
 
 test-pytest: modelica-deps
 	$(PYTEST) $(PYTEST_FLAGS) $(ALL_TESTS) --boblib-package-root $(PACKAGE_ROOT) --boblib-initialization-timeout-s $(MODELICA_INIT_TIMEOUT_S)
+
+test-additional: modelica-deps
+	$(PYTEST) $(PYTEST_FLAGS) $(ADDITIONAL_TESTS) --boblib-package-root $(PACKAGE_ROOT) --boblib-initialization-timeout-s $(MODELICA_INIT_TIMEOUT_S)
 
 modelica-translation: modelica-deps
 	$(PYTEST) $(PYTEST_FLAGS) $(MODELICA_TRANSLATION_TESTS) --boblib-package-root $(PACKAGE_ROOT)
