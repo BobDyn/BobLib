@@ -268,6 +268,76 @@
       "stop_time": 0.1
     },
     {
+      "model": "BobLib.ElectricDrives.Interfaces.Base",
+      "test": "BobLibTest.ElectricDrives.Interfaces.TestBase",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.ElectricDrives.Internal.PowerLimitedMotor",
+      "test": "BobLibTest.ElectricDrives.Internal.TestPowerLimitedMotor",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.ElectricDrives.Motor",
+      "test": "BobLibTest.ElectricDrives.TestMotor",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.05
+    },
+    {
+      "model": "BobLib.EnergyStorage.BatteryPack",
+      "test": "BobLibTest.EnergyStorage.TestBatteryPack",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.EnergyStorage.Interfaces.Base",
+      "test": "BobLibTest.EnergyStorage.Interfaces.TestBase",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.EnergyStorage.Internal.BatteryBase",
+      "test": "BobLibTest.EnergyStorage.Internal.TestBatteryBase",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.EnergyStorage.Internal.TheveninBatteryPack",
+      "test": "BobLibTest.EnergyStorage.Internal.TestTheveninBatteryPack",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 100.0
+    },
+    {
+      "model": "BobLib.PowerElectronics.Interfaces.Base",
+      "test": "BobLibTest.PowerElectronics.Interfaces.TestBase",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.PowerElectronics.Internal.InverterDCCore",
+      "test": "BobLibTest.PowerElectronics.Internal.TestInverterDCCore",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 10.0
+    },
+    {
+      "model": "BobLib.PowerElectronics.InverterDC",
+      "test": "BobLibTest.PowerElectronics.TestInverterDC",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 10.0
+    },
+    {
       "model": "BobLib.Utilities.Mechanics.MultiBody.Actuators.ChassisActuator",
       "test": "BobLibTest.Utilities.Mechanics.MultiBody.Actuators.TestChassisActuator",
       "mode": "simulate",

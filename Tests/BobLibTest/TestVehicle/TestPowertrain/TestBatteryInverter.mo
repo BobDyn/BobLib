@@ -5,7 +5,7 @@ model TestBatteryInverter
   import SI = Modelica.Units.SI;
 
   // Battery
-  BobLib.EnergyStorage.Internal.TheveninBatteryPack batt(Ns = 140, Np = 4, SOC_start = 1.0) annotation(
+  BobLib.EnergyStorage.Internal.TheveninBatteryPack batt(pBattery(Ns = 140, Np = 4, SOC_start = 1.0)) annotation(
     Placement(transformation(origin = {0, -10}, extent = {{-10, -10}, {10, 10}})));
 
   // Inverter

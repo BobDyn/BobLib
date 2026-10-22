@@ -7,9 +7,7 @@ model TestBatteryPack
   import SI = Modelica.Units.SI;
 
   // Device under test
-  BobLib.EnergyStorage.Internal.TheveninBatteryPack batt(Ns = 140,
-                                                          Np = 4,
-                                                          SOC_start = 1.0, R_cell = 0.020, E_cell = 3.888e4) annotation(
+  BobLib.EnergyStorage.Internal.TheveninBatteryPack batt(pBattery(Ns = 140, Np = 4, SOC_start = 1.0, R_cell = 0.020, E_cell = 3.888e4)) annotation(
     Placement(transformation(origin = {-50, -30}, extent = {{-10, -10}, {10, 10}})));
 
   // Load

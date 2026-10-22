@@ -4,24 +4,17 @@ model TestPowerLimitedMotor
 
   import SI = Modelica.Units.SI;
 
-  BobLib.ElectricDrives.Internal.PowerLimitedMotor motoringForward(
-    enablePeakTimer = false);
+  BobLib.ElectricDrives.Internal.PowerLimitedMotor motoringForward(pMotor(enablePeakTimer = false));
 
-  BobLib.ElectricDrives.Internal.PowerLimitedMotor motoringReverse(
-    enablePeakTimer = false);
+  BobLib.ElectricDrives.Internal.PowerLimitedMotor motoringReverse(pMotor(enablePeakTimer = false));
 
-  BobLib.ElectricDrives.Internal.PowerLimitedMotor regenForward(
-    enablePeakTimer = false);
+  BobLib.ElectricDrives.Internal.PowerLimitedMotor regenForward(pMotor(enablePeakTimer = false));
 
-  BobLib.ElectricDrives.Internal.PowerLimitedMotor regenReverse(
-    enablePeakTimer = false);
+  BobLib.ElectricDrives.Internal.PowerLimitedMotor regenReverse(pMotor(enablePeakTimer = false));
 
-  BobLib.ElectricDrives.Internal.PowerLimitedMotor forwardLaunch(
-    enablePeakTimer = false);
+  BobLib.ElectricDrives.Internal.PowerLimitedMotor forwardLaunch(pMotor(enablePeakTimer = false));
 
-  BobLib.ElectricDrives.Internal.PowerLimitedMotor reverseLaunch(
-    enablePeakTimer = false,
-    reverseLaunch = true);
+  BobLib.ElectricDrives.Internal.PowerLimitedMotor reverseLaunch(pMotor(enablePeakTimer = false, reverseLaunch = true));
 
   Modelica.Blocks.Sources.Constant positivePower(k = 10000);
 
