@@ -31,6 +31,7 @@ select = [
 # Tests/conftest.py. Declaring them first-party keeps them in their own import
 # block instead of being sorted in among third-party packages.
 known-first-party = [
+  "modelica_fmu_export",
   "modelica_initialization_checks",
   "modelica_linter",
   "modelica_translation_checks",
