@@ -35,7 +35,8 @@ subsystems; keep attachment and mounted-housing frames distinct.
 
 VehicleSim selects front-outboard/rear-inboard braking. Base models and other
 wrappers can have different defaults: select the intended placement explicitly.
-VehicleFMI retains its Modelica input boundary. Tools/export_fmu.py preserves independent calibration before initialization;
+VehicleFMI retains its Modelica input boundary. Tools/export_fmu.py and
+Tools/build_native.py preserve independent calibration before initialization;
 derived parameters remain read-only. Rebuild old artifacts, and use the manifest
 parameter contract described in Tools/README.md.
 

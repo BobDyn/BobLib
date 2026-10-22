@@ -1,4 +1,4 @@
-# Reusable FMUs
+# Reusable native binaries and FMUs
 
 Build a fixed vehicle architecture once, then set its independent calibration
 before each new run. This includes suspension hardpoints, masses and inertias,
@@ -60,3 +60,24 @@ contains a Model Exchange interface, which is not certified here. Passing
 metadata checks does not establish physical validity of arbitrary calibrations
 or acceptance of all architecture combinations.
 
+## Native export and cross-runtime verification
+
+```sh
+python3 Tools/build_native.py --front stabar --rear stabar --rear-brakes Inboard --output build/native
+python3 Tools/verify_fmu.py build/fmu/BobLibVehicle_DWBCStabar_DWBCStabar_RearInboard/BobLibVehicle_DWBCStabar_DWBCStabar_RearInboard.fmu --native build/native/BobLibVehicle_DWBCStabar_DWBCStabar_RearInboard/BobLibVehicle_DWBCStabar_DWBCStabar_RearInboard --output build/verification
+```
+
+The native executable accepts `-overrideFile` before initialization. Keep the
+runtime files listed in its manifest together. The supported verifier rejects
+unknown/noneditable overrides and uses a fresh process for each configuration.
+An arbitrary direct command-line override is not a replacement for that contract.
+
+The standalone verifier requires FMPy and NumPy, but no compiler, BobLib sources,
+or BobSim. It checks baseline, changed calibration and unused table capacity,
+and optionally compares the same cases with a matching native artifact.
+`Tests/test_calibration_dependencies.py` builds a separate record probe and checks
+actual default/changed/default propagation in native and FMU runs, including
+combined mass, all CG coordinates and all inertia entries. To compare a reused
+full-vehicle artifact with separately translated calibration families, set
+`BOBLIB_CALIBRATION_FMU` and `BOBLIB_CALIBRATION_NATIVE` and run
+`Tests/test_calibration_rebuild.py`.

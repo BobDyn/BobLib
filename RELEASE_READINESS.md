@@ -1,15 +1,15 @@
 # Release-readiness scope
 
 This stack prepares the Modelica library for review; it does not certify a release.
-The foundation is the preserved pre-SS release candidate of 2026-10-20. Configurable FMU export tooling and calibration tests are included. VehicleSimSS,
+The foundation is the preserved pre-SS release candidate of 2026-10-20. Native/FMU export tooling and calibration tests are included. VehicleSimSS,
 SS initialization hooks and GGV prototypes are excluded. The FMU exporter already merged in PR #30 is retained. Later GGV-related plant changes remain separate. The
 existing dynamic maneuver controller and VehicleFMI Modelica boundary remain.
 
 Layers separate package styling, calibration contracts, typed buses, mechanics,
 brakes, suspension components, wheel compliance, aero, differential components,
 drivers and electrical drive. The coupled vehicle API migration follows, then
-fixture coverage, domain regression checks and CI/migration documentation. A final tooling layer adds configurable FMU export and its matching runtime tests.
-Native export and cross-runtime verification follow in the next PR.
+fixture coverage, domain regression checks and CI/migration documentation. Two final tooling layers add configurable FMU export, then native export and
+cross-runtime calibration verification. They each contain corresponding tests.
 
 ## Fresh isolated checks
 
