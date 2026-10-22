@@ -18,16 +18,24 @@ model FixedRatioTransmission
       Placement(transformation(origin = {58, 48}, extent = {{10, -10}, {-10, 10}})));
 
   output SI.AngularVelocity w_out "Transmission output speed";
+  output Real activeGearRatio "Engaged gear ratio published for controllers";
 
 protected
   VehicleInterfaces.Interfaces.TransmissionBus transmissionBus annotation(
     Placement(transformation(extent = {{-60, 50}, {-40, 70}})));
 
+  Modelica.Blocks.Sources.RealExpression gearRatioBusSignal(
+    y = activeGearRatio) "Engaged gear ratio published to the transmission bus" annotation(
+      Placement(transformation(origin = {-8, 66}, extent = {{-8, -4}, {8, 4}})));
+
 equation
   w_out = outputSpeed.w;
+  activeGearRatio = gearRatio;
 
   connect(controlBus.transmissionBus, transmissionBus) annotation(
     Line(points = {{-100, 60}, {-50, 60}}, color = {255, 204, 51}, thickness = 0.5));
+  connect(gearRatioBusSignal.y, transmissionBus.gearRatio) annotation(
+    Line(points = {{0.8, 66}, {30, 66}, {30, 60}, {-50, 60}}, color = {0, 0, 127}));
   connect(engineFlange.flange, gear.inputFlange) annotation(
     Line(points = {{-100, 0}, {-24, 0}}, color = {135, 135, 135}, thickness = 0.5));
   connect(gear.outputFlange, drivelineFlange.flange) annotation(

@@ -2,7 +2,7 @@ within BobLib.Experiments.Standards;
 
 model FourPostSim
 
-  extends Templates.FourPost.FourPostSim_DWBCStabar_DWBCStabar;
+  extends Templates.FourPost.FourPostSim_EVBatInvMotDiff_DWBCStabar_DWBCStabar;
   extends BobLib.Icons.SimulationIcon;
 
   annotation(
@@ -13,12 +13,5 @@ model FourPostSim
       lv = "LOG_STDOUT,LOG_ASSERT,LOG_STATS",
       s = "dassl",
       variableFilter = ".*"),
-    Documentation(info = "<html>
-<p>
-Model <code>FourPostSim</code> is the front-facing standard four-post simulation entry point.
-</p>
-<p>
-It extends the selected four-post architecture template, applies the standard experiment setup, and is intended for suspension and chassis response studies.
-</p>
-</html>"));
+    Documentation(info = "<html><p>Generated standard four-post simulation entry point.</p></html>"));
 end FourPostSim;
