@@ -3,7 +3,7 @@ within BobLib.Icons;
 partial model CFDAeroMapIcon "Reusable CFD aero map icon overlay"
 
   annotation(
-    Icon(coordinateSystem(extent = {{-100, -100}, {100, 100}}), graphics = {
+    Icon(coordinateSystem(extent = {{-160, -100}, {160, 100}}), graphics = {
       Rectangle(
         extent = {{-62, -54}, {62, -82}},
         lineColor = {0, 85, 170},
@@ -20,11 +20,7 @@ partial model CFDAeroMapIcon "Reusable CFD aero map icon overlay"
       Line(
         points = {{-52, -76}, {-26, -68}, {-4, -72}, {20, -61}, {50, -64}},
         color = {0, 85, 170},
-        thickness = 0.75),
-      Text(
-        extent = {{-56, -52}, {56, -32}},
-        textString = "CFD",
-        textColor = {0, 85, 170})}),
+        thickness = 0.75)}),
     Documentation(info = "<html>
 <p>
 Partial model <code>CFDAeroMapIcon</code> defines the CFD map overlay used by

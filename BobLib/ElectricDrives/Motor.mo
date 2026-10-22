@@ -2,75 +2,41 @@ within BobLib.ElectricDrives;
 model Motor
 
   "BobLib motor exposed through the VehicleInterfaces electric-drive shaft"
+
+  import Modelica.Units.SI;
+
+  parameter BobLib.Records.VehicleRecord.ElectricDrives.MotorRecord pMotor "Motor torque, power, efficiency and rotor calibration" annotation(Dialog(group = "Calibration"));
+
   extends VehicleInterfaces.Icons.ElectricMotor;
-  extends VehicleInterfaces.ElectricDrives.Interfaces.Base;
+  extends BobLib.ElectricDrives.Interfaces.Base;
 
-  import SI = Modelica.Units.SI;
+  parameter Boolean includeRotorEffects = false
+    "Include gyroscopic and carrier-acceleration effects when mounted" annotation(Dialog(group = "Architecture"), choices(checkBox = true), Evaluate = true);
 
-  parameter SI.Voltage Vdc_max = 630
-    "Motor maximum DC voltage reference";
-  parameter Real rpm_max_peak = 6500
-    "Motor peak speed reference";
-  parameter SI.Torque T_peak = 220
-    "Motor peak torque";
-  parameter SI.Torque T_cont = 130
-    "Motor continuous torque";
-  parameter SI.Current I_peak_2min = 360
-    "Motor peak current";
-  parameter SI.Current I_cont = 180
-    "Motor continuous current";
-  parameter Real Kt_Nm_per_A = 0.61
-    "Motor torque constant";
-  parameter SI.Time peakTime = 120
-    "Peak torque/current allowance duration";
-  parameter SI.Power P_mech_peak = 124e3
-    "Motor peak mechanical power";
-  parameter SI.Power P_cont_low = 75e3
-    "Motor continuous power envelope low-speed anchor";
-  parameter SI.Power P_cont_high = 75e3
-    "Motor continuous power envelope high-speed anchor";
-  parameter Real eta_mot(unit = "1") = 0.96
-    "Motor motoring efficiency reference";
-  parameter Real eta_reg(unit = "1") = 0.95
-    "Motor regen efficiency reference";
-  parameter SI.AngularVelocity w_eps = 1.0
-    "Low-speed regularization for power-to-torque conversion";
-  parameter Boolean reverseLaunch = false
-    "Select reverse torque direction when starting exactly from standstill";
-  parameter SI.Inertia rotorJ = 0.02521
-    "Motor rotor inertia";
+  parameter Modelica.Mechanics.MultiBody.Types.Axis shaftAxis = {0, 1, 0}
+    "Rotor axis resolved in shaft bearing frame" annotation(Dialog(group = "Operating settings"), Evaluate = true);
 
-  Modelica.Electrical.Analog.Interfaces.PositivePin pin_p
-    "Motor-side DC positive pin" annotation(
-      Placement(transformation(origin = {-100, 44}, extent = {{-10, -10}, {10, 10}}),
-        iconTransformation(origin = {60, 100}, extent = {{-10, -10}, {10, 10}})));
-
-  Modelica.Electrical.Analog.Interfaces.NegativePin pin_n
-    "Motor-side DC negative pin" annotation(
-      Placement(transformation(origin = {-100, 20}, extent = {{-10, -10}, {10, 10}}),
-        iconTransformation(origin = {-60, 100}, extent = {{-10, -10}, {10, 10}})));
+  VehicleInterfaces.PowertrainMounts.SingleSystemRigidMount mount(
+    r_ChassisToMount1 = pMotor.mountOffset) if includeBearing or usingMultiBodySystem annotation(
+    Placement(visible = includeBearing or usingMultiBodySystem,
+      transformation(origin = {20, 65}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
 
   BobLib.ElectricDrives.Internal.PowerLimitedMotor motor(
-    Vdc_max = Vdc_max,
-    rpm_max_peak = rpm_max_peak,
-    T_peak = T_peak,
-    T_cont = T_cont,
-    I_peak_2min = I_peak_2min,
-    I_cont = I_cont,
-    Kt_Nm_per_A = Kt_Nm_per_A,
-    peakTime = peakTime,
-    P_mech_peak = P_mech_peak,
-    P_cont_low = P_cont_low,
-    P_cont_high = P_cont_high,
-    eta_mot = eta_mot,
-    eta_reg = eta_reg,
-    w_eps = w_eps,
-    reverseLaunch = reverseLaunch) annotation(
-      Placement(transformation(origin = {-20, 0}, extent = {{-30, -30}, {30, 30}})));
+    pMotor = pMotor,
+    useSupport = includeBearing or usingMultiBodySystem) annotation(
+      Placement(transformation(origin = {-20, 15}, extent = {{-25, -25}, {25, 25}})));
 
   Modelica.Mechanics.Rotational.Components.Inertia rotor(
-    J = rotorJ) annotation(
-      Placement(transformation(origin = {45, 0}, extent = {{-10, -10}, {10, 10}})));
+    J = pMotor.rotorJ) if not ((includeBearing or usingMultiBodySystem) and includeRotorEffects) annotation(
+      Placement(
+        visible = not ((includeBearing or usingMultiBodySystem) and includeRotorEffects),
+        transformation(origin = {45, 0}, extent = {{-10, -10}, {10, 10}})));
+
+  Modelica.Mechanics.MultiBody.Parts.Rotor1D spatialRotor(
+    J = pMotor.rotorJ, n = shaftAxis, animation = false) if (includeBearing or usingMultiBodySystem) and includeRotorEffects annotation(
+    Placement(
+      visible = (includeBearing or usingMultiBodySystem) and includeRotorEffects,
+      transformation(origin = {45, 0}, extent = {{-10, -10}, {10, 10}})));
 
   output SI.AngularVelocity w "Shaft speed";
   output SI.Voltage V_dc "Motor-side DC voltage";
@@ -81,34 +47,97 @@ model Motor
   output SI.Torque tau_lim "Active motor torque limit";
 
 protected
-  Modelica.Blocks.Sources.RealExpression electricalPowerInput(
+  outer Modelica.Mechanics.MultiBody.World world;
+
+  Modelica.Mechanics.MultiBody.Parts.Mounting1D stator(n = Modelica.Math.Vectors.normalizeWithAssert(shaftAxis))
+    if includeBearing or usingMultiBodySystem annotation(
+    Placement(
+      visible = includeBearing or usingMultiBodySystem,
+      transformation(origin = {55, -30}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
+
+  Modelica.Blocks.Interfaces.RealInput availablePowerBusTap(unit = "W")
+    "Power allocated by the inverter" annotation(
+    Placement(transformation(origin = {-75, 40}, extent = {{-5, -5}, {5, 5}})));
+  SI.Voltage V_dc_eff;
+
+  Modelica.Blocks.Sources.RealExpression powerInput(
     y = P_elec) "Electrical power measurement fed to the internal motor model" annotation(
-      Placement(transformation(origin = {-72, 6}, extent = {{-8, -5}, {8, 5}})));
+      Placement(transformation(origin = {-76, 15}, extent = {{-12, -12}, {12, 12}})));
 
-  Modelica.Blocks.Sources.RealExpression speedBusSignal(
+  Modelica.Blocks.Sources.RealExpression speedSignal(
     y = w) "Shaft speed published to electricMotorBus" annotation(
-      Placement(transformation(origin = {-70, -54}, extent = {{-8, -4}, {8, 4}})));
+      Placement(transformation(origin = {-55, -60}, extent = {{12, -12}, {-12, 12}})));
 
-  Modelica.Blocks.Sources.RealExpression electricalPowerBusSignal(
+  Modelica.Blocks.Sources.RealExpression electricSignal(
     y = P_elec) "Electrical power published to electricMotorBus" annotation(
-      Placement(transformation(origin = {-70, -64}, extent = {{-8, -4}, {8, 4}})));
+      Placement(transformation(origin = {0, -60}, extent = {{12, -12}, {-12, 12}})));
 
-  Modelica.Blocks.Sources.RealExpression mechanicalPowerBusSignal(
+  Modelica.Blocks.Sources.RealExpression shaftSignal(
     y = P_mech) "Mechanical shaft power published to electricMotorBus" annotation(
-      Placement(transformation(origin = {-70, -74}, extent = {{-8, -4}, {8, 4}})));
+      Placement(transformation(origin = {55, -60}, extent = {{12, -12}, {-12, 12}})));
 
-  Modelica.Blocks.Sources.RealExpression torqueCommandBusSignal(
+  Modelica.Blocks.Sources.RealExpression torqueSignal(
     y = tau_cmd) "Commanded torque published to electricMotorBus" annotation(
-      Placement(transformation(origin = {-70, -84}, extent = {{-8, -4}, {8, 4}})));
+      Placement(transformation(origin = {-25, -88}, extent = {{12, -12}, {-12, 12}})));
 
-  Modelica.Blocks.Sources.RealExpression torqueLimitBusSignal(
+  Modelica.Blocks.Sources.RealExpression limitSignal(
     y = tau_lim) "Active torque limit published to electricMotorBus" annotation(
-      Placement(transformation(origin = {-70, -94}, extent = {{-8, -4}, {8, 4}})));
+      Placement(transformation(origin = {35, -88}, extent = {{12, -12}, {-12, 12}})));
+
+  BobLib.ElectricDrives.Interfaces.ElectricMotorBus electricMotorBus
+    "Typed electricMotorBus signal contract" annotation(
+      Placement(transformation(origin = {-80, -10}, extent = {{-10, -10}, {10, 10}})));
+  BobLib.ElectricDrives.Interfaces.ElectricMotorControlBus electricMotorControlBus
+    "Typed electricMotorControlBus signal contract" annotation(
+      Placement(transformation(origin = {-80, 65}, extent = {{-20, -20}, {20, 20}})));
 
 equation
+  connect(chassisFrame, mount.chassisFrame) annotation(
+    Line(visible = includeBearing or usingMultiBodySystem,
+      points = {{0, 100}, {0, 75}, {20, 75}}, color = {95, 95, 95}));
+  connect(mount.mount_1, shaft_b.bearingFrame) annotation(
+    Line(visible = includeBearing or usingMultiBodySystem,
+      points = {{20, 55}, {35, 55}, {35, 35}, {100, 35}, {100, 0}}, color = {95, 95, 95}));
+  connect(electricMotorBus, controlBus.electricMotorBus) annotation(
+    Line(points = {{-80, -10}, {-100, -10}, {-100, -60}}, color = {255, 204, 51}, thickness = 0.5));
+  connect(electricMotorControlBus, controlBus.electricMotorControlBus) annotation(
+    Line(points = {{-80, 65}, {-100, 65}, {-100, -60}}, color = {255, 204, 51}, thickness = 0.5));
+  assert(not (includeBearing or usingMultiBodySystem) or world.driveTrainMechanics3D,
+    "Spatial motor requires world.driveTrainMechanics3D=true");
+  connect(motor.support, stator.flange_b) annotation(
+    Line(
+      visible = (includeBearing or usingMultiBodySystem),
+      points = {{-20, -10}, {-20, -30}, {45, -30}},
+      color = {0, 0, 0}));
+  connect(stator.frame_a, shaft_b.bearingFrame) annotation(
+    Line(
+      visible = (includeBearing or usingMultiBodySystem),
+      points = {{55, -20}, {55, -15}, {100, -15}, {100, 0}},
+      color = {95, 95, 95}));
+  connect(spatialRotor.frame_a, shaft_b.bearingFrame) annotation(
+    Line(
+      visible = (includeBearing or usingMultiBodySystem) and includeRotorEffects,
+      points = {{45, -10}, {45, -15}, {100, -15}, {100, 0}},
+      color = {95, 95, 95}));
+  connect(motor.shaft, spatialRotor.flange_a) annotation(
+    Line(
+      visible = (includeBearing or usingMultiBodySystem) and includeRotorEffects,
+      points = {{5, 15}, {20, 15}, {20, 0}, {35, 0}},
+      color = {0, 0, 0}));
+  connect(spatialRotor.flange_b, shaft_b.flange) annotation(
+    Line(
+      visible = (includeBearing or usingMultiBodySystem) and includeRotorEffects,
+      points = {{55, 0}, {100, 0}},
+      color = {0, 0, 0}));
+  assert(pMotor.V_eps > 0, "Motor: V_eps must be positive");
+  connect(electricMotorControlBus.availablePower, availablePowerBusTap) annotation(
+    Line(points = {{-80, 65}, {-80, 40}, {-75, 40}}, color = {0, 0, 127}));
   0 = pin_p.i + pin_n.i;
   V_dc = pin_p.v - pin_n.v;
+  V_dc_eff = if noEvent(V_dc >= 0) then noEvent(max(V_dc, pMotor.V_eps))
+    else noEvent(min(V_dc, -pMotor.V_eps));
   I_dc = pin_p.i;
+  I_dc = availablePowerBusTap/V_dc_eff;
   P_elec = V_dc*I_dc;
 
   w = motor.w;
@@ -116,32 +145,45 @@ equation
   tau_cmd = motor.tau_cmd;
   tau_lim = motor.tau_lim;
 
-  connect(speedBusSignal.y, controlBus.electricMotorBus.speed) annotation(
-    Line(points = {{-61.2, -54}, {-88, -54}, {-88, -60}, {-100, -60}}, color = {0, 0, 127}));
-  connect(electricalPowerBusSignal.y, controlBus.electricMotorBus.electricalPower) annotation(
-    Line(points = {{-61.2, -64}, {-88, -64}, {-88, -60}, {-100, -60}}, color = {0, 0, 127}));
-  connect(mechanicalPowerBusSignal.y, controlBus.electricMotorBus.mechanicalPower) annotation(
-    Line(points = {{-61.2, -74}, {-90, -74}, {-90, -60}, {-100, -60}}, color = {0, 0, 127}));
-  connect(torqueCommandBusSignal.y, controlBus.electricMotorBus.torqueCommand) annotation(
-    Line(points = {{-61.2, -84}, {-92, -84}, {-92, -60}, {-100, -60}}, color = {0, 0, 127}));
-  connect(torqueLimitBusSignal.y, controlBus.electricMotorBus.torqueLimit) annotation(
-    Line(points = {{-61.2, -94}, {-94, -94}, {-94, -60}, {-100, -60}}, color = {0, 0, 127}));
+  connect(speedSignal.y, electricMotorBus.speed) annotation(
+    Line(points = {{-68.2, -60}, {-80, -60}, {-80, -10}}, color = {0, 0, 127}));
+  connect(electricSignal.y, electricMotorBus.electricalPower) annotation(
+    Line(points = {{-13.2, -60}, {-28, -60}, {-28, -40}, {-80, -40}, {-80, -10}}, color = {0, 0, 127}));
+  connect(shaftSignal.y, electricMotorBus.mechanicalPower) annotation(
+    Line(points = {{41.8, -60}, {30, -60}, {30, -38}, {-80, -38}, {-80, -10}}, color = {0, 0, 127}));
+  connect(torqueSignal.y, electricMotorBus.torqueCommand) annotation(
+    Line(points = {{-38.2, -88}, {-88, -88}, {-88, -10}, {-80, -10}}, color = {0, 0, 127}));
+  connect(limitSignal.y, electricMotorBus.torqueLimit) annotation(
+    Line(points = {{21.8, -88}, {10, -88}, {10, -75}, {-84, -75}, {-84, -10}, {-80, -10}}, color = {0, 0, 127}));
 
-  connect(electricalPowerInput.y, motor.P_elec) annotation(
-    Line(points = {{-63.2, 6}, {-56, 6}, {-56, 0}}, color = {0, 0, 127}));
+  connect(powerInput.y, motor.P_elec) annotation(
+    Line(points = {{-62.8, 15}, {-50, 15}}, color = {0, 0, 127}));
   connect(motor.shaft, rotor.flange_a) annotation(
-    Line(points = {{10, 0}, {35, 0}}));
+    Line(
+      visible = not ((includeBearing or usingMultiBodySystem) and includeRotorEffects),
+      points = {{5, 15}, {20, 15}, {20, 0}, {35, 0}}));
   connect(rotor.flange_b, shaft_b.flange) annotation(
-    Line(points = {{55, 0}, {100, 0}}));
+    Line(
+      visible = not ((includeBearing or usingMultiBodySystem) and includeRotorEffects),
+      points = {{55, 0}, {100, 0}}));
   annotation(Documentation(info = "<html>
+<p>The internal rigid mount locates the motor housing relative to chassisFrame using pMotor.mountOffset. Connect chassisFrame to the sprung chassis; shaft_b.bearingFrame remains at the motor housing. The VI bearing frame carries stator reaction whenever usingMultiBodySystem
+or includeBearing is enabled. includeRotorEffects independently selects Rotor1D
+for gyroscopic and carrier-acceleration corrections; otherwise the rotor is a
+scalar inertia. Enable world.driveTrainMechanics3D for the mounted support.
+VehicleDefn owns the complete locked-rotor inertia tensor. Rotor1D supplies the
+relative-spin correction; do not subtract it from that tensor.</p>
 <p>
 Thin adapter around <code>BobLib.ElectricDrives.Internal.PowerLimitedMotor</code>.
-The mechanical side follows <code>VehicleInterfaces.ElectricDrives.Interfaces.Base</code>
+The mechanical side follows <code>BobLib.ElectricDrives.Interfaces.Base</code>
 and includes the motor rotor inertia so the downstream driveline can remain a
 pure final-drive/differential/halfshaft assembly. The adapter publishes motor
 speed, absorbed electrical power, mechanical power, commanded torque, and active
 torque limit on <code>controlBus.electricMotorBus</code>. Electrical power is
-absorbed through the motor-side DC pins instead of a public raw signal input.
+absorbed through the motor-side DC pins. The averaged current law consumes
+<code>controlBus.electricMotorControlBus.availablePower</code> from the inverter,
+with positive power for motoring and negative power for regeneration.
+<code>V_eps</code> regularizes the current law near zero bus voltage.
 </p>
 </html>"));
 end Motor;

@@ -9,7 +9,7 @@ partial model BatteryPackIcon "Reusable battery pack icon"
       Line(points = {{-48, 0}, {-22, 0}}, color = {40, 120, 70}, thickness = 1),
       Line(points = {{-35, 13}, {-35, -13}}, color = {40, 120, 70}, thickness = 1),
       Line(points = {{18, 0}, {48, 0}}, color = {40, 120, 70}, thickness = 1),
-      Text(extent = {{-62, 54}, {62, 34}}, textString = "%name", lineColor = {32, 32, 32})}),
+      Text(extent = {{-62, 54}, {62, 34}}, textString = "%name", lineColor = {32, 32, 32}, fontSize = 0)}),
     Documentation(info = "<html>
 <p>
 Partial model <code>BatteryPackIcon</code> defines shared icon geometry for battery pack icon.

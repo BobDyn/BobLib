@@ -2,95 +2,95 @@ within BobLib.Utilities.Mechanics.MultiBody.Actuators;
 
 model ChassisActuator
 
-  import SI = Modelica.Units.SI;
+  import Modelica.Units.SI;
 
-  parameter SI.Position axleRef[3] "Vector from origin to axle reference, resolved in world frame";
-  outer parameter Boolean headless;
+  parameter SI.Position axleRef[3] "Vector from origin to axle reference, resolved in world frame" annotation(Dialog(group = "Operating settings"));
+  outer parameter Boolean headless "Disable MultiBody animation geometry for simulation without visualization";
 
   // Chassis interface
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a chassisFrame annotation(
     Placement(
-      transformation(origin = {70, 100}, extent = {{-16, -16}, {16, 16}}, rotation = -90),
+      transformation(origin = {60, 140}, extent = {{-16, -16}, {16, 16}}, rotation = 0),
       iconTransformation(origin = {0, 80}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
 
   // Ground reference
   Modelica.Mechanics.MultiBody.Parts.Fixed groundFixed(
     animation = false,
-    r = {0, 0, 0}) annotation(Placement(transformation(origin = {-70, -70}, extent = {{-10, -10}, {10, 10}})));
+    r = {0, 0, 0}) annotation(Placement(transformation(origin = {-140, -100}, extent = {{-15, -15}, {15, 15}}, rotation = 0)));
 
   // Heave actuation
   Modelica.Mechanics.MultiBody.Joints.Prismatic heaveDOF(
     n = {0, 0, 1},
     useAxisFlange = true,
-    animation = not headless) annotation(Placement(transformation(origin = {50, 50}, extent = {{10, -10}, {-10, 10}}, rotation = 180)));
+    animation = not headless) annotation(Placement(transformation(origin = {60, 90}, extent = {{-15, -15}, {15, 15}}, rotation = 90)));
 
   Modelica.Mechanics.Translational.Sources.Position heavePosition(
     exact = true,
-    useSupport = true) annotation(Placement(transformation(origin = {58, 10}, extent = {{10, -10}, {-10, 10}}, rotation = -90)));
+    useSupport = true) annotation(Placement(transformation(origin = {-70, 90}, extent = {{-15, -15}, {15, 15}}, rotation = 0)));
 
   Modelica.Blocks.Interfaces.RealInput heaveInput(quantity = "Position", unit = "m") annotation(
     Placement(
-      transformation(origin = {116, -20}, extent = {{16, -16}, {-16, 16}}),
+      transformation(origin = {-180, 90}, extent = {{-16, -16}, {16, 16}}, rotation = 0),
       iconTransformation(origin = {-36, 60}, extent = {{-16, -16}, {16, 16}})));
 
   // Roll actuation
   Modelica.Mechanics.MultiBody.Joints.Revolute rollDOF(
     n = {1, 0, 0},
     useAxisFlange = true,
-    animation = not headless) annotation(Placement(transformation(origin = {0, -30}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
+    animation = not headless) annotation(Placement(transformation(origin = {60, -50}, extent = {{-15, -15}, {15, 15}}, rotation = 90)));
 
   Modelica.Mechanics.Rotational.Sources.Position rollPosition(
     exact = true,
-    useSupport = true) annotation(Placement(transformation(origin = {-50, -30}, extent = {{-10, -10}, {10, 10}})));
+    useSupport = true) annotation(Placement(transformation(origin = {-70, -50}, extent = {{-15, -15}, {15, 15}}, rotation = 0)));
 
   Modelica.Blocks.Interfaces.RealInput rollInput(quantity = "Angle", unit = "rad") annotation(
     Placement(
-      transformation(origin = {-116, -30}, extent = {{-16, -16}, {16, 16}}),
+      transformation(origin = {-180, -50}, extent = {{-16, -16}, {16, 16}}, rotation = 0),
       iconTransformation(origin = {-36, -60}, extent = {{-16, -16}, {16, 16}})));
 
   // Instrumentation
-  Modelica.Mechanics.MultiBody.Sensors.CutForce sprungLoads(animation = false) annotation(Placement(transformation(origin = {-30, -70}, extent = {{-10, -10}, {10, 10}})));
+  Modelica.Mechanics.MultiBody.Sensors.CutForce sprungLoads(animation = false) annotation(Placement(transformation(origin = {-80, -100}, extent = {{-15, -15}, {15, 15}}, rotation = 0)));
 
   Modelica.Blocks.Interfaces.RealOutput jackingOutput(quantity = "Force", unit = "N") annotation(
     Placement(
-      transformation(origin = {-38, -116}, extent = {{-16, -16}, {16, 16}}, rotation = -90),
+      transformation(origin = {180, -100}, extent = {{-16, -16}, {16, 16}}, rotation = 0),
       iconTransformation(origin = {36, 0}, extent = {{-16, -16}, {16, 16}})));
 
 protected
   Modelica.Mechanics.MultiBody.Parts.FixedRotation toAxle(
     r = axleRef,
-    animation = false) annotation(Placement(transformation(origin = {0, 30}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
+    animation = false) annotation(Placement(transformation(origin = {60, 10}, extent = {{-15, -15}, {15, 15}}, rotation = 90)));
 
 public
 
 equation
   connect(groundFixed.frame_b, sprungLoads.frame_a) annotation(
-    Line(points = {{-60, -70}, {-40, -70}}, color = {95, 95, 95}));
+    Line(points = {{-125, -100}, {-95, -100}}, color = {95, 95, 95}));
   connect(sprungLoads.frame_b, rollDOF.frame_a) annotation(
-    Line(points = {{-20, -70}, {0, -70}, {0, -40}}, color = {95, 95, 95}));
+    Line(points = {{-65, -100}, {60, -100}, {60, -65}}, color = {95, 95, 95}));
   connect(rollPosition.support, rollDOF.support) annotation(
-    Line(points = {{-50, -40}, {-10, -40}, {-10, -36}}));
+    Line(points = {{-70, -65}, {30, -65}, {30, -59}, {45, -59}}));
   connect(rollDOF.axis, rollPosition.flange) annotation(
-    Line(points = {{-10, -30}, {-40, -30}}));
+    Line(points = {{45, -50}, {-55, -50}}));
   connect(toAxle.frame_a, rollDOF.frame_b) annotation(
-    Line(points = {{0, 20}, {0, -20}}, color = {95, 95, 95}));
+    Line(points = {{60, -5}, {60, -35}}, color = {95, 95, 95}));
   connect(heaveDOF.frame_a, toAxle.frame_b) annotation(
-    Line(points = {{40, 50}, {0, 50}, {0, 40}}, color = {95, 95, 95}));
+    Line(points = {{60, 75}, {60, 25}}, color = {95, 95, 95}));
   connect(heavePosition.support, heaveDOF.support) annotation(
-    Line(points = {{48, 10}, {46, 10}, {46, 44}}, color = {0, 127, 0}));
+    Line(points = {{-70, 75}, {30, 75}, {30, 84}, {51, 84}}, color = {0, 127, 0}));
   connect(heaveDOF.axis, heavePosition.flange) annotation(
-    Line(points = {{58, 44}, {58, 20}}, color = {0, 127, 0}));
+    Line(points = {{51, 102}, {40, 102}, {40, 90}, {-55, 90}}, color = {0, 127, 0}));
   connect(heaveDOF.frame_b, chassisFrame) annotation(
-    Line(points = {{60, 50}, {70, 50}, {70, 100}}, color = {95, 95, 95}));
+    Line(points = {{60, 105}, {60, 140}}, color = {95, 95, 95}));
   connect(rollInput, rollPosition.phi_ref) annotation(
-    Line(points = {{-116, -30}, {-62, -30}}, color = {0, 0, 127}));
+    Line(points = {{-180, -50}, {-88, -50}}, color = {0, 0, 127}));
   connect(heaveInput, heavePosition.s_ref) annotation(
-    Line(points = {{116, -20}, {58, -20}, {58, -2}}, color = {0, 0, 127}));
+    Line(points = {{-180, 90}, {-88, 90}}, color = {0, 0, 127}));
   connect(sprungLoads.force[3], jackingOutput) annotation(
-    Line(points = {{-38, -80}, {-38, -116}}, color = {0, 0, 127}));
+    Line(points = {{-92, -115}, {160, -115}, {160, -100}, {180, -100}}, color = {0, 0, 127}));
 annotation(
-    Diagram(coordinateSystem(extent = {{-100, -100}, {100, 100}})),
-    Icon(graphics = {Text(origin = {-80, 92}, extent = {{-40, 20}, {40, -20}}, textString = "Heave"), Text(origin = {-70, -28}, extent = {{-30, 20}, {30, -20}}, textString = "Roll"), Text(origin = {82, -20}, extent = {{-40, 20}, {40, -20}}, textString = "Jacking"), Rectangle(fillColor = {0, 170, 0}, fillPattern = FillPattern.Solid, extent = {{-20, 80}, {20, -80}})}),
+    Diagram(coordinateSystem(extent = {{-180, -140}, {180, 140}})),
+    Icon(graphics = {Text(extent = {{-300, 130}, {300, 105}}, textString = "%name", textColor = {0, 0, 255}, fontSize = 0),    Rectangle(fillColor = {0, 170, 0}, fillPattern = FillPattern.Solid, extent = {{-20, 80}, {20, -80}})}),
     Documentation(info = "<html>
 <p>
 Model <code>ChassisActuator</code> provides a reusable MultiBody fixture and

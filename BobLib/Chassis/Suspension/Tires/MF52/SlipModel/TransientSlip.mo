@@ -2,57 +2,11 @@ within BobLib.Chassis.Suspension.Tires.MF52.SlipModel;
 
 model TransientSlip
 
+  import Modelica.Units.SI;
+
+  parameter BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.RelaxationRecord pSlip "Tire relaxation and low-speed slip calibration" annotation(Dialog(group = "Calibration"));
+
   extends BaseSlipModel;
-
-  import SI = Modelica.Units.SI;
-
-  parameter SI.Force FNOMIN = 650
-    "Nominal vertical load";
-
-  parameter SI.Length UNLOADED_RADIUS = 0.2
-    "Unloaded tire radius used for PAC2002 relaxation";
-
-  parameter Real LFZO = 1
-    "Scale factor of nominal load lambda_Fz0 [-]";
-
-  parameter Real PTX1 = 0
-    "Longitudinal relaxation coefficient p_Tx1 [-]";
-
-  parameter Real PTX2 = 0
-    "Longitudinal relaxation load dependency p_Tx2 [-]";
-
-  parameter Real PTX3 = 0
-    "Longitudinal relaxation exponential load dependency p_Tx3 [-]";
-
-  parameter Real PTY1 = 0
-    "Peak value of lateral relaxation length p_Ty1 [-]";
-
-  parameter Real PTY2 = 0
-    "Load at which lateral relaxation is extreme p_Ty2 [-]";
-
-  parameter Real PKY3 = 0
-    "Lateral relaxation camber sensitivity p_Ky3 [-]";
-
-  parameter Real LSGKP = 1
-    "Scale factor of longitudinal relaxation length [-]";
-
-  parameter Real LSGAL = 1
-    "Scale factor of lateral relaxation length [-]";
-
-  parameter SI.Length sigma_kappa_default = 0.5
-    "Fallback longitudinal relaxation length";
-
-  parameter SI.Length sigma_alpha_default = 0.5
-    "Fallback lateral relaxation length";
-
-  parameter Real V_min = 0.5
-    "Low-speed regularization velocity";
-
-  parameter Real kappa_max = 2.0
-    "Clamp for longitudinal slip";
-
-  parameter Real alpha_max = 1.2
-    "Clamp for slip angle [rad]";
 
   SI.Length u(nominal = 0.1)
     "Longitudinal deformation state";
@@ -75,7 +29,7 @@ protected
   SI.Force Fz0_scaled;
 
   Real kappa_raw;
-  Real alpha_raw;
+  Modelica.Units.SI.Angle alpha_raw;
   Real dfz;
   Real camber_factor;
 
@@ -84,32 +38,35 @@ initial equation
   v = sigma_alpha * (-Vy) / Vx_abs_eff;
 
 equation
+  assert(
+    pSlip.V_min > 0 and pSlip.sigma_kappa_default > 0 and pSlip.sigma_alpha_default > 0 and pSlip.FNOMIN > 0 and pSlip.LFZO > 0 and pSlip.UNLOADED_RADIUS > 0,
+    "TransientSlip: speed regularization, relaxation lengths, nominal load, load scale and radius must be positive");
   Fz_eff = noEvent(max(Fz, 1e-3));
-  Fz0 = noEvent(max(FNOMIN, 1e-3));
-  Fz0_scaled = noEvent(max(FNOMIN*LFZO, 1e-3));
+  Fz0 = noEvent(max(pSlip.FNOMIN, 1e-3));
+  Fz0_scaled = noEvent(max(pSlip.FNOMIN*pSlip.LFZO, 1e-3));
   dfz = (Fz_eff - Fz0_scaled) / Fz0_scaled;
-  camber_factor = 1 - PKY3*abs(gamma);
+  camber_factor = 1 - pSlip.PKY3*abs(gamma);
 
   sigma_kappa =
 
-    if PTX1 > 0 then
-      noEvent(max(1e-4, Fz_eff * (PTX1 + PTX2*dfz) * exp(-PTX3*dfz) * (UNLOADED_RADIUS/Fz0) * LSGKP))
+    if pSlip.PTX1 > 0 then
+      noEvent(max(1e-4, Fz_eff * (pSlip.PTX1 + pSlip.PTX2*dfz) * exp(-pSlip.PTX3*dfz) * (pSlip.UNLOADED_RADIUS/Fz0) * pSlip.LSGKP))
     else
-      sigma_kappa_default;
+      pSlip.sigma_kappa_default;
 
   sigma_alpha =
 
-    if PTY1 > 0 and PTY2 > 0 then
-      noEvent(max(1e-4, PTY1 * sin(2*atan(Fz_eff/(PTY2*Fz0*LFZO))) * camber_factor * UNLOADED_RADIUS * LFZO * LSGAL))
+    if pSlip.PTY1 > 0 and pSlip.PTY2 > 0 then
+      noEvent(max(1e-4, pSlip.PTY1 * sin(2*atan(Fz_eff/(pSlip.PTY2*Fz0*pSlip.LFZO))) * camber_factor * pSlip.UNLOADED_RADIUS * pSlip.LFZO * pSlip.LSGAL))
     else
-      sigma_alpha_default;
+      pSlip.sigma_alpha_default;
 
   // Slip velocities
   Vsx = Vx - R0 * omega;
   Vsy = -Vy;
 
   // Smooth regularized speed
-  Vx_abs_eff = sqrt(Vx^2 + V_min^2);
+  Vx_abs_eff = sqrt(Vx^2 + pSlip.V_min^2);
 
   // Transient dynamics (MF5.2 consistent)
   der(u) = -Vsx - (Vx_abs_eff / sigma_kappa) * u;
@@ -119,8 +76,8 @@ equation
   kappa_raw = u / sigma_kappa;
   alpha_raw = atan2(v, sigma_alpha);
 
-  kappa = noEvent(max(min(kappa_raw, kappa_max), -kappa_max));
-  alpha = noEvent(max(min(alpha_raw, alpha_max), -alpha_max));
+  kappa = noEvent(max(min(kappa_raw, pSlip.kappa_max), -pSlip.kappa_max));
+  alpha = noEvent(max(min(alpha_raw, pSlip.alpha_max), -pSlip.alpha_max));
 
   annotation(
     Documentation(info = "<html>

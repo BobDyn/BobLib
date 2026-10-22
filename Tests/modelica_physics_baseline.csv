@@ -1,45 +1,45 @@
 model,stop_time,signal,expected,abs_tol,rel_tol,description
-BobLibTest.Regression.AngleBetweenSmoke,0.001,tinyAntiparallel,3.141592653589793,1e-12,1e-12,Tiny antiparallel vectors retain their pi angle
-BobLibTest.Regression.AngleBetweenSmoke,0.001,scaledQuarterTurn,1.5707963267948966,1e-12,1e-12,Angle is invariant to vector and axis magnitude
-BobLibTest.Regression.AngleBetweenSmoke,0.001,negativeQuarterTurn,-1.5707963267948966,1e-12,1e-12,Signed negative quarter turn is preserved
-BobLibTest.Regression.AngleBetweenSmoke,0.001,skewAxisAngle,0.7853981633974483,1e-12,1e-12,Reference-axis skew does not change angle magnitude
-BobLibTest.Regression.AngleBetweenSmoke,0.001,zeroVectorAngle,0,1e-12,1e-12,Zero-length vectors use the documented neutral angle
-BobLibTest.Regression.MF52PureSlipSmoke,0.01,Fx,0,1e-9,1e-9,MF52 pure slip smoke longitudinal force at zero kappa
-BobLibTest.Regression.MF52PureSlipSmoke,0.01,Fy,1367.049907523304,1e-6,1e-9,MF52 pure slip smoke lateral force
-BobLibTest.Regression.MF52PureSlipSmoke,0.01,Mx,-18.283297449124898,1e-6,1e-9,MF52 pure slip smoke overturning moment
-BobLibTest.Regression.MF52PureSlipSmoke,0.01,My,0,1e-9,1e-9,MF52 pure slip smoke rolling resistance moment
-BobLibTest.Regression.MF52PureSlipSmoke,0.01,Mz,-28.781188544190439,1e-6,1e-9,MF52 pure slip smoke aligning moment
-BobLibTest.Regression.MF52PureSlipSmoke,0.01,pneumaticTrail,0.021053502425769931,1e-9,1e-9,MF52 pure slip smoke pneumatic trail
-BobLibTest.Regression.MF52PureSlipSmoke,0.01,residualScrub,0,1e-9,1e-9,MF52 pure slip smoke residual scrub
-BobLibTest.Regression.MF52PureSlipSmoke,0.01,MzReconstructed,-28.781188544190439,1e-6,1e-9,MF52 aligning moment reconstruction
-BobLibTest.Regression.TransientSlipReverseSmoke,0.1,kappaForward,0.09987523388778446,1e-8,1e-8,Forward wheel overspeed produces positive transient slip
-BobLibTest.Regression.TransientSlipReverseSmoke,0.1,kappaReverse,-0.09987523388778446,1e-8,1e-8,Mirrored reverse wheel overspeed produces negative transient slip
-BobLibTest.Regression.TransientSlipReverseSmoke,0.1,symmetryError,0,1e-10,1e-10,Mirrored forward and reverse kinematics produce mirrored transient slip
-BobLibTest.Regression.TireForceFrameSmoke,0.001,appliedForceWorld[3],0,1e-9,1e-9,Tire shear force remains in the road plane
-BobLibTest.Regression.TireForceFrameSmoke,0.001,appliedTorqueWorld[3],100,1e-9,1e-9,Tire aligning moment acts about the road normal
-BobLibTest.Regression.WheelAlignmentUnitsSmoke,0.001,maxAxisError,0,1e-12,1e-12,Degree-typed alignment matches explicit radian conversion
-BobLibTest.TestUtilities.TestMechanics.TestMultiBody.TestContactMechanics.TestGroundPhysicsRotatedFrame,0.01,contactForceWorld[1],0,1e-9,1e-9,rotated contact-frame force has no world x component
-BobLibTest.TestUtilities.TestMechanics.TestMultiBody.TestContactMechanics.TestGroundPhysicsRotatedFrame,0.01,contactForceWorld[2],0,1e-9,1e-9,rotated contact-frame force has no world y component
-BobLibTest.TestUtilities.TestMechanics.TestMultiBody.TestContactMechanics.TestGroundPhysicsRotatedFrame,0.01,contactForceWorld[3],-1000.000252499937,1e-6,1e-9,rotated contact-frame force remains world vertical
-BobLibTest.TestVehicle.TestAero.TestCFDAeroMap,0.01,aero.drag,52,1e-9,1e-9,CFD aero map drag interpolation
-BobLibTest.TestVehicle.TestAero.TestCFDAeroMap,0.01,aero.downforce,520,1e-9,1e-9,CFD aero map downforce interpolation
-BobLibTest.TestVehicle.TestAero.TestCFDAeroMapDirections,0.01,reverseVehicle.force[1],13,1e-9,1e-9,drag opposes reverse vehicle motion
-BobLibTest.TestVehicle.TestAero.TestCFDAeroMapDirections,0.01,followingWind.force[1],13,1e-9,1e-9,strong following wind produces forward drag
-BobLibTest.TestVehicle.TestAero.TestCFDAeroMapDirections,0.01,crosswind.drag,26,1e-9,1e-9,crosswind dynamic-pressure scaling
-BobLibTest.TestVehicle.TestAero.TestCFDAeroMapDirections,0.01,crosswind.force[1],-18.38477631085024,1e-9,1e-9,crosswind drag body-x component
-BobLibTest.TestVehicle.TestAero.TestCFDAeroMapDirections,0.01,crosswind.force[2],18.38477631085024,1e-9,1e-9,crosswind drag body-y component
-BobLibTest.TestVehicle.TestAero.TestCFDAeroMapDirections,0.01,crosswind.force[3],-260,1e-9,1e-9,downforce remains on negative body z
-BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor,0.01,forwardMotoringPower,9345.61646995376,0.01,1e-9,Positive power produces positive mechanical power at positive speed
-BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor,0.01,reverseMotoringPower,9345.61646995376,0.01,1e-9,Positive power produces positive mechanical power at negative speed
-BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor,0.01,forwardRegenPower,-10645.08892770384,0.01,1e-9,Negative power produces negative mechanical power at positive speed
-BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor,0.01,reverseRegenPower,-10645.08892770384,0.01,1e-9,Negative power produces negative mechanical power at negative speed
-BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor,0.01,forwardMotoringTorque,94.09014067819274,1e-6,1e-9,Motoring torque follows positive shaft direction
-BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor,0.01,reverseMotoringTorque,-94.09014067819274,1e-6,1e-9,Motoring torque follows negative shaft direction
-BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor,0.01,forwardRegenTorque,-107.1730172064809,1e-6,1e-9,Regeneration opposes positive shaft direction
-BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor,0.01,reverseRegenTorque,107.1730172064809,1e-6,1e-9,Regeneration opposes negative shaft direction
-BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor,0.01,forwardLaunchTorque,219.6,1e-9,1e-9,Standstill defaults to the forward launch direction
-BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor,0.01,reverseLaunchTorque,-219.6,1e-9,1e-9,Configured reverse launch uses reverse torque direction
-BobLibTest.TestVehicle.TestPowertrain.TestVCU,0.01,vcu.P_req,3000,1e-6,1e-9,VCU requested motor power
-BobLibTest.TestVehicle.TestPowertrain.TestVCU,0.01,vcu.tau_cmd_limited,30,1e-9,1e-9,VCU torque limit command
-BobLibTest.Regression.UniversalSphericalReferenceSmoke,1,rotationError,0,1e-10,0,Derived parameter frame preserves MSL joint orientation
-BobLibTest.Regression.UniversalSphericalReferenceSmoke,1,angularVelocityError,0,1e-10,0,Derived parameter frame preserves MSL angular velocity
+BobLibTest.Utilities.Math.Vector.AngleBetweenSmoke,0.001,tinyAntiparallel,3.141592653589793,1e-12,1e-12,Tiny antiparallel vectors retain their pi angle
+BobLibTest.Utilities.Math.Vector.AngleBetweenSmoke,0.001,scaledQuarterTurn,1.5707963267948966,1e-12,1e-12,Angle is invariant to vector and axis magnitude
+BobLibTest.Utilities.Math.Vector.AngleBetweenSmoke,0.001,negativeQuarterTurn,-1.5707963267948966,1e-12,1e-12,Signed negative quarter turn is preserved
+BobLibTest.Utilities.Math.Vector.AngleBetweenSmoke,0.001,skewAxisAngle,0.7853981633974483,1e-12,1e-12,Reference-axis skew does not change angle magnitude
+BobLibTest.Utilities.Math.Vector.AngleBetweenSmoke,0.001,zeroVectorAngle,0,1e-12,1e-12,Zero-length vectors use the documented neutral angle
+BobLibTest.Chassis.Suspension.Tires.MF52.MF52PureSlipSmoke,0.01,Fx,0,1e-9,1e-9,MF52 pure slip smoke longitudinal force at zero kappa
+BobLibTest.Chassis.Suspension.Tires.MF52.MF52PureSlipSmoke,0.01,Fy,1367.049907523304,1e-6,1e-9,MF52 pure slip smoke lateral force
+BobLibTest.Chassis.Suspension.Tires.MF52.MF52PureSlipSmoke,0.01,Mx,-18.283297449124898,1e-6,1e-9,MF52 pure slip smoke overturning moment
+BobLibTest.Chassis.Suspension.Tires.MF52.MF52PureSlipSmoke,0.01,My,0,1e-9,1e-9,MF52 pure slip smoke rolling resistance moment
+BobLibTest.Chassis.Suspension.Tires.MF52.MF52PureSlipSmoke,0.01,Mz,-28.781188544190439,1e-6,1e-9,MF52 pure slip smoke aligning moment
+BobLibTest.Chassis.Suspension.Tires.MF52.MF52PureSlipSmoke,0.01,pneumaticTrail,0.021053502425769931,1e-9,1e-9,MF52 pure slip smoke pneumatic trail
+BobLibTest.Chassis.Suspension.Tires.MF52.MF52PureSlipSmoke,0.01,residualScrub,0,1e-9,1e-9,MF52 pure slip smoke residual scrub
+BobLibTest.Chassis.Suspension.Tires.MF52.MF52PureSlipSmoke,0.01,MzReconstructed,-28.781188544190439,1e-6,1e-9,MF52 aligning moment reconstruction
+BobLibTest.Chassis.Suspension.Tires.MF52.SlipModel.TransientSlipReverseSmoke,0.1,kappaForward,0.09987523388778446,1e-8,1e-8,Forward wheel overspeed produces positive transient slip
+BobLibTest.Chassis.Suspension.Tires.MF52.SlipModel.TransientSlipReverseSmoke,0.1,kappaReverse,-0.09987523388778446,1e-8,1e-8,Mirrored reverse wheel overspeed produces negative transient slip
+BobLibTest.Chassis.Suspension.Tires.MF52.SlipModel.TransientSlipReverseSmoke,0.1,symmetryError,0,1e-10,1e-10,Mirrored forward and reverse kinematics produce mirrored transient slip
+BobLibTest.Chassis.Suspension.Tires.TireForceFrameSmoke,0.001,appliedForceWorld[3],0,1e-9,1e-9,Tire shear force remains in the road plane
+BobLibTest.Chassis.Suspension.Tires.TireForceFrameSmoke,0.001,appliedTorqueWorld[3],100,1e-9,1e-9,Tire aligning moment acts about the road normal
+BobLibTest.Chassis.Suspension.Tires.Wheels.WheelAlignmentUnitsSmoke,0.001,maxAxisError,0,1e-12,1e-12,Degree-typed alignment matches explicit radian conversion
+BobLibTest.Utilities.Mechanics.MultiBody.ContactMechanics.TestGroundPhysicsRotatedFrame,0.01,contactForceWorld[1],0,1e-9,1e-9,rotated contact-frame force has no world x component
+BobLibTest.Utilities.Mechanics.MultiBody.ContactMechanics.TestGroundPhysicsRotatedFrame,0.01,contactForceWorld[2],0,1e-9,1e-9,rotated contact-frame force has no world y component
+BobLibTest.Utilities.Mechanics.MultiBody.ContactMechanics.TestGroundPhysicsRotatedFrame,0.01,contactForceWorld[3],-1000.000252499937,1e-6,1e-9,rotated contact-frame force remains world vertical
+BobLibTest.Aero.TestCFDAeroMap,0.01,aero.drag,52,1e-9,1e-9,CFD aero map drag interpolation
+BobLibTest.Aero.TestCFDAeroMap,0.01,aero.downforce,520,1e-9,1e-9,CFD aero map downforce interpolation
+BobLibTest.Aero.TestCFDAeroMapDirections,0.01,reverseVehicle.force[1],13,1e-9,1e-9,drag opposes reverse vehicle motion
+BobLibTest.Aero.TestCFDAeroMapDirections,0.01,followingWind.force[1],13,1e-9,1e-9,strong following wind produces forward drag
+BobLibTest.Aero.TestCFDAeroMapDirections,0.01,crosswind.drag,26,1e-9,1e-9,crosswind dynamic-pressure scaling
+BobLibTest.Aero.TestCFDAeroMapDirections,0.01,crosswind.force[1],-18.38477631085024,1e-9,1e-9,crosswind drag body-x component
+BobLibTest.Aero.TestCFDAeroMapDirections,0.01,crosswind.force[2],18.38477631085024,1e-9,1e-9,crosswind drag body-y component
+BobLibTest.Aero.TestCFDAeroMapDirections,0.01,crosswind.force[3],-260,1e-9,1e-9,downforce remains on negative body z
+BobLibTest.ElectricDrives.Internal.TestPowerLimitedMotor,0.01,forwardMotoringPower,9345.61646995376,0.01,1e-9,Positive power produces positive mechanical power at positive speed
+BobLibTest.ElectricDrives.Internal.TestPowerLimitedMotor,0.01,reverseMotoringPower,9345.61646995376,0.01,1e-9,Positive power produces positive mechanical power at negative speed
+BobLibTest.ElectricDrives.Internal.TestPowerLimitedMotor,0.01,forwardRegenPower,-10645.08892770384,0.01,1e-9,Negative power produces negative mechanical power at positive speed
+BobLibTest.ElectricDrives.Internal.TestPowerLimitedMotor,0.01,reverseRegenPower,-10645.08892770384,0.01,1e-9,Negative power produces negative mechanical power at negative speed
+BobLibTest.ElectricDrives.Internal.TestPowerLimitedMotor,0.01,forwardMotoringTorque,94.09014067819274,1e-6,1e-9,Motoring torque follows positive shaft direction
+BobLibTest.ElectricDrives.Internal.TestPowerLimitedMotor,0.01,reverseMotoringTorque,-94.09014067819274,1e-6,1e-9,Motoring torque follows negative shaft direction
+BobLibTest.ElectricDrives.Internal.TestPowerLimitedMotor,0.01,forwardRegenTorque,-107.1730172064809,1e-6,1e-9,Regeneration opposes positive shaft direction
+BobLibTest.ElectricDrives.Internal.TestPowerLimitedMotor,0.01,reverseRegenTorque,107.1730172064809,1e-6,1e-9,Regeneration opposes negative shaft direction
+BobLibTest.ElectricDrives.Internal.TestPowerLimitedMotor,0.01,forwardLaunchTorque,219.6,1e-9,1e-9,Standstill defaults to the forward launch direction
+BobLibTest.ElectricDrives.Internal.TestPowerLimitedMotor,0.01,reverseLaunchTorque,-219.6,1e-9,1e-9,Configured reverse launch uses reverse torque direction
+BobLibTest.Controllers.TestVCU,0.01,vcu.P_req,3000,1e-6,1e-9,VCU requested motor power
+BobLibTest.Controllers.TestVCU,0.01,vcu.tau_cmd_limited,30,1e-9,1e-9,VCU torque limit command
+BobLibTest.Utilities.Mechanics.MultiBody.Joints.Internal.UniversalSphericalReferenceSmoke,1,rotationError,0,1e-10,0,Derived parameter frame preserves MSL joint orientation
+BobLibTest.Utilities.Mechanics.MultiBody.Joints.Internal.UniversalSphericalReferenceSmoke,1,angularVelocityError,0,1e-10,0,Derived parameter frame preserves MSL angular velocity

@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 
-MF52_REGRESSION_MODEL = "BobLibTest.Regression.MF52PureSlipSmoke"
+MF52_REGRESSION_MODEL = "BobLibTest.Chassis.Suspension.Tires.MF52.MF52PureSlipSmoke"
 MF52_RESULT_SIGNALS = (
     "Fx",
     "Fy",
@@ -23,7 +23,7 @@ MF52_RESULT_SIGNALS = (
 
 LOW_LEVEL_SIGNAL_CASES = (
     (
-        "BobLibTest.TestVehicle.TestAero.TestBilinear2D",
+        "BobLibTest.Aero.Internal.TestBilinear2D",
         ("zInterior", "zClamped"),
         0.01,
         {
@@ -32,7 +32,7 @@ LOW_LEVEL_SIGNAL_CASES = (
         },
     ),
     (
-        "BobLibTest.TestVehicle.TestAero.TestCFDAeroMap",
+        "BobLibTest.Aero.TestCFDAeroMap",
         ("aero.drag", "aero.downforce"),
         0.01,
         {
@@ -41,7 +41,7 @@ LOW_LEVEL_SIGNAL_CASES = (
         },
     ),
     (
-        "BobLibTest.TestVehicle.TestPowertrain.TestVCU",
+        "BobLibTest.Controllers.TestVCU",
         ("vcu.P_req", "vcu.tau_cmd_limited"),
         0.01,
         {
