@@ -108,3 +108,8 @@ jobs:
 
       - name: Export and drive the FMUs
         run: make modelica-fmu
+
+      - name: Check reusable FMU runtime corrections
+        env:
+          BOBLIB_TEST_FMU_RUNTIME: "1"
+        run: python3 -m pytest Tests/test_fmu_events.py Tests/test_fmu_homotopy.py Tests/test_fmu_tolerance.py

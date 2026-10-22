@@ -1,16 +1,15 @@
-# Release-readiness draft scope
+# Release-readiness scope
 
 This stack prepares the Modelica library for review; it does not certify a release.
-The foundation is the preserved pre-SS release candidate of 2026-10-20. New Python
-native/FMU build and runtime tooling, VehicleSimSS, SS initialization hooks and GGV
-prototypes are excluded. The FMU exporter already merged in PR #30 is retained. Later GGV-related plant changes remain separate. The
+The foundation is the preserved pre-SS release candidate of 2026-10-20. Configurable FMU export tooling and calibration tests are included. VehicleSimSS,
+SS initialization hooks and GGV prototypes are excluded. The FMU exporter already merged in PR #30 is retained. Later GGV-related plant changes remain separate. The
 existing dynamic maneuver controller and VehicleFMI Modelica boundary remain.
 
 Layers separate package styling, calibration contracts, typed buses, mechanics,
 brakes, suspension components, wheel compliance, aero, differential components,
 drivers and electrical drive. The coupled vehicle API migration follows, then
-fixture coverage, domain regression checks and CI/migration documentation. New Python files support tests
-only; no Tools directory or runtime export runner is included.
+fixture coverage, domain regression checks and CI/migration documentation. A final tooling layer adds configurable FMU export and its matching runtime tests.
+Native export and cross-runtime verification follow in the next PR.
 
 ## Fresh isolated checks
 
@@ -31,8 +30,8 @@ result cannot certify these extracted commits.
 
 Run the full gate on final merged sources, justify baseline changes case by case,
 complete OMEdit review of every model and relevant conditional variant, and validate
-numerical behavior across supported architectures. Native/FMU artifact acceptance
-belongs to the later tooling work and must use its exact source identity.
+numerical behavior across supported architectures. Native/FMU artifact acceptance must use the final exact source identity; a single
+architecture validation is not acceptance of the complete catalog.
 
 The merged FMU-export PR #30 has been incorporated. Reconcile the unmerged
 damper-table work against the new package and record paths; compatibility with

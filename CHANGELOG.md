@@ -9,7 +9,8 @@
 
 See [MIGRATION.md](MIGRATION.md) for breaking class/record changes and
 [RELEASE_READINESS.md](RELEASE_READINESS.md) for remaining validation.
-Python runtime/export tooling and SS/GGV analysis are excluded.
+Configurable FMU export now includes editable independent calibration, dependency
+validation and build provenance. SS/GGV analysis remains excluded.
 
 ## 0.2.0 - 2026-08-09
 

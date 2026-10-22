@@ -35,8 +35,9 @@ subsystems; keep attachment and mounted-housing frames distinct.
 
 VehicleSim selects front-outboard/rear-inboard braking. Base models and other
 wrappers can have different defaults: select the intended placement explicitly.
-VehicleFMI retains its Modelica input boundary; Python exporters and binary
-catalogs are not part of this stack.
+VehicleFMI retains its Modelica input boundary. Tools/export_fmu.py preserves independent calibration before initialization;
+derived parameters remain read-only. Rebuild old artifacts, and use the manifest
+parameter contract described in Tools/README.md.
 
 Wheel compliance is downstream of the caliper support. Dynamic models and static
 rigs have distinct mass/damping settings; use the provided KnC/four-post models.

@@ -10,6 +10,7 @@ MODELICA_FMU_TIMEOUT_S ?= 900
 PYTHON_TESTS := \
 	Tests/test_modelica_linter.py \
 	Tests/test_modelica_fmu_source_edits.py \
+	Tests/test_fmu_export.py \
 	Tests/test_modelica_fmu_export_timeout.py \
 	Tests/test_modelica_test_library.py
 
@@ -65,7 +66,7 @@ help:
 		'  make ci                   Run the full local CI suite'
 
 lint:
-	$(PYTHON) -m ruff check Tests
+	$(PYTHON) -m ruff check Tests Tools
 
 modelica-lint:
 	$(PYTHON) Tests/modelica_linter.py check $(MODELICA_LINT_PATHS)
