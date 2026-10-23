@@ -19,9 +19,9 @@ TabularDamperIcon
 TabularSpringIcon
 TwoAxleVehicleCoreIcon
 WishboneUprightLoopIcon
-RecordsPackageIcon
+BobLibInternalPackageBackground
+BobLibPackageBackground
+BobLibPackageFrame
 FMIIcon
 MathIcon
-BobLibPackageFrame
-BobLibPackageBackground
-BobLibInternalPackageBackground
+RecordsPackageIcon

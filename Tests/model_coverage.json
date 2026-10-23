@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "models": [
+    {
+      "model": "BobLib.Utilities.Mechanics.MultiBody.Actuators.ChassisActuator",
+      "test": "BobLibTest.Utilities.Mechanics.MultiBody.Actuators.TestChassisActuator",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Utilities.Mechanics.MultiBody.Actuators.ContactPatchFixture",
+      "test": "BobLibTest.Utilities.Mechanics.MultiBody.Actuators.TestContactPatchFixture",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Utilities.Mechanics.MultiBody.Actuators.ContactPatchForceActuator",
+      "test": "BobLibTest.Utilities.Mechanics.MultiBody.Actuators.TestContactPatchForceActuator",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Utilities.Mechanics.MultiBody.ContactMechanics.FixedGround",
+      "test": "BobLibTest.Utilities.Mechanics.MultiBody.ContactMechanics.TestFixedGround",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Utilities.Mechanics.MultiBody.ContactMechanics.GroundPhysics",
+      "test": "BobLibTest.Utilities.Mechanics.MultiBody.ContactMechanics.TestGroundPhysics",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 2.0
+    },
+    {
+      "model": "BobLib.Utilities.Mechanics.MultiBody.ContactMechanics.RoadGround",
+      "test": "BobLibTest.Utilities.Mechanics.MultiBody.ContactMechanics.TestRoadGround",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.5
+    },
+    {
+      "model": "BobLib.Utilities.Mechanics.MultiBody.ContactMechanics.RoadSurface",
+      "test": "BobLibTest.Utilities.Mechanics.MultiBody.ContactMechanics.TestRoadSurface",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.5
+    },
+    {
+      "model": "BobLib.Utilities.Mechanics.MultiBody.Joints.Internal.UniversalSpherical",
+      "test": "BobLibTest.Utilities.Mechanics.MultiBody.Joints.Internal.TestUniversalSpherical",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 1.0
+    }
+  ],
+  "initialization_baselines": [
+    "BobLibTest.Regression.AngleBetweenSmoke",
+    "BobLibTest.Regression.MF52PureSlipSmoke",
+    "BobLibTest.Regression.TransientSlipReverseSmoke",
+    "BobLibTest.Regression.TireForceFrameSmoke",
+    "BobLibTest.Regression.UniversalSphericalReferenceSmoke",
+    "BobLibTest.Regression.WheelAlignmentUnitsSmoke",
+    "BobLibTest.Regression.VehicleSimAnimationOn",
+    "BobLibTest.TestUtilities.TestMechanics.TestMultiBody.TestContactMechanics.TestGroundPhysics",
+    "BobLibTest.TestUtilities.TestMechanics.TestMultiBody.TestContactMechanics.TestGroundPhysicsRotatedFrame",
+    "BobLibTest.TestVehicle.TestAero.TestBilinear2D",
+    "BobLibTest.TestVehicle.TestAero.TestCFDAeroMap",
+    "BobLibTest.TestVehicle.TestAero.TestCFDAeroMapDirections",
+    "BobLibTest.TestVehicle.TestChassis.TestBody.TestFrameCompX",
+    "BobLibTest.TestVehicle.TestChassis.TestBody.TestFrameRigid",
+    "BobLibTest.TestVehicle.TestChassis.TestSuspension.TestFrAxleDW",
+    "BobLibTest.TestVehicle.TestChassis.TestSuspension.TestLinkages.TestBellcrank2",
+    "BobLibTest.TestVehicle.TestChassis.TestSuspension.TestLinkages.TestBellcrank3",
+    "BobLibTest.TestVehicle.TestChassis.TestSuspension.TestLinkages.TestForceOnlyRod",
+    "BobLibTest.TestVehicle.TestChassis.TestSuspension.TestLinkages.TestShockLinkage",
+    "BobLibTest.TestVehicle.TestChassis.TestSuspension.TestRrAxleDW",
+    "BobLibTest.TestVehicle.TestChassis.TestSuspension.TestTemplates.TestDoubleWishbone.TestDoubleWishbone",
+    "BobLibTest.TestVehicle.TestChassis.TestSuspension.TestTemplates.TestStabar.TestStabar",
+    "BobLibTest.TestVehicle.TestChassis.TestSuspension.TestTemplates.TestSteeringRack.TestRackAndPinion",
+    "BobLibTest.TestVehicle.TestChassis.TestSuspension.TestTemplates.TestTire.TestFourMF52Kinematic",
+    "BobLibTest.TestVehicle.TestChassis.TestSuspension.TestTemplates.TestTire.TestFourMF52Transient",
+    "BobLibTest.TestVehicle.TestChassis.TestSuspension.TestTemplates.TestTire.TestMF52.TestMF52",
+    "BobLibTest.TestVehicle.TestChassis.TestSuspension.TestTemplates.TestTire.TestWheelPhysicsVariants",
+    "BobLibTest.TestVehicle.TestPowertrain.TestBatteryInverter",
+    "BobLibTest.TestVehicle.TestPowertrain.TestBatteryInverterMotor",
+    "BobLibTest.TestVehicle.TestPowertrain.TestBatteryPack",
+    "BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor",
+    "BobLibTest.TestVehicle.TestPowertrain.TestPowertrain",
+    "BobLibTest.TestVehicle.TestPowertrain.TestStandardVCU",
+    "BobLibTest.TestVehicle.TestPowertrain.TestVCU"
+  ]
+}

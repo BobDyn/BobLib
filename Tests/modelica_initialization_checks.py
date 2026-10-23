@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import csv
 import hashlib
+import json
 import math
 import os
 import shutil
@@ -96,16 +97,9 @@ def default_package_root() -> Path:
 
 
 def test_fixture_models(package_root: Path) -> tuple[str, ...]:
-    tests_root = package_root.parent / "Tests" / "BobLibTest"
-    return tuple(
-        sorted(
-            {
-                _class_path(tests_root, path)
-                for path in tests_root.rglob("*.mo")
-                if path.name != "package.mo"
-            }
-        )
-    )
+    # New fixtures require behavioral checks before adding a calibrated snapshot.
+    catalog = package_root.parent / "Tests" / "model_coverage.json"
+    return tuple(json.loads(catalog.read_text())["initialization_baselines"])
 
 
 def render_mos(package_root: Path, work_dir: Path, model: str, prefix: str) -> str:
@@ -162,7 +156,7 @@ def run_omc(mos_text: str, model: str, *, timeout_s: int) -> str:
         mos_path.unlink(missing_ok=True)
 
     if completed.returncode != 0:
-        raise RuntimeError(f"omc failed for {model}:\n{completed.stdout}")
+        raise RuntimeError(f"omc exited with status {completed.returncode} for {model}:\n{completed.stdout}")
     if "The initialization finished successfully" not in completed.stdout:
         raise RuntimeError(
             f"initialization did not report success for {model}:\n{completed.stdout}"

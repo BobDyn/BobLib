@@ -4,12 +4,9 @@ partial model Bellcrank3Icon "Reusable bellcrank3 icon"
 
   annotation(
     Icon(graphics = {
+      Text(extent = {{-150, 130}, {150, 105}}, textString = "%name", textColor = {0, 0, 255}, fontSize = 0),
       Line(points = {{-80, 0}, {0, -80}, {80, 0}, {0, 80}, {-80, 0}}, thickness = 3),
-      Ellipse(origin = {-80, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, lineThickness = 2, extent = {{-10, 10}, {10, -10}}),
-      Text(origin = {-40, -80}, extent = {{-20, -20}, {20, 20}}, textString = "P1"),
-      Text(origin = {80, -40}, extent = {{-20, -20}, {20, 20}}, textString = "P2"),
-      Text(origin = {40, 80}, extent = {{-20, -20}, {20, 20}}, textString = "P3")
-    }),
+      Ellipse(origin = {-80, 0}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, lineThickness = 2, extent = {{-10, 10}, {10, -10}})}),
     Documentation(info = "<html>
 <p>
 Partial model <code>Bellcrank3Icon</code> defines shared icon geometry for bellcrank3 icon.
