@@ -16,7 +16,8 @@ def test_road_physics(tmp_path):
     parameter BobLib.Records.VehicleDefn.EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord pVehicle
       "Complete calibration supplying the probe's tire-force record";
     extends BobLib.Chassis.Suspension.Tires.BaseTire(
-      pTire(force=pVehicle.chassis.frontAxle.tire.force),
+      pTire(wheel(vertical=pVehicle.chassis.frontAxle.tire.wheel.vertical),
+        force=pVehicle.chassis.frontAxle.tire.force),
       useRoadSurface=true,realExpressionFy(y=1000),realExpressionMz(y=100));
     output Real appliedForceWorld[3]=tireForceWorld;
     output Real appliedTorqueWorld[3]=tireTorqueWorld;
