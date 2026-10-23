@@ -102,9 +102,10 @@ make ci
 GitHub CI intentionally uses a lighter default gate for pushes and pull
 requests: Python lint/tests, Modelica formatting, smoke translation,
 initialization baselines, and mirrored fixture simulations/profiles.
-Version tags use that same gate. The full OpenModelica gate is a release
-activity: run it locally with `make test`/`make ci`, or on a runner through the
-separate `Release Gate` workflow (Actions -> Release Gate -> Run workflow).
+Version tags use that same gate and also start the separate `Release Gate`
+workflow. The full OpenModelica gate is a release activity: run it locally with
+`make test`/`make ci`, or on a runner through that workflow (Actions -> Release
+Gate -> Run workflow).
 
 The release workflow separates lint, formatting, coverage, translation,
 initialization, physics, signal regressions, and component/contract tests into
