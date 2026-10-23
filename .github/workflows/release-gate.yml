@@ -10,6 +10,9 @@ name: Release Gate
 # tag you are about to release. `make test` / `make ci` is the local equivalent.
 
 on:
+  push:
+    tags:
+      - "v*"
   workflow_dispatch:
 
 concurrency:

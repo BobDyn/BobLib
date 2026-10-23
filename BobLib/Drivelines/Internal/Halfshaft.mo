@@ -53,8 +53,13 @@ model Halfshaft "Lumped halfshaft inertia and replaceable torsional compliance"
     Placement(transformation(origin = {0, 0}, extent = {{-15, -15}, {15, 15}})));
   output Modelica.Units.SI.Torque tau = compliance.tau "Wheel-side reaction torque (MSL compliance convention)";
 
+protected
+  outer Modelica.Mechanics.MultiBody.World world;
+
 initial equation
   assert(pHalfshaft.inertia > 0, "Halfshaft: inertia must be positive");
+  assert(not (useWheelFrame and not useMount and world.driveTrainMechanics3D),
+    "Halfshaft: useWheelFrame with a 3D drivetrain requires useMount");
   assert(pHalfshaft.stiffness >= 0 and pHalfshaft.damping >= 0,
     "Halfshaft: stiffness and damping must be nonnegative");
   compliance.phi_rel = 0;
@@ -110,6 +115,6 @@ equation
         points = {{-42, -32}, {-42, -70}, {0, -70}, {0, -100}},
         color = {95, 95, 95}),
       Text(extent = {{-150, 85}, {150, 45}}, textString = "%name", lineColor = {0, 0, 255})}),
-    Documentation(info = "<html><p>Lumped rotational inertia followed by a replaceable compliance law. Both sides of a differential receive the same pHalfshaft record. Initial twist is zero; the assembly decides which shaft speeds require initial equations.</p><p>The optional mount supplies the sprung reaction reference. includeRotorEffects selects Rotor1D carrier/gyroscopic corrections when mounted and requires world.driveTrainMechanics3D. Shaft reaction transport remains active with scalar inertia. This is a torsional model, with ideal carrier-motion and torque-reaction transport when useWheelFrame is enabled; without CV-joint geometry, plunge forces or bending. The inboard brake taps the shaft before compliance; outboard brakes attach at the external wheel hub. Vehicle mass properties already include the locked rotor inertia.</p><h4>Parameter setup</h4><p>Set physical calibration once through <code>pHalfshaft</code>. The axle-level driveline copies this per-half record to both shafts. <code>useInboardBrake</code> exposes the brake rotor port; <code>useWheelFrame</code> adds carrier motion and the upright reaction path; <code>useMount</code> supplies the housing reference. Rotor gyroscopic effects require both <code>useMount</code> and <code>includeRotorEffects</code>. These connector and physics switches select topology before translation. Set <code>initialAngularVelocity</code> with <code>fixInitialSpeed=true</code> to impose the initial speed; otherwise it is only a start guess.</p>
+    Documentation(info = "<html><p>Lumped rotational inertia followed by a replaceable compliance law. Both sides of a differential receive the same pHalfshaft record. Initial twist is zero; the assembly decides which shaft speeds require initial equations.</p><p>The optional mount supplies the sprung reaction reference. includeRotorEffects selects Rotor1D carrier/gyroscopic corrections when mounted and requires world.driveTrainMechanics3D. Shaft reaction transport remains active with scalar inertia. This is a torsional model, with ideal carrier-motion and torque-reaction transport when useWheelFrame is enabled; without CV-joint geometry, plunge forces or bending. The inboard brake taps the shaft before compliance; outboard brakes attach at the external wheel hub. Vehicle mass properties already include the locked rotor inertia.</p><h4>Parameter setup</h4><p>Set physical calibration once through <code>pHalfshaft</code>. The axle-level driveline copies this per-half record to both shafts. <code>useInboardBrake</code> exposes the brake rotor port; <code>useWheelFrame</code> adds carrier motion and the upright reaction path; <code>useMount</code> supplies the housing reference and is required with <code>useWheelFrame</code> when world.driveTrainMechanics3D=true. Rotor gyroscopic effects require both <code>useMount</code> and <code>includeRotorEffects</code>. These connector and physics switches select topology before translation. Set <code>initialAngularVelocity</code> with <code>fixInitialSpeed=true</code> to impose the initial speed; otherwise it is only a start guess.</p>
 </html>"));
 end Halfshaft;

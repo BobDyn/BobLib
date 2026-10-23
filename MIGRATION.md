@@ -24,6 +24,38 @@ switches and experiment settings remain separate. Old flat modifiers are not
 compatibility aliases. Respect constrainedby contracts and keep implementation-only
 modifiers on the selected implementation. Frame replacement is independent of axles.
 
+## Old to new names used by BobSim
+
+This table lists the names that BobSim on main writes today. It shows only names
+that exist on main and on this release. BobSim's override writer silently skips
+keys that the model does not have, so a caller with an old key gets no error.
+Update the keys.
+
+| Old name (main) | New name |
+|---|---|
+| `BobLib.Chassis.Chassis_DW` | `BobLib.Chassis.DoubleWishbone` |
+| `Chassis_DW` modifier `redeclare record VehicleRecord` | `redeclare record ChassisRecord = VehicleRecord.ChassisRecord` |
+| `Chassis_DW` modifier `pVehicle = pVehicle` | `pChassis = pVehicle.chassis` |
+| `BobLib.Chassis.Suspension.FrAxleDW_Direct`, `RrAxleDW_Direct` | `BobLib.Chassis.Suspension.DoubleWishboneDirect` |
+| `BobLib.Chassis.Suspension.FrAxleDW_BC`, `RrAxleDW_BC` | `BobLib.Chassis.Suspension.DoubleWishboneBellcrank` |
+| `BobLib.Chassis.Suspension.FrAxleDW_BC_Stabar`, `RrAxleDW_BC_Stabar` | `BobLib.Chassis.Suspension.DoubleWishboneBellcrankStabar` |
+| `Experiments.Standards.Templates.Vehicle.BaseVehicleSim` | `Experiments.Standards.BaseClasses.PartialVehicleSim` |
+| `Experiments.Standards.Templates.FourPost.BaseFourPostSim` | `Experiments.Standards.BaseClasses.PartialDoubleWishboneFourPost` |
+| `vcu.targetAy`, `vcu.useMode`, `vcu.steerStart` | `driver.targetAy`, `driver.useMode`, `driver.steerStart` |
+| `vcu.linearitySlopeSamplePeriod`, `vcu.handwheelRampRate`, `vcu.handwheelRampStopDuration` | `driver.` with the same parameter name |
+| `vcu.enableNormalLoadSteerLimiter`, `vcu.tireNormalLoadMin` | `driver.` with the same parameter name |
+| `vcu.steadyStateAyRampRate`, `vcu.steadyStateMaxHandwheel`, `vcu.steadyStateAyGain`, `vcu.steadyStateAyTi`, `vcu.steadyStateSteerTimeConstant` | `driver.` with the same parameter name |
+| `vcu.frRampSteerHeight`, `vcu.stepDuration`, `vcu.steerAmp`, `vcu.steerFreq` | `driver.` with the same parameter name |
+| `vcu.velGain`, `vcu.velTi` | `driver.velGain`, `driver.velTi` |
+
+`initialVel` keeps its name and still sets the speed target through
+`driver.targetVel`. The four-post modifiers `VehicleRecord`, `FrAxleModel`,
+`RrAxleModel`, `pVehicle`, `pFrStabar` and `pRrStabar` keep their names on
+`PartialDoubleWishboneFourPost`. `vcu.frRampSteerDuration` has no replacement.
+On main it only set the default of `stepDuration`, so set `driver.stepDuration`.
+The `Templates.Vehicle` and `Templates.FourPost` packages are removed, so put
+generated templates in your own package.
+
 ## Physical connections
 
 Brakes is a top-level VI subsystem with front/rear assemblies. Rotor connections
