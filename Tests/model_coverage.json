@@ -44,6 +44,83 @@
       "stop_time": 0.1
     },
     {
+      "model": "BobLib.Chassis.Suspension.BaseClasses.PartialTabularCompliant",
+      "test": "BobLibTest.Chassis.Suspension.BaseClasses.TestPartialTabularCompliant",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Components.Bellcrank2",
+      "test": "BobLibTest.Chassis.Suspension.Components.TestBellcrank2",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Components.Bellcrank3",
+      "test": "BobLibTest.Chassis.Suspension.Components.TestBellcrank3",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Components.ForceOnlyRod",
+      "test": "BobLibTest.Chassis.Suspension.Components.TestForceOnlyRod",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Components.RackAndPinion",
+      "test": "BobLibTest.Chassis.Suspension.Components.TestRackAndPinion",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 3.0
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Components.Rod",
+      "test": "BobLibTest.Chassis.Suspension.Components.TestRod",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 3.0
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Components.ShockLinkage",
+      "test": "BobLibTest.Chassis.Suspension.Components.TestShockLinkage",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Components.Stabar",
+      "test": "BobLibTest.Chassis.Suspension.Components.TestStabar",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 3.0
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Components.TabularDamper",
+      "test": "BobLibTest.Chassis.Suspension.Components.TestTabularDamper",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Components.TabularSpring",
+      "test": "BobLibTest.Chassis.Suspension.Components.TestTabularSpring",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Components.WishboneUprightLoop",
+      "test": "BobLibTest.Chassis.Suspension.Components.TestWishboneUprightLoop",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 3.0
+    },
+    {
       "model": "BobLib.Utilities.Mechanics.MultiBody.Actuators.ChassisActuator",
       "test": "BobLibTest.Utilities.Mechanics.MultiBody.Actuators.TestChassisActuator",
       "mode": "simulate",
