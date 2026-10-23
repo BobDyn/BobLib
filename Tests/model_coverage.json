@@ -177,6 +177,27 @@
       "stop_time": 0.01
     },
     {
+      "model": "BobLib.Drivelines.Internal.Halfshaft",
+      "test": "BobLibTest.Drivelines.Internal.TestHalfshaft",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Drivelines.Internal.LockedDifferential1D",
+      "test": "BobLibTest.Drivelines.Internal.TestLockedDifferential1D",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Drivelines.Internal.OpenDifferential1D",
+      "test": "BobLibTest.Drivelines.Internal.TestOpenDifferential1D",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
       "model": "BobLib.Utilities.Mechanics.MultiBody.Actuators.ChassisActuator",
       "test": "BobLibTest.Utilities.Mechanics.MultiBody.Actuators.TestChassisActuator",
       "mode": "simulate",
