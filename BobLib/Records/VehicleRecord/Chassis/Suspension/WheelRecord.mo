@@ -5,8 +5,6 @@ record WheelRecord
 
   parameter Templates.Tire.Wheel1DOF_YRecord rotation(wheelJ = 0.01) "Wheel rotational inertia calibration";
 
-  parameter Templates.Tire.Wheel1DOF_ZRecord vertical(
-    wheelC = 0,
-    wheelD = 0) "Wheel vertical spring and damping calibration";
+  parameter Templates.Tire.Wheel1DOF_ZRecord vertical "Wheel vertical spring and damping calibration";
   parameter WheelComplianceRecord compliance "Six-axis wheel-stack compliance after the upright/caliper mount";
 end WheelRecord;
