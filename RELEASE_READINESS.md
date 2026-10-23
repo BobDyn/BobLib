@@ -42,8 +42,8 @@ unmerged PRs is not established by these drafts.
 A fresh comparison used pre-stack `a3932b3` (package styling only) and `0729995`
 with OpenModelica 1.27.0-cmake, MSL 4.1.0 and VehicleInterfaces 2.0.2. Both use
 the shipped bellcrank/stabilizer vehicle, its saved starting pose, 15 m/s initial
-speed, DASSL, 1e-6 tolerance and local homotopy. No initialization baseline was
-regenerated. The compiler reported initialization without homotopy in all six runs.
+speed, DASSL, 1e-6 tolerance and local homotopy. The vehicle starting pose and
+physical calibration were preserved. The compiler reported initialization without homotopy in all six runs.
 
 | Measurement | Before | After |
 |---|---:|---:|
@@ -82,3 +82,11 @@ Seven behavioral tests in `Tests/test_vehicle_termination.py` passed on a fresh
 full-vehicle build: running, settled, tire limit, sideslip limit, both settling
 timeouts and invalid monitor configuration. Envelope/timeout exits retain the
 result and expose a distinct status; invalid configuration still fails.
+
+The initialization snapshot for `VehicleSimAnimationOn` was subsequently updated
+for the new `terminationStatus` output. A fresh before/after comparison against
+`0b7ab76` verified the old snapshot, found exactly one added numeric variable
+(`terminationStatus=0`), no removed variables, and no existing initialized value
+outside the unchanged 1e-9 relative / 1e-8 absolute tolerances. Only that one
+snapshot row changed (2,683 to 2,684 numeric/finite variables); no physical
+initialization values or tolerances were adjusted.
