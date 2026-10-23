@@ -35,7 +35,7 @@ model TestFourMF52Kinematic
     Placement(transformation(origin = {-210, -130}, extent = {{-10, -10}, {10, 10}})));
 
   BobLib.Chassis.Suspension.Tires.MF52Tire tireFL(
-    pTire(wheel(geometry = pCar.chassis.frontAxle.tire.wheel.geometry), force = pCar.chassis.frontAxle.tire.force),
+    pTire(wheel(geometry = pCar.chassis.frontAxle.tire.wheel.geometry, vertical = pCar.chassis.frontAxle.tire.wheel.vertical), force = pCar.chassis.frontAxle.tire.force),
     redeclare BobLib.Chassis.Suspension.Tires.Wheels.Wheel1DOF_Y wheelModel(pWheel(geometry = pCar.chassis.frontAxle.tire.wheel.geometry, rotation = pCar.chassis.frontAxle.tire.wheel.rotation)),
     redeclare BobLib.Chassis.Suspension.Tires.MF52.SlipModel.KinematicSlip slipModel) annotation(
     Placement(transformation(origin = {-70, 80}, extent = {{10, -10}, {-10, 10}})));
@@ -44,7 +44,7 @@ model TestFourMF52Kinematic
                                                                                                        rimR0 = pCar.chassis.frontAxle.tire.wheel.geometry.rimR0,
                                                                                                        rimWidth = pCar.chassis.frontAxle.tire.wheel.geometry.rimWidth,
                                                                                                        staticAlpha = -pCar.chassis.frontAxle.tire.wheel.geometry.staticAlpha,
-                                                                                                       staticGamma = -pCar.chassis.frontAxle.tire.wheel.geometry.staticGamma)), force = pCar.chassis.frontAxle.tire.force), redeclare BobLib.Chassis.Suspension.Tires.Wheels.Wheel1DOF_Y wheelModel(pWheel(geometry = PartialWheelRecord(R0 = pCar.chassis.frontAxle.tire.wheel.geometry.R0,
+                                                                                                       staticGamma = -pCar.chassis.frontAxle.tire.wheel.geometry.staticGamma), vertical = pCar.chassis.frontAxle.tire.wheel.vertical), force = pCar.chassis.frontAxle.tire.force), redeclare BobLib.Chassis.Suspension.Tires.Wheels.Wheel1DOF_Y wheelModel(pWheel(geometry = PartialWheelRecord(R0 = pCar.chassis.frontAxle.tire.wheel.geometry.R0,
                                                                                                                                                                                                           rimR0 = pCar.chassis.frontAxle.tire.wheel.geometry.rimR0,
                                                                                                                                                                                                           rimWidth = pCar.chassis.frontAxle.tire.wheel.geometry.rimWidth,
                                                                                                                                                                                                           staticAlpha = -pCar.chassis.frontAxle.tire.wheel.geometry.staticAlpha,
@@ -52,7 +52,7 @@ model TestFourMF52Kinematic
     Placement(transformation(origin = {70, 80}, extent = {{-10, -10}, {10, 10}})));
 
   BobLib.Chassis.Suspension.Tires.MF52Tire tireRL(
-    pTire(wheel(geometry = pCar.chassis.frontAxle.tire.wheel.geometry), force = pCar.chassis.frontAxle.tire.force),
+    pTire(wheel(geometry = pCar.chassis.frontAxle.tire.wheel.geometry, vertical = pCar.chassis.frontAxle.tire.wheel.vertical), force = pCar.chassis.frontAxle.tire.force),
     redeclare BobLib.Chassis.Suspension.Tires.Wheels.Wheel1DOF_Y wheelModel(pWheel(geometry = pCar.chassis.frontAxle.tire.wheel.geometry, rotation = pCar.chassis.frontAxle.tire.wheel.rotation)),
     redeclare BobLib.Chassis.Suspension.Tires.MF52.SlipModel.KinematicSlip slipModel) annotation(
     Placement(transformation(origin = {-70, 0}, extent = {{10, -10}, {-10, 10}})));
@@ -61,7 +61,7 @@ model TestFourMF52Kinematic
                                                                                                        rimR0 = pCar.chassis.frontAxle.tire.wheel.geometry.rimR0,
                                                                                                        rimWidth = pCar.chassis.frontAxle.tire.wheel.geometry.rimWidth,
                                                                                                        staticAlpha = -pCar.chassis.frontAxle.tire.wheel.geometry.staticAlpha,
-                                                                                                       staticGamma = -pCar.chassis.frontAxle.tire.wheel.geometry.staticGamma)), force = pCar.chassis.frontAxle.tire.force), redeclare BobLib.Chassis.Suspension.Tires.Wheels.Wheel1DOF_Y wheelModel(pWheel(geometry = PartialWheelRecord(R0 = pCar.chassis.frontAxle.tire.wheel.geometry.R0,
+                                                                                                       staticGamma = -pCar.chassis.frontAxle.tire.wheel.geometry.staticGamma), vertical = pCar.chassis.frontAxle.tire.wheel.vertical), force = pCar.chassis.frontAxle.tire.force), redeclare BobLib.Chassis.Suspension.Tires.Wheels.Wheel1DOF_Y wheelModel(pWheel(geometry = PartialWheelRecord(R0 = pCar.chassis.frontAxle.tire.wheel.geometry.R0,
                                                                                                                                                                                                           rimR0 = pCar.chassis.frontAxle.tire.wheel.geometry.rimR0,
                                                                                                                                                                                                           rimWidth = pCar.chassis.frontAxle.tire.wheel.geometry.rimWidth,
                                                                                                                                                                                                           staticAlpha = -pCar.chassis.frontAxle.tire.wheel.geometry.staticAlpha,
