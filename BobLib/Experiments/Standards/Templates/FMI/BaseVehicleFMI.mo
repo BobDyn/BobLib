@@ -67,11 +67,8 @@ partial model BaseVehicleFMI
     Dialog(group = "Plant Models"),
     Placement(transformation(origin = {90, -50}, extent = {{-30, -20}, {30, 20}}))) constrainedby VehicleInterfaces.Chassis.Interfaces.TwoAxleBase "Chassis subsystem";
 
-  replaceable BobLib.EnergyStorage.BatteryPack battery(
-    includeGround = true,
-    Ns = pVehicle.pBattery.Ns,
-    Np = pVehicle.pBattery.Np,
-    SOC_start = pVehicle.pBattery.SOC_start) annotation(
+  replaceable BobLib.EnergyStorage.BatteryPack battery(pBattery(Ns = pVehicle.pBattery.Ns, Np = pVehicle.pBattery.Np, SOC_start = pVehicle.pBattery.SOC_start),
+    includeGround = true) annotation(
     choicesAllMatching = true,
     Dialog(group = "Plant Models"),
     Placement(transformation(origin = {-150, -10}, extent = {{-10, -10}, {10, 10}}, rotation = -90))) constrainedby VehicleInterfaces.EnergyStorage.Interfaces.Base "Energy storage subsystem";
@@ -93,29 +90,10 @@ partial model BaseVehicleFMI
     Dialog(group = "Controller Models"),
     Placement(transformation(origin = {130, 50}, extent = {{-10, -10}, {10, 10}}))) constrainedby VehicleInterfaces.Controllers.Interfaces.Base "Vehicle control unit";
 
-  replaceable BobLib.PowerElectronics.InverterDC inverter(
-    P_max_mot = pVehicle.pInverter.P_max_mot,
-    P_max_reg = pVehicle.pInverter.P_max_reg,
-    V_dc_max = pVehicle.pInverter.V_dc_max) "Power electronics subsystem" annotation(
+  replaceable BobLib.PowerElectronics.InverterDC inverter(pInverter(P_max_mot = pVehicle.pInverter.P_max_mot, P_max_reg = pVehicle.pInverter.P_max_reg, V_dc_max = pVehicle.pInverter.V_dc_max)) "Power electronics subsystem" annotation(
     Placement(transformation(origin = {-110, -30}, extent = {{-10, -10}, {10, 10}})));
 
-  replaceable BobLib.ElectricDrives.Motor motor(
-    Vdc_max = pVehicle.pMotor.Vdc_max,
-    rpm_max_peak = pVehicle.pMotor.rpm_max_peak,
-    T_peak = pVehicle.pMotor.T_peak,
-    T_cont = pVehicle.pMotor.T_cont,
-    I_peak_2min = pVehicle.pMotor.I_peak_2min,
-    I_cont = pVehicle.pMotor.I_cont,
-    Kt_Nm_per_A = pVehicle.pMotor.Kt_Nm_per_A,
-    peakTime = pVehicle.pMotor.peakTime,
-    P_mech_peak = pVehicle.pMotor.P_mech_peak,
-    P_cont_low = pVehicle.pMotor.P_cont_low,
-    P_cont_high = pVehicle.pMotor.P_cont_high,
-    eta_mot = pVehicle.pMotor.eta_mot,
-    eta_reg = pVehicle.pMotor.eta_reg,
-    w_eps = pVehicle.pMotor.w_eps,
-    reverseLaunch = pVehicle.pMotor.reverseLaunch,
-    rotorJ = pVehicle.pMotor.rotorJ) annotation(
+  replaceable BobLib.ElectricDrives.Motor motor(pMotor(Vdc_max = pVehicle.pMotor.Vdc_max, rpm_max_peak = pVehicle.pMotor.rpm_max_peak, T_peak = pVehicle.pMotor.T_peak, T_cont = pVehicle.pMotor.T_cont, I_peak_2min = pVehicle.pMotor.I_peak_2min, I_cont = pVehicle.pMotor.I_cont, Kt_Nm_per_A = pVehicle.pMotor.Kt_Nm_per_A, peakTime = pVehicle.pMotor.peakTime, P_mech_peak = pVehicle.pMotor.P_mech_peak, P_cont_low = pVehicle.pMotor.P_cont_low, P_cont_high = pVehicle.pMotor.P_cont_high, eta_mot = pVehicle.pMotor.eta_mot, eta_reg = pVehicle.pMotor.eta_reg, w_eps = pVehicle.pMotor.w_eps, reverseLaunch = pVehicle.pMotor.reverseLaunch, rotorJ = pVehicle.pMotor.rotorJ)) annotation(
     choicesAllMatching = true,
     Dialog(group = "Plant Models"),
     Placement(transformation(origin = {-79, -10.3334}, extent = {{-10, -10}, {10, 10}}, rotation = -180))) constrainedby VehicleInterfaces.ElectricDrives.Interfaces.Base "Traction motor subsystem";
