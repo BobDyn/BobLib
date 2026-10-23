@@ -56,6 +56,74 @@ On main it only set the default of `stepDuration`, so set `driver.stepDuration`.
 The `Templates.Vehicle` and `Templates.FourPost` packages are removed, so put
 generated templates in your own package.
 
+## Physical record modifier map
+
+The following are prefix replacements: keep the field suffix, including array
+indices. `Fr` maps to `frontAxle` and `Rr` to `rearAxle`; both sides are required.
+These paths are relative to the experiment instance.
+
+| Old prefix | New prefix |
+|---|---|
+| `pVehicle.pFrAxleDW`, `pVehicle.pRrAxleDW` | `pVehicle.chassis.frontAxle.actuation`, `pVehicle.chassis.rearAxle.actuation` |
+| `pVehicle.pFrDW`, `pVehicle.pRrDW` | `pVehicle.chassis.frontAxle.geometry`, `pVehicle.chassis.rearAxle.geometry` |
+| `pVehicle.pFrRack`, `pVehicle.pRrRack` | `pVehicle.chassis.frontAxle.steering`, `pVehicle.chassis.rearAxle.steering` |
+| `pVehicle.pFrAxleMass`, `pVehicle.pRrAxleMass` | `pVehicle.chassis.frontAxle.masses`, `pVehicle.chassis.rearAxle.masses` |
+| `pVehicle.pFrPartialWheel`, `pVehicle.pRrPartialWheel` | `pVehicle.chassis.frontAxle.tire.wheel.geometry`, `pVehicle.chassis.rearAxle.tire.wheel.geometry` |
+| `pVehicle.pFrTire1DOF_YParams`, `pVehicle.pRrTire1DOF_YParams` | `pVehicle.chassis.frontAxle.tire.wheel.rotation`, `pVehicle.chassis.rearAxle.tire.wheel.rotation` |
+| `pVehicle.pFrTire1DOF_ZParams`, `pVehicle.pRrTire1DOF_ZParams` | `pVehicle.chassis.frontAxle.tire.wheel.vertical`, `pVehicle.chassis.rearAxle.tire.wheel.vertical` |
+| `pVehicle.pFrTireModel`, `pVehicle.pRrTireModel` | `pVehicle.chassis.frontAxle.tire.force`, `pVehicle.chassis.rearAxle.tire.force` |
+| `pVehicle.pFrStabar`, `pVehicle.pRrStabar` | `pVehicle.chassis.frontAxle.stabilizer`, `pVehicle.chassis.rearAxle.stabilizer` |
+| `pVehicle.pBaseSprungMass` | `pVehicle.chassis.frame.baseMass` |
+| `pVehicle.pDriverMass` | `pVehicle.chassis.frame.driverMass` |
+| `pVehicle.pSprungMass` | `pVehicle.chassis.frame.mass` (derived; edit base/driver mass instead) |
+| `pVehicle.pTorsionalStiff` | `pVehicle.chassis.frame.torsionalStiffness` |
+| `pVehicle.pQSSInitialization` | `pInitialization` on `VehicleSim` |
+| `pVehicle.pBattery`, `pVehicle.pVCU` | `pVehicle.battery`, `pVehicle.controller` |
+| `pVehicle.pInverter`, `pVehicle.pMotor` | `pVehicle.inverter`, `pVehicle.motor` |
+| `pVehicle.pAero` | `pVehicle.aero`, except ride-height references below |
+
+For example, `pVehicle.pFrAxleDW.springFreeLength` becomes
+`pVehicle.chassis.frontAxle.actuation.springFreeLength`, and
+`pVehicle.pRrAxleDW.springTable[1,2]` becomes
+`pVehicle.chassis.rearAxle.actuation.springTable[1,2]`. The intermediate
+`actuation` member is necessary. Spring/damper tables also have active point
+counts; preserve the count when editing a fixed-capacity exported table.
+
+`pVehicle.pAero.FL_RideHeightRef` and `RL_RideHeightRef` move to
+`pVehicle.chassis.frontAxle.rideHeightReference` and
+`pVehicle.chassis.rearAxle.rideHeightReference`. These points belong to the
+suspension measurements, rather than the aero force map.
+
+Four-post bar-rate overrides need special care. `FourPostSim` explicitly binds
+its axle stabilizers to the top-level `pFrStabar`/`pRrStabar` records and defaults
+both rates to zero. Change `pFrStabar.barRate` and `pRrStabar.barRate` to enable
+bars there; changing only the vehicle record's rate does not enable them.
+Generated subclasses of `PartialDoubleWishboneFourPost` must retain those bindings:
+`frAxleDW(pAxle(stabilizer=pFrStabar))` and
+`rrAxleDW(pAxle(stabilizer=pRrStabar))` when they select stabilizer axles.
+
+The driveline is not a uniform prefix substitution:
+
+| Old field under `pVehicle.pDriveline` | New field or selection |
+|---|---|
+| `finalDriveRatio` | `pVehicle.transmission.gearRatio` (with `pVehicle.driveline.inputRatio=1`) |
+| `diffInputRotorJ` | `pVehicle.driveline.inputInertia` |
+| `diff_T_preload` | `pVehicle.driveline.differential.preloadTorque` |
+| `diff_driveSideTorqueSign` | `pVehicle.driveline.differential.driveSideTorqueSign` |
+| `diff_lockFractionAccel`, `diff_lockFractionDecel` | `pVehicle.driveline.differential.driveLockingFraction`, `coastLockingFraction` |
+| `diff_kineticFrictionRatio` | `pVehicle.driveline.differential.slidingFrictionRatio` |
+| `halfshaftLeftC`, `halfshaftRightC` | `pVehicle.driveline.halfshaft.stiffness` (shared by both shafts) |
+| `halfshaftLeftD`, `halfshaftRightD` | `pVehicle.driveline.halfshaft.damping` (shared by both shafts) |
+| `halfshaftLeftJEquivalent`, `halfshaftRightJEquivalent` | No behavior-preserving alias: `halfshaft.inertia` is now real rotating inertia, not just a damping calculation input |
+| `diff_use_lsd` | Architecture selection `differentialArchitecture`; choose `Open` or `ClutchLSD` explicitly |
+| `diff_T_capacity_max`, `diff_clutchEffectiveRadius`, `diff_w_transition`, `diff_c_viscous` | No direct alias in the new clutch law; recalibrate the selected differential |
+
+Do not merge asymmetric left/right shaft calibration into the shared record
+silently: use a custom driveline if independent calibration is required.
+BobSim's generated records and runtime override dictionaries must both migrate.
+Validate every requested override against the generated init XML or artifact
+manifest and reject unknown keys; do not rely on the old runner's silent skip.
+
 ## Physical connections
 
 Brakes is a top-level VI subsystem with front/rear assemblies. Rotor connections
@@ -87,3 +155,23 @@ Run make ci and inspect failures and skips. Initialization baselines were migrat
 with their fixtures; do not regenerate snapshots to silence mismatches. Static
 route checks do not replace OMEdit review of inherited and conditional views.
 See RELEASE_READINESS.md for current draft scope and remaining validation.
+
+## Maneuver exit status
+
+`VehicleSim.terminationStatus` is included in the default result filter:
+
+| Value | Meaning |
+|---|---|
+| 0 | Running, or the configured stop time was reached without a monitored outcome |
+| 1 | Steady-state acceptance conditions held for the required duration |
+| 2 | Steering lateral-gain loss limit reached |
+| 3 | Settling timeout; not a converged point |
+| 4 | Tire normal-load limit reached |
+| 5 | Sideslip limit held for the configured duration |
+
+Timeout and envelope exits use `terminate()` and retain the result file. A zero
+process exit code alone does not establish convergence. Read the final status
+and preserve limit points separately from accepted steady-state points. If limits
+coincide, tire load takes priority over sideslip, timeout, linearity and settling.
+Invalid calibration and solver failures remain errors. This output does not
+change `VehicleFMI`'s externally driven command boundary.
