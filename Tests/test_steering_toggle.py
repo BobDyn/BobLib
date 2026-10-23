@@ -25,7 +25,7 @@ equation
   connect(load.y, force.force);
   assert(abs(rack.rackAxis.s-0.01)<1e-8, "Rack lock position changed under load");
   assert(abs(abs(rack.mountFrame.f[2])-100)<1e-6, "Rack load did not reach chassis");
-  assert(abs(rack.mountFrame.t[3])<1e-6, "Internal pinion reaction did not cancel");
+  assert(Modelica.Math.Vectors.norm(rack.mountFrame.t)<1e-6, "Internal pinion reaction did not cancel");
 end LockedRack;
 ''')
     script = tmp_path / "check.mos"
