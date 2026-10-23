@@ -76,6 +76,9 @@ jobs:
       - name: Check Modelica initialization baselines
         run: make modelica-initialization
 
+      - name: Check bearing physics and neutral axle contracts
+        run: python3 -m pytest Tests/test_vi_bearings.py Tests/test_architecture_boundaries.py
+
   modelica-profile:
     name: OpenModelica Profiles
     runs-on: ubuntu-latest
