@@ -9,12 +9,7 @@ record FrameRecord
   parameter SI.Position rearReference[3] "Rear axle mounting position in vehicle design coordinates";
   parameter Suspension.Templates.MassRecord baseMass "Sprung vehicle mass properties excluding the separately specified driver";
 
-  parameter Suspension.Templates.MassRecord driverMass(
-    m = 0,
-    rCM = zeros(3),
-    inertia = zeros(
-      3,
-      3)) "Driver mass properties in the same design coordinates as baseMass";
+  parameter Suspension.Templates.MassRecord driverMass "Driver mass properties in the same design coordinates as baseMass";
 
   // Bind fields separately so OMC preserves initialization-time dependencies.
   final parameter Suspension.Templates.MassRecord mass(
