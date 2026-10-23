@@ -26,7 +26,7 @@ model TireForceFrameSmoke
     parameter BobLib.Records.VehicleDefn.EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord pVehicle "Complete vehicle calibration record; subsystem records are passed to the selected models" annotation(Dialog(group = "Calibration"));
 
     extends BobLib.Chassis.Suspension.Tires.BaseTire(
-      pTire(wheel(geometry = pTestWheel), force = pVehicle.chassis.frontAxle.tire.force),
+      pTire(wheel(geometry = pTestWheel, vertical = pVehicle.chassis.frontAxle.tire.wheel.vertical), force = pVehicle.chassis.frontAxle.tire.force),
       realExpressionFy(y = 1000),
       realExpressionMz(y = 100));
 

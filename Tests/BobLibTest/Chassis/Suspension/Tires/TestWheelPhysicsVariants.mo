@@ -74,10 +74,10 @@ model TestWheelPhysicsVariants
     r_0(start = {0, 3, 0}, each fixed = true)) annotation(
     Placement(transformation(origin = {60, -50}, extent = {{-10, -10}, {10, 10}}, rotation = 270)));
 
-  BobLib.Chassis.Suspension.Tires.Wheels.Wheel0DOF wheel0(pWheel(geometry = pWheel)) annotation(
+  BobLib.Chassis.Suspension.Tires.Wheels.Wheel0DOF wheel0(pWheel(geometry = pWheel, vertical = pWheelZ)) annotation(
     Placement(transformation(origin = {-40, 70}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
 
-  BobLib.Chassis.Suspension.Tires.Wheels.Wheel1DOF_Y wheelY(pWheel(geometry = pWheel, rotation = pWheelY)) annotation(
+  BobLib.Chassis.Suspension.Tires.Wheels.Wheel1DOF_Y wheelY(pWheel(geometry = pWheel, rotation = pWheelY, vertical = pWheelZ)) annotation(
     Placement(transformation(origin = {-40, -20}, extent = {{-10, -10}, {10, 10}})));
 
   BobLib.Chassis.Suspension.Tires.Wheels.Wheel1DOF_Z wheelZ(pWheel(geometry = pWheel, vertical = pWheelZ)) annotation(
