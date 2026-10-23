@@ -28,7 +28,7 @@ model TestFrameCompX
     I_33 = 0.01) annotation(
     Placement(transformation(origin = {60, 0}, extent = {{-10, -10}, {10, 10}})));
 
-  BobLib.Chassis.Body.FrameCompX frame(pFrame(frontReference = {1, 0, 0}, rearReference = {-1, 0, 0}, baseMass = pSprung, torsionalStiffness = 1000)) annotation(
+  BobLib.Chassis.Body.FrameCompX frame(pFrame(frontReference = {1, 0, 0}, rearReference = {-1, 0, 0}, baseMass = pSprung, driverMass(m = 0, rCM = zeros(3), inertia = zeros(3, 3)), torsionalStiffness = 1000)) annotation(
     Placement(transformation(extent = {{-20, -20}, {20, 20}})));
 
 equation
