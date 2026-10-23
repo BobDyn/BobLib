@@ -76,6 +76,36 @@ jobs:
       - name: Check Modelica initialization baselines
         run: make modelica-initialization
 
+  modelica-components:
+    name: OpenModelica Component Contracts
+    runs-on: ubuntu-latest
+    container: openmodelica/openmodelica:v1.27.1-ompython
+    needs: python
+    timeout-minutes: 120
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Python test dependencies
+        run: python3 -m pip install --upgrade pip -r Tests/requirements-dev.txt
+
+      - name: Cache Modelica libraries
+        uses: actions/cache@v6
+        with:
+          path: ~/.openmodelica
+          key: om-libs-${{ hashFiles('msl_setup.mos') }}
+
+      - name: Run component, contract and Python tests
+        run: make test-additional PYTEST_FLAGS="--junitxml=/tmp/boblib-components.xml -ra"
+
+      - name: Retain component test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: boblib-component-contracts
+          path: /tmp/boblib-components.xml
+          if-no-files-found: warn
+
   modelica-profile:
     name: OpenModelica Profiles
     runs-on: ubuntu-latest
@@ -135,3 +165,6 @@ jobs:
         env:
           BOBLIB_TEST_FMU_RUNTIME: "1"
         run: python3 -m pytest Tests/test_fmu_events.py Tests/test_fmu_homotopy.py Tests/test_fmu_tolerance.py Tests/test_fmu_vehicle_calibration.py
+
+      - name: Check native and FMU calibration dependencies
+        run: python3 -m pytest Tests/test_calibration_dependencies.py

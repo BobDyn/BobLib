@@ -19,7 +19,7 @@ def test_bearing_load_path_and_vehicle_flags(tmp_path):
     inner parameter Real linkDiameter=0.02;
     inner Modelica.Mechanics.MultiBody.World world(g=0, enableAnimation=false);
     Modelica.Mechanics.MultiBody.Parts.Fixed upright;
-    BobLib.Chassis.Suspension.Tires.Wheels.Wheel1DOF_Y wheel(pWheel(rotation(wheelJ=0.1),geometry(R0=0.2, rimR0=0.125, rimWidth=0.18, staticAlpha=10, staticGamma=15)),exposeWheelBearing=true);
+    BobLib.Chassis.Suspension.Tires.Wheels.Wheel1DOF_Y wheel(pWheel(rotation(wheelJ=0.1),vertical(wheelC=200000,wheelD=100),geometry(R0=0.2, rimR0=0.125, rimWidth=0.18, staticAlpha=10, staticGamma=15)),exposeWheelBearing=true);
     Modelica.Mechanics.Rotational.Sources.Speed spin(exact=true, w_ref=3);
     Modelica.Mechanics.MultiBody.Forces.WorldForceAndTorque load(
       animation=false, force={1,2,3}, torque={4,5,6},
@@ -43,7 +43,7 @@ def test_bearing_load_path_and_vehicle_flags(tmp_path):
     Modelica.Mechanics.MultiBody.Joints.Revolute carrier(n={0,1,0},useAxisFlange=true);
     Modelica.Mechanics.Rotational.Sources.Speed carrierSpeed(exact=true,w_ref=2);
     Modelica.Mechanics.Rotational.Sources.Speed spin(exact=true,w_ref=3);
-    BobLib.Chassis.Suspension.Tires.Wheels.Wheel1DOF_Y wheel(pWheel(rotation(wheelJ=0.1),geometry(R0=0.2,rimR0=0.125,rimWidth=0.18,staticAlpha=0,staticGamma=0)),includeRotorEffects=true,exposeWheelBearing=true);
+    BobLib.Chassis.Suspension.Tires.Wheels.Wheel1DOF_Y wheel(pWheel(rotation(wheelJ=0.1),vertical(wheelC=200000,wheelD=100),geometry(R0=0.2,rimR0=0.125,rimWidth=0.18,staticAlpha=0,staticGamma=0)),includeRotorEffects=true,exposeWheelBearing=true);
   equation
     connect(world.frame_b,carrier.frame_a);
     connect(carrierSpeed.flange,carrier.axis);
@@ -83,7 +83,6 @@ loadFile("{fixture}");
 def test_locked_wheel_spin(tmp_path, wheel_type, spatial):
     if shutil.which('omc') is None:
         pytest.skip('OpenModelica is not installed')
-    extra = ',vertical(wheelC=200000,wheelD=100)' if wheel_type == 'Wheel1DOF_Z' else ''
     (tmp_path/'Locked.mo').write_text(f'''model Locked
   inner parameter Boolean headless=true;
   inner parameter Real linkDiameter=0.02;
@@ -93,7 +92,8 @@ def test_locked_wheel_spin(tmp_path, wheel_type, spatial):
   Modelica.Mechanics.Rotational.Sources.Torque load(tau=5);
   BobLib.Chassis.Suspension.Tires.Wheels.{wheel_type} wheel(
     includeRotorEffects={str(spatial).lower()},exposeWheelBearing=true,
-    pWheel(geometry(R0=0.2,rimR0=0.125,rimWidth=0.18,staticAlpha=0,staticGamma=0){extra}));
+    pWheel(geometry(R0=0.2,rimR0=0.125,rimWidth=0.18,staticAlpha=0,staticGamma=0),
+      vertical(wheelC=200000,wheelD=100)));
 equation
   connect(world.frame_b,carrier.frame_a);
   connect(carrierSpeed.flange,carrier.axis);

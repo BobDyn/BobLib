@@ -111,7 +111,7 @@ The release workflow separates lint, formatting, coverage, translation,
 initialization, physics, signal regressions, and component/contract tests into
 named steps and retains their individual test reports. Inspect skipped tests:
 a passing default gate alone does not certify an FMU distribution or provide
-rendered diagram sign-off. Use [Tools/README.md](Tools/README.md) to build reusable FMUs
+rendered diagram sign-off. Use [Tools/README.md](Tools/README.md) to build reusable native binaries and FMUs
 with editable independent calibration. SS/GGV analysis remains excluded.
 The FMU export/test support already merged in #30 is retained: use
 `make modelica-fmu-export` to export VehicleFMI and `make modelica-fmu`

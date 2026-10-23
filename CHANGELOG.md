@@ -9,7 +9,7 @@
 
 See [MIGRATION.md](MIGRATION.md) for breaking class/record changes and
 [RELEASE_READINESS.md](RELEASE_READINESS.md) for remaining validation.
-Configurable FMU export now includes editable independent calibration, dependency
+Native/FMU export now includes editable independent calibration, dependency
 validation and build provenance. SS/GGV analysis remains excluded.
 
 ### Changed
@@ -25,10 +25,13 @@ change to user models.
   brakes acted at the wheel hubs.
 - Electric vehicle experiments now set `world.driveTrainMechanics3D` to `true`
   as a `final` modifier.
-- The closed-loop steady-state hold is now 1.0 s. Before, it was 0.1 s.
-- The settling timeout, tire-lift limit and sideslip limit now call
-  `assert(false, ...)` instead of `terminate()`. A run that reaches one of these
-  limits now fails with an error instead of ending normally.
+- The closed-loop steady-state hold is now 1.0 s (previously 0.1 s), requiring
+  sustained convergence rather than a brief passage through the tolerances.
+  Set `steadyStateHoldDuration=0.1` explicitly for a legacy-duration comparison.
+- Maneuver settling timeouts, tire-load limits and sideslip limits terminate
+  normally and retain results. `terminationStatus` distinguishes those outcomes
+  from accepted steady state; callers must inspect it rather than treating a
+  zero process exit code as convergence. Invalid calibration still asserts.
 
 ## 0.2.0 - 2026-08-09
 
