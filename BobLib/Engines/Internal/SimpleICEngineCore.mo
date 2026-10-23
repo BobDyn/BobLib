@@ -2,36 +2,27 @@ within BobLib.Engines.Internal;
 block SimpleICEngineCore
 
   "Simple throttle-to-torque law for an internal-combustion engine sample"
-  import SI = Modelica.Units.SI;
-  import Modelica.Constants.pi;
+  extends Modelica.Blocks.Icons.Block;
 
-  parameter SI.Torque peakTorque = 120
-    "Peak positive engine torque at full accelerator request";
-  parameter SI.Torque frictionTorque = 8
-    "Simple speed-opposing friction torque magnitude";
-  parameter SI.AngularVelocity redlineSpeed = 6500*2*pi/60
-    "Speed where torque begins to roll off";
-  parameter SI.AngularVelocity redlineSoftWidth = 300*2*pi/60
-    "Speed range used for smooth redline torque cutoff";
-  parameter SI.AngularVelocity w_eps = 1
-    "Speed regularization for friction sign";
+  parameter BobLib.Records.VehicleRecord.Engines.SimpleICEngineRecord pEngine
+    "Engine torque, inertia and response calibration" annotation(Dialog(group = "Calibration"));
 
   Modelica.Blocks.Interfaces.RealInput throttle
     "Driver accelerator request, clamped internally to 0..1" annotation(
       Placement(
-        transformation(origin = {-20, 0}, extent = {{-120, 40}, {-80, 80}}),
+        transformation(origin = {0, 0}, extent = {{-120, 40}, {-80, 80}}),
         iconTransformation(origin = {-20, 0}, extent = {{-120, 40}, {-80, 80}})));
 
   Modelica.Blocks.Interfaces.RealInput w(unit = "rad/s")
     "Engine shaft speed" annotation(
       Placement(
-        transformation(origin = {-20, 0}, extent = {{-120, -80}, {-80, -40}}),
+        transformation(origin = {0, 0}, extent = {{-120, -80}, {-80, -40}}),
         iconTransformation(origin = {-20, 0}, extent = {{-120, -80}, {-80, -40}})));
 
   Modelica.Blocks.Interfaces.RealOutput tau(unit = "N.m")
     "Commanded crankshaft torque" annotation(
       Placement(
-        transformation(origin = {-100, 0}, extent = {{200, -20}, {240, 20}}),
+        transformation(origin = {-120, 0}, extent = {{200, -20}, {240, 20}}),
         iconTransformation(extent = {{100, -10}, {120, 10}})));
 
 protected
@@ -41,9 +32,9 @@ protected
 equation
   throttleLimited = noEvent(max(0, min(1, throttle)));
   redlineScale = noEvent(max(0, min(1,
-    (redlineSpeed + redlineSoftWidth - abs(w)) / max(redlineSoftWidth, 1e-6))));
-  tau = peakTorque*throttleLimited*redlineScale
-    - frictionTorque*Modelica.Math.tanh(w / max(w_eps, 1e-6));
+    (pEngine.redlineSpeed + pEngine.redlineSoftWidth - abs(w)) / max(pEngine.redlineSoftWidth, 1e-6))));
+  tau = pEngine.peakTorque*throttleLimited*redlineScale
+    - pEngine.frictionTorque*Modelica.Math.tanh(w / max(pEngine.w_eps, 1e-6));
 
   annotation(Documentation(info = "<html>
 <p>
@@ -53,4 +44,5 @@ speed-opposing friction torque. It is a sample core for architecture and
 interface work, not a calibrated combustion model.
 </p>
 </html>"));
+  annotation(Diagram(coordinateSystem(extent = {{-100, -100}, {100, 100}}, preserveAspectRatio = true)));
 end SimpleICEngineCore;

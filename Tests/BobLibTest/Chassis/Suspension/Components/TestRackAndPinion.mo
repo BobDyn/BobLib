@@ -14,12 +14,12 @@ model TestRackAndPinion
 
   // Rack definition
   Modelica.Mechanics.MultiBody.Parts.Fixed rackFixed(
-    r = {pVehicle.pFrRack.leftPickup[1], 0, pVehicle.pFrRack.leftPickup[3]},
+    r = {pVehicle.chassis.frontAxle.steering.leftPickup[1], 0, pVehicle.chassis.frontAxle.steering.leftPickup[3]},
     animation = false) annotation(
     Placement(transformation(origin = {0, -65}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
 
   BobLib.Chassis.Suspension.Components.RackAndPinion rackAndPinion(
-    pRack = pVehicle.pFrRack,
+    pRack = pVehicle.chassis.frontAxle.steering,
     linkDiameter = linkDiameter) annotation(
     Placement(transformation(extent = {{-20, -20}, {20, 20}})));
 
@@ -35,7 +35,7 @@ model TestRackAndPinion
 
   // Torque feedback
   Modelica.Mechanics.MultiBody.Parts.Fixed springSupport(
-    r = {pVehicle.pFrRack.leftPickup[1], pVehicle.pFrRack.leftPickup[2] + 0.5, pVehicle.pFrRack.leftPickup[3]},
+    r = {pVehicle.chassis.frontAxle.steering.leftPickup[1], pVehicle.chassis.frontAxle.steering.leftPickup[2] + 0.5, pVehicle.chassis.frontAxle.steering.leftPickup[3]},
     animation = false) annotation(
     Placement(transformation(origin = {-80, 0}, extent = {{-10, -10}, {10, 10}})));
 
@@ -54,10 +54,10 @@ equation
   connect(spring.frame_b, rackAndPinion.leftFrame) annotation(
     Line(points = {{-40, 0}, {-20, 0}}, color = {95, 95, 95}));
   assert(abs((rackAndPinion.leftFrame.r_0[2] + rackAndPinion.rightFrame.r_0[2])/2 -
-    pinionRamp.y*pVehicle.pFrRack.cFactor/(2*Modelica.Constants.pi)) < 1e-8,
+    pinionRamp.y*pVehicle.chassis.frontAxle.steering.cFactor/(2*Modelica.Constants.pi)) < 1e-8,
     "Rack midpoint travel must match the commanded pinion rotation and conversion factor");
   assert(abs(rackAndPinion.leftFrame.r_0[2] - rackAndPinion.rightFrame.r_0[2] -
-    2*pVehicle.pFrRack.leftPickup[2]) < 1e-8,
+    2*pVehicle.chassis.frontAxle.steering.leftPickup[2]) < 1e-8,
     "Rack motion must preserve left/right pickup separation");
   assert(abs(rackAndPinion.mountFrame.t[1] + rackAndPinion.pinionFlange.tau) < 1e-7,
     "Pinion torque must react into the rack housing about its steering shaft axis");

@@ -9,6 +9,7 @@ MODELICA_FMU_TIMEOUT_S ?= 900
 
 PYTHON_TESTS := \
 	Tests/test_modelica_linter.py \
+	Tests/test_modelica_fmu_source_edits.py \
 	Tests/test_modelica_fmu_export_timeout.py
 
 MODELICA_REGRESSION_TESTS := \

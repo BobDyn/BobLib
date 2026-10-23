@@ -5,8 +5,6 @@ model TestCFDAeroMap
   import BobLib.Records.VehicleRecord.Aero.CFDAeroMapRecord;
 
   parameter CFDAeroMapRecord pAero(
-    FL_RideHeightRef = {1, 0.5, 0},
-    RL_RideHeightRef = {-1, 0.5, 0},
     referenceSpeed = 10,
     referenceDensity = 1.225,
     aeroRef = {0, 0, 0},

@@ -2,8 +2,8 @@ within BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.Templates;
 
 record PartialWheelRecord
 
-  import SI = Modelica.Units.SI;
-  import NonSI = Modelica.Units.NonSI;
+  import Modelica.Units.SI;
+  import Modelica.Units.NonSI;
 
   // Dimensions
   parameter SI.Length R0 "Tire unloaded static radius" annotation(

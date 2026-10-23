@@ -24,7 +24,7 @@ model TestDoubleWishbone
 
   // Jounce input
   Modelica.Mechanics.MultiBody.Parts.Fixed jounceRef(
-    r = pVehicle.pFrDW.lower_o,
+    r = pVehicle.chassis.frontAxle.geometry.lower_o,
     animation = false) annotation(
     Placement(transformation(origin = {90, -90}, extent = {{10, -10}, {-10, 10}}, rotation = -0)));
 
@@ -38,37 +38,37 @@ model TestDoubleWishbone
 
   // Inboard fixtures
   Modelica.Mechanics.MultiBody.Parts.Fixed upperFixed_i(
-    r = (pVehicle.pFrDW.upperFore_i + pVehicle.pFrDW.upperAft_i) / 2,
+    r = (pVehicle.chassis.frontAxle.geometry.upperFore_i + pVehicle.chassis.frontAxle.geometry.upperAft_i) / 2,
     animation = false) annotation(
     Placement(transformation(origin = {90, 10}, extent = {{10, -10}, {-10, 10}})));
 
   Modelica.Mechanics.MultiBody.Parts.Fixed lowerFixed_i(
-    r = (pVehicle.pFrDW.lowerFore_i + pVehicle.pFrDW.lowerAft_i) / 2,
+    r = (pVehicle.chassis.frontAxle.geometry.lowerFore_i + pVehicle.chassis.frontAxle.geometry.lowerAft_i) / 2,
     animation = false) annotation(
     Placement(transformation(origin = {90, -30}, extent = {{10, -10}, {-10, 10}})));
 
   Modelica.Mechanics.MultiBody.Parts.Fixed rackFixed(
-    r = {pVehicle.pFrRack.leftPickup[1], 0, pVehicle.pFrRack.leftPickup[3]},
+    r = {pVehicle.chassis.frontAxle.steering.leftPickup[1], 0, pVehicle.chassis.frontAxle.steering.leftPickup[3]},
     animation = false) annotation(
     Placement(transformation(origin = {90, 50}, extent = {{-10, -10}, {10, 10}}, rotation = -180)));
 
   // Rack
-  BobLib.Chassis.Suspension.Components.RackAndPinion rackAndPinion(pRack = pVehicle.pFrRack,
+  BobLib.Chassis.Suspension.Components.RackAndPinion rackAndPinion(pRack = pVehicle.chassis.frontAxle.steering,
                                                                                        linkDiameter = linkDiameter) annotation(
     Placement(transformation(origin = {50, 60}, extent = {{-20, -20}, {20, 20}})));
 
   // Kinematic wishbone-upright loop
-  BobLib.Chassis.Suspension.Components.WishboneUprightLoop wishboneUprightLoop(pDW = pVehicle.pFrDW,
+  BobLib.Chassis.Suspension.Components.WishboneUprightLoop wishboneUprightLoop(pDW = pVehicle.chassis.frontAxle.geometry,
                                                                                                      linkDiameter = linkDiameter,
                                                                                                      jointDiameter = jointDiameter) annotation(
     Placement(transformation(origin = {0, 10}, extent = {{30, -30}, {-30, 30}})));
 
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation tieConnection(r = pVehicle.pFrDW.lower_o - pVehicle.pFrDW.tie_o) annotation(
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation tieConnection(r = pVehicle.chassis.frontAxle.geometry.lower_o - pVehicle.chassis.frontAxle.geometry.tie_o) annotation(
     Placement(transformation(origin = {-40, 10}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
 
   // Tie rod
-  BobLib.Chassis.Suspension.Components.Rod tieRod(r_a = pVehicle.pFrRack.leftPickup,
-                                                        r_b = pVehicle.pFrDW.tie_o,
+  BobLib.Chassis.Suspension.Components.Rod tieRod(r_a = pVehicle.chassis.frontAxle.steering.leftPickup,
+                                                        r_b = pVehicle.chassis.frontAxle.geometry.tie_o,
                                                         n1_a = {1, 0, 0},
                                                         linkDiameter = linkDiameter,
                                                         jointDiameter = jointDiameter) annotation(
@@ -126,11 +126,11 @@ equation
   connect(tieRod.frame_b, tieConnection.frame_a) annotation(
     Line(points = {{-30, 60}, {-33, 60}, {-33, 26}, {-40, 26}, {-40, 20}}, color = {95, 95, 95}));
   assert(abs(Modelica.Math.Vectors.norm(tieRod.frame_b.r_0 - tieRod.frame_a.r_0) -
-    Modelica.Math.Vectors.norm(pVehicle.pFrDW.tie_o -
-      pVehicle.pFrRack.leftPickup)) < 1e-7,
+    Modelica.Math.Vectors.norm(pVehicle.chassis.frontAxle.geometry.tie_o -
+      pVehicle.chassis.frontAxle.steering.leftPickup)) < 1e-7,
     "Steering and jounce must preserve the rigid tie-rod length");
   assert(abs(wishboneUprightLoop.lowerFrame_o.r_0[3] -
-    pVehicle.pFrDW.lower_o[3] - jounceRamp.y) < 1e-7,
+    pVehicle.chassis.frontAxle.geometry.lower_o[3] - jounceRamp.y) < 1e-7,
     "The lower outboard pickup must follow the prescribed vertical jounce");
 
   annotation(

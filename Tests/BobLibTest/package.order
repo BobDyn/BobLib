@@ -1,6 +1,9 @@
+Experiments
 Aero
+Atmospheres
 Brakes
 Chassis
+Controllers
 Drivelines
 DriverEnvironments
 Drivers
@@ -8,6 +11,3 @@ ElectricDrives
 EnergyStorage
 PowerElectronics
 Utilities
-Regression
-TestVehicle
-TestUtilities

@@ -2,13 +2,11 @@ within BobLib.Chassis.Suspension.Tires.MF52.CombinedSlip;
 
 function MxCombinedEval
 
-  import SI = Modelica.Units.SI;
-
-  import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.MxPureRecord;
-  import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.CombinedSlip.MxCombinedRecord;
-  import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.SetupRecord;
-
+  import Modelica.Units.SI;
   import BobLib.Chassis.Suspension.Tires.MF52.PureSlip.MxPureEval;
+  import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.CombinedSlip.MxCombinedRecord;
+  import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.MxPureRecord;
+  import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.SetupRecord;
 
   input SI.Force Fz;
   input SI.Force Fy;

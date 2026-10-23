@@ -13,12 +13,6 @@ record CFDAeroMapRecord
   parameter SI.Position aeroRef[3]
     "Aero load reference position in vehicle design coordinates";
 
-  parameter SI.Position FL_RideHeightRef[3]
-    "World-frame vector from origin to front-left ride-height reference point";
-
-  parameter SI.Position RL_RideHeightRef[3]
-    "World-frame vector from origin to rear-left ride-height reference point";
-
   parameter Integer frontPoints(min = 2, max = size(frontRideHeightGrid, 1)) = size(frontRideHeightGrid, 1)
     "Number of active ride-height breakpoints" annotation(Evaluate = false);
 
