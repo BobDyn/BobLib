@@ -12,6 +12,24 @@ See [MIGRATION.md](MIGRATION.md) for breaking class/record changes and
 Native/FMU export now includes editable independent calibration, dependency
 validation and build provenance. SS/GGV analysis remains excluded.
 
+### Changed
+
+These default vehicle behavior changes alter simulation results without any
+change to user models.
+
+- The default differential is now `ClutchLSD`. It uses the MSL `Clutch`
+  stick-slip friction model instead of the previous `tanh` lock-torque law.
+- Each halfshaft now has a real rotor inertia of 0.02 kg·m². Before, this value
+  only set the default halfshaft damping.
+- `VehicleSim` now sets `rearBrakePlacement` to `Inboard`. Before, all four
+  brakes acted at the wheel hubs.
+- Electric vehicle experiments now set `world.driveTrainMechanics3D` to `true`
+  as a `final` modifier.
+- The closed-loop steady-state hold is now 1.0 s. Before, it was 0.1 s.
+- The settling timeout, tire-lift limit and sideslip limit now call
+  `assert(false, ...)` instead of `terminate()`. A run that reaches one of these
+  limits now fails with an error instead of ending normally.
+
 ## 0.2.0 - 2026-08-09
 
 Minor release focused on physically consistent vehicle initialization, correct

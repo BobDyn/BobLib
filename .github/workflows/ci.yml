@@ -76,6 +76,28 @@ jobs:
       - name: Check Modelica initialization baselines
         run: make modelica-initialization
 
+  modelica-profile:
+    name: OpenModelica Profiles
+    runs-on: ubuntu-latest
+    container: openmodelica/openmodelica:v1.27.1-ompython
+    needs: python
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Python test dependency
+        run: python3 -m pip install --upgrade pip -r Tests/requirements-dev.txt
+
+      - name: Cache Modelica libraries
+        uses: actions/cache@v6
+        with:
+          path: ~/.openmodelica
+          key: om-libs-${{ hashFiles('msl_setup.mos') }}
+
+      - name: Install Modelica libraries
+        run: make modelica-deps
+
       - name: Simulate mirrored model coverage and collect profiles
         run: make modelica-profile PROFILE_DIR=/tmp/boblib-profile
 
@@ -112,7 +134,7 @@ jobs:
       - name: Check reusable FMU runtime corrections
         env:
           BOBLIB_TEST_FMU_RUNTIME: "1"
-        run: python3 -m pytest Tests/test_fmu_events.py Tests/test_fmu_homotopy.py Tests/test_fmu_tolerance.py
+        run: python3 -m pytest Tests/test_fmu_events.py Tests/test_fmu_homotopy.py Tests/test_fmu_tolerance.py Tests/test_fmu_vehicle_calibration.py
 
       - name: Check native and FMU calibration dependencies
         run: python3 -m pytest Tests/test_calibration_dependencies.py
