@@ -1,1 +1,5 @@
+TestBaseSlipModel
+TestNoSlip
+TestKinematicSlip
+TestTransientSlip
 TransientSlipReverseSmoke
