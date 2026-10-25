@@ -32,7 +32,8 @@ def test_shared_assemblies_accept_an_axle_without_wishbone_members(tmp_path: Pat
       redeclare Axle rrAxleDW,
       redeclare BobLib.Chassis.Body.FrameRigid spaceFrame(
         pFrame(frontReference={1,0,0}, rearReference={-1,0,0},
-        baseMass(m=1000, rCM={0,0,0}, inertia=identity(3)))));
+        baseMass(m=1000, rCM={0,0,0}, inertia=identity(3)),
+        driverMass(m=0, rCM={0,0,0}, inertia=zeros(3,3)))));
     inner Modelica.Mechanics.MultiBody.World world;
   end Chassis;
   model Rig

@@ -45,7 +45,7 @@ initial equation
       noEquidistantTimeGrid = "()",
       noEventEmit = "()",
       s = "dassl",
-      variableFilter = "time|frSteerCmd|accX|accY|handwheelAngle|steerExcess|handwheelTorque|Fz_.*|leftSteerAngle|rightSteerAngle|roll|sideslip|velX|velY|yawVel|steadyState.*|linearity.*|minTireNormalLoad|chassis.(front|rear)(Left|Right)SpringLength"),
+      variableFilter = "time|terminationStatus|frSteerCmd|accX|accY|handwheelAngle|steerExcess|handwheelTorque|Fz_.*|leftSteerAngle|rightSteerAngle|roll|sideslip|velX|velY|yawVel|steadyState.*|linearity.*|minTireNormalLoad|chassis.(front|rear)(Left|Right)SpringLength"),
     Documentation(info = "<html>
 <p>
 Primary entrypoint for the BobLib-native EV battery-inverter-motor-differential

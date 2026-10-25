@@ -11,6 +11,7 @@ PYTHON_TESTS := \
 	Tests/test_modelica_linter.py \
 	Tests/test_modelica_fmu_source_edits.py \
 	Tests/test_fmu_export.py \
+	Tests/test_native_artifact.py \
 	Tests/test_modelica_fmu_export_timeout.py \
 	Tests/test_modelica_test_library.py
 

@@ -54,7 +54,7 @@ partial model PartialVehicleSim
   parameter Real handwheelRateTol = 0.01 "Handwheel-rate derivative tolerance for QSS/steady-state detection" annotation(
     Evaluate = false,
     Dialog(tab = "Maneuver Monitors", group = "Settling"));
-  parameter SI.Time settleTimeout = 3.0 "Fail-fast timeout after the ramp ends if QSS is never reached" annotation(
+  parameter SI.Time settleTimeout = 3.0 "Maximum wait after the ramp ends before reporting a settling timeout" annotation(
     Evaluate = false,
     Dialog(tab = "Maneuver Monitors", group = "Settling"));
 
@@ -80,9 +80,11 @@ partial model PartialVehicleSim
   parameter Real steadyStateRollRateTolerance(unit = "rad/s") = 0.005 "Roll-rate tolerance for closed-loop steady-state detection" annotation(
     Evaluate = false,
     Dialog(tab = "Maneuver Monitors", group = "Steady-State Ay"));
-  parameter SI.Time steadyStateSettleTimeout = 20.0 "Fail-fast timeout after the closed-loop target reaches its final value" annotation(
+  parameter SI.Time steadyStateSettleTimeout = 20.0 "Maximum wait after the closed-loop target reaches its final value" annotation(
     Evaluate = false,
     Dialog(tab = "Maneuver Monitors", group = "Steady-State Ay"));
+
+  output Integer terminationStatus "Maneuver outcome: 0 running, 1 settled, 2 linearity limit, 3 settling timeout, 4 tire-load limit, 5 sideslip limit";
 
   // Maneuver diagnostics forwarded from StandardDriver
   SI.Angle frSteerCmd;
@@ -160,6 +162,17 @@ equation
   assert(steadyStateHoldDuration > 0 and steadyStateSettleTimeout > steadyStateHoldDuration and
     tireLiftTerminateLoad >= 0 and sideslipTerminate > 0,
     "BOBLIB_INVALID_MONITOR_CONFIG: require positive hold and sideslip limit, timeout greater than hold, and nonnegative tire-load limit");
+
+  // Report limit exits separately from accepted steady-state results. Limit
+  // events end normally so callers can retain the last valid result sample.
+  terminationStatus = if (driver.useMode == driver.MODE_OPEN_LOOP_RAMP or driver.useMode == driver.MODE_STEADY_STATE_AY) and terminateOnTireLift and time > driver.steerStart and minTireNormalLoad <= tireLiftTerminateLoad then 4
+    elseif(driver.useMode == driver.MODE_OPEN_LOOP_RAMP or driver.useMode == driver.MODE_STEADY_STATE_AY) and terminateOnSpinout and t_spinout_hit > 0 and time > t_spinout_hit + spinoutHoldDuration then 5
+    elseif(driver.useMode == driver.MODE_OPEN_LOOP_RAMP and rampEnding and time > t_ramp_end_hit + driver.handwheelRampStopDuration + settleTimeout) or
+      (driver.useMode == driver.MODE_STEADY_STATE_AY and steadyStateTargetReached and time > driver.steerStart + steadyStateAyRampDuration + steadyStateSettleTimeout) then 3
+        elseif driver.useMode == driver.MODE_OPEN_LOOP_RAMP and enableLinearityTermination and linearityReferenceValid and linearityGainLossFraction >= linearityNonlinearityFraction and t_linearity_limit_hit > 0 and time > t_linearity_limit_hit + linearityHoldDuration then 2
+    elseif(driver.useMode == driver.MODE_OPEN_LOOP_RAMP and t_qss_hit > 0 and time > t_qss_hit + steadyHoldDuration) or
+      (driver.useMode == driver.MODE_STEADY_STATE_AY and t_steady_state_hit > 0 and time > t_steady_state_hit + steadyStateHoldDuration) or
+      (driver.useMode == driver.MODE_STEP_STEER and t_yawVel_hit > 0 and time > t_yawVel_hit + 0.1) then 1 else 0;
   frSteerCmd = driver.frSteerCmd;
   handwheelRampCmd = driver.handwheelRampCmd;
   handwheelRateCmd = driver.handwheelRateCmd;
@@ -277,8 +290,7 @@ equation
   end when;
 
   when driver.useMode == driver.MODE_OPEN_LOOP_RAMP and rampEnding and time > t_ramp_end_hit + driver.handwheelRampStopDuration + settleTimeout then
-    assert(
-      false,
+    terminate(
       "BOBLIB_SETTLING_TIMEOUT: ramp-steer did not reach QSS at t=" + String(time) + " s; check controller response and steering/load calibration.");
   end when;
 
@@ -293,7 +305,7 @@ equation
   end when;
 
   when driver.useMode == driver.MODE_STEADY_STATE_AY and steadyStateTargetReached and time > driver.steerStart + steadyStateAyRampDuration + steadyStateSettleTimeout then
-    assert(false, "BOBLIB_SETTLING_TIMEOUT: t=" + String(time) +
+    terminate("BOBLIB_SETTLING_TIMEOUT: t=" + String(time) +
       " s; target=" + String(steadyStateAyCommand) + " m/s2, actual=" + String(accY) +
       "; abs(error)/limit=" + String(abs(steadyStateAyError)) + "/" + String(steadyStateAyTolerance) +
       "; abs(ayRate)/limit=" + String(abs(steadyStateAyRate)) + "/" + String(steadyStateAyRateTolerance) +
@@ -303,7 +315,7 @@ equation
   end when;
 
   when (driver.useMode == driver.MODE_OPEN_LOOP_RAMP or driver.useMode == driver.MODE_STEADY_STATE_AY) and terminateOnTireLift and time > driver.steerStart and minTireNormalLoad <= tireLiftTerminateLoad then
-    assert(false, "BOBLIB_TIRE_LOAD_LIMIT: t=" + String(time) + " s; minimum=" + String(minTireNormalLoad) +
+    terminate("BOBLIB_TIRE_LOAD_LIMIT: t=" + String(time) + " s; minimum=" + String(minTireNormalLoad) +
       " N, limit=" + String(tireLiftTerminateLoad) + " N; FL=" + String(Fz_FL) + ", FR=" + String(Fz_FR) +
       ", RL=" + String(Fz_RL) + ", RR=" + String(Fz_RR) +
       " N. Maneuver exceeds this vehicle load margin; check roll stiffness distribution, CG, geometry, and demand.");
@@ -316,7 +328,7 @@ equation
   end when;
 
   when (driver.useMode == driver.MODE_OPEN_LOOP_RAMP or driver.useMode == driver.MODE_STEADY_STATE_AY) and terminateOnSpinout and t_spinout_hit > 0 and time > t_spinout_hit + spinoutHoldDuration then
-    assert(false, "BOBLIB_SIDESLIP_LIMIT: t=" + String(time) + " s; abs(sideslip)=" + String(abs(sideslip)) +
+    terminate("BOBLIB_SIDESLIP_LIMIT: t=" + String(time) + " s; abs(sideslip)=" + String(abs(sideslip)) +
       " rad, limit=" + String(sideslipTerminate) + " rad. Check tire calibration, axle balance, and maneuver demand.");
   end when;
 

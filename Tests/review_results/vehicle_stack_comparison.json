@@ -1,0 +1,119 @@
+{
+  "compiler": "v1.27.0-cmake",
+  "libraries": {
+    "Modelica": "4.1.0",
+    "VehicleInterfaces": "2.0.2"
+  },
+  "scope": "Shipped default ramp plus 2 s straight acceleration/braking from 15 m/s; aggregate behavior changes, not isolated causal attribution or full-catalog acceptance.",
+  "before": {
+    "revision": "a3932b3180b68bb6d1508c7d88a3a7ffba67df9a",
+    "modelica_source_sha256": "9fdb58e66e1ad9d77be1bcb2b03aca8f12f40f320b809961158a05caa9177b88",
+    "results": {
+      "default": {
+        "stop_time_s": 6.138183274265137,
+        "final": {
+          "accX": 0.2044472091053413,
+          "accY": 16.91486019263458,
+          "velX": 14.87406668608501,
+          "yawVel": 1.136998903713203,
+          "roll": 0.02719006578255665,
+          "sideslip": -0.006258097935062896,
+          "Fz_FL": 274.839194272969,
+          "Fz_FR": 1133.18903277615,
+          "Fz_RL": 187.1848163735549,
+          "Fz_RR": 1261.289373953988
+        },
+        "minimum_tire_load_N": 182.8284897131062
+      },
+      "braking": {
+        "stop_time_s": 2.0,
+        "final": {
+          "accX": -0.7464881592728245,
+          "accY": -0.005808010439541603,
+          "velX": 10.4398629858191,
+          "yawVel": -0.0005565953314723839,
+          "roll": -0.0001251503236135892,
+          "sideslip": 1.712384702415597e-05,
+          "Fz_FL": 683.8805050734869,
+          "Fz_FR": 678.0255669016454,
+          "Fz_RL": 675.0899341297236,
+          "Fz_RR": 668.1695683425569
+        },
+        "minimum_tire_load_N": 619.437872775204
+      },
+      "acceleration": {
+        "stop_time_s": 2.0,
+        "final": {
+          "accX": 0.8552116856129306,
+          "accY": -0.02195732339962348,
+          "velX": 19.48743193471648,
+          "yawVel": -0.001130505969739378,
+          "roll": -0.0001685081015455602,
+          "sideslip": 5.436249752966938e-05,
+          "Fz_FL": 757.1899168205462,
+          "Fz_FR": 749.7355616807483,
+          "Fz_RL": 787.6485480556026,
+          "Fz_RR": 778.8084092394591
+        },
+        "minimum_tire_load_N": 630.3355147983746
+      }
+    }
+  },
+  "after": {
+    "revision": "0729995f3fd1af4f1dad154379c944f10a87acb2",
+    "modelica_source_sha256": "785f53f6ba07cae79ed0af7f4e061c84b8ae87778809f3312cf9945eb90c3a32",
+    "results": {
+      "default": {
+        "stop_time_s": 6.096959891894935,
+        "final": {
+          "accX": 0.1745630886453725,
+          "accY": 16.61409384679807,
+          "velX": 14.87483252210211,
+          "yawVel": 1.116581220271947,
+          "roll": 0.02727379990575862,
+          "sideslip": -0.004927926706447757,
+          "Fz_FL": 277.9822827041812,
+          "Fz_FR": 1137.333958144744,
+          "Fz_RL": 187.4669717617996,
+          "Fz_RR": 1263.961923910875
+        },
+        "minimum_tire_load_N": 183.5423429567985,
+        "termination_status": 1
+      },
+      "braking": {
+        "stop_time_s": 2.0,
+        "final": {
+          "accX": -0.7475464849032802,
+          "accY": -0.004299556763844983,
+          "velX": 10.43852144424956,
+          "yawVel": -0.0004100296760980931,
+          "roll": -0.0001155586479299399,
+          "sideslip": 1.268109097091461e-05,
+          "Fz_FL": 685.5584432811434,
+          "Fz_FR": 680.0729006000598,
+          "Fz_RL": 675.6570573170087,
+          "Fz_RR": 669.1410699988479
+        },
+        "minimum_tire_load_N": 619.5086825173169,
+        "termination_status": 0
+      },
+      "acceleration": {
+        "stop_time_s": 2.0,
+        "final": {
+          "accX": 0.8573102486042821,
+          "accY": -0.02072882799358164,
+          "velX": 19.48877485780201,
+          "yawVel": -0.001064955053651167,
+          "roll": -0.0001582568078589212,
+          "sideslip": 5.149841076631564e-05,
+          "Fz_FL": 758.1695690231389,
+          "Fz_FR": 751.0902969114455,
+          "Fz_RL": 788.9848350167082,
+          "Fz_RR": 780.552797861495
+        },
+        "minimum_tire_load_N": 630.8716233044695,
+        "termination_status": 0
+      }
+    }
+  }
+}
