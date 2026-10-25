@@ -2,7 +2,7 @@ within BobLib.Utilities.Mechanics.MultiBody;
 package Actuators
 
   "Reusable MultiBody actuator and fixture helpers"
-  extends BobLib.Icons.BobLibPackageBackground;
+  extends Modelica.Icons.SourcesPackage;
 
   annotation(
     Documentation(info = "<html>
@@ -16,4 +16,5 @@ implementation. They provide rig-level plumbing for experiments and tests that
 need to impose motion or loads through MultiBody frames.
 </p>
 </html>"));
+  annotation(Icon(graphics = {Rectangle(extent = {{-100, 100}, {100, -100}}, lineColor = {0, 0, 0}, lineThickness = 0.5, fillPattern = FillPattern.None)}));
 end Actuators;

@@ -1,7 +1,7 @@
 within BobLib.Records;
 package VehicleDefn
 
-  extends BobLib.Icons.RecordsPackageIcon;
+  extends Modelica.Icons.RecordsPackage;
 
   annotation(
     Documentation(info = "<html>
@@ -15,4 +15,5 @@ rear suspension architecture, wheel and tire data, mass properties, and aero
 map.
 </p>
 </html>"));
+  annotation(Icon(graphics = {Rectangle(extent = {{-100, 100}, {100, -100}}, lineColor = {0, 0, 0}, lineThickness = 0.5, fillPattern = FillPattern.None)}));
 end VehicleDefn;

@@ -20,7 +20,7 @@ package BobLib
         Text(extent = {{-76, 88}, {76, 74}}, textString = "BobLib", textColor = {107, 182, 255}, fontName = "DejaVu Sans"),
         Line(points = {{-70, -62}, {70, -62}}, color = {78, 161, 255}, thickness = 1.25),
         Line(points = {{-70, 58}, {70, 58}}, color = {230, 235, 242}),
-        Bitmap(extent = {{-74, -76}, {74, 72}}, fileName = "modelica://BobLib/Resources/Images/bobdyn.png")}),
+        Bitmap(extent = {{-74, -76}, {74, 72}}, fileName = "modelica://BobLib/Resources/Images/bobdyn.png"), Rectangle(extent = {{-100, 100}, {100, -100}}, lineColor = {0, 0, 0}, lineThickness = 0.5, fillPattern = FillPattern.None)}),
     Documentation(info = "<html>
 <p style = \"text-align:center;\">
 <img src = \"modelica://BobLib/Resources/Images/bobdyn.png\" width=\"240\"/>
