@@ -2,7 +2,10 @@ within BobLib.Drivelines.Internal;
 model LockedDifferential1D
 
   "1D spool/locked differential with kinematically tied outputs"
-  import SI = Modelica.Units.SI;
+
+  import Modelica.Units.SI;
+
+  extends BobLib.Icons.DifferentialIcon;
 
   Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft_in
     "Input from final drive" annotation(
@@ -61,4 +64,5 @@ the limited-slip clutch law and kinematically tie the left and right differentia
 outputs. Compliant halfshafts remain outside this model.
 </p>
 </html>"));
+  annotation(Diagram(coordinateSystem(extent = {{-100, -100}, {100, 100}}, preserveAspectRatio = true)));
 end LockedDifferential1D;

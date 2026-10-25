@@ -2,7 +2,7 @@ within BobLib.Records.VehicleRecord.Controllers;
 
 record VCURecord
 
-  import SI = Modelica.Units.SI;
+  import Modelica.Units.SI;
 
   parameter SI.Torque tau_max = 220
     "VCU motoring torque limit";
@@ -15,10 +15,13 @@ record VCURecord
   parameter Real regenBrakeBlend(unit = "1", min = 0, max = 1) = 0
     "Default fraction of negative speed-control torque assigned to regen";
   parameter SI.AngularVelocity w_eps = 1.0
-    "Low-speed regularization for VCU power conversion";
+    "Direction-latch threshold and speed floor; match pMotor.w_eps";
   parameter Real motorSpeedSign = 1
     "Multiplier mapping sensed motor speed to drive-positive speed in the VCU";
 
+  parameter Real finalDriveRatio = 1
+    "Final-drive ratio used to convert rear-axle torque command to motor torque" annotation(
+    Dialog(tab = "Controllers", group = "Electric Drive Mapping"));
   annotation(
     Documentation(info = "<html>
 <p>

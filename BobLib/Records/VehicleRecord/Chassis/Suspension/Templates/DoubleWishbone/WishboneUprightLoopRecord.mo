@@ -2,7 +2,7 @@ within BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.DoubleWishbone;
 
 record WishboneUprightLoopRecord
 
-  import SI = Modelica.Units.SI;
+  import Modelica.Units.SI;
 
   // Geometry
   parameter SI.Position upperFore_i[3] "Upper control arm fore inboard joint, expressed in chassis frame" annotation(

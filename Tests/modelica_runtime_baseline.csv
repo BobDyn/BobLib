@@ -1,12 +1,12 @@
 model,budget_s,description
-BobLibTest.Regression.AngleBetweenSmoke,10,Vector angle scale-invariance regression simulation
-BobLibTest.Regression.MF52PureSlipSmoke,8,MF52 smoke physical baseline simulation
-BobLibTest.Regression.TransientSlipReverseSmoke,12,Transient reverse-slip regression simulation
-BobLibTest.Regression.TireForceFrameSmoke,15,Tire road-frame force regression simulation
-BobLibTest.Regression.WheelAlignmentUnitsSmoke,10,Wheel alignment degree/radian equivalence regression simulation
-BobLibTest.TestUtilities.TestMechanics.TestMultiBody.TestContactMechanics.TestGroundPhysicsRotatedFrame,5,rotated contact-frame physical baseline simulation
-BobLibTest.TestVehicle.TestAero.TestCFDAeroMap,5,CFD aero map physical baseline simulation
-BobLibTest.TestVehicle.TestAero.TestCFDAeroMapDirections,12,directional CFD aero map physical baseline simulation
-BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor,25,Motor power and torque sign physical baseline simulation
-BobLibTest.TestVehicle.TestPowertrain.TestVCU,5,VCU physical baseline simulation
-BobLibTest.Regression.UniversalSphericalReferenceSmoke,10,Derived reference frame comparison under non-axis-aligned motion
+BobLibTest.Utilities.Math.Vector.AngleBetweenSmoke,10,Vector angle scale-invariance regression simulation
+BobLibTest.Chassis.Suspension.Tires.MF52.MF52PureSlipSmoke,8,MF52 smoke physical baseline simulation
+BobLibTest.Chassis.Suspension.Tires.MF52.SlipModel.TransientSlipReverseSmoke,12,Transient reverse-slip regression simulation
+BobLibTest.Chassis.Suspension.Tires.TireForceFrameSmoke,15,Tire road-frame force regression simulation
+BobLibTest.Chassis.Suspension.Tires.Wheels.WheelAlignmentUnitsSmoke,10,Wheel alignment degree/radian equivalence regression simulation
+BobLibTest.Utilities.Mechanics.MultiBody.ContactMechanics.TestGroundPhysicsRotatedFrame,5,rotated contact-frame physical baseline simulation
+BobLibTest.Aero.TestCFDAeroMap,5,CFD aero map physical baseline simulation
+BobLibTest.Aero.TestCFDAeroMapDirections,12,directional CFD aero map physical baseline simulation
+BobLibTest.ElectricDrives.Internal.TestPowerLimitedMotor,25,Motor power and torque sign physical baseline simulation
+BobLibTest.Controllers.TestVCU,5,VCU physical baseline simulation
+BobLibTest.Utilities.Mechanics.MultiBody.Joints.Internal.UniversalSphericalReferenceSmoke,10,Derived reference frame comparison under non-axis-aligned motion

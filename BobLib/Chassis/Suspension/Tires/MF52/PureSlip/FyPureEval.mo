@@ -2,8 +2,7 @@ within BobLib.Chassis.Suspension.Tires.MF52.PureSlip;
 
 function FyPureEval
 
-  import SI = Modelica.Units.SI;
-
+  import Modelica.Units.SI;
   import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.FyPureRecord;
   import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.SetupRecord;
 

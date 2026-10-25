@@ -2,10 +2,10 @@ within BobLib.Records.VehicleRecord.Chassis.Suspension;
 
 record AxleDW_DirectRecord
 
-  import SI = Modelica.Units.SI;
+  import Modelica.Units.SI;
 
   // Geometry
-  parameter Boolean rodToLower "Whether push/pullrod mounts to lower wishbone. False if mounted to upper wishbone" annotation(
+  parameter Boolean rodToLower "Whether push/pullrod mounts to lower wishbone. False if mounted to upper wishbone" annotation(choices(checkBox = true),
     Evaluate = true,
     Dialog(group = "Geometry"));
   parameter SI.Position rodMount[3] "Vector from origin to push/pullrod wishbone mount, expressed in chassis frame" annotation(
@@ -14,11 +14,15 @@ record AxleDW_DirectRecord
   parameter SI.Position shockMount[3] "Vector from origin to shock chassis mount, expressed in chassis frame" annotation(
     Evaluate = false,
     Dialog(group = "Geometry"));
+  parameter Integer springPoints(min = 2, max = size(springTable, 1)) = size(springTable, 1)
+    "Number of active curve points" annotation(Evaluate = false, Dialog(group = "Spring Params"));
   parameter Real springTable[:, 2] "Table of spring force [N] vs deflection [m], [dx1, F1; dx2, F2; ...]" annotation(
     Evaluate = false, Dialog(group = "Spring Params"));
   parameter SI.Length springFreeLength "Spring free length (zero-force length) = installed length + static compression" annotation(
     Evaluate = false, Dialog(group = "Spring Params"));
-  parameter SI.Position damperTable[:, 2] "Table of damper force [N] vs relative velocity [m/s], [v1, F1; v2, F2; ...]" annotation(
+  parameter Integer damperPoints(min = 2, max = size(damperTable, 1)) = size(damperTable, 1)
+    "Number of active curve points" annotation(Evaluate = false, Dialog(group = "Damper Params"));
+  parameter Real damperTable[:, 2] "Table of damper force [N] vs relative velocity [m/s], [v1, F1; v2, F2; ...]" annotation(
     Evaluate = false, Dialog(group = "Damper Params"));
 
   annotation(

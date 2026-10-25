@@ -23,7 +23,7 @@ model BrakeReactionSmoke "Signed reaction balance and differential brake gearing
   Modelica.Mechanics.Rotational.Components.Fixed leftWheel annotation(Placement(transformation(origin = {100, 60}, extent = {{-14, -14}, {14, 14}}, rotation = 0)));
   Modelica.Mechanics.Rotational.Components.Fixed rightWheel annotation(Placement(transformation(origin = {260, 60}, extent = {{-14, -14}, {14, 14}}, rotation = 0)));
 
-  BobLib.Drivelines.Internal.Differential1D actualDifferential(use_lsd = false) annotation(Placement(transformation(origin = {-40, -150}, extent = {{-20, -20}, {20, 20}}, rotation = 0)));
+  BobLib.Drivelines.Internal.Differential1D actualDifferential(differentialArchitecture = BobLib.Drivelines.Types.DifferentialArchitecture.Open) annotation(Placement(transformation(origin = {-40, -150}, extent = {{-20, -20}, {20, 20}}, rotation = 0)));
 
   Modelica.Mechanics.Rotational.Components.IdealGear actualReduction(ratio = 3) annotation(Placement(transformation(origin = {-160, -150}, extent = {{-14, -14}, {14, 14}}, rotation = 0)));
 
