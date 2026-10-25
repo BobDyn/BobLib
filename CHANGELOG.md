@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Consolidate typed VI contracts, nested records and replaceable assemblies.
+- Make brake reactions, halfshafts, mounts and wheel compliance explicit.
+- Add single-axle KnC rigs and mirrored component fixtures.
+- Standardize diagrams and validation gates.
+
+See [MIGRATION.md](MIGRATION.md) for breaking class/record changes and
+[RELEASE_READINESS.md](RELEASE_READINESS.md) for remaining validation.
+Python runtime/export tooling and SS/GGV analysis are excluded.
+
 ### Changed
 
 These default vehicle behavior changes alter simulation results without any

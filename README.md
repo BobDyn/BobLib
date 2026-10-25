@@ -24,6 +24,9 @@ The web documentation lives at:
 
 https://bobdyn.com/boblib
 
+Organization changes and removed class paths are documented in [MIGRATION.md](MIGRATION.md).
+Current validation scope is recorded in [RELEASE_READINESS.md](RELEASE_READINESS.md).
+
 ## Release
 
 Current package version: `0.2.0`, dated `2026-08-09`.
@@ -68,7 +71,7 @@ Current checks target:
 - Modelica Standard Library 4.1.0
 - VehicleInterfaces 2.0.2 for `BobLib`
 - OpenModelica via the CI container `openmodelica/openmodelica:v1.27.1-ompython`
-- Python with `pytest` and `ruff`, plus `fmpy` for the FMU checks
+- Python with `pytest` and `ruff`, plus `fmpy` for the existing FMU checks
 
 Install Modelica dependencies with:
 
@@ -78,13 +81,10 @@ make modelica-deps
 
 ## Primary Entrypoints
 
-- `BobLib.Experiments.Standards.VehicleFMI`: driver-input FMI/DIL/SIL vehicle boundary;
-  `make modelica-fmu-export` exports it to `build/VehicleFMI.fmu` (Linux, CMake 3.21+).
-  The co-simulation FMU can fail a step when the car pulls away again after
-  holding the brake at standstill (a stop-and-go drive passes); see the comments
-  in `Tests/modelica_fmu_export.py`.
+- `BobLib.Experiments.Standards.VehicleFMI`: driver-input FMI/DIL/SIL vehicle boundary
 - `BobLib.Experiments.Standards.VehicleSim`: full-vehicle maneuver benchmark
 - `BobLib.Experiments.Standards.FourPostSim`: four-post benchmark
+- `BobLib.Experiments.Standards.KnCSteerable` and `KnCLocked`: single-axle kinematics/compliance rigs
 
 `BobLib` is the forward-looking standalone package. It builds
 BobLib physics inside the public subsystem contracts from VehicleInterfaces
@@ -100,12 +100,21 @@ make ci
 ```
 
 GitHub CI intentionally uses a lighter default gate for pushes and pull
-requests: Python lint/tests, Modelica formatting, `make modelica-smoke`,
-`make modelica-initialization` and `make modelica-fmu`.
-Version tags use the same lightweight gate so releases are not blocked by a
-GitHub runner doing a full rebuild. The full OpenModelica gate is a release
-activity: run it locally with `make test`/`make ci`, or on a runner through the
-separate `Release Gate` workflow (Actions -> Release Gate -> Run workflow).
+requests: Python lint/tests, Modelica formatting, smoke translation,
+initialization baselines, and mirrored fixture simulations/profiles.
+Version tags use that same gate and also start the separate `Release Gate`
+workflow. The full OpenModelica gate is a release activity: run it locally with
+`make test`/`make ci`, or on a runner through that workflow (Actions -> Release
+Gate -> Run workflow).
+
+The release workflow separates lint, formatting, coverage, translation,
+initialization, physics, signal regressions, and component/contract tests into
+named steps and retains their individual test reports. Inspect skipped tests:
+a passing default gate alone does not certify an FMU distribution or provide
+rendered diagram sign-off. The new Tools/ exporters and SS/GGV analysis remain outside this change.
+The FMU export/test support already merged in #30 is retained: use
+`make modelica-fmu-export` to export VehicleFMI and `make modelica-fmu`
+to run its checks. See Tests/modelica_fmu_export.py for runtime limitations.
 
 Python tooling versions are pinned in `Tests/requirements-dev.txt` and the ruff
 rule selection is pinned in `ruff.toml`, so a new ruff or pytest release cannot
