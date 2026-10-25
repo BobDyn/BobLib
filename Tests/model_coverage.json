@@ -121,6 +121,41 @@
       "stop_time": 3.0
     },
     {
+      "model": "BobLib.Chassis.Suspension.Tires.Wheels.PartialWheel",
+      "test": "BobLibTest.Chassis.Suspension.Tires.Wheels.TestPartialWheel",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Tires.Wheels.Wheel0DOF",
+      "test": "BobLibTest.Chassis.Suspension.Tires.Wheels.TestWheel0DOF",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Tires.Wheels.Wheel1DOF_Y",
+      "test": "BobLibTest.Chassis.Suspension.Tires.Wheels.TestWheel1DOF_Y",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Tires.Wheels.Wheel1DOF_Z",
+      "test": "BobLibTest.Chassis.Suspension.Tires.Wheels.TestWheel1DOF_Z",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Tires.Wheels.Wheel2DOF_YZ",
+      "test": "BobLibTest.Chassis.Suspension.Tires.Wheels.TestWheel2DOF_YZ",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 0.01
+    },
+    {
       "model": "BobLib.Utilities.Mechanics.MultiBody.Actuators.ChassisActuator",
       "test": "BobLibTest.Utilities.Mechanics.MultiBody.Actuators.TestChassisActuator",
       "mode": "simulate",
@@ -175,6 +210,27 @@
       "mode": "simulate",
       "scope": "integration",
       "stop_time": 1.0
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Tires.Wheels.WheelCompliance",
+      "test": "BobLibTest.Chassis.Suspension.Tires.Wheels.TestWheelCompliance",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Tires.Wheels.PartialWheelCompliance",
+      "test": "BobLibTest.Chassis.Suspension.Tires.Wheels.TestPartialWheelCompliance",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Tires.Wheels.DampedWheelCompliance",
+      "test": "BobLibTest.Chassis.Suspension.Tires.Wheels.TestDampedWheelCompliance",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.01
     }
   ],
   "initialization_baselines": [
