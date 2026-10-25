@@ -2,3 +2,10 @@ Templates
 AxleDW_DirectRecord
 AxleDW_BCRecord
 AxleDW_BC_StabarRecord
+TireRecord
+AxleRecord
+DoubleWishboneDirectRecord
+DoubleWishboneBellcrankRecord
+DoubleWishboneBellcrankStabarRecord
+WheelRecord
+WheelComplianceRecord
