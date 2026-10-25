@@ -8,11 +8,10 @@ model JointUSR
   "Universal - spherical - revolute joint aggregation (no constraints, no potential states)"
 
   import Modelica.Units.SI;
-  import Modelica.Mechanics.MultiBody.Types;
   import Modelica.Mechanics.MultiBody.Frames;
   import Modelica.Mechanics.MultiBody.Interfaces;
-  import Modelica.Mechanics.MultiBody.Visualizers;
   import Modelica.Mechanics.MultiBody.Sensors;
+  import Modelica.Mechanics.MultiBody.Types;
 
   extends Interfaces.PartialTwoFramesDoubleSize;
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a frame_ia
@@ -40,27 +39,27 @@ model JointUSR
     "1-dim. rotational flange of the drive bearing of the revolute joint"
     annotation(Placement(transformation(extent = {{95, 45}, {105, 35}})));
 
-  parameter Boolean animation = true "= true, if animation shall be enabled";
-  parameter Boolean showUniversalAxes = true
-    "= true, if universal joint shall be visualized with two cylinders, otherwise with a sphere (provided animation=true)";
   parameter Modelica.Mechanics.MultiBody.Types.Axis n1_a = {0, 0, 1}
 
     "Axis 1 of universal joint fixed and resolved in frame_a (axis 2 is orthogonal to axis 1 and to rod 1)"
-    annotation(Evaluate = true);
+    annotation(Dialog(group = "Operating settings"), Evaluate = true);
   parameter Modelica.Mechanics.MultiBody.Types.Axis n_b = {0, 0, 1}
     "Axis of revolute joint fixed and resolved in frame_b"
-    annotation(Evaluate = true);
+    annotation(Dialog(group = "Operating settings"), Evaluate = true);
   parameter SI.Position rRod1_ia[3] = {1, 0, 0}
     "Vector from origin of frame_a to spherical joint, resolved in frame_ia"
-    annotation(Evaluate = true);
+    annotation(Dialog(group = "Operating settings"), Evaluate = true);
   parameter SI.Position rRod2_ib[3] = {-1, 0, 0}
-    "Vector from origin of frame_ib to spherical joint, resolved in frame_ib";
+    "Vector from origin of frame_ib to spherical joint, resolved in frame_ib" annotation(Dialog(group = "Operating settings"));
   parameter Modelica.Units.NonSI.Angle_deg phi_offset = 0
 
-    "Relative angle offset of revolute joint (angle = phi(t) + from_deg(phi_offset))";
+    "Relative angle offset of revolute joint (angle = phi(t) + from_deg(phi_offset))" annotation(Dialog(group = "Operating settings"));
   parameter Modelica.Units.NonSI.Angle_deg phi_guess = 0
 
-    "Select the configuration such that at initial time |phi(t0) - from_deg(phi_guess)| is minimal";
+    "Select the configuration such that at initial time |phi(t0) - from_deg(phi_guess)| is minimal" annotation(Dialog(group = "Initialization"));
+  parameter Boolean animation = true "= true, if animation shall be enabled" annotation(Dialog(group = "Animation"), choices(checkBox = true));
+  parameter Boolean showUniversalAxes = true
+    "= true, if universal joint shall be visualized with two cylinders, otherwise with a sphere (provided animation=true)" annotation(Dialog(group = "Animation"), choices(checkBox = true));
   parameter SI.Diameter sphereDiameter = world.defaultJointLength
     "Diameter of the spheres representing the universal and the spherical joint"
     annotation(Dialog(tab = "Animation", group = "if animation = true", enable = animation));
@@ -112,7 +111,7 @@ model JointUSR
             enable = animation and showUniversalAxes));
   parameter Boolean checkTotalPower = false
     "= true, if total power flowing into this component shall be determined (must be zero)"
-    annotation(Dialog(tab = "Advanced"));
+    annotation(choices(checkBox = true), Dialog(tab = "Advanced"));
   final parameter Real eRod1_ia[3](each final unit = "1") = rod1.eRod_ia
     "Unit vector from origin of frame_a to origin of spherical joint, resolved in frame_ia";
   final parameter Real e2_ia[3](each final unit = "1") = rod1.e2_ia
@@ -509,20 +508,10 @@ the origin of frame_a to the middle of rod 1, this might be defined as:
           points = {{14, 0}, {14, 80}, {0, 80}, {0, 100}},
           color = {95, 95, 95},
           thickness = 0.5),
-        Text(
-          extent = {{40, 110}, {77, 90}},
-          textColor = {128, 128, 128},
-          textString = "ib"),
-        Text(
-          extent = {{-124, 110}, {-95, 90}},
-          textColor = {128, 128, 128},
-          textString = "ia"),
-        Text(
-          extent = {{-43, 110}, {-10, 90}},
-          textColor = {128, 128, 128},
-          textString = "im"),
+
         Text(
           extent = {{-75, -50}, {75, -70}},
           textColor = {0, 0, 255},
-          textString = "%name")}));
+          textString = "%name", fontSize = 0)}));
+  annotation(Diagram(coordinateSystem(extent = {{-100, -100}, {100, 100}}, preserveAspectRatio = true)));
 end JointUSR;
