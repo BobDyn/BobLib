@@ -2,13 +2,17 @@ within BobLib.ElectricDrives.Internal;
 
 model PowerLimitedMotor
 
-  import SI = Modelica.Units.SI;
+  import Modelica.Units.SI;
   import Modelica.Constants.pi;
+
+  parameter BobLib.Records.VehicleRecord.ElectricDrives.MotorRecord pMotor(w_eps = 1e-3) "Motor torque, power, efficiency and rotor calibration" annotation(Dialog(group = "Calibration"));
+
+  extends VehicleInterfaces.Icons.ElectricMotor;
 
   // Power command
   Modelica.Blocks.Interfaces.RealInput P_elec "Electrical power into motor [W], positive motoring and negative regen (connect from inverter P_out)" annotation(
     Placement(
-      transformation(origin = {-120, 0}, extent = {{-20, -20}, {20, 20}}),
+      transformation(origin = {-100, 0}, extent = {{-20, -20}, {20, 20}}),
       iconTransformation(origin = {-120, 0}, extent = {{-20, -20}, {20, 20}})));
 
   // Torque output
@@ -17,38 +21,14 @@ model PowerLimitedMotor
       transformation(origin = {100, 0}, extent = {{-10, -10}, {10, 10}}),
       iconTransformation(origin = {100, 0}, extent = {{-10, -10}, {10, 10}})));
 
+  parameter Boolean useSupport = false "Expose stator reaction" annotation(Dialog(group = "Architecture"), choices(checkBox = true), Evaluate = true);
+
+  Modelica.Mechanics.Rotational.Interfaces.Support support(phi = supportAngle) if useSupport annotation(
+    Placement(transformation(origin = {0, -100}, extent = {{-10, -10}, {10, 10}})));
+
   // Datasheet specs
-  parameter SI.Voltage Vdc_max = 630 "Max battery voltage (EMRAX 228 MV) [Vdc]";
-  parameter Real rpm_fullLoad_ref = 5300 "Full-load RPM at Vdc_max (datasheet)";
-  parameter Real rpm_noLoad_ref = 6500 "No-load RPM at Vdc_max (datasheet)";
-  parameter Real rpm_max_cont = 5500 "Max continuous rotation speed (datasheet) [rpm]";
-  parameter Real rpm_max_peak = 6500 "Max peak speed for a few seconds (datasheet) [rpm]";
-  parameter SI.Torque T_peak = 220 "Peak torque for a few seconds [Nm]";
-  parameter SI.Torque T_cont = 130 "Continuous torque [Nm]";
-  parameter SI.Current I_peak_2min = 360 "Max motor current for ~2 min if cooled [Arms]";
-  parameter SI.Current I_cont = 180 "Continuous motor current [Arms]";
-  parameter Real Kt_Nm_per_A = 0.61 "Torque per phase current (datasheet) [Nm/A]";
-  parameter SI.Power P_mech_peak = 124e3 "Peak motor mechanical power capability [W]";
-  parameter SI.Power P_cont_low = 75e3 "Low end continuous power band [W]";
-  parameter SI.Power P_cont_high = 75e3 "High end continuous power band [W]";
-  parameter Real eta_mot = 0.96 "Constant motoring efficiency approximation";
-  parameter Real eta_reg = 0.95 "Constant regen efficiency approximation";
-  parameter Real lossTable[:, 2] = [
-    0,    0;
-    1000, 200;
-    2000, 550;
-    3000, 1050;
-    4000, 1750;
-    5000, 2800
-  ] "Free-run loss vs speed";
-  parameter SI.Time peakTime = 120 "How long peak limits are allowed (seconds)";
-  parameter Boolean enablePeakTimer = true "If true, peak limits ramp down after peakTime";
 
   // Numerical params
-  parameter SI.AngularVelocity w_eps(min = Modelica.Constants.small) = 1e-3
-    "Speed regularization and direction-latch threshold";
-  parameter Boolean reverseLaunch = false
-    "Select reverse torque direction when starting exactly from standstill";
 
   // Diagnostics
   SI.AngularVelocity w "Shaft speed [rad/s]";
@@ -61,10 +41,12 @@ model PowerLimitedMotor
   SI.Torque tau_lim_from_power "Torque limit from peak power [Nm]";
   SI.Torque tau_lim_from_current "Torque limit from current [Nm]";
   SI.Power P_cont_env "Continuous power envelope [W]";
-  Modelica.Mechanics.Rotational.Sources.Torque torque annotation(
+
+  Modelica.Mechanics.Rotational.Sources.Torque torque(useSupport = useSupport) annotation(
     Placement(transformation(extent = {{-10, -10}, {10, 10}})));
 
 protected
+  SI.Angle supportAngle;
   function interp1
 
     input Real tbl[:, 2];
@@ -88,36 +70,54 @@ protected
   SI.AngularVelocity w_eff
     "Direction-preserving regularized omega for power-to-torque conversion";
 
-  parameter SI.Time tau_tau = 0.002 "Torque actuator time constant";
+initial equation
+  assert(pMotor.w_eps > 0 and pMotor.tau_tau > 0,
+    "PowerLimitedMotor: w_eps and tau_tau must be positive");
+  assert(pMotor.eta_mot > 0 and pMotor.eta_mot <= 1 and pMotor.eta_reg > 0 and pMotor.eta_reg <= 1,
+    "PowerLimitedMotor: efficiencies must be in (0, 1]");
+  assert(min({pMotor.T_peak, pMotor.T_cont, pMotor.I_peak_2min, pMotor.I_cont,
+    pMotor.Kt_Nm_per_A, pMotor.P_mech_peak, pMotor.P_cont_low, pMotor.P_cont_high, pMotor.peakTime}) >= 0,
+    "PowerLimitedMotor: torque, current, power and duration limits must be non-negative");
+  assert(size(pMotor.lossTable, 1) >= 2 and min(pMotor.lossTable[:, 2]) >= 0,
+    "PowerLimitedMotor: lossTable needs at least two points and non-negative losses");
+  for i in 2:size(pMotor.lossTable, 1) loop
+    assert(pMotor.lossTable[i, 1] > pMotor.lossTable[i - 1, 1],
+      "PowerLimitedMotor: lossTable speed breakpoints must be strictly increasing");
+  end for;
 
 equation
+  connect(torque.support, support) annotation(
+    Line(visible = useSupport, points = {{0, -10}, {0, -100}}, color = {0, 0, 0}));
 
   // Shaft speed
-  w = der(shaft.phi);
+  if not useSupport then
+    supportAngle = 0;
+  end if;
+  w = der(shaft.phi-supportAngle);
   rpm = abs(w) * 60 / (2*pi);
 
   // Free-run losses (always dissipative)
-  P_loss_free = interp1(lossTable, rpm);
+  P_loss_free = interp1(pMotor.lossTable, rpm);
 
   // Peak allowance factor (simple time-based derate)
   peakFactor =
-    if not enablePeakTimer then 1
-      else if time <= peakTime then 1
+    if not pMotor.enablePeakTimer then 1
+      else if time <= pMotor.peakTime then 1
       else 0;
 
   // Allowed torque and current (peak -> continuous blend)
-  T_allow = peakFactor*T_peak + (1 - peakFactor)*T_cont;
-  I_allow = peakFactor*I_peak_2min + (1 - peakFactor)*I_cont;
+  T_allow = peakFactor*pMotor.T_peak + (1 - peakFactor)*pMotor.T_cont;
+  I_allow = peakFactor*pMotor.I_peak_2min + (1 - peakFactor)*pMotor.I_cont;
 
   // Continuous power envelope vs speed
   P_cont_env =
 
     if noEvent(rpm <= 3000) then
-      P_cont_low*(0.2 + 0.8*rpm/3000) // mild floor at low rpm
+      pMotor.P_cont_low*(0.2 + 0.8*rpm/3000) // mild floor at low rpm
     elseif noEvent(rpm <= 5000) then
-      P_cont_low + (P_cont_high - P_cont_low)*(rpm - 3000)/2000
+      pMotor.P_cont_low + (pMotor.P_cont_high - pMotor.P_cont_low)*(rpm - 3000)/2000
     else
-      P_cont_high;
+      pMotor.P_cont_high;
 
   // Electrical -> mechanical power command (incl. losses)
   // Motoring: electrical supplies mech + losses
@@ -125,13 +125,13 @@ equation
   P_mech_cmd =
 
     if noEvent(P_elec >= 0) then
-      noEvent(max(0, P_elec*eta_mot - P_loss_free))
+      noEvent(max(0, P_elec*pMotor.eta_mot - P_loss_free))
     else
-      noEvent(min(0, P_elec/eta_reg - P_loss_free));
+      noEvent(min(0, P_elec/pMotor.eta_reg - P_loss_free));
 
   // Allowed mechanical power (peak vs continuous)
   P_allow =
-    peakFactor*P_mech_peak
+    peakFactor*pMotor.P_mech_peak
     + (1 - peakFactor)*P_cont_env;
 
   // Enforce power envelope (symmetric for motoring/regen)
@@ -139,8 +139,8 @@ equation
     noEvent(max(min(P_mech_cmd,  P_allow), -P_allow));
 
   // Torque limits
-  tau_lim_from_power = P_allow / max(abs(w), w_eps);
-  tau_lim_from_current = Kt_Nm_per_A * I_allow;
+  tau_lim_from_power = P_allow / max(abs(w), pMotor.w_eps);
+  tau_lim_from_current = pMotor.Kt_Nm_per_A * I_allow;
 
   // Combined torque limit
   tau_lim =
@@ -155,13 +155,13 @@ equation
   when initial() then
     shaftDirection =
 
-      if abs(w) > w_eps then
+      if abs(w) > pMotor.w_eps then
         if w > 0 then 1 else -1
       else
-        if reverseLaunch then -1 else 1;
-  elsewhen w > w_eps then
+        if pMotor.reverseLaunch then -1 else 1;
+  elsewhen w > pMotor.w_eps then
     shaftDirection = 1;
-  elsewhen w < -w_eps then
+  elsewhen w < -pMotor.w_eps then
     shaftDirection = -1;
   end when;
 
@@ -169,11 +169,11 @@ equation
   // The magnitude is smooth through zero while shaftDirection provides the
   // physically required sign. At established speed tau_cmd*w therefore has
   // the same sign as P_mech_limited for both directions of rotation.
-  w_eff = shaftDirection*sqrt(w*w + w_eps*w_eps);
+  w_eff = shaftDirection*sqrt(w*w + pMotor.w_eps*pMotor.w_eps);
   tau_cmd = noEvent(max(min(P_mech_limited / w_eff, tau_lim), -tau_lim));
 
   // Torque actuator dynamics
-  der(tau_act) = (tau_cmd - tau_act)/tau_tau;
+  der(tau_act) = (tau_cmd - tau_act)/pMotor.tau_tau;
 
   // Apply torque to shaft (Modelica sign convention)
   torque.tau = tau_act;
@@ -195,10 +195,11 @@ independent of shaft rotation direction. The model latches the established
 shaft direction after speed exceeds <code>w_eps</code> and holds it while speed
 is inside that deadband to prevent torque-sign chatter. Since power alone does
 not encode a direction at exactly zero speed, standstill uses forward launch by
-default; set <code>reverseLaunch=true</code> for a reverse launch.
+default; set <code>pMotor.reverseLaunch=true</code> for a reverse launch.
 </p>
 <p>
 It represents the BobLib motor-side behavior behind the public electric-drive adapter while keeping the VehicleInterfaces contract at the package boundary.
 </p>
 </html>"));
+  annotation(Diagram(coordinateSystem(extent = {{-100, -100}, {100, 100}}, preserveAspectRatio = true)));
 end PowerLimitedMotor;

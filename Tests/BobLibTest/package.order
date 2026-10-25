@@ -4,6 +4,9 @@ Chassis
 Drivelines
 DriverEnvironments
 Drivers
+ElectricDrives
+EnergyStorage
+PowerElectronics
 Utilities
 Regression
 TestVehicle

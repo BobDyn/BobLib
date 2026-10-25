@@ -55,6 +55,14 @@ def source_edits(name: str) -> tuple[SourceEdit, ...]:
     cvode = "simulation/solver/cvode_solver.c"
     interface = "fmi-export/fmu2_model_interface.c"
     return (
+        # Roots below the integration accuracy chatter at a held brake or motor
+        # direction threshold. Keep hysteresis at the requested tolerance,
+        # scaled by each relation's nominal values in Modelica's runtime.
+        SourceEdit(
+            "simulation/solver/model_help.c",
+            "tolZC = TOL_HYSTERESIS_ZEROCROSSINGS * fmax(relativeTol, MINIMAL_STEP_SIZE);",
+            "tolZC = fmax(relativeTol, MINIMAL_STEP_SIZE);",
+        ),
         # OpenModelica puts OMC_DISABLE_OPT (no optimization) above the first
         # function in this file, read_simulation_info, but not above
         # read_input_fmu, which sets every variable's name, unit and start
