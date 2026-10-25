@@ -198,6 +198,76 @@
       "stop_time": 0.1
     },
     {
+      "model": "BobLib.DriverEnvironments.AutomaticDriveByWire",
+      "test": "BobLibTest.DriverEnvironments.TestAutomaticDriveByWire",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.DriverEnvironments.CommandedDriveByWire",
+      "test": "BobLibTest.DriverEnvironments.TestCommandedDriveByWire",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.DriverEnvironments.EVDriveByWire",
+      "test": "BobLibTest.DriverEnvironments.TestEVDriveByWire",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.DriverEnvironments.ExternalDriver",
+      "test": "BobLibTest.DriverEnvironments.TestExternalDriver",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.DriverEnvironments.Interfaces.Base",
+      "test": "BobLibTest.DriverEnvironments.Interfaces.TestBase",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.DriverEnvironments.Interfaces.Commanded",
+      "test": "BobLibTest.DriverEnvironments.Interfaces.TestCommanded",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.DriverEnvironments.Internal.Driver",
+      "test": "BobLibTest.DriverEnvironments.Internal.TestDriver",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.DriverEnvironments.Internal.ManeuverMeasurements",
+      "test": "BobLibTest.DriverEnvironments.Internal.TestManeuverMeasurements",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Drivers.Internal.Maneuver",
+      "test": "BobLibTest.Drivers.Internal.TestManeuver",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Drivers.StandardDriver",
+      "test": "BobLibTest.Drivers.TestStandardDriver",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
       "model": "BobLib.Utilities.Mechanics.MultiBody.Actuators.ChassisActuator",
       "test": "BobLibTest.Utilities.Mechanics.MultiBody.Actuators.TestChassisActuator",
       "mode": "simulate",
