@@ -2,6 +2,48 @@
   "schema_version": 1,
   "models": [
     {
+      "model": "BobLib.Brakes.BasicVCUBrakes",
+      "test": "BobLibTest.Brakes.TestBasicVCUBrakes",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Brakes.Interfaces.Base",
+      "test": "BobLibTest.Brakes.Interfaces.TestBase",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Brakes.Internal.AxleBrakes",
+      "test": "BobLibTest.Brakes.Internal.TestAxleBrakes",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Brakes.Internal.BrakeActuation",
+      "test": "BobLibTest.Brakes.Internal.TestBrakeActuation",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Brakes.Internal.RigAxleBrake",
+      "test": "BobLibTest.Brakes.Internal.TestRigAxleBrake",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Brakes.PedalBrakes",
+      "test": "BobLibTest.Brakes.TestPedalBrakes",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
       "model": "BobLib.Utilities.Mechanics.MultiBody.Actuators.ChassisActuator",
       "test": "BobLibTest.Utilities.Mechanics.MultiBody.Actuators.TestChassisActuator",
       "mode": "simulate",
