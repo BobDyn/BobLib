@@ -77,11 +77,15 @@ jobs:
         run: make modelica-initialization
 
   modelica-components:
-    name: OpenModelica Component Contracts
+    name: OpenModelica Component Contracts (${{ matrix.shard }}/4)
     runs-on: ubuntu-latest
     container: openmodelica/openmodelica:v1.27.1-ompython
     needs: python
     timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
 
     steps:
       - uses: actions/checkout@v7
@@ -96,13 +100,13 @@ jobs:
           key: om-libs-${{ hashFiles('msl_setup.mos') }}
 
       - name: Run component, contract and Python tests
-        run: make test-additional PYTEST_FLAGS="--junitxml=/tmp/boblib-components.xml -ra"
+        run: make test-additional PYTEST_FLAGS="--junitxml=/tmp/boblib-components.xml -ra --boblib-shard ${{ matrix.shard }}/4"
 
       - name: Retain component test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: boblib-component-contracts
+          name: boblib-component-contracts-${{ matrix.shard }}
           path: /tmp/boblib-components.xml
           if-no-files-found: warn
 
