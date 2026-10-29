@@ -111,6 +111,7 @@ jobs:
     runs-on: ubuntu-latest
     container: openmodelica/openmodelica:v1.27.1-ompython
     needs: python
+    if: github.event_name != 'pull_request'
     timeout-minutes: 60
 
     steps:
