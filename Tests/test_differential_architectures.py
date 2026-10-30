@@ -12,7 +12,7 @@ def test_sliding_torque_and_power(tmp_path, kind, torque):
                 'TorqueBiasing': (ratio-1)/(ratio+1)*abs(torque)/2}[kind]
     fixture = tmp_path / 'Sliding.mo'
     fixture.write_text(f'''model Sliding
-  BobLib.Drivelines.Internal.Differential1D diff(pDifferential(coastTorqueBiasRatio=2), differentialArchitecture=BobLib.Drivelines.Types.DifferentialArchitecture.{kind});
+  BobLib.Drivelines.Internal.Differential1D diff(pDifferential(coastTorqueBiasRatio=2, slidingFrictionRatio=0.85), differentialArchitecture=BobLib.Drivelines.Types.DifferentialArchitecture.{kind});
   Modelica.Mechanics.Rotational.Sources.ConstantTorque inputTorque(tau_constant={torque});
   Modelica.Mechanics.Rotational.Sources.Speed left(exact=true), right(exact=true);
 equation
