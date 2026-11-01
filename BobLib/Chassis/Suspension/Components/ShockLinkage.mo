@@ -36,6 +36,14 @@ model ShockLinkage
 
   parameter Boolean useDamping = true "Include the parallel damper; rigs disable it for static equilibrium" annotation(Dialog(group = "Architecture"), Evaluate = true, choices(checkBox = true));
 
+  Modelica.Blocks.Interfaces.RealOutput damperCompressionVelocity(unit = "m/s")
+    "Compression-positive shaft speed; zero when damping is disabled" annotation(
+    Placement(visible = false, transformation(origin = {100, 80}, extent = {{-10, -10}, {10, 10}})));
+
+  Modelica.Blocks.Interfaces.RealOutput damperForce(unit = "N")
+    "Signed resisting force of the selected damper law; zero when damping is disabled" annotation(
+    Placement(visible = false, transformation(origin = {100, 60}, extent = {{-10, -10}, {10, 10}})));
+
   // Force elements
   replaceable BobLib.Chassis.Suspension.Components.TabularSpring TabularSpring(
     springPoints = springPoints, springTable = springTable,
@@ -54,6 +62,11 @@ model ShockLinkage
     Placement(transformation(extent = {{-10, -10}, {10, 10}})));
 
 equation
+  damperCompressionVelocity = if useDamping then -der(lineForceWithMass.s) else 0;
+
+  // Parallel force balance also supports replacement laws and a disabled damper.
+  damperForce = if useDamping then -lineForceWithMass.flange_a.f - TabularSpring.flange_a.f else 0;
+
   connect(frame_a, lineForceWithMass.frame_a) annotation(
     Line(points = {{-100, 0}, {-10, 0}}));
   connect(lineForceWithMass.frame_b, frame_b) annotation(

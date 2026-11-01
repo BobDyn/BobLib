@@ -33,9 +33,10 @@ complete OMEdit review of every model and relevant conditional variant, and vali
 numerical behavior across supported architectures. Native/FMU artifact acceptance must use the final exact source identity; a single
 architecture validation is not acceptance of the complete catalog.
 
-The merged FMU-export PR #30 has been incorporated. Reconcile the unmerged
-damper-table work against the new package and record paths; compatibility with
-unmerged PRs is not established by these drafts.
+The merged FMU-export PR #30 has been incorporated. The damper-table work in
+PR #31 has been reconciled with the new package and record paths. BobSim's caller
+migration and submodule update remain a separate integration step; compatibility
+with its older generated models is not established by this BobLib migration.
 
 ## Vehicle behavior comparison for PR #48
 
