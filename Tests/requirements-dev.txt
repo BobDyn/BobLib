@@ -9,5 +9,5 @@
 # comes first on PATH, so the FMU export builds with the cmake pinned here.
 cmake==4.4.4
 fmpy==0.3.32
-pytest==9.1.1
+pytest==9.2.0
 ruff==0.16.9
