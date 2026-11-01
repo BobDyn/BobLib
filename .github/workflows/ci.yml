@@ -104,7 +104,7 @@ jobs:
 
       - name: Retain component test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: boblib-component-contracts-${{ matrix.shard }}
           path: /tmp/boblib-components.xml
@@ -138,7 +138,7 @@ jobs:
 
       - name: Retain component profiles and compiler logs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: boblib-component-profiles
           path: /tmp/boblib-profile
