@@ -13,7 +13,7 @@ record DifferentialRecord
     "Effective drive-side high/low output torque limit; requires calibration";
   parameter Real coastTorqueBiasRatio(min = 1) = 1
     "Effective coast-side high/low output torque limit; requires calibration";
-  parameter Real slidingFrictionRatio(min = 1e-6, max = 1) = 0.85
+  parameter Real slidingFrictionRatio(min = 1e-6, max = 1) = 1.0
     "Sliding/static clutch torque capacity";
   parameter Real driveSideTorqueSign = 1
     "Input torque sign selecting drive calibration (reverse operation uses the same sign convention)";

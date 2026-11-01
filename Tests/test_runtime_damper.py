@@ -10,6 +10,8 @@ from pathlib import Path
 
 import pytest
 
+BOBLIB_SHARD_BY_TEST = True
+
 ROOT = Path(__file__).resolve().parents[1]
 
 

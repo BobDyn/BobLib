@@ -455,7 +455,7 @@ record ChassisRecord = BobLib.Records.VehicleRecord.Chassis.ChassisRecord(
       preloadTorque = 20,
       driveLockingFraction = 0.35,
       coastLockingFraction = 0.15,
-      slidingFrictionRatio = 0.85),
+      slidingFrictionRatio = 1.0),
     halfshaft(stiffness = 15000, inertia = 0.02)) "Differential and halfshaft calibration";
 
   parameter Aero.CFDAeroMapRecord aero(

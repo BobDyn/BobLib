@@ -12,6 +12,12 @@ if str(TESTS_DIR) not in sys.path:
 def pytest_addoption(parser) -> None:
     group = parser.getgroup("boblib")
     group.addoption(
+        "--boblib-shard",
+        action="store",
+        default=os.environ.get("BOBLIB_SHARD"),
+        help="Run one shard of the test files, as INDEX/COUNT with INDEX from 1.",
+    )
+    group.addoption(
         "--boblib-package-root",
         action="store",
         default=os.environ.get("BOBLIB_PACKAGE_ROOT"),
@@ -51,3 +57,21 @@ def pytest_addoption(parser) -> None:
         in {"1", "true", "yes", "on"},
         help="Fail when runtime exceeds the unscaled baseline budget.",
     )
+
+
+def pytest_collection_modifyitems(config, items) -> None:
+    shard = config.getoption("--boblib-shard")
+    if not shard:
+        return
+    index, count = (int(part) for part in shard.split("/"))
+    if not 1 <= index <= count:
+        raise ValueError(f"--boblib-shard {shard} must be INDEX/COUNT with 1 <= INDEX <= COUNT.")
+    # A file stays whole so its module fixtures run once, unless it sets BOBLIB_SHARD_BY_TEST.
+    per_test = sorted(item.nodeid for item in items if getattr(item.module, "BOBLIB_SHARD_BY_TEST", False))
+    files = sorted({item.path for item in items if not getattr(item.module, "BOBLIB_SHARD_BY_TEST", False)})
+    keep = {node for position, node in enumerate(per_test) if position % count == index - 1}
+    keep |= {path for position, path in enumerate(files) if position % count == index - 1}
+    selected = [item for item in items if item.nodeid in keep or item.path in keep]
+    if len(selected) != len(items):
+        config.hook.pytest_deselected(items=[item for item in items if item not in selected])
+        items[:] = selected
