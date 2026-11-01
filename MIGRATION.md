@@ -124,6 +124,38 @@ BobSim's generated records and runtime override dictionaries must both migrate.
 Validate every requested override against the generated init XML or artifact
 manifest and reject unknown keys; do not rely on the old runner's silent skip.
 
+## Runtime damper curves
+
+`VehicleSim` retains `useRuntimeDamperTables` and `damperTableFile` as startup
+parameters. Enable the flag and supply an MSL text table file containing named
+`front` and `rear` tables. Each table has two columns: compression-positive shaft
+velocity in m/s and signed resisting force in N. Curves are read at simulation
+startup; changing the file between runs does not require recompiling a compatible
+executable. This is not live reloading during a run, and BobLib does not read YAML.
+BobSim resolves TTX25 settings and writes these numeric files.
+
+The default tabular laws in all three double-wishbone axle architectures support
+runtime files through `useRuntimeDamperTable`, `runtimeDamperTableFile`, and
+`runtimeDamperTableName`. `Chassis.DoubleWishbone` supplies the front/rear names.
+Replacement spring and damper laws retain the MSL two-flange contract; file
+loading configures the default tabular law, not an arbitrary replacement law.
+`ShockLinkage` publishes compression speed and signed damper force through the
+typed axle bus. The chassis retains the arrays `damperCompressionVelocity[4]`
+and `damperForce[4]`, ordered front-left, front-right, rear-left, rear-right.
+
+With runtime loading disabled, the embedded table and `damperPoints` remain
+active, including fixed-capacity exported tables. Unused padding is ignored;
+the extrapolation diagnostic uses the active range. Both modes use linear
+interpolation and terminal-slope extrapolation. Curves must be passive and pass
+through zero force at zero speed. The reference bellcrank/stabilizer vehicle
+retains the TTX25 MkII C12 compression / R12 rebound curves at 6 / 10 low-speed
+clicks from closed and 4.3 high-speed turns from open on both axles.
+
+`FourPostSim` and the KnC rigs explicitly remain quasi-static: their dampers are
+disabled, their damper diagnostics are zero, and no runtime damper file is needed.
+Do not pass the former dynamic four-post table-loading modifiers to these rigs.
+Use the dynamic vehicle or the dedicated component fixtures to validate damping.
+
 ## Physical connections
 
 Brakes is a top-level VI subsystem with front/rear assemblies. Rotor connections
