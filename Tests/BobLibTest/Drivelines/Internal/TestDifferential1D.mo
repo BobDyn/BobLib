@@ -2,7 +2,7 @@ within BobLibTest.Drivelines.Internal;
 
 model TestDifferential1D
 
-  BobLib.Drivelines.Internal.Differential1D dut annotation(Placement(transformation(origin = {0, 0}, extent = {{-10, -10}, {10, 10}})));
+  BobLib.Drivelines.Internal.Differential1D dut(pDifferential(slidingFrictionRatio = 0.85)) annotation(Placement(transformation(origin = {0, 0}, extent = {{-10, -10}, {10, 10}})));
 
   Modelica.Mechanics.Rotational.Sources.ConstantTorque drive(tau_constant = 200) annotation(Placement(transformation(origin = {-60, 0}, extent = {{-10, -10}, {10, 10}})));
 
