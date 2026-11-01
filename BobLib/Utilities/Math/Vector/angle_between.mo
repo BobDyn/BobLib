@@ -2,9 +2,6 @@ within BobLib.Utilities.Math.Vector;
 
 function angle_between
 
-  import BobLib.Utilities.Math.Vector.cross;
-  import BobLib.Utilities.Math.Vector.dot;
-
   input Real a[3] "First vector";
   input Real b[3] "Second vector";
   input Real n[3] "Reference axis selecting the angle orientation";
@@ -35,14 +32,14 @@ algorithm
   nScale := max(abs(n));
 
   if aScale > 0 and bScale > 0 and nScale > 0 then
-    aUnit := (a/aScale)/sqrt(dot(a/aScale, a/aScale));
-    bUnit := (b/bScale)/sqrt(dot(b/bScale, b/bScale));
-    nUnit := (n/nScale)/sqrt(dot(n/nScale, n/nScale));
+    aUnit := (a/aScale)/sqrt((a/aScale)*(a/aScale));
+    bUnit := (b/bScale)/sqrt((b/bScale)*(b/bScale));
+    nUnit := (n/nScale)/sqrt((n/nScale)*(n/nScale));
     crossUnit := cross(aUnit, bUnit);
 
-    num := sqrt(max(0, dot(crossUnit, crossUnit)));
-    den := max(-1, min(1, dot(aUnit, bUnit)));
-    orientation := dot(nUnit, crossUnit);
+    num := sqrt(max(0, crossUnit*crossUnit));
+    den := max(-1, min(1, aUnit*bUnit));
+    orientation := nUnit*crossUnit;
 
     if orientation < 0 then
       num := -num;

@@ -12,17 +12,20 @@ model GroundPhysics
     Placement(transformation(origin = {100, 0}, extent = {{-16, -16}, {16, 16}}),
     iconTransformation(origin = {0, 100}, extent = {{-16, -16}, {16, 16}}, rotation = 90)));
 
-  parameter Real c = 100000 "Vertical contact stiffness";
-  parameter Real d = 750 "Vertical contact damping";
-  parameter Real eps = 1e-6 "Smoothing length";
-  parameter Real forceEps = 1.0 "Smoothing force for normal-force clamp";
+  parameter Modelica.Units.SI.TranslationalSpringConstant c(min = 0) = 100000 "Vertical contact stiffness" annotation(Dialog(group = "Operating settings"));
+  parameter Modelica.Units.SI.TranslationalDampingConstant d(min = 0) = 750 "Vertical contact damping" annotation(Dialog(group = "Operating settings"));
+  parameter Modelica.Units.SI.Length eps(min = Modelica.Constants.small) = 1e-6 "Smoothing length" annotation(Dialog(group = "Advanced"));
+  parameter Modelica.Units.SI.Force forceEps(min = Modelica.Constants.small) = 1.0 "Smoothing force for normal-force clamp" annotation(Dialog(group = "Advanced"));
 
-  Real pen(nominal = 0.01) "Smooth penetration";
-  Real r_rel_z(nominal = 0.01) "Relative z displacement, positive when separated";
-  Real f_raw(nominal = 1000) "Unclamped normal force";
-  Real f_z(nominal = 1000) "Normal force";
+  Modelica.Units.SI.Length pen(nominal = 0.01) "Smooth penetration";
+  Modelica.Units.SI.Position r_rel_z(nominal = 0.01) "Relative z displacement, positive when separated";
+  Modelica.Units.SI.Force f_raw(nominal = 1000) "Unclamped normal force";
+  Modelica.Units.SI.Force f_z(nominal = 1000) "Normal force";
 
 equation
+  assert(
+    c >= 0 and d >= 0 and eps > 0 and forceEps > 0,
+    "GroundPhysics: nonnegative stiffness/damping and positive smoothing scales required");
   r_rel_z = frame_b.r_0[3] - frame_a.r_0[3];
 
   // Smooth unilateral penetration:

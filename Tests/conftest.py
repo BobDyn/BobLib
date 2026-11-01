@@ -31,6 +31,13 @@ def pytest_addoption(parser) -> None:
         help="Per-model OpenModelica initialization timeout in seconds.",
     )
     group.addoption(
+        "--boblib-fmu-timeout-s",
+        action="store",
+        default=os.environ.get("BOBLIB_FMU_TIMEOUT_S"),
+        type=int,
+        help="Timeout in seconds for each OpenModelica and CMake step of an FMU export.",
+    )
+    group.addoption(
         "--boblib-runtime-scale",
         action="store",
         default=os.environ.get("BOBLIB_RUNTIME_SCALE", "4.0"),

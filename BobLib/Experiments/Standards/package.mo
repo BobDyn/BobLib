@@ -1,24 +1,7 @@
 within BobLib.Experiments;
-package Standards
+package Standards "Standard vehicle, FMI, and four-post experiments"
 
-  annotation(
-    Documentation(info = "<html>
-<p>
-Package <code>BobLib.Experiments.Standards</code> contains standard runnable experiments.
-</p>
-<p>
-The models here are the primary entry points for driver-input vehicles, full-vehicle maneuvers, and four-post simulations assembled from one-level public subsystem models.
-</p>
-<p>
-Reusable experiment assemblies live under <code>Templates</code>. The
-<code>Templates.FMI</code> package contains FMU/export-oriented vehicle bases,
-starting with the driver-input <code>BaseVehicleFMI</code>. The
-<code>Templates.Vehicle</code> package contains the EV
-battery-inverter-motor-differential maneuver simulation base and its nine
-suspension-configuration specializations. The <code>Templates.FourPost</code>
-package contains the PTN-agnostic four-post fixture base and its nine
-
-suspension-configuration specializations.
-</p>
-</html>"));
+  extends Modelica.Icons.ExamplesPackage;
+  annotation(Documentation(info = "<html><p>Start with VehicleSim, VehicleFMI, or FourPostSim. BaseClasses holds the shared vehicle plant and experiment implementations. Examples demonstrates independent front/rear choices. Exhaustive configuration coverage belongs to the sibling Tests library.</p></html>"));
+  annotation(Icon(graphics = {Rectangle(extent = {{-100, 100}, {100, -100}}, lineColor = {0, 0, 0}, lineThickness = 0.5, fillPattern = FillPattern.None)}));
 end Standards;

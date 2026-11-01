@@ -2,21 +2,17 @@ within BobLib.EnergyStorage;
 model BatteryPack
 
   "BobLib battery pack exposed through VehicleInterfaces energy-storage pins"
+
+  import Modelica.Units.SI;
+
+  parameter BobLib.Records.VehicleRecord.EnergyStorage.BatteryPackRecord pBattery "Cell topology, electrical maps and initial charge" annotation(Dialog(group = "Calibration"));
+
   extends VehicleInterfaces.Icons.Battery;
-  extends VehicleInterfaces.EnergyStorage.Interfaces.Base;
 
-  import SI = Modelica.Units.SI;
+  extends BobLib.EnergyStorage.Interfaces.Base(final includeHeatPort = false);
 
-  parameter Integer Ns(min = 1) = 140 "Battery cells in series";
-  parameter Integer Np(min = 1) = 4 "Battery cells in parallel";
-  parameter Real SOC_start(unit = "1", min = 0, max = 1) = 1
-    "Initial battery state of charge";
-
-  BobLib.EnergyStorage.Internal.TheveninBatteryPack battery(
-    Ns = Ns,
-    Np = Np,
-    SOC_start = SOC_start) annotation(
-      Placement(transformation(origin = {0, 0}, extent = {{-40, -40}, {40, 40}})));
+  BobLib.EnergyStorage.Internal.TheveninBatteryPack battery(pBattery = pBattery) annotation(
+      Placement(transformation(origin = {60, 0}, extent = {{-25, -15}, {25, 15}}, rotation = -90)));
 
   output Real SOC(unit = "1") "Pack state of charge";
   output Real SOE(unit = "1") "Pack state of energy";
@@ -26,27 +22,33 @@ model BatteryPack
   output SI.Power P "Electrical power, positive while discharging";
 
 protected
-  Modelica.Blocks.Sources.RealExpression voltageBusSignal(
+  Modelica.Blocks.Sources.RealExpression voltageSignal(
     y = v) "Terminal voltage published to batteryBus" annotation(
-      Placement(transformation(origin = {-74, -28}, extent = {{-8, -4}, {8, 4}})));
+      Placement(transformation(origin = {-20, 80}, extent = {{10, -10}, {-10, 10}})));
 
-  Modelica.Blocks.Sources.RealExpression currentBusSignal(
+  Modelica.Blocks.Sources.RealExpression currentSignal(
     y = i) "Terminal current published to batteryBus" annotation(
-      Placement(transformation(origin = {-74, -38}, extent = {{-8, -4}, {8, 4}})));
+      Placement(transformation(origin = {-20, 40}, extent = {{10, -10}, {-10, 10}})));
 
-  Modelica.Blocks.Sources.RealExpression powerBusSignal(
+  Modelica.Blocks.Sources.RealExpression powerSignal(
     y = P) "Terminal power published to batteryBus" annotation(
-      Placement(transformation(origin = {-74, -48}, extent = {{-8, -4}, {8, 4}})));
+      Placement(transformation(origin = {-20, 0}, extent = {{10, -10}, {-10, 10}})));
 
-  Modelica.Blocks.Sources.RealExpression stateOfChargeBusSignal(
+  Modelica.Blocks.Sources.RealExpression chargeSignal(
     y = SOC) "State of charge published to batteryBus" annotation(
-      Placement(transformation(origin = {-74, -58}, extent = {{-8, -4}, {8, 4}})));
+      Placement(transformation(origin = {-20, -40}, extent = {{10, -10}, {-10, 10}})));
 
-  Modelica.Blocks.Sources.RealExpression stateOfEnergyBusSignal(
+  Modelica.Blocks.Sources.RealExpression energySignal(
     y = SOE) "State of energy published to batteryBus" annotation(
-      Placement(transformation(origin = {-74, -68}, extent = {{-8, -4}, {8, 4}})));
+      Placement(transformation(origin = {-20, -80}, extent = {{10, -10}, {-10, 10}})));
+
+  BobLib.EnergyStorage.Interfaces.BatteryBus batteryBus
+    "Typed batteryBus signal contract" annotation(
+      Placement(transformation(origin = {-70, -60}, extent = {{-10, -10}, {10, 10}})));
 
 equation
+  connect(batteryBus, controlBus.batteryBus) annotation(
+    Line(points = {{-70, -60}, {-100, -60}}, color = {255, 204, 51}, thickness = 0.5));
   SOC = battery.SOC;
   SOE = battery.SOE;
   E_remaining = battery.E_remaining;
@@ -54,26 +56,26 @@ equation
   i = battery.i;
   P = battery.P;
 
-  connect(voltageBusSignal.y, controlBus.batteryBus.voltage) annotation(
-    Line(points = {{-65.2, -28}, {-112, -28}, {-112, -60}, {-100, -60}}, color = {0, 0, 127}));
-  connect(currentBusSignal.y, controlBus.batteryBus.current) annotation(
-    Line(points = {{-65.2, -38}, {-114, -38}, {-114, -60}, {-100, -60}}, color = {0, 0, 127}));
-  connect(powerBusSignal.y, controlBus.batteryBus.power) annotation(
-    Line(points = {{-65.2, -48}, {-116, -48}, {-116, -60}, {-100, -60}}, color = {0, 0, 127}));
-  connect(stateOfChargeBusSignal.y, controlBus.batteryBus.soc) annotation(
-    Line(points = {{-65.2, -58}, {-118, -58}, {-118, -60}, {-100, -60}}, color = {0, 0, 127}));
-  connect(stateOfEnergyBusSignal.y, controlBus.batteryBus.soe) annotation(
-    Line(points = {{-65.2, -68}, {-120, -68}, {-120, -60}, {-100, -60}}, color = {0, 0, 127}));
+  connect(voltageSignal.y, batteryBus.voltage) annotation(
+    Line(points = {{-31, 80}, {-70, 80}, {-70, -60}}, color = {0, 0, 127}));
+  connect(currentSignal.y, batteryBus.current) annotation(
+    Line(points = {{-31, 40}, {-70, 40}, {-70, -60}}, color = {0, 0, 127}));
+  connect(powerSignal.y, batteryBus.power) annotation(
+    Line(points = {{-31, 0}, {-70, 0}, {-70, -60}}, color = {0, 0, 127}));
+  connect(chargeSignal.y, batteryBus.soc) annotation(
+    Line(points = {{-31, -40}, {-70, -40}, {-70, -60}}, color = {0, 0, 127}));
+  connect(energySignal.y, batteryBus.soe) annotation(
+    Line(points = {{-31, -80}, {-70, -80}, {-70, -60}}, color = {0, 0, 127}));
 
   connect(pin_p, battery.p) annotation(
-    Line(points = {{100, 60}, {-40, 60}, {-40, 0}}, color = {0, 0, 255}));
+    Line(points = {{100, 60}, {60, 60}, {60, 25}}, color = {0, 0, 255}));
   connect(pin_n, battery.n) annotation(
-    Line(points = {{100, -60}, {40, -60}, {40, 0}}, color = {0, 0, 255}));
+    Line(points = {{100, -60}, {60, -60}, {60, -25}}, color = {0, 0, 255}));
 
   annotation(Documentation(info = "<html>
 <p>
 VehicleInterfaces-facing battery pack backed by the internal Thevenin pack implementation.
-It inherits <code>VehicleInterfaces.EnergyStorage.Interfaces.Base</code> and
+It inherits <code>BobLib.EnergyStorage.Interfaces.Base</code> and
 connects the standard <code>pin_p</code>/<code>pin_n</code> terminals directly
 to the BobLib battery terminals. The pack publishes terminal voltage, current,
 power, SOC, and SOE measurements on <code>controlBus.batteryBus</code>.

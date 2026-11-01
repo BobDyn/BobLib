@@ -22,8 +22,10 @@ DEFAULT_CHECKS = (
     ModelCheck("BobLib.Experiments.Standards.VehicleFMI"),
     ModelCheck("BobLib.Experiments.Standards.VehicleSim"),
     ModelCheck("BobLib.Experiments.Standards.FourPostSim"),
-    ModelCheck("BobLibTest.Regression.VehicleSimAnimationOn"),
-    ModelCheck("BobLibTest.Regression.MF52PureSlipSmoke"),
+    ModelCheck("BobLib.Experiments.Standards.Examples.MixedSuspensionVehicle"),
+    ModelCheck("BobLib.Experiments.Standards.Examples.DirectSuspensionFourPost"),
+    ModelCheck("BobLibTest.Experiments.Standards.VehicleSimAnimationOn"),
+    ModelCheck("BobLibTest.Chassis.Suspension.Tires.MF52.MF52PureSlipSmoke"),
 )
 
 

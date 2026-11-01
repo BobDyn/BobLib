@@ -2,7 +2,7 @@ within BobLib.Utilities.Mechanics.Functions;
 
 function combineMassRecords
 
-  import SI = Modelica.Units.SI;
+  import Modelica.Units.SI;
   import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.MassRecord;
 
   input MassRecord masses[:] "Mass records to combine";

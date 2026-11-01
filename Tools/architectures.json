@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "libraries": {"Modelica": "4.1.0", "VehicleInterfaces": "2.0.2"},
+  "axles": {
+    "direct": {"tag": "DWDirect", "model": "DoubleWishboneDirect"},
+    "bellcrank": {"tag": "DWBC", "model": "DoubleWishboneBellcrank"},
+    "stabar": {"tag": "DWBCStabar", "model": "DoubleWishboneBellcrankStabar"}
+  },
+  "differentials": ["Open", "ClutchLSD", "TorqueBiasing", "Locked"],
+  "front_brakes": ["Outboard", "Inboard"],
+  "rear_brakes": ["Outboard", "Inboard", "DifferentialInput"],
+  "defaults": {"front": "stabar", "rear": "stabar", "differential": "ClutchLSD", "front_brakes": "Outboard", "rear_brakes": "Outboard", "spatial_powertrain": false},
+  "fixed_models": {"road": "VehicleInterfaces.Roads.FlatRoad", "atmosphere": "BobLib.Atmospheres.ConstantAtmosphere", "tire": "BobLib.Chassis.Suspension.Tires.MF52Tire", "powertrain_mount": "VehicleInterfaces.PowertrainMounts.SingleSystemRigidMount"},
+  "table_capacities": {"curve_points": 64, "aero_axis_points": 16},
+  "scope": "The nine suspension pairs are the default catalog. Differential, brake placement and spatial mechanics select additional compiled variants; their enumeration here is not evidence of validation. Calibration values are set before initialization."
+}

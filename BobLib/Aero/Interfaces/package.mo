@@ -13,4 +13,5 @@ Package <code>BobLib.Aero.Interfaces</code> defines aerodynamic connector contra
 The aero interface is BobLib-specific and parallels the VehicleInterfaces style: first-level aero models expose only the shared signals and nested models provide the physics.
 </p>
 </html>"));
+  annotation(Icon(graphics = {Rectangle(extent = {{-100, 100}, {100, -100}}, lineColor = {0, 0, 0}, lineThickness = 0.5, fillPattern = FillPattern.None)}));
 end Interfaces;

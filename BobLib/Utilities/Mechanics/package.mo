@@ -2,7 +2,7 @@ within BobLib.Utilities;
 package Mechanics
 
   "Mechanical helper functions and MultiBody utilities"
-  extends BobLib.Icons.BobLibPackageBackground;
+  extends Modelica.Icons.UtilitiesPackage;
 
   annotation(
     preferredView = "info",
@@ -18,4 +18,5 @@ MultiBody helpers that are shared by chassis-level assemblies live under
 <code>MultiBody</code>.
 </p>
 </html>"));
+  annotation(Icon(graphics = {Rectangle(extent = {{-100, 100}, {100, -100}}, lineColor = {0, 0, 0}, lineThickness = 0.5, fillPattern = FillPattern.None)}));
 end Mechanics;

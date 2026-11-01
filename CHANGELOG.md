@@ -1,5 +1,38 @@
 # Changelog
 
+## Unreleased
+
+- Consolidate typed VI contracts, nested records and replaceable assemblies.
+- Make brake reactions, halfshafts, mounts and wheel compliance explicit.
+- Add single-axle KnC rigs and mirrored component fixtures.
+- Standardize diagrams and validation gates.
+
+See [MIGRATION.md](MIGRATION.md) for breaking class/record changes and
+[RELEASE_READINESS.md](RELEASE_READINESS.md) for remaining validation.
+Native/FMU export now includes editable independent calibration, dependency
+validation and build provenance. SS/GGV analysis remains excluded.
+
+### Changed
+
+These default vehicle behavior changes alter simulation results without any
+change to user models.
+
+- The default differential is now `ClutchLSD`. It uses the MSL `Clutch`
+  stick-slip friction model instead of the previous `tanh` lock-torque law.
+- Each halfshaft now has a real rotor inertia of 0.02 kg·m². Before, this value
+  only set the default halfshaft damping.
+- `VehicleSim` now sets `rearBrakePlacement` to `Inboard`. Before, all four
+  brakes acted at the wheel hubs.
+- Electric vehicle experiments now set `world.driveTrainMechanics3D` to `true`
+  as a `final` modifier.
+- The closed-loop steady-state hold is now 1.0 s (previously 0.1 s), requiring
+  sustained convergence rather than a brief passage through the tolerances.
+  Set `steadyStateHoldDuration=0.1` explicitly for a legacy-duration comparison.
+- Maneuver settling timeouts, tire-load limits and sideslip limits terminate
+  normally and retain results. `terminationStatus` distinguishes those outcomes
+  from accepted steady state; callers must inspect it rather than treating a
+  zero process exit code as convergence. Invalid calibration still asserts.
+
 ## 0.2.0 - 2026-08-09
 
 Minor release focused on physically consistent vehicle initialization, correct

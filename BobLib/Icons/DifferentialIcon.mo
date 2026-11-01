@@ -8,7 +8,7 @@ partial model DifferentialIcon "Reusable differential icon"
       Ellipse(extent = {{-16, 16}, {16, -16}}, lineColor = {45, 45, 45}, fillColor = {210, 215, 220}, fillPattern = FillPattern.Solid),
       Line(points = {{-28, 0}, {28, 0}}, color = {45, 45, 45}, thickness = 1),
       Line(points = {{0, -28}, {0, 28}}, color = {45, 45, 45}, thickness = 1),
-      Text(extent = {{-70, 78}, {70, 50}}, textString = "%name", lineColor = {32, 32, 32})
+      Text(extent = {{-160, 110}, {160, 80}}, textString = "%name", lineColor = {32, 32, 32}, fontSize = 0)
     }),
     Documentation(info = "<html>
 <p>

@@ -21,42 +21,39 @@ OMC_COMMAND_LINE_OPTIONS = (
 
 CHECK_MODELS = (
     "BobLib.Experiments.Standards.VehicleFMI",
-    "BobLib.Experiments.Standards.Templates.FMI.BaseVehicleFMI",
+    "BobLib.Experiments.Standards.BaseClasses.PartialVehicleFMI",
     "BobLib.Experiments.Standards.VehicleSim",
     "BobLib.Experiments.Standards.FourPostSim",
-    "BobLib.Experiments.Standards.Templates.FourPost.FourPostSim_DWDirect_DWDirect",
+    "BobLibTest.Experiments.Standards.Configurations.FourPostSim_DWDirect_DWDirect",
     "BobLib.Engines.SimpleICEngine",
     "BobLib.Transmissions.FixedRatioTransmission",
     "BobLib.Atmospheres.ConstantAtmosphere",
-    "BobLib.Chassis.Brakes.BasicVCUBrakes",
+    "BobLib.Brakes.BasicVCUBrakes",
     "BobLib.DriverEnvironments.Internal.Driver",
     "BobLib.DriverEnvironments.AutomaticDriveByWire",
     "BobLib.DriverEnvironments.EVDriveByWire",
-    "BobLibTest.TestVehicle.TestPowertrain.TestBatteryInverter",
-    "BobLibTest.TestVehicle.TestPowertrain.TestBatteryInverterMotor",
-    "BobLibTest.TestVehicle.TestPowertrain.TestPowerLimitedMotor",
-    "BobLibTest.TestVehicle.TestAero.TestCFDAeroMap",
-    "BobLibTest.TestVehicle.TestPowertrain.TestVCU",
-    "BobLibTest.TestVehicle.TestPowertrain.TestStandardVCU",
-    "BobLibTest.TestVehicle.TestPowertrain.TestPowertrain",
-    "BobLibTest.TestVehicle.TestChassis.TestSuspension.TestFrAxleDW",
-    "BobLibTest.TestVehicle.TestChassis.TestSuspension.TestRrAxleDW",
-    "BobLibTest.TestVehicle.TestChassis.TestSuspension.TestTemplates.TestTire.TestFourMF52Kinematic",
-    "BobLibTest.Regression.MF52PureSlipSmoke",
+    "BobLibTest.PowerElectronics.TestBatteryInverter",
+    "BobLibTest.ElectricDrives.TestBatteryInverterMotor",
+    "BobLibTest.ElectricDrives.Internal.TestPowerLimitedMotor",
+    "BobLibTest.Aero.TestCFDAeroMap",
+    "BobLibTest.Controllers.TestVCU",
+    "BobLibTest.Drivers.TestStandardDriver",
+    "BobLibTest.Drivelines.TestPowertrain",
+    "BobLibTest.Chassis.Suspension.TestFrAxleDW",
+    "BobLibTest.Chassis.Suspension.TestRrAxleDW",
+    "BobLibTest.Chassis.Suspension.Tires.TestFourMF52Kinematic",
+    "BobLibTest.Chassis.Suspension.Tires.MF52.MF52PureSlipSmoke",
 )
 
 EXPECTED_EQUATION_VARIABLE_DIFFS = {
     "BobLib.Engines.SimpleICEngine": -1,
-    "BobLib.Chassis.Brakes.BasicVCUBrakes": -1,
+    "BobLib.Brakes.BasicVCUBrakes": -1,
 }
 
 ROD_TO_LOWER_AXLE_FILES = (
-    Path("BobLib/Chassis/Suspension/FrAxleDW_BC.mo"),
-    Path("BobLib/Chassis/Suspension/FrAxleDW_BC_Stabar.mo"),
-    Path("BobLib/Chassis/Suspension/FrAxleDW_Direct.mo"),
-    Path("BobLib/Chassis/Suspension/RrAxleDW_BC.mo"),
-    Path("BobLib/Chassis/Suspension/RrAxleDW_BC_Stabar.mo"),
-    Path("BobLib/Chassis/Suspension/RrAxleDW_Direct.mo"),
+    Path("BobLib/Chassis/Suspension/DoubleWishboneBellcrank.mo"),
+    Path("BobLib/Chassis/Suspension/DoubleWishboneBellcrankStabar.mo"),
+    Path("BobLib/Chassis/Suspension/DoubleWishboneDirect.mo"),
 )
 
 
@@ -142,10 +139,7 @@ def test_vcu_enforces_motoring_power_limit() -> None:
             """
 model VCUPowerLimitProbe
 
-  BobLib.Controllers.Internal.VCUCore vcu(
-    tau_max = 200,
-    P_max_mot = 80000,
-    w_eps = 0.1);
+  BobLib.Controllers.Internal.VCUCore vcu(pVCU(tau_max = 200,P_max_mot = 80000,w_eps = 0.1));
   Modelica.Blocks.Sources.Constant torqueRequest(k = 200);
   Modelica.Blocks.Sources.Constant zero(k = 0);
   Modelica.Blocks.Sources.Constant motorSpeed(k = 1000);
@@ -153,14 +147,9 @@ model VCUPowerLimitProbe
 
 equation
   connect(torqueRequest.y, vcu.cmd_torque_motor);
-  connect(zero.y, vcu.cmd_steering_angle);
-  connect(zero.y, vcu.cmd_accelerator_pedal);
-  connect(zero.y, vcu.cmd_brake_pedal);
   connect(zero.y, vcu.cmd_regen_limit);
   connect(enabled.y, vcu.cmd_inverter_enable);
   connect(motorSpeed.y, vcu.sens_motor_speed);
-  connect(zero.y, vcu.sens_hv_bus_voltage);
-  connect(zero.y, vcu.sens_hv_bus_current);
 
   assert(abs(vcu.tau_cmd_limited - 80) < 1e-9,
     "VCU did not limit 200 Nm at 1000 rad/s to 80 Nm");
@@ -217,22 +206,21 @@ def test_nonzero_right_wheel_angles_are_mirrored() -> None:
             """
 model RightWheelChassisProbe
 
-  extends BobLibTest.TestVehicle.TestChassis.TestSuspension.TestFrAxleDW(
-    pVehicle(
-      pFrPartialWheel(staticAlpha = 1.25, staticGamma = 2.5)));
+  extends BobLibTest.Chassis.Suspension.TestFrAxleDW(
+    pVehicle(      chassis(      frontAxle(      tire(      wheel(geometry(staticAlpha = 1.25, staticGamma = 2.5)))))));
 
   output Real frontLeftAlpha =
-    frAxleDW.leftTire.pPartialWheel.staticAlpha;
+    frAxleDW.leftTire.pTire.wheel.geometry.staticAlpha;
   output Real frontRightAlpha =
-    frAxleDW.rightTire.pPartialWheel.staticAlpha;
+    frAxleDW.rightTire.pTire.wheel.geometry.staticAlpha;
   output Real frontRightWheelAlpha =
-    frAxleDW.rightTire.wheelModel.partialWheelParams.staticAlpha;
+    frAxleDW.rightTire.wheelModel.pWheel.geometry.staticAlpha;
   output Real frontLeftGamma =
-    frAxleDW.leftTire.pPartialWheel.staticGamma;
+    frAxleDW.leftTire.pTire.wheel.geometry.staticGamma;
   output Real frontRightGamma =
-    frAxleDW.rightTire.pPartialWheel.staticGamma;
+    frAxleDW.rightTire.pTire.wheel.geometry.staticGamma;
   output Real frontRightWheelGamma =
-    frAxleDW.rightTire.wheelModel.partialWheelParams.staticGamma;
+    frAxleDW.rightTire.wheelModel.pWheel.geometry.staticGamma;
   output Real frontHubXMirrorError[3] =
     Modelica.Mechanics.MultiBody.Frames.resolve1(
       frAxleDW.rightTire.wheelModel.hubAxis.frame_b.R,
@@ -257,36 +245,35 @@ end RightWheelChassisProbe;
 
 model RightWheelFourPostProbe
 
-  extends BobLib.Experiments.Standards.Templates.FourPost.FourPostSim_DWDirect_DWDirect(
-    pVehicle(
-      pFrPartialWheel(staticAlpha = 1.25, staticGamma = 2.5),
-      pRrPartialWheel(staticAlpha = -0.75, staticGamma = 1.5)));
+  extends BobLibTest.Experiments.Standards.Configurations.FourPostSim_DWDirect_DWDirect(
+    pVehicle(      chassis(      frontAxle(      tire(      wheel(geometry(staticAlpha = 1.25, staticGamma = 2.5)))),
+      rearAxle(      tire(      wheel(geometry(staticAlpha = -0.75, staticGamma = 1.5)))))));
 
   output Real frontLeftAlpha =
-    frAxleDW.leftTire.pPartialWheel.staticAlpha;
+    frAxleDW.leftTire.pTire.wheel.geometry.staticAlpha;
   output Real frontRightAlpha =
-    frAxleDW.rightTire.pPartialWheel.staticAlpha;
+    frAxleDW.rightTire.pTire.wheel.geometry.staticAlpha;
   output Real frontRightWheelAlpha =
-    frAxleDW.rightTire.wheelModel.partialWheelParams.staticAlpha;
+    frAxleDW.rightTire.wheelModel.pWheel.geometry.staticAlpha;
   output Real frontLeftGamma =
-    frAxleDW.leftTire.pPartialWheel.staticGamma;
+    frAxleDW.leftTire.pTire.wheel.geometry.staticGamma;
   output Real frontRightGamma =
-    frAxleDW.rightTire.pPartialWheel.staticGamma;
+    frAxleDW.rightTire.pTire.wheel.geometry.staticGamma;
   output Real frontRightWheelGamma =
-    frAxleDW.rightTire.wheelModel.partialWheelParams.staticGamma;
+    frAxleDW.rightTire.wheelModel.pWheel.geometry.staticGamma;
 
   output Real rearLeftAlpha =
-    rrAxleDW.leftTire.pPartialWheel.staticAlpha;
+    rrAxleDW.leftTire.pTire.wheel.geometry.staticAlpha;
   output Real rearRightAlpha =
-    rrAxleDW.rightTire.pPartialWheel.staticAlpha;
+    rrAxleDW.rightTire.pTire.wheel.geometry.staticAlpha;
   output Real rearRightWheelAlpha =
-    rrAxleDW.rightTire.wheelModel.partialWheelParams.staticAlpha;
+    rrAxleDW.rightTire.wheelModel.pWheel.geometry.staticAlpha;
   output Real rearLeftGamma =
-    rrAxleDW.leftTire.pPartialWheel.staticGamma;
+    rrAxleDW.leftTire.pTire.wheel.geometry.staticGamma;
   output Real rearRightGamma =
-    rrAxleDW.rightTire.pPartialWheel.staticGamma;
+    rrAxleDW.rightTire.pTire.wheel.geometry.staticGamma;
   output Real rearRightWheelGamma =
-    rrAxleDW.rightTire.wheelModel.partialWheelParams.staticGamma;
+    rrAxleDW.rightTire.wheelModel.pWheel.geometry.staticGamma;
   output Real frontHubXMirrorError[3] =
     Modelica.Mechanics.MultiBody.Frames.resolve1(
       frAxleDW.rightTire.wheelModel.hubAxis.frame_b.R,
@@ -348,6 +335,7 @@ simulate(
   numberOfIntervals=1,
   outputFormat="csv",
   variableFilter="time|front.*");
+getErrorString();
 simulate(
   RightWheelFourPostProbe,
   startTime=0,
@@ -399,7 +387,7 @@ getErrorString();
         model: {
             signal: value
             for signal, value in signals.items()
-            if "MirrorError[" not in signal
+            if re.fullmatch(r"(front|rear)(Left|Right|RightWheel)(Alpha|Gamma)", signal)
         }
         for model, signals in results.items()
     }
@@ -435,11 +423,10 @@ getErrorString();
 @pytest.mark.parametrize(
     "relative_path",
     (
-        Path("BobLib/Chassis/Chassis_DW.mo"),
-        Path("BobLib/Chassis/Chassis_DWBCStabar_DWBCStabar.mo"),
+        Path("BobLib/Chassis/DoubleWishbone.mo"),
         Path(
-            "BobLib/Experiments/Standards/Templates/FourPost/"
-            "BaseFourPostSim.mo"
+            "BobLib/Experiments/Standards/BaseClasses/"
+            "PartialDoubleWishboneFourPost.mo"
         ),
     ),
     ids=str,
@@ -448,17 +435,15 @@ def test_right_tire_redeclarations_preserve_mirrored_record(
     relative_path: Path,
 ) -> None:
     source = (_repo_root() / relative_path).read_text()
-    for axle in ("Fr", "Rr"):
-        left_record = f"pVehicle.p{axle}PartialWheel"
-        assert source.count(f"pPartialWheel = {left_record}") == 1
-        assert source.count(f"partialWheelParams = {left_record}") == 1
+    # Axle owns mirroring; assemblies must not overwrite the right tire record.
+    assert not re.search(r"rightTire\s*\(\s*pTire", source)
 
     axle_base = (
-        _repo_root() / "BobLib" / "Chassis" / "Suspension" / "AxleDWBase.mo"
+        _repo_root() / "BobLib" / "Chassis" / "Suspension" / "BaseClasses" / "PartialDoubleWishboneAxle.mo"
     ).read_text()
-    assert "staticAlpha = -pLeftPartialWheel.staticAlpha" in axle_base
-    assert "staticGamma = -pLeftPartialWheel.staticGamma" in axle_base
-    assert "rightTire(pPartialWheel = pRightPartialWheel)" in axle_base
+    assert "staticAlpha = -pAxle.tire.wheel.geometry.staticAlpha" in axle_base
+    assert "staticGamma = -pAxle.tire.wheel.geometry.staticGamma" in axle_base
+    assert re.search(r"\brightTire\b[^;]*?\bconstrainedby\s+[\w.]+BaseTire\(\s*pTire\s*=\s*rightTireCalibration\b", axle_base)
 
     tire_base = (
         _repo_root()
@@ -468,7 +453,7 @@ def test_right_tire_redeclarations_preserve_mirrored_record(
         / "Tires"
         / "BaseTire.mo"
     ).read_text()
-    assert "wheelModel(partialWheelParams = pPartialWheel)" in tire_base
+    assert re.search(r"wheelModel\s+constrainedby\s+[\w.]+PartialWheel\(\s*pWheel\s*=\s*pTire.wheel\b", tire_base)
 
 
 def test_default_vehicle_mass_properties_include_both_axle_sides() -> None:
@@ -489,15 +474,20 @@ model ChassisMassPropertiesProbe
   import BobLib.Records.VehicleDefn.EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord;
   import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.MassRecord;
 
-  parameter EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord pVehicle =
-    EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord();
-  final parameter MassRecord pVehicleMass =
-    BobLib.Utilities.Mechanics.Functions.combineSymmetricAxleMassRecords(
-      pVehicle.pSprungMass,
-      {pVehicle.pFrAxleMass, pVehicle.pRrAxleMass});
+  // shortcut: avoid OMC 1.27.1 nested-constructor cycle; see compiler_probes/nested_record_defaults.mos.
+  parameter EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord pVehicle;
+  final parameter MassRecord pVehicleMass(
+    m(fixed=false), rCM(each fixed=false), inertia(each fixed=false));
 
   output Real totalMass = pVehicleMass.m;
   output Real vehicleCG[3] = pVehicleMass.rCM;
+
+initial equation
+  // Match the chassis initialization contract; whole-record bindings freeze in OMC.
+  pVehicleMass =
+    BobLib.Utilities.Mechanics.Functions.combineSymmetricAxleMassRecords(
+      pVehicle.chassis.frame.mass,
+      {pVehicle.chassis.frontAxle.masses, pVehicle.chassis.rearAxle.masses});
 
 end ChassisMassPropertiesProbe;
 """.strip()
@@ -553,35 +543,27 @@ getErrorString();
     )
 
 
-def test_vehicle_sim_qss_initialization_is_wired_from_vehicle_record() -> None:
+def test_vehicle_sim_qss_initialization_is_owned_by_experiment() -> None:
     repo_root = _repo_root()
     vehicle_sim = (
         repo_root / "BobLib" / "Experiments" / "Standards" / "VehicleSim.mo"
     ).read_text()
     axle = (
-        repo_root / "BobLib" / "Chassis" / "Suspension" / "AxleDWBase.mo"
+        repo_root / "BobLib" / "Chassis" / "Suspension" / "BaseClasses" / "PartialDoubleWishboneAxle.mo"
     ).read_text()
-    record = (
-        repo_root
-        / "BobLib"
-        / "Records"
-        / "VehicleDefn"
-        / "EVBatInvMotDiff_DWBCStabar_DWBCStabarRecord.mo"
-    ).read_text()
-
     required_vehicle_sim = (
-        "chassisReferencePosition = pVehicle.pQSSInitialization.chassisReferencePosition",
-        "chassisReferenceAngles = pVehicle.pQSSInitialization.chassisReferenceAngles",
+        "chassisReferencePosition = pInitialization.chassisReferencePosition",
+        "chassisReferenceAngles = pInitialization.chassisReferenceAngles",
         "fixInitialSuspensionAngles = true",
-        "initialFrontLeftLowerArmAngle = pVehicle.pQSSInitialization.frontLeftLowerArmAngle",
-        "initialRearRightLowerArmAngle = pVehicle.pQSSInitialization.rearRightLowerArmAngle",
+        "initialFrontLeftLowerArmAngle = pInitialization.frontLeftLowerArmAngle",
+        "initialRearRightLowerArmAngle = pInitialization.rearRightLowerArmAngle",
     )
     assert all(fragment in vehicle_sim for fragment in required_vehicle_sim)
     assert "fixed = fixInitialLeftLowerArmAngle" in axle
     assert "fixed = fixInitialRightLowerArmAngle" in axle
     assert "fixed = fixInitialLowerArmAngularVelocities" in axle
-    assert "frontSpringLength = 0.175156854188570" in record
-    assert "rearSpringLength = 0.244911388707023" in record
+    assert "frontSpringLength = 0.175156854188570" in vehicle_sim
+    assert "rearSpringLength = 0.244911388707023" in vehicle_sim
 
 
 def test_base_vehicle_sim_replaceable_placements_are_canonical() -> None:
@@ -590,11 +572,10 @@ def test_base_vehicle_sim_replaceable_placements_are_canonical() -> None:
         / "BobLib"
         / "Experiments"
         / "Standards"
-        / "Templates"
-        / "Vehicle"
-        / "BaseVehicleSim.mo"
+        / "BaseClasses"
+        / "PartialVehicle.mo"
     )
-    source = source_path.read_text()
+    source = " ".join(source_path.read_text().split())
     bad_fragments = []
     for match in re.finditer(r"\bconstrainedby\b", source):
         declaration_start = source.rfind(";", 0, match.start()) + 1
@@ -609,7 +590,7 @@ def test_base_vehicle_sim_replaceable_placements_are_canonical() -> None:
             bad_fragments.append((line, declaration.strip()))
 
     assert not bad_fragments, (
-        "BaseVehicleSim replaceable constrained components must keep their "
+        "PartialVehicle replaceable constrained components must keep their "
         "single Placement annotation before constrainedby. OMEdit edits that "
         "pre-constrainedby slot; a second post-constrainedby annotation can "
         "make moved icons or resized icons reload from stale geometry.\n"
@@ -623,11 +604,10 @@ def test_base_vehicle_sim_origin_placements_use_local_extents() -> None:
         / "BobLib"
         / "Experiments"
         / "Standards"
-        / "Templates"
-        / "Vehicle"
-        / "BaseVehicleSim.mo"
+        / "BaseClasses"
+        / "PartialVehicle.mo"
     )
-    source = source_path.read_text()
+    source = " ".join(source_path.read_text().split())
     number = r"[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?"
     placement_pattern = re.compile(
         rf"Placement\s*\(\s*transformation\s*\(\s*origin\s*=\s*\{{\s*"
@@ -647,7 +627,7 @@ def test_base_vehicle_sim_origin_placements_use_local_extents() -> None:
             bad_fragments.append((line, match.group(0).strip()))
 
     assert not bad_fragments, (
-        "BaseVehicleSim placements with an explicit origin must use local "
+        "PartialVehicle placements with an explicit origin must use local "
         "extents centered on that origin. Offset extents can reload with "
         "size discrepancies in OMEdit.\n"
         + "\n".join(f"line {line}: {fragment}" for line, fragment in bad_fragments)
@@ -657,13 +637,13 @@ def test_base_vehicle_sim_origin_placements_use_local_extents() -> None:
 @pytest.mark.parametrize("relative_path", ROD_TO_LOWER_AXLE_FILES, ids=str)
 def test_axles_preserve_rod_to_lower_attachment_selector(relative_path: Path) -> None:
     source_path = _repo_root() / relative_path
-    source = source_path.read_text()
+    source = " ".join(source_path.read_text().split())
 
     required_snippets = (
-        "leftRodWishboneMount[3] = if pAxle.rodToLower then pLeftDW.lower_o else pLeftDW.upper_o",
-        "r = pAxle.rodMount - leftRodWishboneMount",
-        "r = mirrorXZ(pAxle.rodMount - leftRodWishboneMount)",
-        "if pAxle.rodToLower then",
+        "leftRodWishboneMount[3] = if pAxle.actuation.rodToLower then pAxle.geometry.lower_o else pAxle.geometry.upper_o",
+        "r = pAxle.actuation.rodMount - leftRodWishboneMount",
+        "r = mirrorXZ(pAxle.actuation.rodMount - leftRodWishboneMount)",
+        "if pAxle.actuation.rodToLower then",
         "connect(toLeftApex.frame_a, leftWishboneUprightLoop.lowerFrame_o)",
         "connect(toRightApex.frame_a, rightWishboneUprightLoop.lowerFrame_o)",
         "connect(toLeftApex.frame_a, leftWishboneUprightLoop.upperFrame_o)",
@@ -672,7 +652,7 @@ def test_axles_preserve_rod_to_lower_attachment_selector(relative_path: Path) ->
 
     missing = [snippet for snippet in required_snippets if snippet not in source]
     assert not missing, (
-        f"{relative_path} must keep pAxle.rodToLower wired through both the "
+        f"{relative_path} must keep pAxle.actuation.rodToLower wired through both the "
         "apex translation and upper/lower wishbone frame connections. Missing:\n"
         + "\n".join(missing)
     )

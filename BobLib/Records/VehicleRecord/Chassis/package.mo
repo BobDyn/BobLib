@@ -1,7 +1,7 @@
 within BobLib.Records.VehicleRecord;
 package Chassis
 
-  extends BobLib.Icons.RecordsPackageIcon;
+  extends Modelica.Icons.RecordsPackage;
 
   annotation(
     Documentation(info = "<html>
@@ -15,4 +15,5 @@ VehicleInterfaces-facing chassis adapter, while suspension geometry, tire data,
 and linkage mass properties live in nested packages.
 </p>
 </html>"));
+  annotation(Icon(graphics = {Rectangle(extent = {{-100, 100}, {100, -100}}, lineColor = {0, 0, 0}, lineThickness = 0.5, fillPattern = FillPattern.None)}));
 end Chassis;

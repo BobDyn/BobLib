@@ -2,20 +2,18 @@ within BobLib.Chassis.Suspension.Tires;
 
 model MF52Tire
 
-  import SI = Modelica.Units.SI;
-
+  import Modelica.Units.SI;
   import BobLib.Chassis.Suspension.Tires.MF52;
 
-  import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.MF52Record;
-
-  extends BobLib.Chassis.Suspension.Tires.BaseTire(realExpressionFx(y = Fx),
+  extends BobLib.Chassis.Suspension.Tires.BaseTire(
+    redeclare replaceable MF52.SlipModel.TransientSlip slipModel(pSlip = pTire.force.relaxation), final referenceRoadFriction = pTire.force.referenceRoadFriction,
+                                                                    realExpressionFx(y = Fx),
                                                                     realExpressionFy(y = Fy),
                                                                     realExpressionMx(y = Mx),
                                                                     realExpressionMy(y = My),
                                                                     realExpressionMz(y = Mz));
 
   // Record parameters
-  parameter MF52Record pTireModel;
 
   SI.Force Fx;
   SI.Force Fy;
@@ -30,7 +28,7 @@ equation
 
   // MF52 force and moment evaluation
   (Fx, Fy, Mx, My, Mz, t, s) =
-    MF52.Eval(Fz, alpha, kappa, gamma, Vx, pTireModel);
+    MF52.Eval(Fz, alpha, kappa, gamma, Vx, pTire.force);
 
   annotation(
     Documentation(info = "<html>

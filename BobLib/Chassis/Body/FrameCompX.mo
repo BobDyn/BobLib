@@ -3,12 +3,6 @@ within BobLib.Chassis.Body;
 model FrameCompX
 
   extends BobLib.Chassis.Body.FrameBase;
-  import SI = Modelica.Units.SI;
-  import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.MassRecord;
-
-  parameter SI.RotationalSpringConstant torsionalStiff;
-  parameter MassRecord pSprungMass;
-  parameter SI.RotationalDampingConstant torsionalDamp = 2 * sqrt(torsionalStiff * pSprungMass.inertia[1, 1]);
 
   Modelica.Mechanics.MultiBody.Joints.Revolute torsionalRevolute(
     n = {1, 0, 0},
@@ -18,10 +12,12 @@ model FrameCompX
     w(start = 0, fixed = true, nominal = 1)) annotation(
     Placement(transformation(extent = {{-10, -10}, {10, 10}}, rotation = -180)));
 
-  Modelica.Mechanics.Rotational.Components.Spring spring(c = torsionalStiff, phi_rel0 = 0) annotation(
+  replaceable Modelica.Mechanics.Rotational.Components.Spring spring(
+    c = pFrame.torsionalStiffness,
+    phi_rel0 = 0) constrainedby Modelica.Mechanics.Rotational.Interfaces.PartialCompliant annotation(choicesAllMatching = true,
     Placement(transformation(origin = {20, -30}, extent = {{10, -10}, {-10, 10}}, rotation = -0)));
 
-  Modelica.Mechanics.Rotational.Components.Damper damper(d = torsionalDamp) annotation(
+  replaceable Modelica.Mechanics.Rotational.Components.Damper damper(d = pFrame.torsionalDamping) constrainedby Modelica.Mechanics.Rotational.Interfaces.PartialCompliant annotation(choicesAllMatching = true,
     Placement(transformation(origin = {20, -50}, extent = {{10, -10}, {-10, 10}}, rotation = -0)));
 
 equation
@@ -37,8 +33,8 @@ equation
     Line(points = {{30, -50}, {40, -50}, {40, -10}, {6, -10}}));
   connect(damper.flange_b, torsionalRevolute.axis) annotation(
     Line(points = {{10, -50}, {0, -50}, {0, -10}}));
-  annotation(Diagram(coordinateSystem(extent = {{-120, -120}, {120, 120}})),
-    Icon(graphics = {Line(origin = {0.03, -1}, rotation = -90, points = {{-1.02758, -20}, {-1.02758, -6}, {-5.02758, -4}, {2.97242, 0}, {-5.02758, 4}, {2.97242, 8}, {-1.02758, 10}, {-1.02758, 20}}, color = {0, 170, 0}, thickness = 2), Text(textColor = {255, 0, 0}, extent = {{-14, 14}, {14, -14}}, textString = "rxDOF")}),
+  annotation(Diagram(coordinateSystem(extent = {{-100, -80}, {100, 80}}, preserveAspectRatio = true)),
+    Icon(graphics = {Rectangle(extent = {{-21, 9}, {21, -9}}, lineColor = {255, 255, 255}, fillColor = {255, 255, 255}, fillPattern = FillPattern.Solid), Line(origin = {0.03, -1}, rotation = -90, points = {{-1.02758, -20}, {-1.02758, -6}, {-5.02758, -4}, {2.97242, 0}, {-5.02758, 4}, {2.97242, 8}, {-1.02758, 10}, {-1.02758, 20}}, color = {0, 170, 0}, thickness = 2)}),
     Documentation(info = "<html>
 <p>
 Model <code>FrameCompX</code> represents a sprung chassis frame with longitudinal compliance.

@@ -2,7 +2,19 @@ within BobLib.Utilities.Mechanics.MultiBody;
 package ContactMechanics
 
   "MultiBody contact helpers for chassis-level contact-patch wiring"
-  extends BobLib.Icons.BobLibPackageBackground;
+
+  // Package graphic adapted from BobLib.Icons.GroundPhysicsIcon; instance-name text omitted.
+
+  annotation(Icon(
+      coordinateSystem(extent = {{-100, -100}, {100, 100}}),
+      graphics = {
+
+        Rectangle(extent = {{-100, -100}, {100, 25}}, fillPattern = FillPattern.Solid,
+          fillColor = {150, 100, 50}, lineThickness = 2),
+        Rectangle(extent = {{-100, 25}, {100, 100}}, fillPattern = FillPattern.Solid,
+          fillColor = {95, 200, 70}, lineThickness = 2)
+
+      , Rectangle(extent = {{-100, 100}, {100, -100}}, lineColor = {0, 0, 0}, lineThickness = 0.5, fillPattern = FillPattern.None)}));
 
   annotation(
     Documentation(info = "<html>

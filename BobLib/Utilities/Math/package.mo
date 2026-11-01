@@ -1,7 +1,7 @@
 within BobLib.Utilities;
 package Math
 
-  extends BobLib.Icons.MathIcon;
+  extends Modelica.Icons.FunctionsPackage;
 
   annotation(
     Documentation(info = "<html>
@@ -12,4 +12,5 @@ Package <code>BobLib.Utilities.Math</code> contains shared mathematical helpers.
 These utilities cover vector and tensor operations used by geometry, mirroring, and mechanics calculations across the library.
 </p>
 </html>"));
+  annotation(Icon(graphics = {Rectangle(extent = {{-100, 100}, {100, -100}}, lineColor = {0, 0, 0}, lineThickness = 0.5, fillPattern = FillPattern.None)}));
 end Math;

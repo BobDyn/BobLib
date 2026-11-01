@@ -1,0 +1,969 @@
+{
+  "schema_version": 1,
+  "models": [
+    {
+      "model": "BobLib.Aero.CFDAeroMap",
+      "test": "BobLibTest.Aero.TestCFDAeroMap",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Aero.Interfaces.Base",
+      "test": "BobLibTest.Aero.Interfaces.TestBase",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Aero.Mounts.RigidMount",
+      "test": "BobLibTest.Aero.Mounts.TestRigidMount",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Atmospheres.ConstantAtmosphere",
+      "test": "BobLibTest.Atmospheres.TestConstantAtmosphere",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Brakes.BasicVCUBrakes",
+      "test": "BobLibTest.Brakes.TestBasicVCUBrakes",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Brakes.Interfaces.Base",
+      "test": "BobLibTest.Brakes.Interfaces.TestBase",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Brakes.Internal.AxleBrakes",
+      "test": "BobLibTest.Brakes.Internal.TestAxleBrakes",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Brakes.Internal.BrakeActuation",
+      "test": "BobLibTest.Brakes.Internal.TestBrakeActuation",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Brakes.Internal.RigAxleBrake",
+      "test": "BobLibTest.Brakes.Internal.TestRigAxleBrake",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Brakes.PedalBrakes",
+      "test": "BobLibTest.Brakes.TestPedalBrakes",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Chassis.BaseClasses.PartialChassis",
+      "test": "BobLibTest.Chassis.BaseClasses.TestPartialChassis",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Chassis.BaseClasses.PartialChassisAssembly",
+      "test": "BobLibTest.Chassis.BaseClasses.TestPartialChassisAssembly",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Chassis.Body.FrameBase",
+      "test": "BobLibTest.Chassis.Body.TestFrameBase",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Chassis.Body.FrameCompX",
+      "test": "BobLibTest.Chassis.Body.TestFrameCompX",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Chassis.Body.FrameRigid",
+      "test": "BobLibTest.Chassis.Body.TestFrameRigid",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Chassis.DoubleWishbone",
+      "test": "BobLibTest.Chassis.TestDoubleWishbone",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 10.0
+    },
+    {
+      "model": "BobLib.Chassis.Interfaces.Base",
+      "test": "BobLibTest.Chassis.Interfaces.TestBase",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.BaseClasses.PartialDoubleWishboneAxle",
+      "test": "BobLibTest.Chassis.Suspension.BaseClasses.TestPartialDoubleWishboneAxle",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.BaseClasses.PartialTabularCompliant",
+      "test": "BobLibTest.Chassis.Suspension.BaseClasses.TestPartialTabularCompliant",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Components.Bellcrank2",
+      "test": "BobLibTest.Chassis.Suspension.Components.TestBellcrank2",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Components.Bellcrank3",
+      "test": "BobLibTest.Chassis.Suspension.Components.TestBellcrank3",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Components.ForceOnlyRod",
+      "test": "BobLibTest.Chassis.Suspension.Components.TestForceOnlyRod",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Components.RackAndPinion",
+      "test": "BobLibTest.Chassis.Suspension.Components.TestRackAndPinion",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 3.0
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Components.Rod",
+      "test": "BobLibTest.Chassis.Suspension.Components.TestRod",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 3.0
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Components.ShockLinkage",
+      "test": "BobLibTest.Chassis.Suspension.Components.TestShockLinkage",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Components.Stabar",
+      "test": "BobLibTest.Chassis.Suspension.Components.TestStabar",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 3.0
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Components.TabularDamper",
+      "test": "BobLibTest.Chassis.Suspension.Components.TestTabularDamper",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Components.TabularSpring",
+      "test": "BobLibTest.Chassis.Suspension.Components.TestTabularSpring",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Components.WishboneUprightLoop",
+      "test": "BobLibTest.Chassis.Suspension.Components.TestWishboneUprightLoop",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 3.0
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.DoubleWishboneBellcrank",
+      "test": "BobLibTest.Chassis.Suspension.TestDoubleWishboneBellcrank",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.DoubleWishboneBellcrankStabar",
+      "test": "BobLibTest.Chassis.Suspension.TestDoubleWishboneBellcrankStabar",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 3.0
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.DoubleWishboneDirect",
+      "test": "BobLibTest.Chassis.Suspension.TestDoubleWishboneDirect",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Interfaces.AxleBase",
+      "test": "BobLibTest.Chassis.Suspension.Interfaces.TestAxleBase",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Tires.BaseTire",
+      "test": "BobLibTest.Chassis.Suspension.Tires.TestBaseTire",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 0.001
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Tires.MF52.SlipModel.BaseSlipModel",
+      "test": "BobLibTest.Chassis.Suspension.Tires.MF52.SlipModel.TestBaseSlipModel",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Tires.MF52.SlipModel.KinematicSlip",
+      "test": "BobLibTest.Chassis.Suspension.Tires.MF52.SlipModel.TestKinematicSlip",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Tires.MF52.SlipModel.NoSlip",
+      "test": "BobLibTest.Chassis.Suspension.Tires.MF52.SlipModel.TestNoSlip",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Tires.MF52.SlipModel.TransientSlip",
+      "test": "BobLibTest.Chassis.Suspension.Tires.MF52.SlipModel.TestTransientSlip",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Tires.MF52Tire",
+      "test": "BobLibTest.Chassis.Suspension.Tires.TestMF52Tire",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 10.0
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Tires.Wheels.PartialWheel",
+      "test": "BobLibTest.Chassis.Suspension.Tires.Wheels.TestPartialWheel",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Tires.Wheels.Wheel0DOF",
+      "test": "BobLibTest.Chassis.Suspension.Tires.Wheels.TestWheel0DOF",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Tires.Wheels.Wheel1DOF_Y",
+      "test": "BobLibTest.Chassis.Suspension.Tires.Wheels.TestWheel1DOF_Y",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Tires.Wheels.Wheel1DOF_Z",
+      "test": "BobLibTest.Chassis.Suspension.Tires.Wheels.TestWheel1DOF_Z",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Tires.Wheels.Wheel2DOF_YZ",
+      "test": "BobLibTest.Chassis.Suspension.Tires.Wheels.TestWheel2DOF_YZ",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Controllers.Interfaces.Base",
+      "test": "BobLibTest.Controllers.Interfaces.TestBase",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Controllers.Internal.VCUCore",
+      "test": "BobLibTest.Controllers.Internal.TestVCUCore",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Controllers.VCU",
+      "test": "BobLibTest.Controllers.TestVCU",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Drivelines.Interfaces.Base",
+      "test": "BobLibTest.Drivelines.Interfaces.TestBase",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Drivelines.Internal.Differential1D",
+      "test": "BobLibTest.Drivelines.Internal.TestDifferential1D",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Drivelines.Internal.Halfshaft",
+      "test": "BobLibTest.Drivelines.Internal.TestHalfshaft",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Drivelines.Internal.LockedDifferential1D",
+      "test": "BobLibTest.Drivelines.Internal.TestLockedDifferential1D",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Drivelines.Internal.OpenDifferential1D",
+      "test": "BobLibTest.Drivelines.Internal.TestOpenDifferential1D",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Drivelines.RearFinalDriveDifferential",
+      "test": "BobLibTest.Drivelines.TestRearFinalDriveDifferential",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.DriverEnvironments.AutomaticDriveByWire",
+      "test": "BobLibTest.DriverEnvironments.TestAutomaticDriveByWire",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.DriverEnvironments.CommandedDriveByWire",
+      "test": "BobLibTest.DriverEnvironments.TestCommandedDriveByWire",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.DriverEnvironments.EVDriveByWire",
+      "test": "BobLibTest.DriverEnvironments.TestEVDriveByWire",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.DriverEnvironments.ExternalDriver",
+      "test": "BobLibTest.DriverEnvironments.TestExternalDriver",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.DriverEnvironments.Interfaces.Base",
+      "test": "BobLibTest.DriverEnvironments.Interfaces.TestBase",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.DriverEnvironments.Interfaces.Commanded",
+      "test": "BobLibTest.DriverEnvironments.Interfaces.TestCommanded",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.DriverEnvironments.Internal.Driver",
+      "test": "BobLibTest.DriverEnvironments.Internal.TestDriver",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.DriverEnvironments.Internal.ManeuverMeasurements",
+      "test": "BobLibTest.DriverEnvironments.Internal.TestManeuverMeasurements",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Drivers.Internal.Maneuver",
+      "test": "BobLibTest.Drivers.Internal.TestManeuver",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Drivers.StandardDriver",
+      "test": "BobLibTest.Drivers.TestStandardDriver",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.ElectricDrives.Interfaces.Base",
+      "test": "BobLibTest.ElectricDrives.Interfaces.TestBase",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.ElectricDrives.Internal.PowerLimitedMotor",
+      "test": "BobLibTest.ElectricDrives.Internal.TestPowerLimitedMotor",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.ElectricDrives.Motor",
+      "test": "BobLibTest.ElectricDrives.TestMotor",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.05
+    },
+    {
+      "model": "BobLib.EnergyStorage.BatteryPack",
+      "test": "BobLibTest.EnergyStorage.TestBatteryPack",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.EnergyStorage.Interfaces.Base",
+      "test": "BobLibTest.EnergyStorage.Interfaces.TestBase",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.EnergyStorage.Internal.BatteryBase",
+      "test": "BobLibTest.EnergyStorage.Internal.TestBatteryBase",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.EnergyStorage.Internal.TheveninBatteryPack",
+      "test": "BobLibTest.EnergyStorage.Internal.TestTheveninBatteryPack",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 100.0
+    },
+    {
+      "model": "BobLib.Engines.Interfaces.Base",
+      "test": "BobLibTest.Engines.Interfaces.TestBase",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Engines.Internal.SimpleICEngineCore",
+      "test": "BobLibTest.Engines.Internal.TestSimpleICEngineCore",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Engines.SimpleICEngine",
+      "test": "BobLibTest.Engines.TestSimpleICEngine",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Experiments.Standards.BaseClasses.KnCInputs",
+      "test": "BobLibTest.Experiments.Standards.BaseClasses.TestKnCInputs",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Experiments.Standards.BaseClasses.PartialDoubleWishboneFourPost",
+      "test": "BobLibTest.Experiments.Standards.BaseClasses.TestPartialDoubleWishboneFourPost",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Experiments.Standards.BaseClasses.PartialElectricVehicle",
+      "test": "BobLibTest.Experiments.Standards.BaseClasses.TestPartialElectricVehicle",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Experiments.Standards.BaseClasses.PartialFourPostRig",
+      "test": "BobLibTest.Experiments.Standards.BaseClasses.TestPartialFourPostRig",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Experiments.Standards.BaseClasses.PartialKnC",
+      "test": "BobLibTest.Experiments.Standards.BaseClasses.TestPartialKnC",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Experiments.Standards.BaseClasses.PartialVehicle",
+      "test": "BobLibTest.Experiments.Standards.BaseClasses.TestPartialVehicle",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Experiments.Standards.BaseClasses.PartialVehicleFMI",
+      "test": "BobLibTest.Experiments.Standards.BaseClasses.TestPartialVehicleFMI",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Experiments.Standards.BaseClasses.PartialVehicleSim",
+      "test": "BobLibTest.Experiments.Standards.BaseClasses.TestPartialVehicleSim",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Experiments.Standards.Examples.DirectSuspensionFourPost",
+      "test": "BobLibTest.Experiments.Standards.Examples.TestDirectSuspensionFourPost",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 118
+    },
+    {
+      "model": "BobLib.Experiments.Standards.Examples.MixedSuspensionVehicle",
+      "test": "BobLibTest.Experiments.Standards.Examples.TestMixedSuspensionVehicle",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 10
+    },
+    {
+      "model": "BobLib.Experiments.Standards.Examples.PhysicalPedalVehicle",
+      "test": "BobLibTest.Experiments.Standards.Examples.TestPhysicalPedalVehicle",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Experiments.Standards.Examples.RoadAndAtmosphereVehicle",
+      "test": "BobLibTest.Experiments.Standards.Examples.TestRoadAndAtmosphereVehicle",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 2
+    },
+    {
+      "model": "BobLib.Experiments.Standards.Examples.SpatialBrakingVehicle",
+      "test": "BobLibTest.Experiments.Standards.Examples.TestSpatialBrakingVehicle",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 1
+    },
+    {
+      "model": "BobLib.Experiments.Standards.FourPostSim",
+      "test": "BobLibTest.Experiments.Standards.TestFourPostSim",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 118.0
+    },
+    {
+      "model": "BobLib.Experiments.Standards.KnCLocked",
+      "test": "BobLibTest.Experiments.Standards.TestKnCLocked",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Experiments.Standards.KnCSteerable",
+      "test": "BobLibTest.Experiments.Standards.TestKnCSteerable",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 832
+    },
+    {
+      "model": "BobLib.Experiments.Standards.ManeuverFMI",
+      "test": "BobLibTest.Experiments.Standards.TestManeuverFMI",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Experiments.Standards.VehicleFMI",
+      "test": "BobLibTest.Experiments.Standards.TestVehicleFMI",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 10
+    },
+    {
+      "model": "BobLib.Experiments.Standards.VehicleSim",
+      "test": "BobLibTest.Experiments.Standards.TestVehicleSim",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 10
+    },
+    {
+      "model": "BobLib.Icons.AxleDWBaseIcon",
+      "test": "BobLibTest.Icons.TestAxleDWBaseIcon",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Icons.BaseTireIcon",
+      "test": "BobLibTest.Icons.TestBaseTireIcon",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Icons.BatteryPackIcon",
+      "test": "BobLibTest.Icons.TestBatteryPackIcon",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Icons.Bellcrank2Icon",
+      "test": "BobLibTest.Icons.TestBellcrank2Icon",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Icons.Bellcrank3Icon",
+      "test": "BobLibTest.Icons.TestBellcrank3Icon",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Icons.CFDAeroMapIcon",
+      "test": "BobLibTest.Icons.TestCFDAeroMapIcon",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Icons.DifferentialIcon",
+      "test": "BobLibTest.Icons.TestDifferentialIcon",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Icons.FrameBaseIcon",
+      "test": "BobLibTest.Icons.TestFrameBaseIcon",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Icons.GroundPhysicsIcon",
+      "test": "BobLibTest.Icons.TestGroundPhysicsIcon",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Icons.InverterDCIcon",
+      "test": "BobLibTest.Icons.TestInverterDCIcon",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Icons.PartialWheelIcon",
+      "test": "BobLibTest.Icons.TestPartialWheelIcon",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Icons.RackAndPinionIcon",
+      "test": "BobLibTest.Icons.TestRackAndPinionIcon",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Icons.RodIcon",
+      "test": "BobLibTest.Icons.TestRodIcon",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Icons.ShockLinkageIcon",
+      "test": "BobLibTest.Icons.TestShockLinkageIcon",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Icons.SimulationIcon",
+      "test": "BobLibTest.Icons.TestSimulationIcon",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Icons.StabarIcon",
+      "test": "BobLibTest.Icons.TestStabarIcon",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Icons.SteeringWheelOverlayIcon",
+      "test": "BobLibTest.Icons.TestSteeringWheelOverlayIcon",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Icons.TabularDamperIcon",
+      "test": "BobLibTest.Icons.TestTabularDamperIcon",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Icons.TabularSpringIcon",
+      "test": "BobLibTest.Icons.TestTabularSpringIcon",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Icons.TwoAxleVehicleCoreIcon",
+      "test": "BobLibTest.Icons.TestTwoAxleVehicleCoreIcon",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Icons.WishboneUprightLoopIcon",
+      "test": "BobLibTest.Icons.TestWishboneUprightLoopIcon",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.PowerElectronics.Interfaces.Base",
+      "test": "BobLibTest.PowerElectronics.Interfaces.TestBase",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.PowerElectronics.Internal.InverterDCCore",
+      "test": "BobLibTest.PowerElectronics.Internal.TestInverterDCCore",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 10.0
+    },
+    {
+      "model": "BobLib.PowerElectronics.InverterDC",
+      "test": "BobLibTest.PowerElectronics.TestInverterDC",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 10.0
+    },
+    {
+      "model": "BobLib.Transmissions.FixedRatioTransmission",
+      "test": "BobLibTest.Transmissions.TestFixedRatioTransmission",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Transmissions.Interfaces.Base",
+      "test": "BobLibTest.Transmissions.Interfaces.TestBase",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Transmissions.Internal.FixedRatioGear",
+      "test": "BobLibTest.Transmissions.Internal.TestFixedRatioGear",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Utilities.Mechanics.MultiBody.Actuators.ChassisActuator",
+      "test": "BobLibTest.Utilities.Mechanics.MultiBody.Actuators.TestChassisActuator",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Utilities.Mechanics.MultiBody.Actuators.ContactPatchFixture",
+      "test": "BobLibTest.Utilities.Mechanics.MultiBody.Actuators.TestContactPatchFixture",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Utilities.Mechanics.MultiBody.Actuators.ContactPatchForceActuator",
+      "test": "BobLibTest.Utilities.Mechanics.MultiBody.Actuators.TestContactPatchForceActuator",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Utilities.Mechanics.MultiBody.ContactMechanics.FixedGround",
+      "test": "BobLibTest.Utilities.Mechanics.MultiBody.ContactMechanics.TestFixedGround",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Utilities.Mechanics.MultiBody.ContactMechanics.GroundPhysics",
+      "test": "BobLibTest.Utilities.Mechanics.MultiBody.ContactMechanics.TestGroundPhysics",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 2.0
+    },
+    {
+      "model": "BobLib.Utilities.Mechanics.MultiBody.ContactMechanics.RoadGround",
+      "test": "BobLibTest.Utilities.Mechanics.MultiBody.ContactMechanics.TestRoadGround",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.5
+    },
+    {
+      "model": "BobLib.Utilities.Mechanics.MultiBody.ContactMechanics.RoadSurface",
+      "test": "BobLibTest.Utilities.Mechanics.MultiBody.ContactMechanics.TestRoadSurface",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.5
+    },
+    {
+      "model": "BobLib.Utilities.Mechanics.MultiBody.InboardShaft",
+      "test": "BobLibTest.Utilities.Mechanics.MultiBody.TestInboardShaft",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Utilities.Mechanics.MultiBody.Joints.Internal.UniversalSpherical",
+      "test": "BobLibTest.Utilities.Mechanics.MultiBody.Joints.Internal.TestUniversalSpherical",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 1.0
+    },
+    {
+      "model": "BobLib.Utilities.Mechanics.MultiBody.Joints.JointUSR",
+      "test": "BobLibTest.Utilities.Mechanics.MultiBody.Joints.TestJointUSR",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 3.0
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Tires.Wheels.WheelCompliance",
+      "test": "BobLibTest.Chassis.Suspension.Tires.Wheels.TestWheelCompliance",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.1
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Tires.Wheels.PartialWheelCompliance",
+      "test": "BobLibTest.Chassis.Suspension.Tires.Wheels.TestPartialWheelCompliance",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Chassis.Suspension.Tires.Wheels.DampedWheelCompliance",
+      "test": "BobLibTest.Chassis.Suspension.Tires.Wheels.TestDampedWheelCompliance",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.01
+    }
+  ],
+  "initialization_baselines": [
+    "BobLibTest.Utilities.Math.Vector.AngleBetweenSmoke",
+    "BobLibTest.Brakes.Internal.BrakeReactionSmoke",
+    "BobLibTest.Chassis.Suspension.Tires.MF52.MF52PureSlipSmoke",
+    "BobLibTest.Chassis.Suspension.Tires.TireForceFrameSmoke",
+    "BobLibTest.Chassis.Suspension.Tires.MF52.SlipModel.TransientSlipReverseSmoke",
+    "BobLibTest.Utilities.Mechanics.MultiBody.Joints.Internal.UniversalSphericalReferenceSmoke",
+    "BobLibTest.Experiments.Standards.VehicleSimAnimationOn",
+    "BobLibTest.Chassis.Suspension.Tires.Wheels.WheelAlignmentUnitsSmoke",
+    "BobLibTest.Utilities.Mechanics.MultiBody.ContactMechanics.TestFixedGroundRotatedFrame",
+    "BobLibTest.Utilities.Mechanics.MultiBody.ContactMechanics.TestGroundPhysics",
+    "BobLibTest.Utilities.Mechanics.MultiBody.ContactMechanics.TestGroundPhysicsRotatedFrame",
+    "BobLibTest.Aero.Internal.TestBilinear2D",
+    "BobLibTest.Utilities.Math.TestExtendLinearTable",
+    "BobLibTest.Aero.TestCFDAeroMap",
+    "BobLibTest.Aero.TestCFDAeroMapDirections",
+    "BobLibTest.Chassis.Body.TestFrameCompX",
+    "BobLibTest.Chassis.Body.TestFrameRigid",
+    "BobLibTest.Chassis.Suspension.TestFrAxleDW",
+    "BobLibTest.Chassis.Suspension.Components.TestBellcrank2",
+    "BobLibTest.Chassis.Suspension.Components.TestBellcrank3",
+    "BobLibTest.Chassis.Suspension.Components.TestForceOnlyRod",
+    "BobLibTest.Chassis.Suspension.Components.TestShockLinkage",
+    "BobLibTest.Chassis.Suspension.TestRrAxleDW",
+    "BobLibTest.Chassis.Suspension.Components.TestDoubleWishbone",
+    "BobLibTest.Chassis.Suspension.Components.TestStabar",
+    "BobLibTest.Chassis.Suspension.Components.TestRackAndPinion",
+    "BobLibTest.Chassis.Suspension.Tires.TestFourMF52Kinematic",
+    "BobLibTest.Chassis.Suspension.Tires.TestFourMF52Transient",
+    "BobLibTest.Chassis.Suspension.Tires.MF52.TestMF52",
+    "BobLibTest.Chassis.Suspension.Tires.TestWheelPhysicsVariants",
+    "BobLibTest.PowerElectronics.TestBatteryInverter",
+    "BobLibTest.ElectricDrives.TestBatteryInverterMotor",
+    "BobLibTest.EnergyStorage.Internal.TestBatteryPack",
+    "BobLibTest.ElectricDrives.Internal.TestPowerLimitedMotor",
+    "BobLibTest.Drivelines.TestPowertrain",
+    "BobLibTest.Drivers.TestStandardDriver",
+    "BobLibTest.Controllers.TestVCU",
+    "BobLibTest.Atmospheres.TestConstantAtmosphere"
+  ]
+}

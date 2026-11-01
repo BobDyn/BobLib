@@ -2,7 +2,7 @@ within BobLib.Utilities.Mechanics;
 package Functions
 
   "General mechanics calculations that are not tied to MultiBody frames"
-  extends BobLib.Icons.BobLibPackageBackground;
+  extends Modelica.Icons.FunctionsPackage;
 
   annotation(
     Documentation(info = "<html>
@@ -17,4 +17,5 @@ and inertia translation. Frame-based fixtures, joints, and contact utilities
 belong under <code>Utilities.Mechanics.MultiBody</code>.
 </p>
 </html>"));
+  annotation(Icon(graphics = {Rectangle(extent = {{-100, 100}, {100, -100}}, lineColor = {0, 0, 0}, lineThickness = 0.5, fillPattern = FillPattern.None)}));
 end Functions;

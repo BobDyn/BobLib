@@ -4,6 +4,7 @@ partial model TwoAxleVehicleCoreIcon "Reusable two-axle vehicle core icon"
 
   annotation(
     Icon(graphics = {
+      Text(extent = {{-150, 240}, {150, 215}}, textString = "%name", textColor = {0, 0, 255}, fontSize = 0),
       Line(origin = {-25, 105}, points = {{-35, -15}, {25, 15}}),
       Line(origin = {-30, 135}, points = {{-30, -9}, {30, -15}}),
       Line(origin = {-82, 94}, points = {{22, -4}, {-24, 4}}, thickness = 5),

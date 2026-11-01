@@ -6,6 +6,8 @@ pure function Bilinear2D "Clamped bilinear interpolation on a regular grid"
   input Real xGrid[:] "Monotonic first-axis breakpoints";
   input Real yGrid[:] "Monotonic second-axis breakpoints";
   input Real table[size(xGrid, 1), size(yGrid, 1)] "Data table";
+  input Integer nX = size(xGrid, 1) "Active first-axis points";
+  input Integer nY = size(yGrid, 1) "Active second-axis points";
   output Real z "Interpolated value";
 
 protected
@@ -19,13 +21,22 @@ protected
   Real yFrac;
 
 algorithm
+  assert(
+    nX >= 2 and nX <= size(xGrid, 1) and nY >= 2 and nY <= size(yGrid, 1),
+    "Bilinear2D active counts must be between two and the axis capacity");
+  for i in 2:nX loop
+    assert(xGrid[i] > xGrid[i - 1], "Bilinear2D xGrid must be strictly increasing");
+  end for;
+  for i in 2:nY loop
+    assert(yGrid[i] > yGrid[i - 1], "Bilinear2D yGrid must be strictly increasing");
+  end for;
   ix := 1;
-  while ix < size(xGrid, 1) - 1 and x > xGrid[ix + 1] loop
+  while ix < nX - 1 and x > xGrid[ix + 1] loop
     ix := ix + 1;
   end while;
 
   iy := 1;
-  while iy < size(yGrid, 1) - 1 and y > yGrid[iy + 1] loop
+  while iy < nY - 1 and y > yGrid[iy + 1] loop
     iy := iy + 1;
   end while;
 

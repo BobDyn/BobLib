@@ -2,7 +2,16 @@ within BobLib.Chassis.Suspension;
 package Tires
 
   "Tire, wheel, slip, and contact-patch frame models used by suspension axles"
-  extends BobLib.Icons.BobLibPackageBackground;
+
+  // Package graphic adapted from BobLib.Icons.BaseTireIcon; instance-name text omitted.
+
+  annotation(Icon(coordinateSystem(extent = {{-100, -100}, {100, 100}}), graphics = {
+
+      Rectangle(fillColor = {71, 71, 71}, fillPattern = FillPattern.Solid, extent = {{-40, 80}, {40, -80}}, radius = 5),
+      Line(points = {{-22, -84}, {22, -84}}, color = {20, 20, 20}, thickness = 1, arrow = {Arrow.Filled, Arrow.Filled}),
+      Line(points = {{0, -98}, {0, -72}}, color = {20, 20, 20}, thickness = 1, arrow = {Arrow.Filled, Arrow.Filled})
+
+    , Rectangle(extent = {{-100, 100}, {100, -100}}, lineColor = {0, 0, 0}, lineThickness = 0.5, fillPattern = FillPattern.None)}));
 
   annotation(
     Documentation(info = "<html>

@@ -2,7 +2,7 @@ within BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Stabar;
 
 record StabarRecord
 
-  import SI = Modelica.Units.SI;
+  import Modelica.Units.SI;
 
   parameter SI.Position leftBarEnd[3] "Left end of torsion bar, expressed in chassis frame" annotation(
     Evaluate = false,

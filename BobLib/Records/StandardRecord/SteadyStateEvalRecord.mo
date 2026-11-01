@@ -2,7 +2,7 @@ within BobLib.Records.StandardRecord;
 
 record SteadyStateEvalRecord
 
-  import SI = Modelica.Units.SI;
+  import Modelica.Units.SI;
 
   // Inputs
   Modelica.Units.SI.Angle handwheelAngle "Steering wheel angle";

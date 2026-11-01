@@ -4,5 +4,10 @@
 # release could turn the pipeline red with no change to this repository -- which
 # is exactly what happened when ruff widened its default rule selection.
 # Bump these intentionally (dependabot can raise the PR) rather than drifting.
+#
+# fmpy drives the FMUs in make modelica-fmu. It installs CMake, which then
+# comes first on PATH, so the FMU export builds with the cmake pinned here.
+cmake==4.4.4
+fmpy==0.3.32
 pytest==9.1.1
 ruff==0.16.9

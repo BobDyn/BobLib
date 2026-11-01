@@ -4,6 +4,7 @@ partial model PartialWheelIcon "Reusable partial wheel icon"
 
   annotation(
     Icon(graphics = {
+      Text(extent = {{-100, 100}, {100, 70}}, textString = "%name", textColor = {0, 0, 255}, fontSize = 0),
       Ellipse(fillColor = {40, 40, 40}, fillPattern = FillPattern.Solid, lineThickness = 3, extent = {{-60, -60}, {60, 60}}),
       Ellipse(fillColor = {200, 200, 200}, fillPattern = FillPattern.Solid, lineThickness = 2, extent = {{-39, -39}, {39, 39}}),
       Ellipse(fillColor = {0, 170, 0}, fillPattern = FillPattern.Solid, lineThickness = 2, extent = {{-15, -15}, {15, 15}}),

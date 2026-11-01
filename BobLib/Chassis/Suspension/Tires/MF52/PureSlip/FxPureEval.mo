@@ -2,12 +2,13 @@ within BobLib.Chassis.Suspension.Tires.MF52.PureSlip;
 
 function FxPureEval
 
-  // Modelica units
-  import SI = Modelica.Units.SI;
-
-  // MF imports
+  import Modelica.Units.SI;
   import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.FxPureRecord;
   import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.SetupRecord;
+
+  // Modelica units
+
+  // MF imports
 
   input SI.Force Fz;
   input SI.DimensionlessRatio kappa;

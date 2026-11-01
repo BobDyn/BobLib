@@ -2,7 +2,7 @@ within BobLib.Records.StandardRecord;
 
 record FourPostEvalRecord
 
-  import SI = Modelica.Units.SI;
+  import Modelica.Units.SI;
 
   SI.Length heave "Sprung mass heave";
   SI.Angle roll "Body roll angle [rad]";

@@ -2,7 +2,7 @@ within BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52;
 
 record RelaxationRecord
 
-  import SI = Modelica.Units.SI;
+  import Modelica.Units.SI;
 
   SI.Force FNOMIN = 650
     "Nominal vertical load Fz0 for PAC2002 relaxation";
@@ -37,6 +37,16 @@ record RelaxationRecord
   Real LSGAL = 1
     "Scale factor of lateral relaxation length [-]";
 
+  SI.Length sigma_kappa_default = 0.5
+    "Fallback longitudinal relaxation length";
+  SI.Length sigma_alpha_default = 0.5
+    "Fallback lateral relaxation length";
+  Modelica.Units.SI.Velocity V_min(min = Modelica.Constants.small) = 0.5
+    "Low-speed regularization velocity";
+  Real kappa_max(min = 0) = 2.0
+    "Clamp for longitudinal slip";
+  Modelica.Units.SI.Angle alpha_max(min = 0) = 1.2
+    "Clamp for slip angle [rad]";
   annotation(
     Documentation(info = "<html>
 <p>

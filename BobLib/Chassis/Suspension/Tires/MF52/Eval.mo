@@ -2,7 +2,7 @@ within BobLib.Chassis.Suspension.Tires.MF52;
 
 function Eval
 
-  import SI = Modelica.Units.SI;
+  import Modelica.Units.SI;
 
   import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.*;
   import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.*;

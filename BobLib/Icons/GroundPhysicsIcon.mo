@@ -6,7 +6,7 @@ partial model GroundPhysicsIcon "Reusable ground physics icon"
     Icon(
       coordinateSystem(extent = {{-100, -100}, {100, 100}}),
       graphics = {
-        Text(extent = {{-120, -160}, {120, -120}}, textString = "%name", fontSize = 14,
+        Text(extent = {{-150, -145}, {150, -115}}, textString = "%name", fontSize = 0, textColor = {0, 0, 255},
           horizontalAlignment = TextAlignment.Center),
         Rectangle(extent = {{-100, -100}, {100, 25}}, fillPattern = FillPattern.Solid,
           fillColor = {150, 100, 50}, lineThickness = 2),

@@ -3,62 +3,81 @@ within BobLib.Experiments.Standards;
 model VehicleSim
 
   "VehicleInterfaces-aligned BobLib vehicle simulation entrypoint"
+  parameter Boolean useRuntimeDamperTables = false "Read named front and rear damper curves when the simulation starts"
+    annotation(Evaluate = false, choices(checkBox = true), Dialog(group = "Damper Parameters"));
+  parameter String damperTableFile = "damper_tables.txt" "File containing the runtime force-velocity tables"
+    annotation(Evaluate = false, Dialog(group = "Damper Parameters", enable = useRuntimeDamperTables));
 
-  parameter Boolean useRuntimeDamperTables = false annotation(Evaluate = false);
-  parameter String damperTableFile = "damper_tables.txt" annotation(Evaluate = false);
-
-  extends Templates.Vehicle.VehicleSim_EVBatInvMotDiff_DWBCStabar_DWBCStabar(
+  extends BaseClasses.PartialVehicleSim(
+    rearBrakePlacement = BobLib.Brakes.Types.Placement.Inboard,
     chassis(
-      chassisReferencePosition = pVehicle.pQSSInitialization.chassisReferencePosition,
-      chassisReferenceAngles = pVehicle.pQSSInitialization.chassisReferenceAngles,
       useRuntimeDamperTable = useRuntimeDamperTables,
       runtimeDamperTableFile = damperTableFile,
+      chassisReferencePosition = pInitialization.chassisReferencePosition,
+      chassisReferenceAngles = pInitialization.chassisReferenceAngles,
       fixInitialSuspensionAngles = true,
-      initialFrontLeftLowerArmAngle = pVehicle.pQSSInitialization.frontLeftLowerArmAngle,
-      initialFrontRightLowerArmAngle = pVehicle.pQSSInitialization.frontRightLowerArmAngle,
-      initialRearLeftLowerArmAngle = pVehicle.pQSSInitialization.rearLeftLowerArmAngle,
-      initialRearRightLowerArmAngle = pVehicle.pQSSInitialization.rearRightLowerArmAngle));
+      initialFrontLeftLowerArmAngle = pInitialization.frontLeftLowerArmAngle,
+      initialFrontRightLowerArmAngle = pInitialization.frontRightLowerArmAngle,
+      initialRearLeftLowerArmAngle = pInitialization.rearLeftLowerArmAngle,
+      initialRearRightLowerArmAngle = pInitialization.rearRightLowerArmAngle));
   extends BobLib.Icons.SimulationIcon;
+
+  parameter BobLib.Records.VehicleRecord.Chassis.QSSInitializationRecord pInitialization(
+      referenceVelocity = 15,
+      chassisReferencePosition = {-0.810146083618726, 1.742472521734604e-6, 0.281770875605249},
+      chassisReferenceAngles = {0, 0.00104599750922714, 0},
+      frontLeftLowerArmAngle = 0.0125840337509824,
+      frontRightLowerArmAngle = -0.0125840337509825,
+      rearLeftLowerArmAngle = 0.00868319343639186,
+      rearRightLowerArmAngle = -0.00868319343639172,
+      frontSpringLength = 0.175156854188570,
+      rearSpringLength = 0.244911388707023,
+      frontNormalLoad = 710.509308664321,
+      rearNormalLoad = 721.422043064354)
+    "Saved starting pose for the default vehicle; recompute after changing calibration" annotation(Dialog(group = "Initialization"));
 
 initial equation
   assert(
-    abs(initialVel - pVehicle.pQSSInitialization.referenceVelocity) < 1e-6,
+    abs(initialVel - pInitialization.referenceVelocity) < 1e-6,
     "VehicleSim QSS initialization was solved at a different initial velocity",
     AssertionLevel.warning);
 
   annotation(
     experiment(StartTime = 0.0, StopTime = 10, Tolerance = 1e-06, Interval = 0.002),
-    __OpenModelica_commandLineOptions = "--matchingAlgorithm=PFPlusExt --indexReductionMethod=dynamicStateSelection -d=initialization,NLSanalyticJacobian,disableStartCalc --maxSizeLinearTearing=5000 --generateDynamicJacobian=none",
+    __OpenModelica_commandLineOptions = "--matchingAlgorithm=PFPlusExt --indexReductionMethod=dynamicStateSelection -d=initialization,NLSanalyticJacobian,disableStartCalc --maxSizeLinearTearing=5000 --generateDynamicJacobian=none --homotopyApproach=equidistantLocal",
     __OpenModelica_simulationFlags(
       jacobian = "internalNumerical",
       lv = "LOG_STDOUT,LOG_ASSERT,LOG_STATS",
       noEquidistantTimeGrid = "()",
       noEventEmit = "()",
       s = "dassl",
-      variableFilter = "time|frSteerCmd|accX|accY|handwheelAngle|steerExcess|handwheelTorque|Fz_.*|leftSteerAngle|rightSteerAngle|roll|sideslip|velX|velY|yawVel|steadyState.*|linearity.*|minTireNormalLoad|chassis.(front|rear)(Left|Right)SpringLength|chassis.damper(CompressionVelocity|Force).*"),
+      variableFilter = "time|terminationStatus|frSteerCmd|accX|accY|handwheelAngle|steerExcess|handwheelTorque|Fz_.*|leftSteerAngle|rightSteerAngle|roll|sideslip|velX|velY|yawVel|steadyState.*|linearity.*|minTireNormalLoad|chassis.(front|rear)(Left|Right)SpringLength|chassis.damper(CompressionVelocity|Force).*"),
     Documentation(info = "<html>
 <p>
 Primary entrypoint for the BobLib-native EV battery-inverter-motor-differential
 vehicle simulation with front and rear bellcrank-actuated double wishbone
-suspension with stabilizer bars. The assembly follows the VehicleInterfaces
+suspension with stabilizer bars. Front brakes are outboard; rear brakes mount at the differential outputs, upstream of halfshaft compliance, with caliper reactions carried by the sprung differential housing. The assembly follows the VehicleInterfaces
 demo stack while exposing the BobLib powertrain as explicit battery, VCU,
 power-electronics, motor, transmission, and driveline subsystem models at the
 vehicle-simulation level.
 </p>
+<p>The OpenModelica settings use local homotopy to avoid generating a second
+complete initialization system. The standard QSS start initializes without
+homotopy. For configurations that require coupled global homotopy, select
+<code>--homotopyApproach=equidistantGlobal</code> in the translation settings
+and override this model's command-line annotation.</p>
 <p>
 The chassis starts from the coupled pose stored in
-<code>pVehicle.pQSSInitialization</code>. Its lower-arm coordinates were solved
+<code>pInitialization</code>. Its lower-arm coordinates were solved
 with the four-post rig at the settled front and rear corner loads, so the tire
 contact, spring lengths, chassis heave, and chassis pitch are mutually
 consistent at initialization.
 </p>
 <p>
 The subsystem redeclare stack lives in
-<code>Templates.Vehicle.VehicleSim_EVBatInvMotDiff_DWBCStabar_DWBCStabar</code>.
+<code>BaseClasses.PartialElectricVehicle</code>.
 The shared vehicle template owns plant wiring and maneuver termination monitors,
-while <code>Controllers.StandardVCU</code> owns the maneuver excitation, PTN
-speed-control toggles, controller gains, target velocity, generated torque,
-regenerative limit, and pedal commands.
+while <code>Drivers.StandardDriver</code> owns maneuver excitation, longitudinal speed control, and driver intent. <code>Controllers.VCU</code> owns torque limits, regenerative blending, and actuator requests.
 </p>
 </html>"));
 end VehicleSim;

@@ -2,7 +2,7 @@ within BobLib.Utilities.Mechanics.Functions;
 
 function translateInertia
 
-  import SI = Modelica.Units.SI;
+  import Modelica.Units.SI;
 
   input SI.Inertia inertia[3, 3] "Inertia about the body's local CG";
   input SI.Mass mass "Body mass";

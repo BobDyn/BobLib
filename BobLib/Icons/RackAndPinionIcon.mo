@@ -4,6 +4,7 @@ partial model RackAndPinionIcon "Reusable rack and pinion icon"
 
   annotation(
     Icon(graphics = {
+      Text(extent = {{-150, 130}, {150, 105}}, textString = "%name", textColor = {0, 0, 255}, fontSize = 0),
       Line(origin = {-25.8, 3.2}, points = {{-54.2, -3.2}, {25.8, -3.2}, {105.8, -3.2}}, thickness = 15)
     }),
     Documentation(info = "<html>

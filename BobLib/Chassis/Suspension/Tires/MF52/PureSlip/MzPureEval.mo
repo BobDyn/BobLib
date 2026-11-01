@@ -2,11 +2,10 @@ within BobLib.Chassis.Suspension.Tires.MF52.PureSlip;
 
 function MzPureEval
 
-  import SI = Modelica.Units.SI;
-
-  import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.MzPureRecord;
-  import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.FyPureRecord;
+  import Modelica.Units.SI;
   import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.FxPureRecord;
+  import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.FyPureRecord;
+  import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.PureSlip.MzPureRecord;
   import BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52.SetupRecord;
 
   input SI.Force Fz;
@@ -55,14 +54,10 @@ protected
 algorithm
   if Fz > 1e-3 then
 
-    // ------------------------------------------------------------
     // Load normalization
-    // ------------------------------------------------------------
     dfz := (Fz - setup.FNOMIN * pFy.LFZO) / (setup.FNOMIN * pFy.LFZO);
 
-    // ------------------------------------------------------------
     // Fy internals
-    // ------------------------------------------------------------
     IA_y := gamma * pFy.LGAY;
 
     C_y := pFy.PCY1 * pFy.LCY;
@@ -85,17 +80,12 @@ algorithm
     S_Vy := Fz * ((pFy.PVY1 + pFy.PVY2 * dfz) * pFy.LVY
              + (pFy.PVY3 + pFy.PVY4 * dfz) * IA_y) * pFy.LMUY;
 
-    // ------------------------------------------------------------
     // Fx stiffness
-    // ------------------------------------------------------------
     K_x := Fz * (pFx.PKX1 + pFx.PKX2 * dfz)
 
            * exp(pFx.PKX3 * dfz)
            * pFx.LKX;
-
-    // ------------------------------------------------------------
     // Trail model
-    // ------------------------------------------------------------
     IA_z := gamma;
 
     D_t := Fz * (p.QDZ1 + p.QDZ2 * dfz)
@@ -131,10 +121,7 @@ algorithm
 
          * cos(C_t * atan(B_t * SA_t_eq - E_t * (B_t * SA_t_eq - atan(B_t * SA_t_eq))))
          * cos(alpha);
-
-    // ------------------------------------------------------------
     // Residual torque
-    // ------------------------------------------------------------
     SA_r := alpha + S_Hy + S_Vy / (K_y + eps);
 
     SA_r_eq :=
@@ -151,9 +138,7 @@ algorithm
 
     M_zr := D_r * cos(atan(B_r * SA_r_eq)) * cos(alpha);
 
-    // ------------------------------------------------------------
     // Final
-    // ------------------------------------------------------------
     Mz_pure := -t * Fy + M_zr;
 
   else

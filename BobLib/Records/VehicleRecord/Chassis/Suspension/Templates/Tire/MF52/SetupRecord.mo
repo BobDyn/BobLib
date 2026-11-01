@@ -2,7 +2,7 @@ within BobLib.Records.VehicleRecord.Chassis.Suspension.Templates.Tire.MF52;
 
 record SetupRecord
 
-  import SI = Modelica.Units.SI;
+  import Modelica.Units.SI;
 
   parameter SI.Force FNOMIN
     "Nominal vertical load used for normalization (Fz0 in MF formulations)";

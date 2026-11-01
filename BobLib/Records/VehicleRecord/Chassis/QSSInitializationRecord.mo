@@ -2,7 +2,7 @@ within BobLib.Records.VehicleRecord.Chassis;
 
 record QSSInitializationRecord
 
-  import SI = Modelica.Units.SI;
+  import Modelica.Units.SI;
 
   parameter SI.Velocity referenceVelocity
     "Vehicle speed represented by this quasi-steady-state solution";
@@ -10,10 +10,10 @@ record QSSInitializationRecord
     "Solved world position of the sprung-mass reference frame";
   parameter SI.Angle chassisReferenceAngles[3]
     "Solved chassis orientation using the FreeMotion rotation sequence";
-  parameter SI.Angle frontLeftLowerArmAngle;
-  parameter SI.Angle frontRightLowerArmAngle;
-  parameter SI.Angle rearLeftLowerArmAngle;
-  parameter SI.Angle rearRightLowerArmAngle;
+  parameter SI.Angle frontLeftLowerArmAngle "Front-left lower wishbone angle used for suspension initialization, in radians";
+  parameter SI.Angle frontRightLowerArmAngle "Front-right lower wishbone angle used for suspension initialization, in radians";
+  parameter SI.Angle rearLeftLowerArmAngle "Rear-left lower wishbone angle used for suspension initialization, in radians";
+  parameter SI.Angle rearRightLowerArmAngle "Rear-right lower wishbone angle used for suspension initialization, in radians";
   parameter SI.Length frontSpringLength
     "Four-post spring length corresponding to the front lower-arm angles";
   parameter SI.Length rearSpringLength

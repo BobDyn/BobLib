@@ -1,4 +1,8 @@
-VehicleFMI
-VehicleSim
+Examples
+BaseClasses
+KnCSteerable
+KnCLocked
 FourPostSim
-Templates
+VehicleSim
+VehicleFMI
+ManeuverFMI

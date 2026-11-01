@@ -2,7 +2,9 @@ within BobLib.Chassis.Suspension.Tires.MF52.SlipModel;
 
 partial model BaseSlipModel
 
-  import SI = Modelica.Units.SI;
+  import Modelica.Units.SI;
+
+  extends Modelica.Blocks.Icons.Block;
 
   // Inputs (from BaseTire)
   input SI.Velocity Vx "Longitudinal velocity at contact patch";

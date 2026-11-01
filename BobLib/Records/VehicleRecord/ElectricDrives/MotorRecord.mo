@@ -2,7 +2,10 @@ within BobLib.Records.VehicleRecord.ElectricDrives;
 
 record MotorRecord
 
-  import SI = Modelica.Units.SI;
+  import Modelica.Units.SI;
+
+  parameter Modelica.Units.SI.Position mountOffset[3] = zeros(3)
+    "Rigid mount position relative to the chassis attachment frame, resolved in that frame" annotation(Evaluate = false);
 
   parameter SI.Voltage Vdc_max = 630
     "Motor maximum DC voltage reference";
@@ -33,10 +36,25 @@ record MotorRecord
   parameter SI.AngularVelocity w_eps = 1.0
     "Low-speed regularization for power-to-torque conversion";
   parameter Boolean reverseLaunch = false
-    "Select reverse torque direction when starting exactly from standstill";
+    "Select reverse torque direction when starting exactly from standstill" annotation(choices(checkBox = true));
   parameter SI.Inertia rotorJ = 0.02521
     "Motor rotor inertia";
 
+  parameter SI.Voltage V_eps(min = Modelica.Constants.small) = 1
+    "Voltage regularization for the averaged constant-power load";
+  parameter Real rpm_fullLoad_ref = 5300 "Full-load RPM at Vdc_max (datasheet)";
+  parameter Real rpm_noLoad_ref = 6500 "No-load RPM at Vdc_max (datasheet)";
+  parameter Real rpm_max_cont = 5500 "Max continuous rotation speed (datasheet) [rpm]";
+  parameter Real lossTable[:, 2] = [
+    0,    0;
+    1000, 200;
+    2000, 550;
+    3000, 1050;
+    4000, 1750;
+    5000, 2800
+  ] "Free-run loss vs speed";
+  parameter Boolean enablePeakTimer = true "If true, peak limits ramp down after peakTime" annotation(choices(checkBox = true));
+  parameter SI.Time tau_tau = 0.002 "Torque actuator time constant";
   annotation(
     Documentation(info = "<html>
 <p>

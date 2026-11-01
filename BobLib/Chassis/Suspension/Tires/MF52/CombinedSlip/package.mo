@@ -1,7 +1,7 @@
 within BobLib.Chassis.Suspension.Tires.MF52;
 package CombinedSlip
 
-  extends BobLib.Icons.BobLibPackageBackground;
+  extends Modelica.Icons.FunctionsPackage;
 
   annotation(
     Documentation(info = "<html>
@@ -12,4 +12,5 @@ Package <code>BobLib.Chassis.Suspension.Tires.MF52.CombinedSlip</code> contains 
 These functions apply combined-slip weighting and moment corrections to the pure-slip tire outputs.
 </p>
 </html>"));
+  annotation(Icon(graphics = {Rectangle(extent = {{-100, 100}, {100, -100}}, lineColor = {0, 0, 0}, lineThickness = 0.5, fillPattern = FillPattern.None)}));
 end CombinedSlip;
