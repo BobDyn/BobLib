@@ -3,7 +3,8 @@
 # Ignore temporary files, build results, simulation files
 
 ## Vibecoding files
-*.claude
+*.claude/*
+!.claude/settings.json
 *dump.md
 
 ## Modelica-specific files
