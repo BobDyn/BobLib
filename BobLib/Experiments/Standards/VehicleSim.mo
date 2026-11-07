@@ -3,10 +3,16 @@ within BobLib.Experiments.Standards;
 model VehicleSim
 
   "VehicleInterfaces-aligned BobLib vehicle simulation entrypoint"
+  parameter Boolean useRuntimeDamperTables = false "Read named front and rear damper curves when the simulation starts"
+    annotation(Evaluate = false, choices(checkBox = true), Dialog(group = "Damper Parameters"));
+  parameter String damperTableFile = "damper_tables.txt" "File containing the runtime force-velocity tables"
+    annotation(Evaluate = false, Dialog(group = "Damper Parameters", enable = useRuntimeDamperTables));
 
   extends BaseClasses.PartialVehicleSim(
     rearBrakePlacement = BobLib.Brakes.Types.Placement.Inboard,
     chassis(
+      useRuntimeDamperTable = useRuntimeDamperTables,
+      runtimeDamperTableFile = damperTableFile,
       chassisReferencePosition = pInitialization.chassisReferencePosition,
       chassisReferenceAngles = pInitialization.chassisReferenceAngles,
       fixInitialSuspensionAngles = true,
@@ -45,7 +51,7 @@ initial equation
       noEquidistantTimeGrid = "()",
       noEventEmit = "()",
       s = "dassl",
-      variableFilter = "time|terminationStatus|frSteerCmd|accX|accY|handwheelAngle|steerExcess|handwheelTorque|Fz_.*|leftSteerAngle|rightSteerAngle|roll|sideslip|velX|velY|yawVel|steadyState.*|linearity.*|minTireNormalLoad|chassis.(front|rear)(Left|Right)SpringLength"),
+      variableFilter = "time|terminationStatus|frSteerCmd|accX|accY|handwheelAngle|steerExcess|handwheelTorque|Fz_.*|leftSteerAngle|rightSteerAngle|roll|sideslip|velX|velY|yawVel|steadyState.*|linearity.*|minTireNormalLoad|chassis.(front|rear)(Left|Right)SpringLength|chassis.damper(CompressionVelocity|Force).*"),
     Documentation(info = "<html>
 <p>
 Primary entrypoint for the BobLib-native EV battery-inverter-motor-differential

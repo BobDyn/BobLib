@@ -10,6 +10,8 @@ TestShockLinkage
 TestShockLinkagePreload
 TestStabar
 TestTabularDamper
+TestTabularDamperNonlinear
+TestTabularDamperRuntime
 TestTabularSpring
 TestWishboneUprightLoop
 TestDoubleWishbone

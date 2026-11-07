@@ -14,6 +14,8 @@ model DoubleWishboneDirect "Double wishbone axle with direct-acting suspension"
     constrainedby Modelica.Mechanics.Translational.Interfaces.PartialTwoFlanges
     "Spring law used on both axle sides" annotation(choicesAllMatching = true);
   replaceable model DamperModel = BobLib.Chassis.Suspension.Components.TabularDamper(
+    useRuntimeTable = useRuntimeDamperTable,
+    runtimeTableFile = runtimeDamperTableFile, runtimeTableName = runtimeDamperTableName,
     damperPoints = pAxle.actuation.damperPoints, damperTable = pAxle.actuation.damperTable)
     constrainedby Modelica.Mechanics.Translational.Interfaces.PartialTwoFlanges
     "Damper law used on both axle sides" annotation(choicesAllMatching = true);
@@ -65,6 +67,18 @@ protected
     Placement(transformation(origin = {90, -10}, extent = {{-10, -10}, {10, 10}})));
 
 equation
+  connect(
+    leftShockLinkage.damperCompressionVelocity,
+    axleBus.leftDamperCompressionVelocity) annotation(Line(visible = false, points = {{180, 140}, {180, 140}}));
+  connect(
+    rightShockLinkage.damperCompressionVelocity,
+    axleBus.rightDamperCompressionVelocity) annotation(Line(visible = false, points = {{180, 140}, {180, 140}}));
+  connect(
+    leftShockLinkage.damperForce,
+    axleBus.leftDamperForce) annotation(Line(visible = false, points = {{180, 140}, {180, 140}}));
+  connect(
+    rightShockLinkage.damperForce,
+    axleBus.rightDamperForce) annotation(Line(visible = false, points = {{180, 140}, {180, 140}}));
   leftSpringLength = leftShockLinkage.lineForceWithMass.s;
   rightSpringLength = rightShockLinkage.lineForceWithMass.s;
   stabarAngle = 0;
