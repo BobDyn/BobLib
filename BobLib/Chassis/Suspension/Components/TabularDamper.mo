@@ -78,5 +78,6 @@ Model <code>TabularDamper</code> represents a tabulated damper used by suspensio
 Its table data comes from the owning axle or linkage record. The active point count retains fixed-capacity calibration support. Alternatively, enable useRuntimeTable and supply a named table file; the table is loaded when the simulation starts, so curve data can change without recompiling a compatible executable.
 </p>
 <p>The input is minus the rate of increasing damper length: positive is compression and negative is rebound. The signed force curve uses linear interpolation and terminal-slope extrapolation. Monitor extrapolating and dissipatedPower when validating a curve. The component does not model hysteresis.</p>
+<p>With useRuntimeTable the initial checks on damperTable are skipped, so the program that writes the table file owns its validation (BobSim checks passivity and the zero crossing before writing). The embedded damperTable is then only a fallback for runs without the file, and it can differ from the curve the file supplies.</p>
 </html>"));
 end TabularDamper;
