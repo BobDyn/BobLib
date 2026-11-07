@@ -8,6 +8,9 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 
+# One worker builds the vehicle once for every case (needs --dist loadgroup).
+pytestmark = pytest.mark.xdist_group("vehicle_termination")
+
 
 @pytest.fixture(scope="module")
 def vehicle_executable(tmp_path_factory):

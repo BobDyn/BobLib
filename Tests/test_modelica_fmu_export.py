@@ -13,6 +13,9 @@ fmpy = pytest.importorskip("fmpy")
 np = pytest.importorskip("numpy")
 from fmpy.fmi1 import FMICallException  # noqa: E402
 
+# The module fixtures export each FMU once; keep their tests on one xdist worker.
+pytestmark = pytest.mark.xdist_group("fmu_export")
+
 DRIVER_INPUTS = ("steeringAngleCommand", "acceleratorPedalCommand", "brakePedalCommand")
 # Hold the brake, drive off, steer left and back. Inputs ramp, as a driver would
 # move them.
