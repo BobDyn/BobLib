@@ -1,6 +1,9 @@
 """Export boundary and safeguards for reusable vehicle FMUs."""
+import hashlib
 import importlib.util
+import json
 import xml.etree.ElementTree as ET
+import zipfile
 from pathlib import Path
 
 import pytest
@@ -9,6 +12,29 @@ ROOT = Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location('export_fmu', ROOT / 'Tools/export_fmu.py')
 fmu = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(fmu)
+
+
+def test_reuse_rejects_stale_corrupt_or_inconsistent_artifacts(tmp_path):
+    request = {'source_sha256': 'source', 'wrapper_sha256': 'wrapper',
+               'c_optimization': {'physics': '-O2'}, 'configuration': {'sil': True}}
+    metadata = {'build_request': request, 'model': 'Car'}
+    archive = tmp_path / 'Car.fmu'
+
+    def write(embedded):
+        with zipfile.ZipFile(archive, 'w') as package:
+            package.writestr('resources/boblib-build.json', json.dumps(embedded))
+        manifest = {**metadata, 'sha256': hashlib.sha256(archive.read_bytes()).hexdigest()}
+        (tmp_path / 'manifest.json').write_text(json.dumps(manifest))
+
+    assert fmu.cached_artifact(tmp_path, 'Car', request) is None
+    write(metadata)
+    assert fmu.cached_artifact(tmp_path, 'Car', request) == archive
+    for field in ('source_sha256', 'wrapper_sha256', 'c_optimization', 'configuration'):
+        assert fmu.cached_artifact(tmp_path, 'Car', {**request, field: 'changed'}) is None
+    archive.write_bytes(b'corrupt')
+    assert fmu.cached_artifact(tmp_path, 'Car', request) is None
+    write({**metadata, 'model': 'DifferentCar'})
+    assert fmu.cached_artifact(tmp_path, 'Car', request) is None
 
 
 def test_source_identity_includes_uncommitted_models_and_exporter(tmp_path):
@@ -217,6 +243,15 @@ fmi2Status fmi2SetReal(ModelInstance *comp, int vr[], double value[]) {
   return fmi2OK;
 }
 fmi2Status fmi2SetInteger(void) { return 0; }
+int getBoolean(ModelInstance *comp, int vr) { return comp->values[vr]; }
+int setBoolean(ModelInstance *comp, int vr, int v) { comp->values[vr] = v; return 0; }
+fmi2Status fmi2SetBoolean(ModelInstance *comp, int vr[], int value[]) {
+  int i=0;
+    if (setBoolean(comp, vr[i], value[i]) != fmi2OK)
+      return fmi2Error;
+  return fmi2OK;
+}
+fmi2Status fmi2SetString(void) { return 0; }
 int main(void) {
   Solver solver = {S_CVODE, 0};
   ModelInstance comp = {model_state_cs_step_complete, &solver, {0, 0}};
@@ -230,6 +265,13 @@ int main(void) {
   fmi2SetReal(&comp, vr, value); assert(!solver.didEventStep);
   comp.state=model_state_cs_step_complete; solver.solverMethod=0; value[0]=3;
   fmi2SetReal(&comp, vr, value); assert(!solver.didEventStep);
+  comp.state=model_state_cs_step_complete; solver.solverMethod=S_CVODE;
+  int enabled[] = {1};
+  fmi2SetBoolean(&comp, vr, enabled); assert(solver.didEventStep);
+  solver.didEventStep=0;
+  fmi2SetBoolean(&comp, vr, enabled); assert(!solver.didEventStep);
+  enabled[0]=0; comp.state=0;
+  fmi2SetBoolean(&comp, vr, enabled); assert(!solver.didEventStep);
   return 0;
 }
 '''

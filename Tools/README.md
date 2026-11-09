@@ -22,6 +22,12 @@ selects rear inboard brakes. `Tools/architectures.json` defines the architecture
 and table-capacity contract. `--driver` exports the existing maneuver driver.
 No VehicleSimSS or GGV analysis is included.
 
+For an external firmware VCU, add `--sil` to export the separate car-only
+`VehicleSIL` boundary. See [SIL.md](SIL.md) for the signal contract, Docker
+commands, voltage-protection regression, acceptance checks and measured results.
+Use `--reuse` to verify and reuse an exact existing FMU rather than recompiling
+unchanged sources; stale inputs or mismatched artifact hashes force a rebuild.
+
 Each artifact directory contains its Modelica wrapper, build logs,
 `build-timings.json` and `manifest.json`. FMUs also embed provenance in
 `resources/boblib-build.json`. Source and artifact hashes identify the exact

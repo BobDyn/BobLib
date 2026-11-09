@@ -6,6 +6,7 @@ import argparse
 import contextlib
 import hashlib
 import json
+import os
 import platform
 import re
 import shutil
@@ -19,6 +20,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 ARCHITECTURES = json.loads((ROOT / 'Tools/architectures.json').read_text())
 DEFAULTS = ARCHITECTURES['defaults']
+SIL_INTERFACE = json.loads((ROOT / 'Tools/sil-interface.json').read_text())
 AXLES = {key: (value['tag'], value['model']) for key, value in ARCHITECTURES['axles'].items()}
 CURVE_CAPACITY = ARCHITECTURES['table_capacities']['curve_points']
 AERO_CAPACITY = ARCHITECTURES['table_capacities']['aero_axis_points']
@@ -74,13 +76,13 @@ def source_fingerprint(root: Path) -> dict:
 
 def vehicle_model(front: str, rear: str, *, rotor_effects: bool = False,
                   differential: str = DEFAULTS['differential'], front_brakes: str = DEFAULTS['front_brakes'],
-                  rear_brakes: str = DEFAULTS['rear_brakes']) -> tuple[str, str]:
+                  rear_brakes: str = DEFAULTS['rear_brakes'], sil: bool = False) -> tuple[str, str]:
     for key, value in [('differentials', differential), ('front_brakes', front_brakes), ('rear_brakes', rear_brakes)]:
         if value not in ARCHITECTURES[key]:
             raise ValueError(f'Unsupported {key}: {value}')
     fr, fr_model = AXLES[front]
     rr, rr_model = AXLES[rear]
-    name = f'BobLibVehicle_{fr}_{rr}'
+    name = f'BobLib{"SIL" if sil else "Vehicle"}_{fr}_{rr}'
     if rotor_effects:
         name += '_RotorEffects'
     if differential != 'ClutchLSD':
@@ -115,7 +117,7 @@ def vehicle_model(front: str, rear: str, *, rotor_effects: bool = False,
     calibration = ',\n      '.join(calibration)
     return name, f'''model {name}
   constant {record} defaultVehicle;
-  extends BobLib.Experiments.Standards.VehicleFMI(
+  extends BobLib.Experiments.Standards.{"VehicleSIL" if sil else "VehicleFMI"}(
     final headless=true,
     final differentialArchitecture=BobLib.Drivelines.Types.DifferentialArchitecture.{differential},
     final includeRotorEffects={str(rotor_effects).lower()},
@@ -188,11 +190,19 @@ def localize_cs_events(cvode: str, interface: str) -> tuple[str, str]:
             '  /* Error handling */\n  if ((flag == CV_SUCCESS || flag == CV_TSTOP_RETURN)',
     }
     interface_changes = {
+        '  int i, zc_event = 0, time_event = 0;':
+            '  int i, zc_event = 0, time_event = 0, state_events = 0;',
         '    /* adjust for time events */':
             '    zc_event = 0;\n    time_event = 0;\n    /* adjust for time events */',
         '        flag = cvode_solver_fmi_step(comp, tNext, states);':
             '        flag = cvode_solver_fmi_step(comp, tNext, states);\n'
             '        if (flag == 1) {\n'
+            '          if (++state_events > 100) {\n'
+            '            FILTERED_LOG(comp, fmi2Error, LOG_STATUSERROR,\n'
+            '              "fmi2DoStep: more than 100 state events in one communication step.")\n'
+            '            status = fmi2Error;\n'
+            '            goto doStep_cleanup;\n'
+            '          }\n'
             '          tNext = comp->solverInfo->currentTime;\n'
             '          zc_event = 1;\n'
             '          time_event = 0;\n'
@@ -206,6 +216,26 @@ def localize_cs_events(cvode: str, interface: str) -> tuple[str, str]:
     for old, new in interface_changes.items():
         interface = interface.replace(old, new)
     return cvode, interface
+
+
+def recover_cs_evaluation(source: str) -> str:
+    """Let CVODE reduce its internal step after a failed nonlinear evaluation.
+
+    Backport the recoverable RHS return from OpenModelica PR #16988. The FMI
+    call still fails if CVODE exhausts its own retries; no host step is skipped.
+    """
+    old = '  if (!success)\n  {\n    retVal = -1;\n  }\n'
+    if source.count(old) != 1:
+        raise ValueError('Unsupported OMC CVODE source; review nonlinear recovery')
+    return source.replace(old, old.replace('retVal = -1;', 'retVal = 1;'))
+
+
+def guard_cs_relations(source: str) -> str:
+    """Use solver-scale zero-crossing hysteresis, as in the existing FMU tests."""
+    old = 'tolZC = TOL_HYSTERESIS_ZEROCROSSINGS * fmax(relativeTol, MINIMAL_STEP_SIZE);'
+    if source.count(old) != 1:
+        raise ValueError('Unsupported OMC relation source; review zero-crossing hysteresis')
+    return source.replace(old, 'tolZC = fmax(relativeTol, MINIMAL_STEP_SIZE);')
 
 
 def restart_cvode_on_input_change(source: str) -> str:
@@ -224,6 +254,18 @@ def restart_cvode_on_input_change(source: str) -> str:
         mapInputReference2InputNumber(vr[i]) >= 0 && getReal(comp, vr[i]) != value[i])
       comp->solverInfo->didEventStep = 1;
 #endif
+''' + needle
+    source = source[:start] + section.replace(needle, replacement) + source[end:]
+    start = source.find('fmi2Status fmi2SetBoolean(')
+    end = source.find('fmi2Status fmi2SetString(', start)
+    needle = '    if (setBoolean(comp, vr[i], value[i]) != fmi2OK)'
+    section = source[start:end]
+    if start < 0 or end < 0 or section.count(needle) != 1:
+        raise ValueError('Unsupported OMC FMI source; review Boolean input history')
+    replacement = '''    /* Boolean actuator changes (e.g. enable) also invalidate history. */
+    if (comp->state == model_state_cs_step_complete &&
+        comp->solverInfo->solverMethod == S_CVODE && getBoolean(comp, vr[i]) != value[i])
+      comp->solverInfo->didEventStep = 1;
 ''' + needle
     return source[:start] + section.replace(needle, replacement) + source[end:]
 
@@ -266,7 +308,7 @@ def guard_homotopy_initial_guess(source: str) -> str:
     return source.replace(old, old.replace('homotopyData->x,', 'homotopyData->x0,'))
 
 
-def parameter_manifest(xml: Path, *, controller: bool = False) -> dict:
+def parameter_manifest(xml: Path, *, controller: bool = False, sil: bool = False) -> dict:
     root = ET.parse(xml).getroot()
     result = {'parameters': {}, 'derived': {}, 'structural': {},
               'inputs': {}, 'outputs': {}}
@@ -303,6 +345,10 @@ def parameter_manifest(xml: Path, *, controller: bool = False) -> dict:
             result[group][name] = entry
     if unexpected:
         raise ValueError('Numeric vehicle calibration was frozen: ' + ', '.join(unexpected))
+    if sil:
+        validate_sil_interface(result)
+        result['interface'] = SIL_INTERFACE
+        return result
     required = ({'speed', 'ay', *(f'loads[{i}]' for i in range(1, 5))} if controller else
                 {'steeringAngleCommand', 'acceleratorPedalCommand', 'brakePedalCommand'})
     outputs = ({'steering', 'accelerator', 'brake', 'ayTarget', 'rampEnding', 'targetReached'}
@@ -315,6 +361,26 @@ def parameter_manifest(xml: Path, *, controller: bool = False) -> dict:
             raise ValueError('Driver calibration was frozen or lost: ' +
                              ', '.join(sorted(calibration - result['parameters'].keys())))
     return result
+
+
+def validate_sil_interface(manifest: dict) -> None:
+    """Fail export on an accidental controller, missing measurement or unit change."""
+    for direction in ('inputs', 'outputs'):
+        actual = manifest[direction]
+        expected = SIL_INTERFACE[direction]
+        if direction == 'inputs' and actual.keys() != expected.keys():
+            raise ValueError('Unexpected SIL actuator inputs: ' + ', '.join(actual))
+        for name, specification in expected.items():
+            if name not in actual:
+                raise ValueError('Missing SIL signal: ' + name)
+            entry = actual[name]
+            definition = manifest.get('type_definitions', {}).get(entry.get('declaredType'), {})
+            # FMI permits units on a declared type rather than the scalar itself.
+            if 'definition' in definition:
+                definition = next(iter(ET.fromstring(definition['definition']))).attrib
+            unit = entry.get('unit', definition.get('unit'))
+            if entry['type'] != specification['type'] or unit != specification.get('unit'):
+                raise ValueError(f'SIL type/unit mismatch for {name}: {entry["type"]}, {unit}')
 
 
 def check_record_inventory(flattened: str, manifest: dict) -> list[str]:
@@ -374,30 +440,70 @@ def run(command: list[str], cwd: Path, log: Path) -> None:
                        check=True)
 
 
+def cached_artifact(destination: Path, name: str, request: dict) -> Path | None:
+    """Reuse only an exact build request with matching archive and embedded provenance."""
+    archive = destination / f'{name}.fmu'
+    try:
+        manifest = json.loads((destination / 'manifest.json').read_text())
+        if not isinstance(manifest, dict) or manifest.get('build_request') != request:
+            return None
+        digest = hashlib.sha256(archive.read_bytes()).hexdigest()
+        if manifest.pop('sha256', None) != digest:
+            return None
+        with zipfile.ZipFile(archive) as package:
+            embedded = json.loads(package.read('resources/boblib-build.json'))
+        if embedded != manifest:
+            return None
+    except (FileNotFoundError, ValueError, KeyError, TypeError, zipfile.BadZipFile):
+        return None
+    return archive
+
+
 def build(front: str, rear: str, output: Path, jobs: int, *, rotor_effects: bool = False,
           differential: str = DEFAULTS['differential'], front_brakes: str = DEFAULTS['front_brakes'],
-          rear_brakes: str = DEFAULTS['rear_brakes']) -> Path:
+          rear_brakes: str = DEFAULTS['rear_brakes'], sil: bool = False, reuse: bool = False) -> Path:
     name, source = vehicle_model(front, rear, rotor_effects=rotor_effects, differential=differential,
-                                 front_brakes=front_brakes, rear_brakes=rear_brakes)
+                                 front_brakes=front_brakes, rear_brakes=rear_brakes, sil=sil)
     return build_source(name, source, output, jobs,
                         {'front': front, 'rear': rear, 'rotor_effects': rotor_effects,
                          'differential': differential, 'front_brakes': front_brakes,
-                         'rear_brakes': rear_brakes, 'fixed_models': ARCHITECTURES['fixed_models']})
+                         'rear_brakes': rear_brakes, 'fixed_models': ARCHITECTURES['fixed_models']},
+                        sil=sil, reuse=reuse)
 
 
-def build_driver(output: Path, jobs: int) -> Path:
+def build_driver(output: Path, jobs: int, *, reuse: bool = False) -> Path:
     name = 'BobLibDriver'
     source = f'model {name}\n  extends BobLib.Experiments.Standards.ManeuverFMI;\nend {name};\n'
-    return build_source(name, source, output, jobs, {'kind': 'driver'}, controller=True)
+    return build_source(name, source, output, jobs, {'kind': 'driver'}, controller=True, reuse=reuse)
 
 
 def build_source(name: str, source: str, output: Path, jobs: int,
-                 configuration: dict, *, controller: bool = False) -> Path:
+                 configuration: dict, *, controller: bool = False, sil: bool = False,
+                 reuse: bool = False) -> Path:
     started = time.perf_counter()
     source_identity = source_fingerprint(ROOT)
     phases = {}
     destination = output / name
     destination.mkdir(parents=True, exist_ok=True)
+    omc_version = subprocess.check_output(['omc', '--version'], text=True).strip()
+    optimization = '-O2' if sil else '-Os'
+    request = {'source_sha256': source_identity['sha256'],
+               'wrapper_sha256': hashlib.sha256(source.encode()).hexdigest(),
+               'configuration': configuration, 'controller': controller, 'sil': sil,
+               'omc': omc_version,
+               'clang': subprocess.check_output(['clang', '--version'], text=True).splitlines()[0],
+               'libraries': ARCHITECTURES['libraries'], 'compiler_flags': FLAGS,
+               'build_environment': {key: os.environ.get(key) for key in
+                                     ('CFLAGS', 'CXXFLAGS', 'CPPFLAGS', 'LDFLAGS', 'CMAKE_TOOLCHAIN_FILE')},
+               'host': platform.platform(), 'machine': platform.machine(),
+               'c_optimization': {'physics': optimization, 'metadata': '-O0'}}
+    if reuse:
+        cached = cached_artifact(destination, name, request)
+        if cached is not None:
+            (destination / 'last-export.json').write_text(json.dumps({
+                'reused': True, 'seconds': time.perf_counter() - started,
+                'sha256': hashlib.sha256(cached.read_bytes()).hexdigest()}, indent=2) + '\n')
+            return cached
     with contextlib.nullcontext(tempfile.mkdtemp(prefix='boblib-fmu-')) as directory:
         work = Path(directory)
         model = work / f'{name}.mo'
@@ -435,7 +541,9 @@ getErrorString();
         init = sources / f'{name}_init_fmu.c'
         init.write_text(split_initializer(init.read_text(), name))
         cvode = sources / 'simulation/solver/cvode_solver.c'
-        cvode.write_text(guard_cvode_events(cvode.read_text()))
+        cvode.write_text(recover_cs_evaluation(guard_cvode_events(cvode.read_text())))
+        relations = sources / 'simulation/solver/model_help.c'
+        relations.write_text(guard_cs_relations(relations.read_text()))
         interface = sources / 'fmi-export/fmu2_model_interface.c'
         interface.write_text(apply_cs_tolerance(restart_cvode_on_input_change(interface.read_text())))
         cvode_source, interface_source = localize_cs_events(cvode.read_text(), interface.read_text())
@@ -448,20 +556,22 @@ getErrorString();
         with cmake_source.open('a') as stream:
             stream.write(f'\nset_source_files_properties({name}_init_fmu.c '
                          'PROPERTIES COMPILE_OPTIONS "-O0")\n')
-        manifest = parameter_manifest(unpacked / 'modelDescription.xml', controller=controller)
+        manifest = parameter_manifest(unpacked / 'modelDescription.xml', controller=controller, sil=sil)
         if not controller:
             phases['calibration_inventory_seconds'] = validate_record_inventory(
                 name, model, work, manifest, destination)
         manifest.update({'model': name, **configuration,
                          'source': source_identity,
-                         'omc': subprocess.check_output(['omc', '--version'], text=True).strip(),
+                         'omc': omc_version, 'build_request': request,
                          'host': platform.platform(), 'machine': platform.machine(),
                          'compiler_flags': FLAGS,
-                         'c_optimization': {'physics': '-Os', 'metadata': '-O0'},
+                         'c_optimization': request['c_optimization'],
                          'table_capacities': {} if controller else {'curve_points': CURVE_CAPACITY,
                                               'aero_points_per_axis': AERO_CAPACITY},
                          'workarounds': ['split_metadata_initializer', 'cvode_event_roundoff_guard',
-                                         'cvode_input_history_reset', 'cs_setup_tolerance', 'cs_event_localization'] +
+                                         'cvode_input_history_reset', 'cs_setup_tolerance', 'cs_event_localization',
+                                         'cs_event_chatter_limit', 'cvode_recoverable_evaluation',
+                                         'solver_scale_zero_crossing_hysteresis'] +
                                         (['homotopy_initial_guess_return'] if homotopy.is_file() else []),
                          'parameter_lifecycle': 'Set before initialization; array dimensions are fixed.'})
         phases['source_preparation_seconds'] = (time.perf_counter() - before
@@ -469,7 +579,7 @@ getErrorString();
         cmake = work / 'cmake'
         before = time.perf_counter()
         run(['cmake', '-S', str(sources), '-B', str(cmake),
-             '-DCMAKE_C_COMPILER=clang', '-DCMAKE_C_FLAGS_RELEASE=-Os -DNDEBUG'],
+             '-DCMAKE_C_COMPILER=clang', f'-DCMAKE_C_FLAGS_RELEASE={optimization} -DNDEBUG'],
             work, destination / 'configure.log')
         phases['cmake_configure_seconds'] = time.perf_counter() - before
         before = time.perf_counter()
@@ -499,6 +609,9 @@ getErrorString();
         phases['total_build_seconds'] = time.perf_counter() - started
         phases['compile_jobs'] = jobs
         (destination / 'build-timings.json').write_text(json.dumps(phases, indent=2) + '\n')
+        (destination / 'last-export.json').write_text(json.dumps({
+            'reused': False, 'seconds': phases['total_build_seconds'],
+            'sha256': manifest['sha256']}, indent=2) + '\n')
         return final
 
 
@@ -509,6 +622,7 @@ def main() -> None:
     kind = parser.add_mutually_exclusive_group()
     kind.add_argument('--all', action='store_true', help='Build all nine suspension combinations')
     kind.add_argument('--driver', action='store_true', help='Build the standard maneuver driver FMU')
+    kind.add_argument('--sil', action='store_true', help='Build a car-only plant for an external firmware VCU')
     parser.add_argument('--differential', choices=ARCHITECTURES['differentials'], default=DEFAULTS['differential'])
     parser.add_argument('--front-brakes', choices=ARCHITECTURES['front_brakes'], default=DEFAULTS['front_brakes'])
     parser.add_argument('--rear-brakes', choices=ARCHITECTURES['rear_brakes'], default=DEFAULTS['rear_brakes'])
@@ -516,19 +630,22 @@ def main() -> None:
                         help='Include rotor gyroscopic and carrier-acceleration effects (supports are always active)')
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--jobs', type=int, default=4)
+    parser.add_argument('--reuse', action='store_true',
+                        help='Reuse an unchanged artifact after checking build inputs, provenance and SHA-256')
     args = parser.parse_args()
     if args.jobs < 1:
         parser.error('--jobs must be positive')
     if args.driver:
         if args.rotor_effects:
             parser.error('--rotor-effects applies to the vehicle plant')
-        print(build_driver(args.output.resolve(), args.jobs), flush=True)
+        print(build_driver(args.output.resolve(), args.jobs, reuse=args.reuse), flush=True)
         return
     pairs = [(f, r) for f in AXLES for r in AXLES] if args.all else [(args.front, args.rear)]
     for front, rear in pairs:
         print(build(front, rear, args.output.resolve(), args.jobs,
                     rotor_effects=args.rotor_effects, differential=args.differential,
-                    front_brakes=args.front_brakes, rear_brakes=args.rear_brakes), flush=True)
+                    front_brakes=args.front_brakes, rear_brakes=args.rear_brakes,
+                    sil=args.sil, reuse=args.reuse), flush=True)
 
 
 if __name__ == '__main__':

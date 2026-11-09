@@ -6,5 +6,6 @@ TestKnCLocked
 TestFourPostSim
 TestVehicleSim
 TestVehicleFMI
+TestVehicleSIL
 VehicleSimAnimationOn
 TestManeuverFMI

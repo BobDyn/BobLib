@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "kind": "car-only-sil",
+  "inputs": {
+    "motorTorqueCommand": {"type": "Real", "unit": "N.m", "default": 0},
+    "inverterEnable": {"type": "Boolean", "default": false},
+    "brakeCommand": {"type": "Real", "unit": "1", "default": 0, "min": 0, "max": 1},
+    "steeringAngleCommand": {"type": "Real", "unit": "rad", "default": 0}
+  },
+  "outputs": {
+    "vehicleSpeed": {"type": "Real", "unit": "m/s", "role": "truth"},
+    "velX": {"type": "Real", "unit": "m/s", "role": "truth"},
+    "motorSpeed": {"type": "Real", "unit": "rev/min", "role": "sensor"},
+    "wheelSpeedFL": {"type": "Real", "unit": "rad/s", "role": "sensor"},
+    "wheelSpeedFR": {"type": "Real", "unit": "rad/s", "role": "sensor"},
+    "wheelSpeedRL": {"type": "Real", "unit": "rad/s", "role": "sensor"},
+    "wheelSpeedRR": {"type": "Real", "unit": "rad/s", "role": "sensor"},
+    "dcVoltage": {"type": "Real", "unit": "V", "role": "sensor"},
+    "dcCurrent": {"type": "Real", "unit": "A", "role": "sensor"},
+    "accX": {"type": "Real", "unit": "m/s2", "role": "truth"},
+    "accY": {"type": "Real", "unit": "m/s2", "role": "truth"},
+    "requestedPower": {"type": "Real", "unit": "W", "role": "diagnostic"},
+    "motorMechanicalPower": {"type": "Real", "unit": "W", "role": "diagnostic"},
+    "motorTorqueTarget": {"type": "Real", "unit": "N.m", "role": "diagnostic"}
+  }
+}

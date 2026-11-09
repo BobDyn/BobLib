@@ -20,6 +20,7 @@ class ModelCheck:
 
 DEFAULT_CHECKS = (
     ModelCheck("BobLib.Experiments.Standards.VehicleFMI"),
+    ModelCheck("BobLib.Experiments.Standards.VehicleSIL"),
     ModelCheck("BobLib.Experiments.Standards.VehicleSim"),
     ModelCheck("BobLib.Experiments.Standards.FourPostSim"),
     ModelCheck("BobLib.Experiments.Standards.Examples.MixedSuspensionVehicle"),

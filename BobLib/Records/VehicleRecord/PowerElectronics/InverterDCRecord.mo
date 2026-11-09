@@ -43,6 +43,8 @@ record InverterDCRecord
     eta_reg,
     max(eta_min, eta_reg - 0.005)}
     "Regen efficiency vs normalized output power";
+  parameter SI.Voltage voltageDerateBand = 1.0
+    "DC voltage headroom over which motoring or charging capacity tapers to zero at its bus limit";
   annotation(
     Documentation(info = "<html>
 <p>

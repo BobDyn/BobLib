@@ -1,0 +1,15 @@
+FROM openmodelica/openmodelica:v1.27.1-ompython@sha256:a79649b5b65bc3051b324efa05dbf24af460048d51894447e5e324d52e79c65f
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN rm -f /etc/apt/sources.list.d/openmodelica.list \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends clang cmake make git python3-venv \
+    && rm -rf /var/lib/apt/lists/*
+RUN python3 -m venv /opt/sil-venv
+ENV PATH="/opt/sil-venv/bin:${PATH}"
+COPY Tests/requirements-dev.txt /tmp/requirements-dev.txt
+RUN python -m pip install --no-cache-dir -r /tmp/requirements-dev.txt
+COPY msl_setup.mos /tmp/msl_setup.mos
+RUN omc /tmp/msl_setup.mos
+WORKDIR /workspace
+CMD ["python", "--version"]

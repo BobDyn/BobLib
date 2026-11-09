@@ -61,11 +61,15 @@ protected
   SI.Voltage V_abs(start = 500);
   Real eta_mot_eff(unit = "1", start = 0.95);
   Real eta_reg_eff(unit = "1", start = 0.95);
+  Real motoringVoltageFactor(unit = "1") "Continuous capacity fraction above the undervoltage limit";
+  Real regenVoltageFactor(unit = "1") "Continuous charging capacity fraction below the overvoltage limit";
 
 initial equation
   assert(pInverter.V_eps > 0 and pInverter.V_dc_min >= 0 and pInverter.V_dc_max > pInverter.V_dc_min,
     "InverterDC: voltage regularization must be positive and bus voltage limits ordered");
   assert(pInverter.P_standby >= 0, "InverterDC: standby loss must be non-negative");
+  assert(pInverter.voltageDerateBand > 0 and pInverter.voltageDerateBand < Modelica.Constants.inf,
+    "InverterDC: voltageDerateBand must be finite and positive");
   for i in 2:size(pInverter.powerFractionTable, 1) loop
     assert(pInverter.powerFractionTable[i] > pInverter.powerFractionTable[i - 1],
       "InverterDC: powerFractionTable breakpoints must be strictly increasing");
@@ -105,10 +109,15 @@ equation
   eta_eff = if noEvent(P_req_nameplate >= 0) then eta_mot_eff else eta_reg_eff;
   P_standby_active = if enabled then pInverter.P_standby else 0;
 
-  P_mot_from_dc = noEvent(max(0, min(pInverter.P_dc_max_mot, V_abs*pInverter.I_dc_dis_max) - P_standby_active)*eta_mot_eff);
-  P_mot_max_active = noEvent(if enabled and V_dc >= pInverter.V_dc_min then min(pInverter.P_max_mot, P_mot_from_dc) else 0);
-  P_regen_dc_sink = noEvent(min(pInverter.P_dc_max_reg, V_abs*pInverter.I_dc_chg_max));
-  P_reg_max_active = noEvent(if enabled and V_dc <= pInverter.V_dc_max then min(pInverter.P_max_reg, max(0, (P_regen_dc_sink + P_standby_active)/eta_reg_eff)) else 0);
+  // A binary cutout in this algebraic constant-power load can have no solution:
+  // regen raises a full pack above the cutoff, while cutting it drops below.
+  // Taper DC capacity continuously within the voltage protection band instead.
+  motoringVoltageFactor = noEvent(min(1, max(0, (V_dc - pInverter.V_dc_min)/pInverter.voltageDerateBand)));
+  regenVoltageFactor = noEvent(min(1, max(0, (pInverter.V_dc_max - V_dc)/pInverter.voltageDerateBand)));
+  P_mot_from_dc = noEvent(max(0, min(pInverter.P_dc_max_mot, V_abs*pInverter.I_dc_dis_max)*motoringVoltageFactor - P_standby_active)*eta_mot_eff);
+  P_mot_max_active = noEvent(if enabled then min(pInverter.P_max_mot, P_mot_from_dc) else 0);
+  P_regen_dc_sink = noEvent(min(pInverter.P_dc_max_reg, V_abs*pInverter.I_dc_chg_max)*regenVoltageFactor);
+  P_reg_max_active = noEvent(if enabled then min(pInverter.P_max_reg, max(0, (P_regen_dc_sink + P_standby_active)/eta_reg_eff)) else 0);
   P_out = if noEvent(P_req_nameplate >= 0) then
     noEvent(min(P_req_nameplate, P_mot_max_active))
   else
@@ -143,6 +152,12 @@ Model <code>InverterDCCore</code> implements the DC-side inverter/load core with
 <p>
 It converts the VCU power request into DC bus current demand, respects enable state, applies efficiency behavior, and supplies the internal physics behind the public inverter adapter.
 </p>
+<p>DC capacity tapers continuously to zero over <code>voltageDerateBand</code>
+at each voltage limit. Outside that band the existing current and power limits
+are unchanged. This averaged protection avoids an inconsistent algebraic on/off
+cutout against a resistive battery source. At the upper limit, regenerative power
+may still supply enabled standby loss without charging the battery. The default
+one-volt band is a model approximation, not a measured inverter calibration.</p>
 </html>"));
   annotation(Diagram(coordinateSystem(extent = {{-100, -60}, {100, 60}}, preserveAspectRatio = true)));
 end InverterDCCore;

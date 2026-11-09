@@ -2,6 +2,20 @@
   "schema_version": 1,
   "models": [
     {
+      "model": "BobLib.Experiments.Standards.BaseClasses.PartialVehicleSIL",
+      "test": "BobLibTest.Experiments.Standards.BaseClasses.TestPartialVehicleSIL",
+      "mode": "check",
+      "scope": "structural",
+      "stop_time": 0.01
+    },
+    {
+      "model": "BobLib.Experiments.Standards.VehicleSIL",
+      "test": "BobLibTest.Experiments.Standards.TestVehicleSIL",
+      "mode": "simulate",
+      "scope": "integration",
+      "stop_time": 0.01
+    },
+    {
       "model": "BobLib.Aero.CFDAeroMap",
       "test": "BobLibTest.Aero.TestCFDAeroMap",
       "mode": "simulate",
@@ -804,7 +818,7 @@
       "test": "BobLibTest.PowerElectronics.Internal.TestInverterDCCore",
       "mode": "simulate",
       "scope": "integration",
-      "stop_time": 10.0
+      "stop_time": 0.05
     },
     {
       "model": "BobLib.PowerElectronics.InverterDC",
