@@ -26,6 +26,14 @@ model DoubleWishbone
 
   parameter ChassisRecord pChassis
     "Chassis calibration: frame, front axle and rear axle" annotation(Dialog(group = "Calibration"));
+  parameter Boolean useRuntimeDamperTable = false "Read front and rear curves for the default tabular damper laws at simulation start"
+    annotation(Evaluate = false, choices(checkBox = true), Dialog(group = "Damper Parameters"));
+  parameter String runtimeDamperTableFile = "damper_tables.txt" "File containing named front and rear force-velocity tables"
+    annotation(Evaluate = false, Dialog(group = "Damper Parameters", enable = useRuntimeDamperTable));
+  output SI.Velocity damperCompressionVelocity[4]
+    "Compression-positive shaft speed ordered front-left, front-right, rear-left, rear-right";
+  output SI.Force damperForce[4]
+    "Signed damper resisting force ordered front-left, front-right, rear-left, rear-right";
 
   parameter Boolean fixInitialSuspensionAngles = false
     "Initialize suspension states from four-post-solved lower-arm angles" annotation(Dialog(group = "Initialization"), choices(checkBox = true));
@@ -161,12 +169,18 @@ model DoubleWishbone
         pChassis.rearAxle.rideHeightReference -
         {pChassis.rearAxle.geometry.wheelCenter[1], 0, pChassis.rearAxle.geometry.wheelCenter[3]}),
     redeclare replaceable FrAxleModel frAxleDW(pAxle = pChassis.frontAxle,
+useRuntimeDamperTable = useRuntimeDamperTable,
+runtimeDamperTableFile = runtimeDamperTableFile,
+runtimeDamperTableName = "front",
 fixInitialLeftLowerArmAngle = fixInitialSuspensionAngles,
 fixInitialRightLowerArmAngle = fixInitialSuspensionAngles,
 fixInitialLowerArmAngularVelocities = fixInitialSuspensionAngles,
 initialLeftLowerArmAngle = initialFrontLeftLowerArmAngle,
 initialRightLowerArmAngle = initialFrontRightLowerArmAngle),
     redeclare replaceable RrAxleModel rrAxleDW(pAxle = pChassis.rearAxle,
+useRuntimeDamperTable = useRuntimeDamperTable,
+runtimeDamperTableFile = runtimeDamperTableFile,
+runtimeDamperTableName = "rear",
 steerable = false,
 fixInitialLeftLowerArmAngle = fixInitialSuspensionAngles,
 fixInitialRightLowerArmAngle = fixInitialSuspensionAngles,
@@ -174,6 +188,41 @@ fixInitialLowerArmAngularVelocities = fixInitialSuspensionAngles,
 initialLeftLowerArmAngle = initialRearLeftLowerArmAngle,
 initialRightLowerArmAngle = initialRearRightLowerArmAngle),
     redeclare replaceable FrameModel spaceFrame(pFrame = pChassis.frame));
+
+protected
+  Modelica.Blocks.Interfaces.RealInput axleDamperVelocities[4](each unit = "m/s")
+    "Corner shaft speeds received from the axle buses" annotation(Placement(visible = false, transformation(origin = {0, 60}, extent = {{0, 0}, {0, 0}})));
+
+  Modelica.Blocks.Interfaces.RealInput axleDamperForces[4](each unit = "N")
+    "Corner damper forces received from the axle buses" annotation(Placement(visible = false, transformation(origin = {0, 60}, extent = {{0, 0}, {0, 0}})));
+
+equation
+  damperCompressionVelocity = axleDamperVelocities;
+  damperForce = axleDamperForces;
+  connect(
+    axleDamperVelocities[1],
+    frAxleDW.axleBus.leftDamperCompressionVelocity) annotation(Line(visible = false, points = {{-41, 18}, {-25, 18}, {-25, 60}, {0, 60}}));
+  connect(
+    axleDamperVelocities[2],
+    frAxleDW.axleBus.rightDamperCompressionVelocity) annotation(Line(visible = false, points = {{-41, 18}, {-25, 18}, {-25, 60}, {0, 60}}));
+  connect(
+    axleDamperVelocities[3],
+    rrAxleDW.axleBus.leftDamperCompressionVelocity) annotation(Line(visible = false, points = {{41, 18}, {25, 18}, {25, 60}, {0, 60}}));
+  connect(
+    axleDamperVelocities[4],
+    rrAxleDW.axleBus.rightDamperCompressionVelocity) annotation(Line(visible = false, points = {{41, 18}, {25, 18}, {25, 60}, {0, 60}}));
+  connect(
+    axleDamperForces[1],
+    frAxleDW.axleBus.leftDamperForce) annotation(Line(visible = false, points = {{-41, 18}, {-25, 18}, {-25, 60}, {0, 60}}));
+  connect(
+    axleDamperForces[2],
+    frAxleDW.axleBus.rightDamperForce) annotation(Line(visible = false, points = {{-41, 18}, {-25, 18}, {-25, 60}, {0, 60}}));
+  connect(
+    axleDamperForces[3],
+    rrAxleDW.axleBus.leftDamperForce) annotation(Line(visible = false, points = {{41, 18}, {25, 18}, {25, 60}, {0, 60}}));
+  connect(
+    axleDamperForces[4],
+    rrAxleDW.axleBus.rightDamperForce) annotation(Line(visible = false, points = {{41, 18}, {25, 18}, {25, 60}, {0, 60}}));
 
 initial equation
 

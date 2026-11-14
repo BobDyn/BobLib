@@ -27,6 +27,12 @@ partial model PartialDoubleWishboneAxle
 
   parameter Boolean useWheelCompliance = false "Enable the same wheel-stack compliance architecture on both sides" annotation(Dialog(group = "Architecture"), Evaluate = true, choices(checkBox = true));
   parameter Boolean quasiStatic = false "Omit body inertia and damping for equilibrium rigs; retain elastic calibration" annotation(Dialog(group = "Architecture"), Evaluate = true, choices(checkBox = true));
+  parameter Boolean useRuntimeDamperTable = false "Load a named curve for the default tabular damper law at simulation start"
+    annotation(Evaluate = false, choices(checkBox = true), Dialog(group = "Damper Parameters", enable = not quasiStatic));
+  parameter String runtimeDamperTableFile = "damper_tables.txt" "File containing the runtime force-velocity tables"
+    annotation(Evaluate = false, Dialog(group = "Damper Parameters", enable = useRuntimeDamperTable and not quasiStatic));
+  parameter String runtimeDamperTableName = "front" "Named table used by both dampers on this axle"
+    annotation(Dialog(group = "Damper Parameters", enable = useRuntimeDamperTable and not quasiStatic));
 
   // Record parameters
 

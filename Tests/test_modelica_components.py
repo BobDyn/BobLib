@@ -35,6 +35,17 @@ def test_modelica_component_simulates(case, tmp_path):
     assert result['status'] == 'passed', log.read_text()
 
 
+@pytest.mark.parametrize('variant', ['Nonlinear', 'Runtime'])
+def test_damper_variant_simulates(variant, tmp_path):
+    if shutil.which('omc') is None:
+        pytest.skip('OpenModelica omc is not installed')
+    model = 'BobLibTest.Chassis.Suspension.Components.TestTabularDamper' + variant
+    result = run_case({'model': model, 'test': model, 'scope': 'component',
+                       'mode': 'simulate', 'stop_time': 1.0}, tmp_path, timeout=120)
+    log = tmp_path / model / 'omc.log'
+    assert result['status'] == 'passed', log.read_text()
+
+
 def test_bilinear_grid_validation(tmp_path):
     if shutil.which('omc') is None:
         pytest.skip('OpenModelica omc is not installed')
