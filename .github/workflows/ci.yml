@@ -81,7 +81,7 @@ jobs:
     runs-on: ubuntu-latest
     container: openmodelica/openmodelica:v1.27.1-ompython
     needs: python
-    timeout-minutes: 120
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
@@ -99,8 +99,11 @@ jobs:
           path: ~/.openmodelica
           key: om-libs-${{ hashFiles('msl_setup.mos') }}
 
+      # Four runners, each running its shard across every logical CPU. A runner
+      # alone tops out near 2x (2 physical cores), so one xdist job took 48 min
+      # against 17 min for this split.
       - name: Run component, contract and Python tests
-        run: make test-additional PYTEST_FLAGS="--junitxml=/tmp/boblib-components.xml -ra --boblib-shard ${{ matrix.shard }}/4"
+        run: make test-additional PYTEST_WORKERS=logical PYTEST_FLAGS="--junitxml=/tmp/boblib-components.xml -ra --boblib-shard ${{ matrix.shard }}/4"
 
       - name: Retain component test results
         if: always()
