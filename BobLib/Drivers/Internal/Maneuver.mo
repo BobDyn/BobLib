@@ -63,6 +63,10 @@ model Maneuver
     "First-order lag applied to the closed-loop steering command"
     annotation(Evaluate = false, Dialog(tab = "Maneuver", group = "Steady-State Ay", enable = steadyStateAy));
 
+  parameter SI.AngularVelocity steadyStateMaxHandwheelRate = 0.5
+    "Maximum absolute rate of the continuous steady-state handwheel actuator"
+    annotation(Evaluate = false, Dialog(tab = "Maneuver", group = "Steady-State Ay"));
+
   // Step steer command
   parameter SI.Angle frRampSteerHeight = 5*pi/180
     "Handwheel angle reached by the step-steer maneuver"
@@ -132,11 +136,13 @@ model Maneuver
     start = 0,
     fixed = true,
     stateSelect = StateSelect.always)
-    "Sampled first-order steady-state handwheel command";
+    "Continuous rate-limited steady-state handwheel command";
   output Boolean steadyStateTargetReached
     "True once the steady-state lateral-acceleration target ramp is complete";
 
 protected
+  discrete SI.Angle steadyStateSteerRequest(start = 0, fixed = true)
+    "Held PI demand followed by the continuous steering actuator";
   discrete SI.Velocity steadyStateIntegralCandidate(start = 0, fixed = true);
   discrete Boolean rampEndingState(start = false, fixed = true);
   discrete SI.Time rampEndTime(start = 0, fixed = true);
@@ -183,6 +189,7 @@ equation
   assert(steadyStateAyGain > 0 and steadyStateAyGain < Modelica.Constants.inf and
     steadyStateAyTi > 0 and steadyStateAyTi < Modelica.Constants.inf and
     steadyStateSteerTimeConstant > 0 and steadyStateSteerTimeConstant < Modelica.Constants.inf and
+    steadyStateMaxHandwheelRate > 0 and steadyStateMaxHandwheelRate < Modelica.Constants.inf and
     steadyStateMaxHandwheel > 0 and steadyStateMaxHandwheel < Modelica.Constants.inf and
     steadyStateAyRampRate > 0 and steadyStateAyRampRate < Modelica.Constants.inf,
     "BOBLIB_INVALID_DRIVER_CONFIG: steady-state PI gain, integral time, steering time constant, steering limit, and target ramp rate must be finite and positive");
@@ -228,7 +235,9 @@ equation
     steadyStateAy and noEvent(steadyStateAyRampXi >= 1);
 
   // Retain this angle state: removing it broke full-vehicle initialization in OMC 1.27.1.
-  der(steadyStateSteerCmd) = 0;
+  der(steadyStateSteerCmd) = if useMode == MODE_STEADY_STATE_AY then
+    noEvent(max(-steadyStateMaxHandwheelRate, min(steadyStateMaxHandwheelRate,
+      (steadyStateSteerRequest - steadyStateSteerCmd)/steadyStateSteerTimeConstant))) else 0;
 
   when sample(0, linearitySlopeSamplePeriod) and useMode == MODE_STEADY_STATE_AY and time >= steerStart then
     steadyStateIntegralCandidate = pre(steadyStateAyIntegral) + steadyStateAyError*linearitySlopeSamplePeriod;
@@ -236,10 +245,8 @@ equation
       (steadyStateAyError > 0 and steadyStateAyGain*(steadyStateAyError + steadyStateIntegralCandidate/steadyStateAyTi) > steadyStateMaxHandwheel) or
       (steadyStateAyError < 0 and steadyStateAyGain*(steadyStateAyError + steadyStateIntegralCandidate/steadyStateAyTi) < -steadyStateMaxHandwheel)
       then pre(steadyStateAyIntegral) else steadyStateIntegralCandidate;
-    reinit(steadyStateSteerCmd, pre(steadyStateSteerCmd) +
-      min(1, linearitySlopeSamplePeriod/steadyStateSteerTimeConstant)*
-      (max(-steadyStateMaxHandwheel, min(steadyStateMaxHandwheel,
-        steadyStateAyGain*(steadyStateAyError + steadyStateAyIntegral/steadyStateAyTi))) - pre(steadyStateSteerCmd)));
+    steadyStateSteerRequest = max(-steadyStateMaxHandwheel, min(steadyStateMaxHandwheel,
+      steadyStateAyGain*(steadyStateAyError + steadyStateAyIntegral/steadyStateAyTi)));
   end when;
 
   when useMode == MODE_OPEN_LOOP_RAMP and time > steerStart and enableNormalLoadSteerLimiter and minTireNormalLoad <= tireNormalLoadMin and not pre(rampEndingState) then
@@ -300,6 +307,6 @@ equation
   connect(brakeCommand.y, brakePosition.position) annotation(Line(points = {{-203.75, 20}, {-122, 20}}, color = {0, 0, 127}));
   annotation(Diagram(coordinateSystem(extent = {{-320, -140}, {100, 140}}, preserveAspectRatio = true)),
     Documentation(info = "<html><p>Owns steering maneuvers and longitudinal speed control. Publishes normalized driver intent through VI DriverInterface; the environment maps that intent to actuator commands and the VCU owns torque limits and brake blending. steeringCenter and steeringRange must match the environment.</p><h4>Parameter setup</h4><p>Select <code>useMode</code> first: 0 ramp steer, 1 sinusoidal steer, 2 step steer, 3 closed-loop lateral acceleration. <code>steerStart</code> applies to all modes. For step steer, <code>frRampSteerHeight</code> is the handwheel target and <code>stepDuration</code> is the transition time. Steering angles use radians. The speed controller uses <code>targetVel</code>, <code>velGain</code> and <code>velTi</code>; drive and brake torque capacities normalize its requests into pedal commands. Maneuver-specific enable conditions in the dialog identify the applicable settings.</p>
-<p>Closed-loop lateral acceleration uses a sampled PI controller with conditional integration at the steering limit. Its steering command follows a sampled first-order recurrence, not a continuous actuator lag. Retain the prescribed steering-angle state for full-vehicle initialization in OpenModelica. The target uses a cubic ramp of duration <code>abs(targetAy)/steadyStateAyRampRate</code>, so its peak ramp rate is 1.5 times the configured average. A target outside the vehicle's feasible envelope must trigger the experiment's safety or settling diagnostic, not be treated as converged.</p>
+<p>Closed-loop lateral acceleration uses a sampled PI controller with conditional integration at the steering limit. Its sampled PI demand drives a continuous first-order actuator with an explicit handwheel-rate limit. The angle state is never reset at controller updates. Retain the prescribed steering-angle state for full-vehicle initialization in OpenModelica. The target uses a cubic ramp of duration <code>abs(targetAy)/steadyStateAyRampRate</code>, so its peak ramp rate is 1.5 times the configured average. A target outside the vehicle's feasible envelope must trigger the experiment's safety or settling diagnostic, not be treated as converged.</p>
 </html>"));
 end Maneuver;

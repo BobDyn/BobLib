@@ -23,7 +23,7 @@ buildModel(BobLib.Experiments.Standards.VehicleSim, stopTime=1,
   fileNamePrefix="vehicle", variableFilter="time|terminationStatus|Fz_.*|accY|yawVel");
 getErrorString();
 ''')
-    result = subprocess.run(["omc", "build.mos"], cwd=work, capture_output=True,
+    result = subprocess.run(["omc", "--numProcs=1", "build.mos"], cwd=work, capture_output=True,
                             text=True, timeout=600, check=True)
     (work / "build.log").write_text(result.stdout + result.stderr)
     assert "Error:" not in result.stdout, result.stdout
