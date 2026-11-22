@@ -17,6 +17,7 @@ def test_continuous_steering_and_vehicle_balance(tmp_path):
   extends BobLibTest.Drivers.TestStandardDriver(driver(
     useMode=3, steerStart=0.05, targetAy=8, steadyStateAyGain=0.2,
     steadyStateMaxHandwheel=0.3, steadyStateMaxHandwheelRate=0.4));
+  Real handwheelRate = der(driver.steadyStateSteerCmd);
 equation
   assert(abs(der(driver.steadyStateSteerCmd)) <= 0.400001,
     "Continuous actuator must respect its rate limit");
@@ -48,4 +49,6 @@ getErrorString();
         dt = float(b['time']) - float(a['time'])
         change = abs(float(b['driver.steadyStateSteerCmd']) - float(a['driver.steadyStateSteerCmd']))
         assert change <= 0.4*dt + 1e-7
+        rate_change = abs(float(b['handwheelRate']) - float(a['handwheelRate']))
+        assert rate_change <= (2*0.4/0.15)*dt + 1e-6
     assert float(rows[-1]['driver.steadyStateSteerCmd']) > 0.29

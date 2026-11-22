@@ -93,8 +93,8 @@ initialization values or tolerances were adjusted.
 
 ## VehicleSim steering and settling follow-up
 
-The steady-state driver's sampled PI demand now drives a continuous first-order,
-rate-limited handwheel state. `steadyStateMaxHandwheelRate` defaults to 0.5 rad/s;
+The steady-state driver's sampled PI demand now drives a continuous two-stage,
+rate-limited handwheel state with continuous velocity. `steadyStateMaxHandwheelRate` defaults to 0.5 rad/s;
 it is a test-actuator setting and must be matched to the intended experiment.
 The state remains explicit for full-vehicle initialization, without controller
 sample-time resets. Step-steer settling starts after the commanded transition,
