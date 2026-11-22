@@ -45,7 +45,7 @@ getErrorString();
     assert counts and all(a == b for a, b in counts), output
     with (tmp_path / 'Steering_res.csv').open() as stream:
         rows = list(csv.DictReader(stream))
-    for a, b in zip(rows, rows[1:]):
+    for a, b in zip(rows, rows[1:], strict=False):
         dt = float(b['time']) - float(a['time'])
         change = abs(float(b['driver.steadyStateSteerCmd']) - float(a['driver.steadyStateSteerCmd']))
         assert change <= 0.4*dt + 1e-7
