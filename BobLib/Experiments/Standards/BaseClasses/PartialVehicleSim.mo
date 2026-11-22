@@ -406,7 +406,10 @@ algorithm
   when sample(0, driver.linearitySlopeSamplePeriod) then
     if driver.useMode == driver.MODE_STEADY_STATE_AY and pre(steadyStateHoldEligible) and
         pre(settlingExcursionOK) and pre(t_steady_state_hit) > 0 and
-        time > pre(t_steady_state_hit) + steadyStateHoldDuration then
+        time > pre(t_steady_state_hit) + steadyStateHoldDuration and
+        (not terminateOnTireLift or minTireNormalLoad > tireLiftTerminateLoad) and
+        (not terminateOnSpinout or abs(sideslip) < sideslipTerminate) and
+        time <= driver.steerStart + pre(steadyStateAyRampDuration) + steadyStateSettleTimeout then
       terminate("Reached closed-loop steady-state lateral-acceleration target");
     end if;
   end when;
