@@ -124,3 +124,11 @@ that output reproduces the previous variable-name hash. The
 sum, absolute sum and maximum of initialized values are unchanged, and no
 nonfinite values were introduced. Only this fixture's snapshot changed; no
 comparison tolerances were relaxed.
+
+Continuation initialization snapshots were regenerated for `VehicleSimAnimationOn`
+(2692 numeric values) and `TestStandardDriver` (78). Comparing the full vehicle
+CSV with the steering-only revision found no changed existing value outside
+1e-9 relative / 1e-8 absolute tolerances and no removed outputs. The added sequence
+and target inputs account for the new values. The driver adds a zero-valued
+`steadyStatePreviousTarget` input; its aggregate initialized values are unchanged.
+No baseline tolerances were changed.
