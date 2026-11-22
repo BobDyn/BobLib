@@ -234,7 +234,9 @@ equation
   // Continuous excursion guards invalidate the hold without averaging those away.
 
   stepSteerConditionsMet = driver.useMode == driver.MODE_STEP_STEER and
-    time >= driver.steerStart + driver.stepDuration and steadyStateSampleValid and
+    time >= driver.steerStart + max(
+      driver.stepDuration,
+      driver.linearitySlopeSamplePeriod) and steadyStateSampleValid and
     abs(driver.targetVel - chassis.vehicleSpeed) <= steadyStateSpeedTolerance and
     abs(steadyStateSpeedRate) <= steadyStateSpeedRateTolerance and abs(steadyStateAyRate) <= steadyStateAyRateTolerance and
     abs(steadyStateYawRateDerivative) <= steadyStateYawRateDerivativeTolerance and
@@ -378,6 +380,7 @@ algorithm
       "; abs(ayRate)/limit=" + String(abs(steadyStateAyRate)) + "/" + String(steadyStateAyRateTolerance) +
       "; abs(yawRateDerivative)/limit=" + String(abs(steadyStateYawRateDerivative)) + "/" + String(steadyStateYawRateDerivativeTolerance) +
       "; abs(speedError)/limit=" + String(abs(steadyStateSpeedError)) + "/" + String(steadyStateSpeedTolerance) +
+      "; abs(speedRate)/limit=" + String(abs(steadyStateSpeedRate)) + "/" + String(steadyStateSpeedRateTolerance) +
       "; required hold=" + String(steadyStateHoldDuration) + " s. Check sampled feedback, controller tuning, and numerical convergence.");
   end when;
 
