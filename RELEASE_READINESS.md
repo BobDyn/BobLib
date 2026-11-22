@@ -103,3 +103,10 @@ checks speed and sampled speed/lateral/yaw/roll/sideslip rates, and holds for
 continuous signal excursions, including speed, so sample-aligned oscillations cannot pass solely
 because their finite differences vanish. These protocol changes require renewed
 vehicle correlation; fixture checks do not certify runtime or real-vehicle accuracy.
+
+The VehicleSim steering actuator adds one initialized numeric variable to
+`VehicleSimAnimationOn` (2684 to 2685). Its initialization snapshot was regenerated
+with OpenModelica 1.27.1 after inspecting the zero-valued actuator demand. The
+sum, absolute sum and maximum of initialized values are unchanged, and no
+nonfinite values were introduced. Only this fixture's snapshot changed; no
+comparison tolerances were relaxed.
