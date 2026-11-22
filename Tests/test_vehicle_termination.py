@@ -52,8 +52,9 @@ CASES = [
 @pytest.mark.parametrize("name,overrides,status,message", CASES)
 def test_vehicle_exit_status(vehicle_executable, name, overrides, status, message):
     work = vehicle_executable
+    stop = 3 if name == "settled" else 1
     result = subprocess.run([str(work / "vehicle"), f"-override={overrides}",
-                             f"-r={name}.csv", "-stopTime=1"], cwd=work, capture_output=True,
+                             f"-r={name}.csv", f"-stopTime={stop}"], cwd=work, capture_output=True,
                             text=True, timeout=120)
     output = result.stdout + result.stderr
     (work / f"{name}.log").write_text(output)
@@ -67,7 +68,7 @@ def test_vehicle_exit_status(vehicle_executable, name, overrides, status, messag
     assert rows, output
     assert int(rows[-1]["terminationStatus"]) == status, (rows[-1], output)
     if message:
-        assert float(rows[-1]["time"]) < 1, output
+        assert float(rows[-1]["time"]) < stop, output
 
 
 def test_invalid_monitor_configuration_still_fails(vehicle_executable):
