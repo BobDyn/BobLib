@@ -18,7 +18,7 @@ def test_sequence_preserves_time_and_reports_every_acceptance(sequence_executabl
                  'driver.linearitySlopeSamplePeriod=0.02,steadyStateHoldDuration=0.1,'
                  'steadyStateSpeedTolerance=1')
     result = subprocess.run([str(work / 'vehicle'), '-override=' + overrides,
-                             '-stopTime=2', '-r=sequence.csv', '-noEventEmit'],
+                             '-stopTime=10', '-r=sequence.csv', '-noEventEmit'],
                             cwd=work, text=True, capture_output=True, timeout=180)
     output = result.stdout + result.stderr
     (work / 'sequence.log').write_text(output)
@@ -51,7 +51,7 @@ def test_sequence_reaches_nonzero_targets(sequence_executable):
                  'driver.steadyStateAyTi=1,driver.velGain=100,driver.velTi=2')
     result = subprocess.run([str(work / 'vehicle'), '-override=' + overrides,
                              '-stopTime=30', '-r=nonzero_sequence.csv',
-                             '-variableFilter=time|accY|yawVel|handwheelAngle|velX'],
+                             '-variableFilter=time|accY|yawVel|handwheelAngle|velX|steadyStateSpeedRate'],
                             cwd=work, text=True, capture_output=True, timeout=300)
     output = result.stdout + result.stderr
     (work / 'nonzero_sequence.log').write_text(output)
@@ -62,3 +62,4 @@ def test_sequence_reaches_nonzero_targets(sequence_executable):
     with (work / 'nonzero_sequence.csv').open() as stream:
         final = list(csv.DictReader(stream))[-1]
     assert abs(float(final['accY']) - 0.4) <= 0.051, final
+    assert abs(float(final['steadyStateSpeedRate'])) <= 0.02001, final
