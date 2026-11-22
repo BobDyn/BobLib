@@ -220,6 +220,7 @@ equation
     abs(yawVel - settlingReference[2]) <= settlingYawExcursion and
     abs(sideslip - settlingReference[3]) <= settlingAngleExcursion and
     abs(roll - settlingReference[4]) <= settlingAngleExcursion;
+
   // The sampled rate checks cannot see oscillations between their samples.
   // Continuous excursion guards invalidate the hold without averaging those away.
 
@@ -238,6 +239,7 @@ equation
     Line(points = {{-20, 60}, {20, 60}}, color = {85, 85, 255}, thickness = 0.5));
   connect(inverterEnable.y, driverBus.inverterEnable) annotation(
     Line(points = {{-146.6, 80}, {-180, 80}}, color = {255, 0, 255}));
+
 algorithm
   when sample(driver.steerStart, driver.linearitySlopeSamplePeriod) then
     if driver.useMode == driver.MODE_OPEN_LOOP_RAMP and enableLinearityTermination and time >= driver.steerStart then
@@ -408,7 +410,6 @@ algorithm
       terminate("Reached closed-loop steady-state lateral-acceleration target");
     end if;
   end when;
-
 
   annotation(
     Diagram(coordinateSystem(extent = {{-200, -180}, {180, 120}})),

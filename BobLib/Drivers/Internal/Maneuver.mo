@@ -298,7 +298,9 @@ equation
   connect(steeringCommand.y, steeringPosition.phi_ref) annotation(Line(points = {{-203.75, 100}, {-122, 100}}, color = {0, 0, 127}));
   connect(acceleratorCommand.y, acceleratorPosition.position) annotation(Line(points = {{-203.75, 60}, {-122, 60}}, color = {0, 0, 127}));
   connect(brakeCommand.y, brakePosition.position) annotation(Line(points = {{-203.75, 20}, {-122, 20}}, color = {0, 0, 127}));
+
 algorithm
+
   // Sample the pre-event measurement to avoid an implicit actuator/acceleration loop.
   when sample(0, linearitySlopeSamplePeriod) and useMode == MODE_STEADY_STATE_AY and time >= steerStart then
     steadyStateIntegralCandidate := pre(steadyStateAyIntegral) + pre(steadyStateAyError)*linearitySlopeSamplePeriod;
