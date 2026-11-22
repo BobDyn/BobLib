@@ -116,3 +116,11 @@ A limit exit does not accept the unfinished point. BobSim supplies a zero-Ay
 preconditioning point before the requested sweep. Independent starts, reverse
 sweeps and full-vehicle runtime comparisons are required before making this mode
 the default; continuation can expose history-dependent branches.
+
+The VehicleSim settling diagnostics add one initialized numeric variable to
+`VehicleSimAnimationOn` (2684 to 2685). Its initialization snapshot was regenerated
+with OpenModelica 1.27.1 after inspecting the zero-valued `steadyStateSpeedRate` diagnostic. Removing
+that output reproduces the previous variable-name hash. The
+sum, absolute sum and maximum of initialized values are unchanged, and no
+nonfinite values were introduced. Only this fixture's snapshot changed; no
+comparison tolerances were relaxed.
