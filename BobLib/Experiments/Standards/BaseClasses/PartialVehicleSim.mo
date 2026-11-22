@@ -80,6 +80,12 @@ partial model PartialVehicleSim
   parameter SI.Velocity steadyStateSpeedTolerance = 0.10 "Allowed vehicle-speed error for closed-loop steady-state detection" annotation(
     Evaluate = false,
     Dialog(tab = "Maneuver Monitors", group = "Steady-State Ay"));
+  parameter SI.Acceleration steadyStateSpeedRateTolerance = 0.02
+    "Maximum sampled speed drift for steady-state and step-steer acceptance" annotation(
+    Evaluate = false, Dialog(tab = "Maneuver Monitors", group = "Steady-State Ay"));
+  parameter SI.Velocity settlingSpeedExcursion = 0.02
+    "Maximum speed excursion from the start of a settling hold" annotation(
+    Evaluate = false, Dialog(tab = "Maneuver Monitors", group = "Settling"));
   parameter Real steadyStateYawRateDerivativeTolerance(unit = "rad/s2") = 0.01 "Yaw-rate derivative tolerance for closed-loop steady-state detection" annotation(
     Evaluate = false,
     Dialog(tab = "Maneuver Monitors", group = "Steady-State Ay"));
@@ -118,6 +124,7 @@ partial model PartialVehicleSim
   SI.Acceleration steadyStateAyCommand;
   Real steadyStateAyError;
   discrete Real steadyStateSpeedError(start = 0, fixed = true);
+  discrete SI.Acceleration steadyStateSpeedRate(start = 0, fixed = true);
   SI.Velocity steadyStateAyIntegral;
   SI.Angle steadyStateSteerCmd;
   Boolean steadyStateTargetReached;
@@ -155,10 +162,11 @@ protected
   discrete Real t_linearity_limit_hit(start = -1, fixed = true);
   discrete Real t_spinout_hit(start = -1, fixed = true);
   discrete Real t_yawVel_hit(start = -1, fixed = true);
-  discrete Real settlingReference[4](each start = 0, each fixed = true);
+  discrete Real settlingReference[5](each start = 0, each fixed = true);
   Boolean settlingExcursionOK;
   Boolean stepSteerConditionsMet;
   Boolean steadyStateHoldEligible;
+  discrete SI.Velocity steadyStateSampleSpeed(start = 0, fixed = true);
   discrete Real steadyStateSampleAy(start = 0, fixed = true);
   discrete Real steadyStateSampleYawVel(start = 0, fixed = true);
   discrete Real steadyStateSampleSideslip(start = 0, fixed = true);
@@ -174,7 +182,7 @@ equation
     Line(points = {{-180, 80}, {-200, 80}, {-200, 30}}, color = {255, 204, 51}, thickness = 0.5));
   assert(steadyStateHoldDuration > 0 and steadyStateSettleTimeout > steadyStateHoldDuration and
     tireLiftTerminateLoad >= 0 and sideslipTerminate > 0 and stepSteerHoldDuration > 0 and
-    settlingAyExcursion > 0 and settlingYawExcursion > 0 and settlingAngleExcursion > 0,
+    steadyStateSpeedRateTolerance > 0 and settlingSpeedExcursion > 0 and settlingAyExcursion > 0 and settlingYawExcursion > 0 and settlingAngleExcursion > 0,
     "BOBLIB_INVALID_MONITOR_CONFIG: require positive hold and sideslip limit, timeout greater than hold, and nonnegative tire-load limit");
 
   // Report limit exits separately from accepted steady-state results. Limit
@@ -219,7 +227,8 @@ equation
   settlingExcursionOK = abs(accY - settlingReference[1]) <= settlingAyExcursion and
     abs(yawVel - settlingReference[2]) <= settlingYawExcursion and
     abs(sideslip - settlingReference[3]) <= settlingAngleExcursion and
-    abs(roll - settlingReference[4]) <= settlingAngleExcursion;
+    abs(roll - settlingReference[4]) <= settlingAngleExcursion and
+    abs(chassis.vehicleSpeed - settlingReference[5]) <= settlingSpeedExcursion;
 
   // The sampled rate checks cannot see oscillations between their samples.
   // Continuous excursion guards invalidate the hold without averaging those away.
@@ -227,7 +236,7 @@ equation
   stepSteerConditionsMet = driver.useMode == driver.MODE_STEP_STEER and
     time >= driver.steerStart + driver.stepDuration and steadyStateSampleValid and
     abs(driver.targetVel - chassis.vehicleSpeed) <= steadyStateSpeedTolerance and
-    abs(steadyStateAyRate) <= steadyStateAyRateTolerance and
+    abs(steadyStateSpeedRate) <= steadyStateSpeedRateTolerance and abs(steadyStateAyRate) <= steadyStateAyRateTolerance and
     abs(steadyStateYawRateDerivative) <= steadyStateYawRateDerivativeTolerance and
     abs(steadyStateSideslipRate) <= steadyStateSideslipRateTolerance and
     abs(steadyStateRollRate) <= steadyStateRollRateTolerance and
@@ -272,20 +281,23 @@ algorithm
       steadyStateSpeedError := driver.targetVel - chassis.vehicleSpeed;
 
       if pre(steadyStateSampleValid) then
+        steadyStateSpeedRate := (chassis.vehicleSpeed - pre(steadyStateSampleSpeed))/driver.linearitySlopeSamplePeriod;
         steadyStateAyRate := (accY - pre(steadyStateSampleAy))/max(driver.linearitySlopeSamplePeriod, 1e-6);
         steadyStateYawRateDerivative := (yawVel - pre(steadyStateSampleYawVel))/max(driver.linearitySlopeSamplePeriod, 1e-6);
         steadyStateSideslipRate := (sideslip - pre(steadyStateSampleSideslip))/max(driver.linearitySlopeSamplePeriod, 1e-6);
         steadyStateRollRate := (roll - pre(steadyStateSampleRoll))/max(driver.linearitySlopeSamplePeriod, 1e-6);
         steadyStateHandwheelRate := (handwheelAngle - pre(steadyStateSampleHandwheel))/max(driver.linearitySlopeSamplePeriod, 1e-6);
       else
+        steadyStateSpeedRate := pre(steadyStateSpeedRate);
         steadyStateAyRate := pre(steadyStateAyRate);
         steadyStateYawRateDerivative := pre(steadyStateYawRateDerivative);
         steadyStateSideslipRate := pre(steadyStateSideslipRate);
         steadyStateRollRate := pre(steadyStateRollRate);
         steadyStateHandwheelRate := pre(steadyStateHandwheelRate);
       end if;
-      steadyStateConditionsMet := pre(steadyStateSampleValid) and steadyStateTargetReached and abs(steadyStateAyCommand - accY) <= steadyStateAyTolerance and abs(driver.targetVel - chassis.vehicleSpeed) <= steadyStateSpeedTolerance and abs(steadyStateAyRate) <= steadyStateAyRateTolerance and abs(steadyStateYawRateDerivative) <= steadyStateYawRateDerivativeTolerance and abs(steadyStateSideslipRate) <= steadyStateSideslipRateTolerance and abs(steadyStateRollRate) <= steadyStateRollRateTolerance and abs(steadyStateHandwheelRate) <= handwheelRateTol;
+      steadyStateConditionsMet := pre(steadyStateSampleValid) and steadyStateTargetReached and abs(steadyStateAyCommand - accY) <= steadyStateAyTolerance and abs(driver.targetVel - chassis.vehicleSpeed) <= steadyStateSpeedTolerance and abs(steadyStateSpeedRate) <= steadyStateSpeedRateTolerance and abs(steadyStateAyRate) <= steadyStateAyRateTolerance and abs(steadyStateYawRateDerivative) <= steadyStateYawRateDerivativeTolerance and abs(steadyStateSideslipRate) <= steadyStateSideslipRateTolerance and abs(steadyStateRollRate) <= steadyStateRollRateTolerance and abs(steadyStateHandwheelRate) <= handwheelRateTol;
       steadyStateSampleValid := true;
+      steadyStateSampleSpeed := chassis.vehicleSpeed;
       steadyStateSampleAy := accY;
       steadyStateSampleYawVel := yawVel;
       steadyStateSampleSideslip := sideslip;
@@ -293,6 +305,8 @@ algorithm
       steadyStateSampleHandwheel := handwheelAngle;
     else
       steadyStateSpeedError := pre(steadyStateSpeedError);
+      steadyStateSpeedRate := pre(steadyStateSpeedRate);
+      steadyStateSampleSpeed := pre(steadyStateSampleSpeed);
       steadyStateConditionsMet := false;
       steadyStateAyRate := pre(steadyStateAyRate);
       steadyStateYawRateDerivative := pre(steadyStateYawRateDerivative);
@@ -346,7 +360,7 @@ algorithm
 algorithm
   when (steadyStateHoldEligible and pre(t_steady_state_hit) < 0) or
        (stepSteerConditionsMet and pre(t_yawVel_hit) < 0) then
-    settlingReference := {pre(accY), pre(yawVel), pre(sideslip), pre(roll)};
+    settlingReference := {pre(accY), pre(yawVel), pre(sideslip), pre(roll), pre(chassis.vehicleSpeed)};
   end when;
 
 algorithm

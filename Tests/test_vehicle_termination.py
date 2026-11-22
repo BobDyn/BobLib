@@ -52,10 +52,10 @@ CASES = [
 @pytest.mark.parametrize("name,overrides,status,message", CASES)
 def test_vehicle_exit_status(vehicle_executable, name, overrides, status, message):
     work = vehicle_executable
-    stop = 3 if name == "settled" else 1
+    stop = 10 if name == "settled" else 1
     result = subprocess.run([str(work / "vehicle"), f"-override={overrides}",
                              f"-r={name}.csv", f"-stopTime={stop}"], cwd=work, capture_output=True,
-                            text=True, timeout=120)
+                            text=True, timeout=180)
     output = result.stdout + result.stderr
     (work / f"{name}.log").write_text(output)
     assert "override variable name not found" not in output, output
@@ -75,7 +75,7 @@ def test_invalid_monitor_configuration_still_fails(vehicle_executable):
     work = vehicle_executable
     result = subprocess.run([str(work / "vehicle"), "-override=tireLiftTerminateLoad=-1",
                              "-r=invalid.csv"], cwd=work, capture_output=True,
-                            text=True, timeout=120)
+                            text=True, timeout=180)
     output = result.stdout + result.stderr
     (work / "invalid.log").write_text(output)
     assert result.returncode != 0, output

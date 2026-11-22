@@ -98,8 +98,8 @@ rate-limited handwheel state with continuous velocity. `steadyStateMaxHandwheelR
 it is a test-actuator setting and must be matched to the intended experiment.
 The state remains explicit for full-vehicle initialization, without controller
 sample-time resets. Step-steer settling starts after the commanded transition,
-checks speed and sampled lateral/yaw/roll/sideslip rates, and holds for
+checks speed and sampled speed/lateral/yaw/roll/sideslip rates, and holds for
 `stepSteerHoldDuration` (default 0.5 s). Step and closed-loop holds also monitor
-continuous signal excursions so sample-aligned oscillations cannot pass solely
+continuous signal excursions, including speed, so sample-aligned oscillations cannot pass solely
 because their finite differences vanish. These protocol changes require renewed
 vehicle correlation; fixture checks do not certify runtime or real-vehicle accuracy.
