@@ -135,13 +135,13 @@ model Maneuver
   output SI.Angle steadyStateSteerCmd(
     start = 0,
     fixed = true,
-    stateSelect = StateSelect.prefer)
+    stateSelect = StateSelect.always)
     "Continuous rate-limited steady-state handwheel command";
   output Boolean steadyStateTargetReached
     "True once the steady-state lateral-acceleration target ramp is complete";
 
 protected
-  SI.Angle steadyStateSteerDemand(start = 0, fixed = true, stateSelect = StateSelect.prefer)
+  SI.Angle steadyStateSteerDemand(start = 0, fixed = true, stateSelect = StateSelect.always)
     "Rate-limited first actuator stage; the second stage keeps handwheel velocity continuous";
   discrete SI.Angle steadyStateSteerRequest(start = 0, fixed = true)
     "Held PI demand followed by the continuous steering actuator";
