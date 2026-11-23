@@ -90,3 +90,24 @@ for the new `terminationStatus` output. A fresh before/after comparison against
 outside the unchanged 1e-9 relative / 1e-8 absolute tolerances. Only that one
 snapshot row changed (2,683 to 2,684 numeric/finite variables); no physical
 initialization values or tolerances were adjusted.
+
+## VehicleSim steering and settling follow-up
+
+The steady-state driver's sampled PI demand now drives a continuous two-stage,
+rate-limited handwheel state with continuous velocity. `steadyStateMaxHandwheelRate` defaults to 0.5 rad/s;
+it is a test-actuator setting and must be matched to the intended experiment.
+The state remains explicit for full-vehicle initialization, without controller
+sample-time resets. Step-steer settling starts after the commanded transition,
+checks speed and sampled speed/lateral/yaw/roll/sideslip rates, and holds for
+`stepSteerHoldDuration` (default 0.5 s). Step and closed-loop holds also monitor
+continuous signal excursions, including speed, so sample-aligned oscillations cannot pass solely
+because their finite differences vanish. These protocol changes require renewed
+vehicle correlation; fixture checks do not certify runtime or real-vehicle accuracy.
+
+The VehicleSim settling diagnostics add one initialized numeric variable to
+`VehicleSimAnimationOn` (2684 to 2685). Its initialization snapshot was regenerated
+with OpenModelica 1.27.1 after inspecting the zero-valued `steadyStateSpeedRate` diagnostic. Removing
+that output reproduces the previous variable-name hash. The
+sum, absolute sum and maximum of initialized values are unchanged, and no
+nonfinite values were introduced. Only this fixture's snapshot changed; no
+comparison tolerances were relaxed.

@@ -58,6 +58,15 @@ partial model PartialVehicleSim
     Evaluate = false,
     Dialog(tab = "Maneuver Monitors", group = "Settling"));
 
+  parameter SI.Time stepSteerHoldDuration = 0.5 "Continuous multi-signal settling hold after the step transition" annotation(
+    Evaluate = false, Dialog(tab = "Maneuver Monitors", group = "Settling"));
+  parameter SI.Acceleration settlingAyExcursion = 0.05 "Maximum lateral acceleration excursion from the start of a settling hold" annotation(
+    Evaluate = false, Dialog(tab = "Maneuver Monitors", group = "Settling"));
+  parameter SI.AngularVelocity settlingYawExcursion = 0.005 "Maximum yaw-rate excursion from the start of a settling hold" annotation(
+    Evaluate = false, Dialog(tab = "Maneuver Monitors", group = "Settling"));
+  parameter SI.Angle settlingAngleExcursion = 0.002 "Maximum roll or sideslip excursion from the start of a settling hold" annotation(
+    Evaluate = false, Dialog(tab = "Maneuver Monitors", group = "Settling"));
+
   // Closed-loop steady-state lateral-acceleration monitor
   parameter SI.Time steadyStateHoldDuration = 1.0 "Continuous duration required for closed-loop steady-state acceptance" annotation(
     Evaluate = false, Dialog(tab = "Maneuver Monitors", group = "Steady-State Ay"));
@@ -71,6 +80,12 @@ partial model PartialVehicleSim
   parameter SI.Velocity steadyStateSpeedTolerance = 0.10 "Allowed vehicle-speed error for closed-loop steady-state detection" annotation(
     Evaluate = false,
     Dialog(tab = "Maneuver Monitors", group = "Steady-State Ay"));
+  parameter SI.Acceleration steadyStateSpeedRateTolerance = 0.02
+    "Maximum sampled speed drift for steady-state and step-steer acceptance" annotation(
+    Evaluate = false, Dialog(tab = "Maneuver Monitors", group = "Steady-State Ay"));
+  parameter SI.Velocity settlingSpeedExcursion = 0.02
+    "Maximum speed excursion from the start of a settling hold" annotation(
+    Evaluate = false, Dialog(tab = "Maneuver Monitors", group = "Settling"));
   parameter Real steadyStateYawRateDerivativeTolerance(unit = "rad/s2") = 0.01 "Yaw-rate derivative tolerance for closed-loop steady-state detection" annotation(
     Evaluate = false,
     Dialog(tab = "Maneuver Monitors", group = "Steady-State Ay"));
@@ -109,6 +124,7 @@ partial model PartialVehicleSim
   SI.Acceleration steadyStateAyCommand;
   Real steadyStateAyError;
   discrete Real steadyStateSpeedError(start = 0, fixed = true);
+  discrete SI.Acceleration steadyStateSpeedRate(start = 0, fixed = true);
   SI.Velocity steadyStateAyIntegral;
   SI.Angle steadyStateSteerCmd;
   Boolean steadyStateTargetReached;
@@ -146,6 +162,11 @@ protected
   discrete Real t_linearity_limit_hit(start = -1, fixed = true);
   discrete Real t_spinout_hit(start = -1, fixed = true);
   discrete Real t_yawVel_hit(start = -1, fixed = true);
+  discrete Real settlingReference[5](each start = 0, each fixed = true);
+  Boolean settlingExcursionOK;
+  Boolean stepSteerConditionsMet;
+  Boolean steadyStateHoldEligible;
+  discrete SI.Velocity steadyStateSampleSpeed(start = 0, fixed = true);
   discrete Real steadyStateSampleAy(start = 0, fixed = true);
   discrete Real steadyStateSampleYawVel(start = 0, fixed = true);
   discrete Real steadyStateSampleSideslip(start = 0, fixed = true);
@@ -160,7 +181,8 @@ equation
   connect(driverBus, controlBus.driverBus) annotation(
     Line(points = {{-180, 80}, {-200, 80}, {-200, 30}}, color = {255, 204, 51}, thickness = 0.5));
   assert(steadyStateHoldDuration > 0 and steadyStateSettleTimeout > steadyStateHoldDuration and
-    tireLiftTerminateLoad >= 0 and sideslipTerminate > 0,
+    tireLiftTerminateLoad >= 0 and sideslipTerminate > 0 and stepSteerHoldDuration > 0 and
+    steadyStateSpeedRateTolerance > 0 and settlingSpeedExcursion > 0 and settlingAyExcursion > 0 and settlingYawExcursion > 0 and settlingAngleExcursion > 0,
     "BOBLIB_INVALID_MONITOR_CONFIG: require positive hold and sideslip limit, timeout greater than hold, and nonnegative tire-load limit");
 
   // Report limit exits separately from accepted steady-state results. Limit
@@ -171,8 +193,8 @@ equation
       (driver.useMode == driver.MODE_STEADY_STATE_AY and steadyStateTargetReached and time > driver.steerStart + steadyStateAyRampDuration + steadyStateSettleTimeout) then 3
         elseif driver.useMode == driver.MODE_OPEN_LOOP_RAMP and enableLinearityTermination and linearityReferenceValid and linearityGainLossFraction >= linearityNonlinearityFraction and t_linearity_limit_hit > 0 and time > t_linearity_limit_hit + linearityHoldDuration then 2
     elseif(driver.useMode == driver.MODE_OPEN_LOOP_RAMP and t_qss_hit > 0 and time > t_qss_hit + steadyHoldDuration) or
-      (driver.useMode == driver.MODE_STEADY_STATE_AY and t_steady_state_hit > 0 and time > t_steady_state_hit + steadyStateHoldDuration) or
-      (driver.useMode == driver.MODE_STEP_STEER and t_yawVel_hit > 0 and time > t_yawVel_hit + 0.1) then 1 else 0;
+      (driver.useMode == driver.MODE_STEADY_STATE_AY and steadyStateHoldEligible and settlingExcursionOK and t_steady_state_hit > 0 and time > t_steady_state_hit + steadyStateHoldDuration) or
+      (driver.useMode == driver.MODE_STEP_STEER and stepSteerConditionsMet and settlingExcursionOK and t_yawVel_hit > 0 and time > t_yawVel_hit + stepSteerHoldDuration) then 1 else 0;
   frSteerCmd = driver.frSteerCmd;
   handwheelRampCmd = driver.handwheelRampCmd;
   handwheelRateCmd = driver.handwheelRateCmd;
@@ -196,114 +218,161 @@ equation
   linearityGainLossFraction = if driver.useMode == driver.MODE_OPEN_LOOP_RAMP and enableLinearityTermination and linearityReferenceValid and noEvent(abs(accY) >= linearityReferenceAy + max(0, linearityEvaluationAyMargin)) then noEvent(max(0, 1 - linearityGainRatio))
     else 0;
 
+  // Open-loop QSS detection starts after the normal-load floor ends the
+  // handwheel ramp, then waits for yaw and steering rates to flatten.
+
+  steadyStateHoldEligible = steadyStateConditionsMet and steadyStateTargetReached and
+    abs(steadyStateAyCommand - accY) <= steadyStateAyTolerance and
+    abs(driver.targetVel - chassis.vehicleSpeed) <= steadyStateSpeedTolerance;
+  settlingExcursionOK = abs(accY - settlingReference[1]) <= settlingAyExcursion and
+    abs(yawVel - settlingReference[2]) <= settlingYawExcursion and
+    abs(sideslip - settlingReference[3]) <= settlingAngleExcursion and
+    abs(roll - settlingReference[4]) <= settlingAngleExcursion and
+    abs(chassis.vehicleSpeed - settlingReference[5]) <= settlingSpeedExcursion;
+
+  // The sampled rate checks cannot see oscillations between their samples.
+  // Continuous excursion guards invalidate the hold without averaging those away.
+
+  stepSteerConditionsMet = driver.useMode == driver.MODE_STEP_STEER and
+    time >= driver.steerStart + max(
+      driver.stepDuration,
+      driver.linearitySlopeSamplePeriod) and steadyStateSampleValid and
+    abs(driver.targetVel - chassis.vehicleSpeed) <= steadyStateSpeedTolerance and
+    abs(steadyStateSpeedRate) <= steadyStateSpeedRateTolerance and abs(steadyStateAyRate) <= steadyStateAyRateTolerance and
+    abs(steadyStateYawRateDerivative) <= steadyStateYawRateDerivativeTolerance and
+    abs(steadyStateSideslipRate) <= steadyStateSideslipRateTolerance and
+    abs(steadyStateRollRate) <= steadyStateRollRateTolerance and
+    abs(der(yawVel)) < der_yawVelTol and abs(der(handwheelAngle)) < handwheelRateTol;
+
+  connect(controlBus, vcu.controlBus) annotation(
+    Line(points = {{-200, 30}, {131, 30}, {131, 40}, {130, 40}}, color = {255, 204, 51}, thickness = 0.5));
+  connect(driver.driverInterface, driverEnvironment.driverInterface) annotation(
+    Line(points = {{-20, 60}, {20, 60}}, color = {85, 85, 255}, thickness = 0.5));
+  connect(inverterEnable.y, driverBus.inverterEnable) annotation(
+    Line(points = {{-146.6, 80}, {-180, 80}}, color = {255, 0, 255}));
+
+algorithm
   when sample(driver.steerStart, driver.linearitySlopeSamplePeriod) then
     if driver.useMode == driver.MODE_OPEN_LOOP_RAMP and enableLinearityTermination and time >= driver.steerStart then
       if pre(linearitySampleValid) and abs(handwheelAngle - pre(linearitySampleHandwheel)) > 1e-6 then
-        linearityLocalLateralGain = (accY - pre(linearitySampleAy))/(handwheelAngle - pre(linearitySampleHandwheel));
+        linearityLocalLateralGain := (accY - pre(linearitySampleAy))/(handwheelAngle - pre(linearitySampleHandwheel));
       else
-        linearityLocalLateralGain = pre(linearityLocalLateralGain);
+        linearityLocalLateralGain := pre(linearityLocalLateralGain);
       end if;
 
       if not pre(linearityReferenceValid) and pre(linearitySampleValid) and abs(accY) >= linearityReferenceAy and abs(linearityLocalLateralGain) > 1e-6 then
-        linearityReferenceValid = true;
-        linearityReferenceLateralGain = linearityLocalLateralGain;
+        linearityReferenceValid := true;
+        linearityReferenceLateralGain := linearityLocalLateralGain;
       else
-        linearityReferenceValid = pre(linearityReferenceValid);
-        linearityReferenceLateralGain = pre(linearityReferenceLateralGain);
+        linearityReferenceValid := pre(linearityReferenceValid);
+        linearityReferenceLateralGain := pre(linearityReferenceLateralGain);
       end if;
-      linearitySampleValid = true;
-      linearitySampleAy = accY;
-      linearitySampleHandwheel = handwheelAngle;
+      linearitySampleValid := true;
+      linearitySampleAy := accY;
+      linearitySampleHandwheel := handwheelAngle;
     else
-      linearitySampleValid = pre(linearitySampleValid);
-      linearitySampleAy = pre(linearitySampleAy);
-      linearitySampleHandwheel = pre(linearitySampleHandwheel);
-      linearityLocalLateralGain = pre(linearityLocalLateralGain);
-      linearityReferenceValid = pre(linearityReferenceValid);
-      linearityReferenceLateralGain = pre(linearityReferenceLateralGain);
+      linearitySampleValid := pre(linearitySampleValid);
+      linearitySampleAy := pre(linearitySampleAy);
+      linearitySampleHandwheel := pre(linearitySampleHandwheel);
+      linearityLocalLateralGain := pre(linearityLocalLateralGain);
+      linearityReferenceValid := pre(linearityReferenceValid);
+      linearityReferenceLateralGain := pre(linearityReferenceLateralGain);
     end if;
 
-    if driver.useMode == driver.MODE_STEADY_STATE_AY and time >= driver.steerStart then
-      steadyStateSpeedError = driver.targetVel - chassis.vehicleSpeed;
+    if (driver.useMode == driver.MODE_STEADY_STATE_AY or driver.useMode == driver.MODE_STEP_STEER) and time >= driver.steerStart then
+      steadyStateSpeedError := driver.targetVel - chassis.vehicleSpeed;
 
       if pre(steadyStateSampleValid) then
-        steadyStateAyRate = (accY - pre(steadyStateSampleAy))/max(driver.linearitySlopeSamplePeriod, 1e-6);
-        steadyStateYawRateDerivative = (yawVel - pre(steadyStateSampleYawVel))/max(driver.linearitySlopeSamplePeriod, 1e-6);
-        steadyStateSideslipRate = (sideslip - pre(steadyStateSampleSideslip))/max(driver.linearitySlopeSamplePeriod, 1e-6);
-        steadyStateRollRate = (roll - pre(steadyStateSampleRoll))/max(driver.linearitySlopeSamplePeriod, 1e-6);
-        steadyStateHandwheelRate = (handwheelAngle - pre(steadyStateSampleHandwheel))/max(driver.linearitySlopeSamplePeriod, 1e-6);
+        steadyStateSpeedRate := (chassis.vehicleSpeed - pre(steadyStateSampleSpeed))/driver.linearitySlopeSamplePeriod;
+        steadyStateAyRate := (accY - pre(steadyStateSampleAy))/max(driver.linearitySlopeSamplePeriod, 1e-6);
+        steadyStateYawRateDerivative := (yawVel - pre(steadyStateSampleYawVel))/max(driver.linearitySlopeSamplePeriod, 1e-6);
+        steadyStateSideslipRate := (sideslip - pre(steadyStateSampleSideslip))/max(driver.linearitySlopeSamplePeriod, 1e-6);
+        steadyStateRollRate := (roll - pre(steadyStateSampleRoll))/max(driver.linearitySlopeSamplePeriod, 1e-6);
+        steadyStateHandwheelRate := (handwheelAngle - pre(steadyStateSampleHandwheel))/max(driver.linearitySlopeSamplePeriod, 1e-6);
       else
-        steadyStateAyRate = pre(steadyStateAyRate);
-        steadyStateYawRateDerivative = pre(steadyStateYawRateDerivative);
-        steadyStateSideslipRate = pre(steadyStateSideslipRate);
-        steadyStateRollRate = pre(steadyStateRollRate);
-        steadyStateHandwheelRate = pre(steadyStateHandwheelRate);
+        steadyStateSpeedRate := pre(steadyStateSpeedRate);
+        steadyStateAyRate := pre(steadyStateAyRate);
+        steadyStateYawRateDerivative := pre(steadyStateYawRateDerivative);
+        steadyStateSideslipRate := pre(steadyStateSideslipRate);
+        steadyStateRollRate := pre(steadyStateRollRate);
+        steadyStateHandwheelRate := pre(steadyStateHandwheelRate);
       end if;
-      steadyStateConditionsMet = steadyStateTargetReached and abs(steadyStateAyCommand - accY) <= steadyStateAyTolerance and abs(driver.targetVel - chassis.vehicleSpeed) <= steadyStateSpeedTolerance and abs(steadyStateAyRate) <= steadyStateAyRateTolerance and abs(steadyStateYawRateDerivative) <= steadyStateYawRateDerivativeTolerance and abs(steadyStateSideslipRate) <= steadyStateSideslipRateTolerance and abs(steadyStateRollRate) <= steadyStateRollRateTolerance and abs(steadyStateHandwheelRate) <= handwheelRateTol;
-      steadyStateSampleValid = true;
-      steadyStateSampleAy = accY;
-      steadyStateSampleYawVel = yawVel;
-      steadyStateSampleSideslip = sideslip;
-      steadyStateSampleRoll = roll;
-      steadyStateSampleHandwheel = handwheelAngle;
+      steadyStateConditionsMet := pre(steadyStateSampleValid) and steadyStateTargetReached and abs(steadyStateAyCommand - accY) <= steadyStateAyTolerance and abs(driver.targetVel - chassis.vehicleSpeed) <= steadyStateSpeedTolerance and abs(steadyStateSpeedRate) <= steadyStateSpeedRateTolerance and abs(steadyStateAyRate) <= steadyStateAyRateTolerance and abs(steadyStateYawRateDerivative) <= steadyStateYawRateDerivativeTolerance and abs(steadyStateSideslipRate) <= steadyStateSideslipRateTolerance and abs(steadyStateRollRate) <= steadyStateRollRateTolerance and abs(steadyStateHandwheelRate) <= handwheelRateTol;
+      steadyStateSampleValid := true;
+      steadyStateSampleSpeed := chassis.vehicleSpeed;
+      steadyStateSampleAy := accY;
+      steadyStateSampleYawVel := yawVel;
+      steadyStateSampleSideslip := sideslip;
+      steadyStateSampleRoll := roll;
+      steadyStateSampleHandwheel := handwheelAngle;
     else
-      steadyStateSpeedError = pre(steadyStateSpeedError);
-      steadyStateConditionsMet = false;
-      steadyStateAyRate = pre(steadyStateAyRate);
-      steadyStateYawRateDerivative = pre(steadyStateYawRateDerivative);
-      steadyStateSideslipRate = pre(steadyStateSideslipRate);
-      steadyStateRollRate = pre(steadyStateRollRate);
-      steadyStateHandwheelRate = pre(steadyStateHandwheelRate);
-      steadyStateSampleValid = pre(steadyStateSampleValid);
-      steadyStateSampleAy = pre(steadyStateSampleAy);
-      steadyStateSampleYawVel = pre(steadyStateSampleYawVel);
-      steadyStateSampleSideslip = pre(steadyStateSampleSideslip);
-      steadyStateSampleRoll = pre(steadyStateSampleRoll);
-      steadyStateSampleHandwheel = pre(steadyStateSampleHandwheel);
+      steadyStateSpeedError := pre(steadyStateSpeedError);
+      steadyStateSpeedRate := pre(steadyStateSpeedRate);
+      steadyStateSampleSpeed := pre(steadyStateSampleSpeed);
+      steadyStateConditionsMet := false;
+      steadyStateAyRate := pre(steadyStateAyRate);
+      steadyStateYawRateDerivative := pre(steadyStateYawRateDerivative);
+      steadyStateSideslipRate := pre(steadyStateSideslipRate);
+      steadyStateRollRate := pre(steadyStateRollRate);
+      steadyStateHandwheelRate := pre(steadyStateHandwheelRate);
+      steadyStateSampleValid := pre(steadyStateSampleValid);
+      steadyStateSampleAy := pre(steadyStateSampleAy);
+      steadyStateSampleYawVel := pre(steadyStateSampleYawVel);
+      steadyStateSampleSideslip := pre(steadyStateSampleSideslip);
+      steadyStateSampleRoll := pre(steadyStateSampleRoll);
+      steadyStateSampleHandwheel := pre(steadyStateSampleHandwheel);
     end if;
   end when;
 
+algorithm
   when driver.useMode == driver.MODE_OPEN_LOOP_RAMP and enableLinearityTermination and linearityReferenceValid and linearityGainLossFraction >= linearityNonlinearityFraction and pre(t_linearity_limit_hit) < 0 then
-    t_linearity_limit_hit = time;
+    t_linearity_limit_hit := time;
   elsewhen driver.useMode == driver.MODE_OPEN_LOOP_RAMP and enableLinearityTermination and linearityReferenceValid and linearityGainLossFraction < linearityNonlinearityFraction then
-    t_linearity_limit_hit = -1;
+    t_linearity_limit_hit := -1;
   end when;
 
+algorithm
   when driver.useMode == driver.MODE_OPEN_LOOP_RAMP and enableLinearityTermination and t_linearity_limit_hit > 0 and time > t_linearity_limit_hit + linearityHoldDuration then
     terminate("Reached steering lateral-gain loss threshold");
   end when;
 
+algorithm
   when driver.useMode == driver.MODE_OPEN_LOOP_RAMP and rampEnding and not pre(rampEnding) then
-    t_ramp_end_hit = time;
+    t_ramp_end_hit := time;
   end when;
 
-  // Open-loop QSS detection starts after the normal-load floor ends the
-  // handwheel ramp, then waits for yaw and steering rates to flatten.
+algorithm
   when driver.useMode == driver.MODE_OPEN_LOOP_RAMP and rampEnding and abs(der(yawVel)) < der_yawVelTol and abs(der(handwheelAngle)) < handwheelRateTol and pre(t_qss_hit) < 0 then
-    t_qss_hit = time;
+    t_qss_hit := time;
   elsewhen driver.useMode == driver.MODE_OPEN_LOOP_RAMP and rampEnding and (abs(der(yawVel)) >= der_yawVelTol or abs(der(handwheelAngle)) >= handwheelRateTol) then
-    t_qss_hit = -1;
+    t_qss_hit := -1;
   end when;
 
+algorithm
   when driver.useMode == driver.MODE_OPEN_LOOP_RAMP and t_qss_hit > 0 and time > t_qss_hit + steadyHoldDuration then
     terminate("Reached open-loop ramp-steer QSS plateau");
   end when;
 
+algorithm
   when driver.useMode == driver.MODE_OPEN_LOOP_RAMP and rampEnding and time > t_ramp_end_hit + driver.handwheelRampStopDuration + settleTimeout then
     terminate(
       "BOBLIB_SETTLING_TIMEOUT: ramp-steer did not reach QSS at t=" + String(time) + " s; check controller response and steering/load calibration.");
   end when;
 
-  when steadyStateConditionsMet and pre(t_steady_state_hit) < 0 then
-    t_steady_state_hit = time;
-  elsewhen driver.useMode == driver.MODE_STEADY_STATE_AY and not steadyStateConditionsMet then
-    t_steady_state_hit = -1;
+algorithm
+  when (steadyStateHoldEligible and pre(t_steady_state_hit) < 0) or
+       (stepSteerConditionsMet and pre(t_yawVel_hit) < 0) then
+    settlingReference := {pre(accY), pre(yawVel), pre(sideslip), pre(roll), pre(chassis.vehicleSpeed)};
   end when;
 
-  when driver.useMode == driver.MODE_STEADY_STATE_AY and t_steady_state_hit > 0 and time > t_steady_state_hit + steadyStateHoldDuration then
-    terminate("Reached closed-loop steady-state lateral-acceleration target");
+algorithm
+  when steadyStateHoldEligible and pre(t_steady_state_hit) < 0 then
+    t_steady_state_hit := time;
+  elsewhen driver.useMode == driver.MODE_STEADY_STATE_AY and (not steadyStateHoldEligible or not settlingExcursionOK) then
+    t_steady_state_hit := -1;
   end when;
 
+algorithm
   when driver.useMode == driver.MODE_STEADY_STATE_AY and steadyStateTargetReached and time > driver.steerStart + steadyStateAyRampDuration + steadyStateSettleTimeout then
     terminate("BOBLIB_SETTLING_TIMEOUT: t=" + String(time) +
       " s; target=" + String(steadyStateAyCommand) + " m/s2, actual=" + String(accY) +
@@ -311,9 +380,11 @@ equation
       "; abs(ayRate)/limit=" + String(abs(steadyStateAyRate)) + "/" + String(steadyStateAyRateTolerance) +
       "; abs(yawRateDerivative)/limit=" + String(abs(steadyStateYawRateDerivative)) + "/" + String(steadyStateYawRateDerivativeTolerance) +
       "; abs(speedError)/limit=" + String(abs(steadyStateSpeedError)) + "/" + String(steadyStateSpeedTolerance) +
+      "; abs(speedRate)/limit=" + String(abs(steadyStateSpeedRate)) + "/" + String(steadyStateSpeedRateTolerance) +
       "; required hold=" + String(steadyStateHoldDuration) + " s. Check sampled feedback, controller tuning, and numerical convergence.");
   end when;
 
+algorithm
   when (driver.useMode == driver.MODE_OPEN_LOOP_RAMP or driver.useMode == driver.MODE_STEADY_STATE_AY) and terminateOnTireLift and time > driver.steerStart and minTireNormalLoad <= tireLiftTerminateLoad then
     terminate("BOBLIB_TIRE_LOAD_LIMIT: t=" + String(time) + " s; minimum=" + String(minTireNormalLoad) +
       " N, limit=" + String(tireLiftTerminateLoad) + " N; FL=" + String(Fz_FL) + ", FR=" + String(Fz_FR) +
@@ -321,32 +392,45 @@ equation
       " N. Maneuver exceeds this vehicle load margin; check roll stiffness distribution, CG, geometry, and demand.");
   end when;
 
+algorithm
   when (driver.useMode == driver.MODE_OPEN_LOOP_RAMP or driver.useMode == driver.MODE_STEADY_STATE_AY) and terminateOnSpinout and time > driver.steerStart and abs(sideslip) >= sideslipTerminate and pre(t_spinout_hit) < 0 then
-    t_spinout_hit = time;
+    t_spinout_hit := time;
   elsewhen (driver.useMode == driver.MODE_OPEN_LOOP_RAMP or driver.useMode == driver.MODE_STEADY_STATE_AY) and terminateOnSpinout and abs(sideslip) < sideslipTerminate then
-    t_spinout_hit = -1;
+    t_spinout_hit := -1;
   end when;
 
+algorithm
   when (driver.useMode == driver.MODE_OPEN_LOOP_RAMP or driver.useMode == driver.MODE_STEADY_STATE_AY) and terminateOnSpinout and t_spinout_hit > 0 and time > t_spinout_hit + spinoutHoldDuration then
     terminate("BOBLIB_SIDESLIP_LIMIT: t=" + String(time) + " s; abs(sideslip)=" + String(abs(sideslip)) +
       " rad, limit=" + String(sideslipTerminate) + " rad. Check tire calibration, axle balance, and maneuver demand.");
   end when;
 
-  when driver.useMode == driver.MODE_STEP_STEER and time > driver.steerStart and abs(der(yawVel)) < der_yawVelTol and pre(t_yawVel_hit) < 0 then
-    t_yawVel_hit = time;
-  elsewhen driver.useMode == driver.MODE_STEP_STEER and abs(der(yawVel)) >= der_yawVelTol then
-    t_yawVel_hit = -1;
+algorithm
+  when stepSteerConditionsMet and pre(t_yawVel_hit) < 0 then
+    t_yawVel_hit := time;
+  elsewhen driver.useMode == driver.MODE_STEP_STEER and
+      (not stepSteerConditionsMet or not settlingExcursionOK) then
+    t_yawVel_hit := -1;
   end when;
 
-  when driver.useMode == driver.MODE_STEP_STEER and t_yawVel_hit > 0 and time > t_yawVel_hit + 0.1 then
-    terminate("Reached open-loop step-steer steady-state: der(yawVel) below tolerance (held 0.1s)");
+algorithm
+  when driver.useMode == driver.MODE_STEP_STEER and stepSteerConditionsMet and
+      settlingExcursionOK and t_yawVel_hit > 0 and time > t_yawVel_hit + stepSteerHoldDuration then
+    terminate("Reached open-loop step-steer steady-state: multi-signal settling hold completed");
   end when;
-  connect(controlBus, vcu.controlBus) annotation(
-    Line(points = {{-200, 30}, {131, 30}, {131, 40}, {130, 40}}, color = {255, 204, 51}, thickness = 0.5));
-  connect(driver.driverInterface, driverEnvironment.driverInterface) annotation(
-    Line(points = {{-20, 60}, {20, 60}}, color = {85, 85, 255}, thickness = 0.5));
-  connect(inverterEnable.y, driverBus.inverterEnable) annotation(
-    Line(points = {{-146.6, 80}, {-180, 80}}, color = {255, 0, 255}));
+
+algorithm
+  when sample(0, driver.linearitySlopeSamplePeriod) then
+    if driver.useMode == driver.MODE_STEADY_STATE_AY and pre(steadyStateHoldEligible) and
+        pre(settlingExcursionOK) and pre(t_steady_state_hit) > 0 and
+        time > pre(t_steady_state_hit) + steadyStateHoldDuration and
+        (not terminateOnTireLift or minTireNormalLoad > tireLiftTerminateLoad) and
+        (not terminateOnSpinout or abs(sideslip) < sideslipTerminate) and
+        time <= driver.steerStart + pre(steadyStateAyRampDuration) + steadyStateSettleTimeout then
+      terminate("Reached closed-loop steady-state lateral-acceleration target");
+    end if;
+  end when;
+
   annotation(
     Diagram(coordinateSystem(extent = {{-200, -180}, {180, 120}})),
     experiment(StartTime = 0.0, StopTime = 10, Tolerance = 1e-06, Interval = 0.002),

@@ -23,7 +23,7 @@ buildModel(BobLib.Experiments.Standards.VehicleSim, stopTime=1,
   fileNamePrefix="vehicle", variableFilter="time|terminationStatus|Fz_.*|accY|yawVel");
 getErrorString();
 ''')
-    result = subprocess.run(["omc", "build.mos"], cwd=work, capture_output=True,
+    result = subprocess.run(["omc", "--numProcs=1", "build.mos"], cwd=work, capture_output=True,
                             text=True, timeout=600, check=True)
     (work / "build.log").write_text(result.stdout + result.stderr)
     assert "Error:" not in result.stdout, result.stdout
@@ -52,9 +52,10 @@ CASES = [
 @pytest.mark.parametrize("name,overrides,status,message", CASES)
 def test_vehicle_exit_status(vehicle_executable, name, overrides, status, message):
     work = vehicle_executable
+    stop = 10 if name == "settled" else 1
     result = subprocess.run([str(work / "vehicle"), f"-override={overrides}",
-                             f"-r={name}.csv", "-stopTime=1"], cwd=work, capture_output=True,
-                            text=True, timeout=120)
+                             f"-r={name}.csv", f"-stopTime={stop}"], cwd=work, capture_output=True,
+                            text=True, timeout=180)
     output = result.stdout + result.stderr
     (work / f"{name}.log").write_text(output)
     assert "override variable name not found" not in output, output
@@ -67,14 +68,14 @@ def test_vehicle_exit_status(vehicle_executable, name, overrides, status, messag
     assert rows, output
     assert int(rows[-1]["terminationStatus"]) == status, (rows[-1], output)
     if message:
-        assert float(rows[-1]["time"]) < 1, output
+        assert float(rows[-1]["time"]) < stop, output
 
 
 def test_invalid_monitor_configuration_still_fails(vehicle_executable):
     work = vehicle_executable
     result = subprocess.run([str(work / "vehicle"), "-override=tireLiftTerminateLoad=-1",
                              "-r=invalid.csv"], cwd=work, capture_output=True,
-                            text=True, timeout=120)
+                            text=True, timeout=180)
     output = result.stdout + result.stderr
     (work / "invalid.log").write_text(output)
     assert result.returncode != 0, output
