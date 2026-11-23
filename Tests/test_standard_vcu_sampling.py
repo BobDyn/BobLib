@@ -1,5 +1,6 @@
-"""Sampled steering retains its recurrence and prevents integral windup."""
+"""Sampled PI drives a continuous steering actuator without integral windup."""
 import csv
+import math
 import shutil
 import subprocess
 from pathlib import Path
@@ -33,17 +34,25 @@ getErrorString();
     assert 'The simulation finished successfully' in result.stdout, result.stdout
     with (tmp_path / 'Sampled_res.csv').open() as stream:
         rows = list(csv.DictReader(stream))
-    integral = command = 0.0
+    # Exact zero-order-held response of two equal first-order stages. This
+    # small demand stays below the actuator rate limit (0.5 rad/s).
+    integral = demand = command = request = 0.0
     for n in range(11):
         t = n / 10
+        if n:
+            decay = math.exp(-0.1 / 0.15)
+            command = request + (command - request + (demand - request) * 0.1 / 0.15) * decay
+            demand = request + (demand - request) * decay
         xi = min(1, t / 0.5)
         error = 3 * xi**2 - 2 * xi**3
         integral += error * 0.1
-        command += (0.1 / 0.15) * (0.025 * (error + integral) - command)
-        # The last row at an event contains its post-event value.
-        row = [r for r in rows if abs(float(r['time']) - t) < 1e-9][-1]
-        assert float(row['driver.steadyStateAyIntegral']) == pytest.approx(integral, abs=1e-10)
-        assert float(row['driver.steadyStateSteerCmd']) == pytest.approx(command, abs=1e-7)
+        request = 0.025 * (error + integral)
+        assert abs(request - demand) / 0.15 < 0.5
+        event_rows = [r for r in rows if abs(float(r['time']) - t) < 1e-9]
+        # The PI integral updates at the event; the physical angle cannot jump.
+        assert float(event_rows[-1]['driver.steadyStateAyIntegral']) == pytest.approx(integral, abs=1e-10)
+        for row in event_rows:
+            assert float(row['driver.steadyStateSteerCmd']) == pytest.approx(command, abs=1e-7)
 
 
 
