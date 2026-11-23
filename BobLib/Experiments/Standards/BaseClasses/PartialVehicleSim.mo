@@ -99,6 +99,24 @@ partial model PartialVehicleSim
     Evaluate = false,
     Dialog(tab = "Maneuver Monitors", group = "Steady-State Ay"));
 
+  parameter Boolean enableSteadyStateSequence = false
+    "Advance through settled targets in one MBD run, retaining plant and controller states"
+    annotation(choices(checkBox = true), Evaluate = false, Dialog(tab = "Maneuver Monitors", group = "Sequence"));
+  parameter Integer steadyStatePointCount(min = 1, max = 64) = 1
+    "Number of active targets in the fixed-capacity steady-state sequence"
+    annotation(Evaluate = false, Dialog(tab = "Maneuver Monitors", group = "Sequence"));
+  parameter SI.Acceleration steadyStateTargets[64] = fill(0, 64)
+    "Ordered lateral-acceleration targets; only the first steadyStatePointCount entries are used"
+    annotation(Evaluate = false, Dialog(tab = "Maneuver Monitors", group = "Sequence"));
+  discrete output Integer steadyStatePointIndex(start = 1, fixed = true)
+    "One-based active sequence point";
+  discrete output Integer steadyStateCompletedPoints(start = 0, fixed = true)
+    "Number of points whose settling hold completed";
+  discrete output SI.Time steadyStatePointStart(start = driver.steerStart, fixed = true)
+    "Start time of the active target transition";
+  discrete SI.Acceleration steadyStatePreviousTarget(start = 0, fixed = true)
+    "Accepted command preceding the current target transition";
+
   output Integer terminationStatus "Maneuver outcome: 0 running, 1 settled, 2 linearity limit, 3 settling timeout, 4 tire-load limit, 5 sideslip limit";
 
   // Maneuver diagnostics forwarded from StandardDriver
@@ -142,6 +160,10 @@ partial model PartialVehicleSim
 
   replaceable BobLib.Drivers.StandardDriver driver(
     targetVel = initialVel,
+    steadyStateTarget = if enableSteadyStateSequence then steadyStateTargets[steadyStatePointIndex]
+      else driver.targetAy,
+    steadyStatePreviousTarget = if enableSteadyStateSequence then steadyStatePreviousTarget else 0,
+    steadyStateTargetStart = if enableSteadyStateSequence then steadyStatePointStart else driver.steerStart,
     driveTorqueCapacity = pVehicle.controller.tau_max*pVehicle.controller.finalDriveRatio,
     brakeTorqueCapacity = pVehicle.controller.mechanicalBrakeTorqueLimit)
     constrainedby BobLib.Drivers.StandardDriver annotation(choicesAllMatching = true,
@@ -185,12 +207,21 @@ equation
     steadyStateSpeedRateTolerance > 0 and settlingSpeedExcursion > 0 and settlingAyExcursion > 0 and settlingYawExcursion > 0 and settlingAngleExcursion > 0,
     "BOBLIB_INVALID_MONITOR_CONFIG: require positive hold and sideslip limit, timeout greater than hold, and nonnegative tire-load limit");
 
+  assert(not enableSteadyStateSequence or (driver.useMode == driver.MODE_STEADY_STATE_AY and
+    steadyStatePointCount >= 1 and steadyStatePointCount <= 64),
+    "BOBLIB_INVALID_SEQUENCE: require steady-state mode and 1 to 64 targets");
+  for i in 1:64 loop
+    assert(not enableSteadyStateSequence or i > steadyStatePointCount or
+      abs(steadyStateTargets[i]) < Modelica.Constants.inf,
+      "BOBLIB_INVALID_SEQUENCE: targets must be finite");
+  end for;
+
   // Report limit exits separately from accepted steady-state results. Limit
   // events end normally so callers can retain the last valid result sample.
   terminationStatus = if (driver.useMode == driver.MODE_OPEN_LOOP_RAMP or driver.useMode == driver.MODE_STEADY_STATE_AY) and terminateOnTireLift and time > driver.steerStart and minTireNormalLoad <= tireLiftTerminateLoad then 4
     elseif(driver.useMode == driver.MODE_OPEN_LOOP_RAMP or driver.useMode == driver.MODE_STEADY_STATE_AY) and terminateOnSpinout and t_spinout_hit > 0 and time > t_spinout_hit + spinoutHoldDuration then 5
     elseif(driver.useMode == driver.MODE_OPEN_LOOP_RAMP and rampEnding and time > t_ramp_end_hit + driver.handwheelRampStopDuration + settleTimeout) or
-      (driver.useMode == driver.MODE_STEADY_STATE_AY and steadyStateTargetReached and time > driver.steerStart + steadyStateAyRampDuration + steadyStateSettleTimeout) then 3
+      (driver.useMode == driver.MODE_STEADY_STATE_AY and steadyStateTargetReached and time > driver.steadyStateTargetStart + steadyStateAyRampDuration + steadyStateSettleTimeout) then 3
         elseif driver.useMode == driver.MODE_OPEN_LOOP_RAMP and enableLinearityTermination and linearityReferenceValid and linearityGainLossFraction >= linearityNonlinearityFraction and t_linearity_limit_hit > 0 and time > t_linearity_limit_hit + linearityHoldDuration then 2
     elseif(driver.useMode == driver.MODE_OPEN_LOOP_RAMP and t_qss_hit > 0 and time > t_qss_hit + steadyHoldDuration) or
       (driver.useMode == driver.MODE_STEADY_STATE_AY and steadyStateHoldEligible and settlingExcursionOK and t_steady_state_hit > 0 and time > t_steady_state_hit + steadyStateHoldDuration) or
@@ -373,7 +404,7 @@ algorithm
   end when;
 
 algorithm
-  when driver.useMode == driver.MODE_STEADY_STATE_AY and steadyStateTargetReached and time > driver.steerStart + steadyStateAyRampDuration + steadyStateSettleTimeout then
+  when driver.useMode == driver.MODE_STEADY_STATE_AY and steadyStateTargetReached and time > driver.steadyStateTargetStart + steadyStateAyRampDuration + steadyStateSettleTimeout then
     terminate("BOBLIB_SETTLING_TIMEOUT: t=" + String(time) +
       " s; target=" + String(steadyStateAyCommand) + " m/s2, actual=" + String(accY) +
       "; abs(error)/limit=" + String(abs(steadyStateAyError)) + "/" + String(steadyStateAyTolerance) +
@@ -426,8 +457,31 @@ algorithm
         time > pre(t_steady_state_hit) + steadyStateHoldDuration and
         (not terminateOnTireLift or minTireNormalLoad > tireLiftTerminateLoad) and
         (not terminateOnSpinout or abs(sideslip) < sideslipTerminate) and
-        time <= driver.steerStart + pre(steadyStateAyRampDuration) + steadyStateSettleTimeout then
-      terminate("Reached closed-loop steady-state lateral-acceleration target");
+        time <= pre(driver.steadyStateTargetStart) + pre(steadyStateAyRampDuration) + steadyStateSettleTimeout then
+
+      if enableSteadyStateSequence then
+        steadyStateCompletedPoints := pre(steadyStatePointIndex);
+        Modelica.Utilities.Streams.print("BOBLIB_STEADY_POINT: index=" + String(pre(steadyStatePointIndex)) +
+          " time=" + String(time, significantDigits = 16) + " target=" +
+          String(steadyStateTargets[pre(steadyStatePointIndex)], significantDigits = 16));
+
+        if pre(steadyStatePointIndex) < steadyStatePointCount then
+          steadyStatePreviousTarget := steadyStateTargets[pre(steadyStatePointIndex)];
+          steadyStatePointIndex := pre(steadyStatePointIndex) + 1;
+          steadyStatePointStart := time;
+        else
+          steadyStatePreviousTarget := pre(steadyStatePreviousTarget);
+          steadyStatePointIndex := pre(steadyStatePointIndex);
+          steadyStatePointStart := pre(steadyStatePointStart);
+          terminate("Reached closed-loop steady-state sequence targets");
+        end if;
+      else
+        steadyStateCompletedPoints := pre(steadyStateCompletedPoints);
+        steadyStatePreviousTarget := pre(steadyStatePreviousTarget);
+        steadyStatePointIndex := pre(steadyStatePointIndex);
+        steadyStatePointStart := pre(steadyStatePointStart);
+        terminate("Reached closed-loop steady-state lateral-acceleration target");
+      end if;
     end if;
   end when;
 
@@ -465,5 +519,5 @@ after the lateral acceleration, speed, yaw rate, sideslip, roll, and
 handwheel-rate settle criteria have held for
 <code>steadyHoldDuration</code>.
 </p>
-</html>"));
+<p>Enable <code>enableSteadyStateSequence</code> to visit the first <code>steadyStatePointCount</code> entries of <code>steadyStateTargets</code> without reinitializing the plant or controller. Each accepted hold prints its point index, physical time and target. Timeouts apply separately to each transition. Sequence advancement is clocked and uses prior monitor values to avoid an algebraic event loop.</p></html>"));
 end PartialVehicleSim;

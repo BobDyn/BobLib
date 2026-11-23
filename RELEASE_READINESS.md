@@ -104,6 +104,19 @@ continuous signal excursions, including speed, so sample-aligned oscillations ca
 because their finite differences vanish. These protocol changes require renewed
 vehicle correlation; fixture checks do not certify runtime or real-vehicle accuracy.
 
+## Opt-in steady-state continuation
+
+`enableSteadyStateSequence` enables a fixed-capacity list of up to 64 Ay targets.
+The scalar `driver.targetAy` contract remains the default. Each accepted hold
+emits `BOBLIB_STEADY_POINT` with its index, physical time and target, independently
+of CSV event emission. The next smooth target transition starts from the prior
+command, preserving the mechanical, steering and PI states. Settling timeout is
+relative to each target's transition; tire-load and sideslip exits remain active.
+A limit exit does not accept the unfinished point. BobSim supplies a zero-Ay
+preconditioning point before the requested sweep. Independent starts, reverse
+sweeps and full-vehicle runtime comparisons are required before making this mode
+the default; continuation can expose history-dependent branches.
+
 The VehicleSim settling diagnostics add one initialized numeric variable to
 `VehicleSimAnimationOn` (2684 to 2685). Its initialization snapshot was regenerated
 with OpenModelica 1.27.1 after inspecting the zero-valued `steadyStateSpeedRate` diagnostic. Removing
@@ -111,3 +124,11 @@ that output reproduces the previous variable-name hash. The
 sum, absolute sum and maximum of initialized values are unchanged, and no
 nonfinite values were introduced. Only this fixture's snapshot changed; no
 comparison tolerances were relaxed.
+
+Continuation initialization snapshots were regenerated for `VehicleSimAnimationOn`
+(2692 numeric values) and `TestStandardDriver` (78). Comparing the full vehicle
+CSV with the steering-only revision found no changed existing value outside
+1e-9 relative / 1e-8 absolute tolerances and no removed outputs. The added sequence
+and target inputs account for the new values. The driver adds a zero-valued
+`steadyStatePreviousTarget` input; its aggregate initialized values are unchanged.
+No baseline tolerances were changed.

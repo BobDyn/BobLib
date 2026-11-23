@@ -32,6 +32,13 @@ model Maneuver
     "Sample period for finite-difference controller updates"
     annotation(Evaluate = false, Dialog(tab = "Maneuver", group = "Shared", enable = ayManeuver));
 
+  input SI.Acceleration steadyStateTarget = targetAy
+    "Current steady-state target; experiment sequences may supply a new target";
+  input SI.Acceleration steadyStatePreviousTarget = 0
+    "Start value of the current steady-state target transition";
+  input SI.Time steadyStateTargetStart = steerStart
+    "Start time of the current steady-state target transition";
+
   // Open-loop ramp steer command
   parameter SI.AngularVelocity handwheelRampRate = 0.14
     "Open-loop handwheel ramp rate"
@@ -223,15 +230,16 @@ equation
   der(handwheelRampCmd) = handwheelRateCmd;
 
   steadyStateAyRampDuration =
-    noEvent(abs(targetAy)/max(steadyStateAyRampRate, 1e-6));
+    noEvent(max(linearitySlopeSamplePeriod, abs(steadyStateTarget - steadyStatePreviousTarget)/max(steadyStateAyRampRate, 1e-6)));
   steadyStateAyRampXi =
 
-    if steadyStateAy and noEvent(time >= steerStart) then
-      noEvent(min(1, max(0, (time - steerStart)/max(steadyStateAyRampDuration, 1e-6))))
+    if steadyStateAy and noEvent(time >= steadyStateTargetStart) then
+      noEvent(min(1, max(0, (time - steadyStateTargetStart)/max(steadyStateAyRampDuration, 1e-6))))
     else
       0;
   steadyStateAyCommand =
-    targetAy*noEvent(3*steadyStateAyRampXi^2 - 2*steadyStateAyRampXi^3);
+    steadyStatePreviousTarget + (steadyStateTarget - steadyStatePreviousTarget)*
+      noEvent(3*steadyStateAyRampXi^2 - 2*steadyStateAyRampXi^3);
   steadyStateAyError = steadyStateAyCommand - measuredAy;
   steadyStateTargetReached =
     steadyStateAy and noEvent(steadyStateAyRampXi >= 1);
@@ -314,6 +322,6 @@ algorithm
 
   annotation(Diagram(coordinateSystem(extent = {{-320, -140}, {100, 140}}, preserveAspectRatio = true)),
     Documentation(info = "<html><p>Owns steering maneuvers and longitudinal speed control. Publishes normalized driver intent through VI DriverInterface; the environment maps that intent to actuator commands and the VCU owns torque limits and brake blending. steeringCenter and steeringRange must match the environment.</p><h4>Parameter setup</h4><p>Select <code>useMode</code> first: 0 ramp steer, 1 sinusoidal steer, 2 step steer, 3 closed-loop lateral acceleration. <code>steerStart</code> applies to all modes. For step steer, <code>frRampSteerHeight</code> is the handwheel target and <code>stepDuration</code> is the transition time. Steering angles use radians. The speed controller uses <code>targetVel</code>, <code>velGain</code> and <code>velTi</code>; drive and brake torque capacities normalize its requests into pedal commands. Maneuver-specific enable conditions in the dialog identify the applicable settings.</p>
-<p>Closed-loop lateral acceleration uses a sampled PI controller with conditional integration at the steering limit. Its sampled PI demand drives a continuous two-stage actuator with an explicit handwheel-rate limit and continuous handwheel velocity. The angle state is never reset at controller updates. Retain the prescribed steering-angle state for full-vehicle initialization in OpenModelica. The target uses a cubic ramp of duration <code>abs(targetAy)/steadyStateAyRampRate</code>, so its peak ramp rate is 1.5 times the configured average. A target outside the vehicle's feasible envelope must trigger the experiment's safety or settling diagnostic, not be treated as converged.</p>
+<p>Closed-loop lateral acceleration uses a sampled PI controller with conditional integration at the steering limit. Its sampled PI demand drives a continuous two-stage actuator with an explicit handwheel-rate limit and continuous handwheel velocity. The angle state is never reset at controller updates. Retain the prescribed steering-angle state for full-vehicle initialization in OpenModelica. Each target transition uses a cubic ramp of duration <code>max(linearitySlopeSamplePeriod, abs(steadyStateTarget-steadyStatePreviousTarget)/steadyStateAyRampRate)</code>. Its peak rate is at most 1.5 times the configured average rate. The scalar target remains the default; sequence experiments supply the target, preceding target and transition start. A target outside the vehicle's feasible envelope must trigger the experiment's safety or settling diagnostic, not be treated as converged.</p>
 </html>"));
 end Maneuver;
