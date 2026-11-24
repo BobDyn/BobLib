@@ -99,6 +99,27 @@ Run the full local gate before trusting a branch:
 make ci
 ```
 
+The OpenModelica suites (`make test`, `make test-additional`,
+`make modelica-components`) run in parallel with pytest-xdist, one worker per
+physical core by default. Each case compiles in its own temporary directory, so workers do not
+share build files. Set `PYTEST_WORKERS=4` to pick the count (`logical` uses every
+CPU thread, which is what CI does), or `PYTEST_WORKERS=0` to run serially, for
+example when benchmarking runtime budgets. A module whose module-scoped fixture
+builds something expensive marks itself `pytest.mark.xdist_group(...)` so one
+worker builds it once. CI also splits the component job across four runners with
+`--boblib-shard N/4`, which deals tests out one at a time and keeps each
+`xdist_group` on one shard.
+
+No OpenModelica installed? Run the same targets in the CI image with Docker:
+
+```sh
+make docker-test                              # make test in the container
+make docker-test DOCKER_TARGET=test-additional   # what the CI component job runs
+```
+
+The Modelica libraries install into a `boblib-openmodelica` Docker volume on the
+first run and are reused after that.
+
 GitHub CI intentionally uses a lighter default gate for pushes and pull
 requests: Python lint/tests, Modelica formatting, smoke translation,
 initialization baselines, and mirrored fixture simulations/profiles.
@@ -141,10 +162,21 @@ you want signal before the branch is ready for review. Running on both events
 for the same branch produced two runs per commit writing to the same commit SHA,
 which made required status checks resolve unpredictably.
 
-The component contract tests run as four parallel shards,
-`OpenModelica Component Contracts (1/4)` to `(4/4)`. Require the single
-`OpenModelica Component Contracts` check instead of the shards: it waits for all
-of them, always reports, and fails if any shard fails or is cancelled. A
+On a pull request, the `Changes` job decides how much OpenModelica work the
+diff needs (`Tests/ci_changes.py`). Any change to the library, the makefile,
+the workflow, shared test helpers or anything it doesn't recognise runs the
+full gate. A PR that changes only `Tests/test_*.py` modules runs just those
+modules in one component shard, plus the smoke job when it touches the
+initialization suite and the FMU job when it touches an FMU test. A
+docs-only PR skips the OpenModelica jobs; skipped jobs count as passing for
+the required checks. Pushes to `main`, tags and manual runs always run
+everything.
+
+The component contract tests run as parallel shards,
+`OpenModelica Component Contracts (1/4)` to `(4/4)` on a full run and `(1/1)`
+on a test-only one. Require the single `OpenModelica Component Contracts`
+check instead of the shards: it waits for all of them, always reports, and
+fails if `Changes`, `Python Checks` or any shard fails or is cancelled. A
 skipped matrix job reports only its unexpanded name, so a ruleset that names
 the shards would leave a PR that skips them waiting forever.
 
