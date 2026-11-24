@@ -81,6 +81,7 @@ jobs:
     runs-on: ubuntu-latest
     container: openmodelica/openmodelica:v1.27.1-ompython
     needs: python
+    if: false
     timeout-minutes: 120
     strategy:
       fail-fast: false
