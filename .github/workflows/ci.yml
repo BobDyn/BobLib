@@ -110,6 +110,32 @@ jobs:
           path: /tmp/boblib-components.xml
           if-no-files-found: warn
 
+  modelica-components-summary:
+    # The one name for the ruleset to require. The shard names change with the
+    # shard count, and a skipped matrix job reports only its unexpanded name,
+    # so requiring the shards themselves would leave PRs waiting forever.
+    # Skipped shards pass here; a failed or cancelled shard or Python Checks
+    # fails it.
+    name: OpenModelica Component Contracts
+    runs-on: ubuntu-latest
+    needs: [python, modelica-components]
+    if: always()
+    timeout-minutes: 5
+
+    steps:
+      - name: Check the contract shards
+        env:
+          PYTHON_RESULT: ${{ needs.python.result }}
+          SHARDS_RESULT: ${{ needs.modelica-components.result }}
+        run: |
+          echo "Python Checks: $PYTHON_RESULT"
+          echo "Component contract shards: $SHARDS_RESULT"
+          for result in "$PYTHON_RESULT" "$SHARDS_RESULT"; do
+            if [ "$result" = failure ] || [ "$result" = cancelled ]; then
+              exit 1
+            fi
+          done
+
   modelica-profile:
     name: OpenModelica Profiles
     runs-on: ubuntu-latest

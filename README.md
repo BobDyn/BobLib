@@ -141,6 +141,13 @@ you want signal before the branch is ready for review. Running on both events
 for the same branch produced two runs per commit writing to the same commit SHA,
 which made required status checks resolve unpredictably.
 
+The component contract tests run as four parallel shards,
+`OpenModelica Component Contracts (1/4)` to `(4/4)`. Require the single
+`OpenModelica Component Contracts` check instead of the shards: it waits for all
+of them, always reports, and fails if any shard fails or is cancelled. A
+skipped matrix job reports only its unexpanded name, so a ruleset that names
+the shards would leave a PR that skips them waiting forever.
+
 Modelica translation, initialization, and signal regressions are collected as
 individual pytest cases. A failing model should appear directly in the pytest
 node id, for example `Tests/test_modelica_translation.py::test_modelica_model_translates[BobLib.Experiments.Standards.VehicleSim]`.
