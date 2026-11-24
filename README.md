@@ -99,6 +99,27 @@ Run the full local gate before trusting a branch:
 make ci
 ```
 
+The OpenModelica suites (`make test`, `make test-additional`,
+`make modelica-components`) run in parallel with pytest-xdist, one worker per
+physical core by default. Each case compiles in its own temporary directory, so workers do not
+share build files. Set `PYTEST_WORKERS=4` to pick the count (`logical` uses every
+CPU thread, which is what CI does), or `PYTEST_WORKERS=0` to run serially, for
+example when benchmarking runtime budgets. A module whose module-scoped fixture
+builds something expensive marks itself `pytest.mark.xdist_group(...)` so one
+worker builds it once. CI also splits the component job across four runners with
+`--boblib-shard N/4`, which deals tests out one at a time and keeps each
+`xdist_group` on one shard.
+
+No OpenModelica installed? Run the same targets in the CI image with Docker:
+
+```sh
+make docker-test                              # make test in the container
+make docker-test DOCKER_TARGET=test-additional   # what the CI component job runs
+```
+
+The Modelica libraries install into a `boblib-openmodelica` Docker volume on the
+first run and are reused after that.
+
 GitHub CI intentionally uses a lighter default gate for pushes and pull
 requests: Python lint/tests, Modelica formatting, smoke translation,
 initialization baselines, and mirrored fixture simulations/profiles.

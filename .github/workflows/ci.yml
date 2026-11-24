@@ -118,7 +118,7 @@ jobs:
     container: openmodelica/openmodelica:v1.27.1-ompython
     needs: [python, changes]
     if: needs.changes.outputs.components == 'true'
-    timeout-minutes: 120
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
@@ -137,11 +137,14 @@ jobs:
           key: om-libs-${{ hashFiles('msl_setup.mos') }}
 
       # COMPONENT_TESTS is empty on a full run, so the makefile's own list applies.
+      # Each runner runs its shard across every logical CPU. A runner alone tops
+      # out near 2x (2 physical cores), so one xdist job took 48 min against
+      # 17 min for a four-way split.
       - name: Run component, contract and Python tests
         env:
           COMPONENT_TESTS: ${{ needs.changes.outputs.component_tests }}
           SHARD: ${{ matrix.shard }}/${{ needs.changes.outputs.shard_count }}
-        run: make test-additional ${COMPONENT_TESTS:+ADDITIONAL_TESTS="$COMPONENT_TESTS"} PYTEST_FLAGS="--junitxml=/tmp/boblib-components.xml -ra --boblib-shard $SHARD"
+        run: make test-additional PYTEST_WORKERS=logical ${COMPONENT_TESTS:+ADDITIONAL_TESTS="$COMPONENT_TESTS"} PYTEST_FLAGS="--junitxml=/tmp/boblib-components.xml -ra --boblib-shard $SHARD"
 
       - name: Retain component test results
         if: always()

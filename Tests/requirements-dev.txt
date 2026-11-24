@@ -10,4 +10,5 @@
 cmake==4.4.4
 fmpy==0.3.32
 pytest==9.1.1
+pytest-xdist==3.8.0
 ruff==0.16.9
