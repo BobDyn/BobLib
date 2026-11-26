@@ -39,10 +39,17 @@ partial model FrameBase
     angles_fixed = false) annotation(
     Placement(transformation(origin = {50, 30}, extent = {{-10, -10}, {10, 10}})));
 
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation midToFore(r = (pFrame.frontReference - pFrame.rearReference)/2) annotation(
+  // Pinned shape directions keep frame mass, CG and references changeable after compilation. The MSL default derives lengthDirection from r with Evaluate = true, which freezes r.
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation midToFore(
+    lengthDirection = {1, 0, 0},
+    widthDirection = {0, 1, 0},
+    r = (pFrame.frontReference - pFrame.rearReference)/2) annotation(
     Placement(transformation(origin = {-50, 0}, extent = {{10, -10}, {-10, 10}}, rotation = -0)));
 
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation midToAft(r = -1*(pFrame.frontReference - pFrame.rearReference)/2) annotation(
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation midToAft(
+    lengthDirection = {1, 0, 0},
+    widthDirection = {0, 1, 0},
+    r = -1*(pFrame.frontReference - pFrame.rearReference)/2) annotation(
     Placement(transformation(origin = {50, 0}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Mechanics.MultiBody.Interfaces.Frame_b cgFrame annotation(
     Placement(
@@ -50,6 +57,8 @@ partial model FrameBase
       iconTransformation(origin = {0, -60}, extent = {{-16, -16}, {16, 16}}, rotation = -90)));
 
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation midToCG(
+    lengthDirection = {1, 0, 0},
+    widthDirection = {0, 1, 0},
     r = pFrame.mass.rCM - (pFrame.frontReference + pFrame.rearReference)/2,
     animation = false) annotation(
     Placement(transformation(origin = {-10, 60}, extent = {{-10, -10}, {10, 10}})));

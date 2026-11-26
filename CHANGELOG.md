@@ -33,6 +33,14 @@ change to user models.
   from accepted steady state; callers must inspect it rather than treating a
   zero process exit code as convergence. Invalid calibration still asserts.
 
+### Fixed
+
+- Frame mass, CG, inertia and reference points, the aero mount offset and
+  static toe and camber now take effect when overridden at run time. OMC used
+  to fold them into the compiled model, so an override was accepted and did
+  nothing. Default results are unchanged. Suspension hardpoints still need a
+  rebuild.
+
 ## 0.2.0 - 2026-08-09
 
 Minor release focused on physically consistent vehicle initialization, correct

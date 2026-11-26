@@ -34,11 +34,9 @@ public
     Placement(transformation(origin = {120, -100}, extent = {{-12, -12}, {12, 12}}),
       iconTransformation(origin = {-60, 100}, extent = {{-12, -12}, {12, 12}})));
 
-  Modelica.Mechanics.MultiBody.Parts.FixedRotation massOrientation(
-    rotationType = Modelica.Mechanics.MultiBody.Types.RotationTypes.PlanarRotationSequence,
+  BobLib.Utilities.Mechanics.MultiBody.TunableFixedRotation massOrientation(
     sequence = {3, 2, 1},
-    angles = {-pWheel.geometry.staticAlpha, 0, -pWheel.geometry.staticGamma},
-    animation = false) "Undo static wheel alignment for the existing unsprung mass calibration" annotation(
+    angles = {-pWheel.geometry.staticAlpha, 0, -pWheel.geometry.staticGamma}) "Undo static wheel alignment for the existing unsprung mass calibration" annotation(
     Placement(transformation(origin = {70, -90}, extent = {{-10, -10}, {10, 10}})));
 
   // Frames
@@ -64,8 +62,9 @@ public
   ComplianceModel compliance(pCompliance = pWheel.compliance) if useWheelCompliance annotation(Placement(visible = useWheelCompliance, transformation(origin = {-15, 0}, extent = {{-10, -10}, {10, 10}})));
 
   // Tire attitude
-  Modelica.Mechanics.MultiBody.Parts.FixedRotation toHub(rotationType = Modelica.Mechanics.MultiBody.Types.RotationTypes.PlanarRotationSequence,
-                                                         sequence = {1, 2, 3}, angles = {pWheel.geometry.staticGamma, 0, pWheel.geometry.staticAlpha}) annotation(
+  BobLib.Utilities.Mechanics.MultiBody.TunableFixedRotation toHub(
+    sequence = {1, 2, 3},
+    angles = {pWheel.geometry.staticGamma, 0, pWheel.geometry.staticAlpha}) annotation(
     Placement(transformation(origin = {-50, 0}, extent = {{-10, -10}, {10, 10}})));
 
   // Rotational physics (wheel rotation about the hub axis)
