@@ -6,6 +6,8 @@ from pathlib import Path
 import pytest
 from modelica_test_library import coverage, run_case
 
+BOBLIB_SHARD_BY_TEST = True
+
 
 @pytest.mark.parametrize('case', [row for row in coverage() if row['mode'] == 'simulate'] + [{
     'model': 'BobLibTest.Chassis.ChassisBusContractSmoke',

@@ -8,6 +8,8 @@ TESTS_DIR = Path(__file__).resolve().parent
 if str(TESTS_DIR) not in sys.path:
     sys.path.insert(0, str(TESTS_DIR))
 
+import shard_plan  # noqa: E402
+
 
 def pytest_addoption(parser) -> None:
     group = parser.getgroup("boblib")
@@ -59,13 +61,6 @@ def pytest_addoption(parser) -> None:
     )
 
 
-def _shard_key(item) -> str:
-    group = item.get_closest_marker("xdist_group")
-    if group is None:
-        return item.nodeid
-    return "group:" + str(group.args[0] if group.args else group.kwargs.get("name"))
-
-
 def pytest_collection_modifyitems(config, items) -> None:
     shard = config.getoption("--boblib-shard")
     if not shard:
@@ -73,11 +68,20 @@ def pytest_collection_modifyitems(config, items) -> None:
     index, count = (int(part) for part in shard.split("/"))
     if not 1 <= index <= count:
         raise ValueError(f"--boblib-shard {shard} must be INDEX/COUNT with 1 <= INDEX <= COUNT.")
-    # Deal tests out one at a time so a slow parametrized family spreads across
-    # shards. An xdist_group stays whole so its module fixture still builds once.
-    keys = sorted({_shard_key(item) for item in items})
-    keep = {key for position, key in enumerate(keys) if position % count == index - 1}
-    selected = [item for item in items if _shard_key(item) in keep]
+    # Units are planned by recorded duration (shard_plan.py). A file stays whole so its
+    # module fixtures run once, unless it sets BOBLIB_SHARD_BY_TEST; a file with an
+    # xdist_group stays whole regardless, since that group shares one module fixture.
+    # Units are keyed from the repo root so they match shard_durations.json whatever
+    # rootdir pytest picked.
+    def unit(item) -> str:
+        path = Path(str(item.path)).resolve().relative_to(shard_plan.ROOT).as_posix()
+        by_test = getattr(item.module, "BOBLIB_SHARD_BY_TEST", False)
+        if by_test and item.get_closest_marker("xdist_group") is None:
+            return f"{path}::{item.nodeid.split('::', 1)[1]}"
+        return path
+
+    keep = shard_plan.plan({unit(item) for item in items}, count, shard_plan.load_durations())[index - 1]
+    selected = [item for item in items if unit(item) in keep]
     if len(selected) != len(items):
-        config.hook.pytest_deselected(items=[item for item in items if _shard_key(item) not in keep])
+        config.hook.pytest_deselected(items=[item for item in items if unit(item) not in keep])
         items[:] = selected
