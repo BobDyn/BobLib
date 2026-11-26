@@ -107,8 +107,8 @@ CPU thread, which is what CI does), or `PYTEST_WORKERS=0` to run serially, for
 example when benchmarking runtime budgets. A module whose module-scoped fixture
 builds something expensive marks itself `pytest.mark.xdist_group(...)` so one
 worker builds it once. CI also splits the component job across four runners with
-`--boblib-shard N/4`, which deals tests out one at a time and keeps each
-`xdist_group` on one shard.
+`--boblib-shard N/4`, planned by recorded test time (below). A file with an
+`xdist_group` always stays on one shard, even if it sets `BOBLIB_SHARD_BY_TEST`.
 
 No OpenModelica installed? Run the same targets in the CI image with Docker:
 
@@ -179,6 +179,14 @@ check instead of the shards: it waits for all of them, always reports, and
 fails if `Changes`, `Python Checks` or any shard fails or is cancelled. A
 skipped matrix job reports only its unexpanded name, so a ruleset that names
 the shards would leave a PR that skips them waiting forever.
+
+The component job runs in four shards. `Tests/shard_plan.py` deals the heaviest
+test files out first, each to the shard with the least work, from the times in
+`Tests/shard_durations.json`, so the shards finish together instead of waiting
+on one 40-minute shard. A new test file counts as a median file until the
+durations are refreshed. After a big change to the slow tests, download the
+`boblib-component-contracts-*` JUnit artifacts from a run and refresh with
+`python3 Tests/shard_plan.py path/to/*.xml`, which also prints the new split.
 
 Modelica translation, initialization, and signal regressions are collected as
 individual pytest cases. A failing model should appear directly in the pytest
