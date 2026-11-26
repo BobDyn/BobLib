@@ -35,4 +35,5 @@ known-first-party = [
   "modelica_initialization_checks",
   "modelica_linter",
   "modelica_translation_checks",
+  "shard_plan",
 ]

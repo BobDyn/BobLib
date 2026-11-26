@@ -107,8 +107,8 @@ CPU thread, which is what CI does), or `PYTEST_WORKERS=0` to run serially, for
 example when benchmarking runtime budgets. A module whose module-scoped fixture
 builds something expensive marks itself `pytest.mark.xdist_group(...)` so one
 worker builds it once. CI also splits the component job across four runners with
-`--boblib-shard N/4`, which deals tests out one at a time and keeps each
-`xdist_group` on one shard.
+`--boblib-shard N/4`, planned by recorded test time (below). A file with an
+`xdist_group` always stays on one shard, even if it sets `BOBLIB_SHARD_BY_TEST`.
 
 No OpenModelica installed? Run the same targets in the CI image with Docker:
 
@@ -162,15 +162,13 @@ you want signal before the branch is ready for review. Running on both events
 for the same branch produced two runs per commit writing to the same commit SHA,
 which made required status checks resolve unpredictably.
 
-On a pull request, the `Changes` job decides how much OpenModelica work the
-diff needs (`Tests/ci_changes.py`). Any change to the library, the makefile,
-the workflow, shared test helpers or anything it doesn't recognise runs the
-full gate. A PR that changes only `Tests/test_*.py` modules runs just those
-modules in one component shard, plus the smoke job when it touches the
-initialization suite and the FMU job when it touches an FMU test. A
-docs-only PR skips the OpenModelica jobs; skipped jobs count as passing for
-the required checks. Pushes to `main`, tags and manual runs always run
-everything.
+The component job runs in four shards. `Tests/shard_plan.py` deals the heaviest
+test files out first, each to the shard with the least work, from the times in
+`Tests/shard_durations.json`, so the shards finish together instead of waiting
+on one 40-minute shard. A new test file counts as a median file until the
+durations are refreshed. After a big change to the slow tests, download the
+`boblib-component-contracts-*` JUnit artifacts from a run and refresh with
+`python3 Tests/shard_plan.py path/to/*.xml`, which also prints the new split.
 
 Modelica translation, initialization, and signal regressions are collected as
 individual pytest cases. A failing model should appear directly in the pytest

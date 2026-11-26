@@ -15,13 +15,13 @@ MODELICA_FMU_OUTPUT_DIR ?= build
 MODELICA_FMU_TIMEOUT_S ?= 900
 
 PYTHON_TESTS := \
-	Tests/test_ci_changes.py \
 	Tests/test_modelica_linter.py \
 	Tests/test_modelica_fmu_source_edits.py \
 	Tests/test_fmu_export.py \
 	Tests/test_native_artifact.py \
 	Tests/test_modelica_fmu_export_timeout.py \
-	Tests/test_modelica_test_library.py
+	Tests/test_modelica_test_library.py \
+	Tests/test_shard_plan.py
 
 MODELICA_REGRESSION_TESTS := \
 	Tests/test_modelica_regression.py \
