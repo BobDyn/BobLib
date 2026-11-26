@@ -162,6 +162,16 @@ you want signal before the branch is ready for review. Running on both events
 for the same branch produced two runs per commit writing to the same commit SHA,
 which made required status checks resolve unpredictably.
 
+On a pull request, the `Changes` job decides how much OpenModelica work the
+diff needs (`Tests/ci_changes.py`). Any change to the library, the makefile,
+the workflow, shared test helpers or anything it doesn't recognise runs the
+full gate. A PR that changes only `Tests/test_*.py` modules runs just those
+modules in one component shard, plus the smoke job when it touches the
+initialization suite and the FMU job when it touches an FMU test. A
+docs-only PR skips the OpenModelica jobs; skipped jobs count as passing for
+the required checks. Pushes to `main`, tags and manual runs always run
+everything.
+
 Modelica translation, initialization, and signal regressions are collected as
 individual pytest cases. A failing model should appear directly in the pytest
 node id, for example `Tests/test_modelica_translation.py::test_modelica_model_translates[BobLib.Experiments.Standards.VehicleSim]`.

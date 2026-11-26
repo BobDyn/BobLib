@@ -25,6 +25,41 @@ permissions:
   contents: read
 
 jobs:
+  changes:
+    name: Changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      smoke: ${{ steps.classify.outputs.smoke }}
+      fmu: ${{ steps.classify.outputs.fmu }}
+      components: ${{ steps.classify.outputs.components }}
+      shards: ${{ steps.classify.outputs.shards }}
+      shard_count: ${{ steps.classify.outputs.shard_count }}
+      component_tests: ${{ steps.classify.outputs.component_tests }}
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      # Pull requests that change only test modules run just those tests and skip
+      # the full OpenModelica compile; anything else runs everything. Pushes, tags
+      # and manual runs always run everything. See Tests/ci_changes.py.
+      - name: Classify changed paths
+        id: classify
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if [ "$EVENT" = pull_request ]; then
+            git diff --name-only --no-renames "$BASE...$HEAD" > /tmp/changed.txt
+            cat /tmp/changed.txt
+            python3 Tests/ci_changes.py < /tmp/changed.txt >> "$GITHUB_OUTPUT"
+          else
+            python3 Tests/ci_changes.py --full >> "$GITHUB_OUTPUT"
+          fi
+
   python:
     name: Python Checks
     runs-on: ubuntu-latest
@@ -55,7 +90,8 @@ jobs:
     name: OpenModelica Smoke
     runs-on: ubuntu-latest
     container: openmodelica/openmodelica:v1.27.1-ompython
-    needs: python
+    needs: [python, changes]
+    if: needs.changes.outputs.smoke == 'true'
     timeout-minutes: 60
 
     steps:
@@ -77,15 +113,16 @@ jobs:
         run: make modelica-initialization
 
   modelica-components:
-    name: OpenModelica Component Contracts (${{ matrix.shard }}/4)
+    name: OpenModelica Component Contracts (${{ matrix.shard }}/${{ needs.changes.outputs.shard_count }})
     runs-on: ubuntu-latest
     container: openmodelica/openmodelica:v1.27.1-ompython
-    needs: python
+    needs: [python, changes]
+    if: needs.changes.outputs.components == 'true'
     timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4]
+        shard: ${{ fromJSON(needs.changes.outputs.shards) }}
 
     steps:
       - uses: actions/checkout@v7
@@ -99,11 +136,15 @@ jobs:
           path: ~/.openmodelica
           key: om-libs-${{ hashFiles('msl_setup.mos') }}
 
-      # Four runners, each running its shard across every logical CPU. A runner
-      # alone tops out near 2x (2 physical cores), so one xdist job took 48 min
-      # against 17 min for this split.
+      # COMPONENT_TESTS is empty on a full run, so the makefile's own list applies.
+      # Each runner runs its shard across every logical CPU. A runner alone tops
+      # out near 2x (2 physical cores), so one xdist job took 48 min against
+      # 17 min for a four-way split.
       - name: Run component, contract and Python tests
-        run: make test-additional PYTEST_WORKERS=logical PYTEST_FLAGS="--junitxml=/tmp/boblib-components.xml -ra --boblib-shard ${{ matrix.shard }}/4"
+        env:
+          COMPONENT_TESTS: ${{ needs.changes.outputs.component_tests }}
+          SHARD: ${{ matrix.shard }}/${{ needs.changes.outputs.shard_count }}
+        run: make test-additional PYTEST_WORKERS=logical ${COMPONENT_TESTS:+ADDITIONAL_TESTS="$COMPONENT_TESTS"} PYTEST_FLAGS="--junitxml=/tmp/boblib-components.xml -ra --boblib-shard $SHARD"
 
       - name: Retain component test results
         if: always()
@@ -151,7 +192,8 @@ jobs:
     name: FMU Export
     runs-on: ubuntu-latest
     container: openmodelica/openmodelica:v1.27.1-ompython
-    needs: python
+    needs: [python, changes]
+    if: needs.changes.outputs.fmu == 'true'
     timeout-minutes: 60
 
     steps:
