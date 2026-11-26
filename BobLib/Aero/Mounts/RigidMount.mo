@@ -20,7 +20,11 @@ model RigidMount
       Placement(transformation(extent = {{84, -16}, {116, 16}})));
 
 protected
+
+  // Pinned shape directions keep r changeable after compilation. The MSL default derives lengthDirection from r with Evaluate = true, which freezes r.
   Modelica.Mechanics.MultiBody.Parts.FixedTranslation fixedTranslation(
+    lengthDirection = {1, 0, 0},
+    widthDirection = {0, 1, 0},
     r = r,
     animation = animation) annotation(
       Placement(transformation(extent = {{-10, -10}, {10, 10}})));
