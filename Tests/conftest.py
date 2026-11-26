@@ -17,7 +17,7 @@ def pytest_addoption(parser) -> None:
         "--boblib-shard",
         action="store",
         default=os.environ.get("BOBLIB_SHARD"),
-        help="Run one shard of the test files, as INDEX/COUNT with INDEX from 1.",
+        help="Run one shard of the tests, as INDEX/COUNT with INDEX from 1.",
     )
     group.addoption(
         "--boblib-package-root",
@@ -68,16 +68,20 @@ def pytest_collection_modifyitems(config, items) -> None:
     index, count = (int(part) for part in shard.split("/"))
     if not 1 <= index <= count:
         raise ValueError(f"--boblib-shard {shard} must be INDEX/COUNT with 1 <= INDEX <= COUNT.")
-    # A file stays whole so its module fixtures run once, unless it sets BOBLIB_SHARD_BY_TEST.
-    # Units are keyed from the repo root so they match shard_durations.json whatever rootdir pytest picked.
+    # Units are planned by recorded duration (shard_plan.py). A file stays whole so its
+    # module fixtures run once, unless it sets BOBLIB_SHARD_BY_TEST; a file with an
+    # xdist_group stays whole regardless, since that group shares one module fixture.
+    # Units are keyed from the repo root so they match shard_durations.json whatever
+    # rootdir pytest picked.
     def unit(item) -> str:
         path = Path(str(item.path)).resolve().relative_to(shard_plan.ROOT).as_posix()
-        if getattr(item.module, "BOBLIB_SHARD_BY_TEST", False):
+        by_test = getattr(item.module, "BOBLIB_SHARD_BY_TEST", False)
+        if by_test and item.get_closest_marker("xdist_group") is None:
             return f"{path}::{item.nodeid.split('::', 1)[1]}"
         return path
 
     keep = shard_plan.plan({unit(item) for item in items}, count, shard_plan.load_durations())[index - 1]
     selected = [item for item in items if unit(item) in keep]
     if len(selected) != len(items):
-        config.hook.pytest_deselected(items=[item for item in items if item not in selected])
+        config.hook.pytest_deselected(items=[item for item in items if unit(item) not in keep])
         items[:] = selected
