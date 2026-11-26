@@ -1,169 +1,57 @@
 # BobLib
 
-BobLib is the low-level Modelica vehicle modeling layer for BobDyn. It contains
-the physical vehicle models, records, standard simulation entry points, and
-regression fixtures used to develop detailed vehicle dynamics components.
+Modelica multibody vehicle models for BobDyn. BobLib provides the physical
+components, calibration records, and vehicle and suspension test rigs.
+[BobSim](https://github.com/BobDyn/BobSim) provides study orchestration,
+configuration, analysis, and reporting.
 
-The full workflow layer is BobSim. Use BobSim when you want repeatable study
-execution, signal extraction, metrics, plots, reports, envelope maps, and
-sensitivity sweeps. Use BobLib when you are developing or inspecting the
-underlying Modelica models.
+[Documentation](https://bobdyn.com/boblib) · [Development](docs/development.md) ·
+[Migration guide](docs/migration.md) · [Release status](docs/release-readiness.md)
 
-The authoritative documentation for this package version lives inside the
-Modelica package at:
+## Get started
 
-`BobLib.UsersGuide`
-
-The UsersGuide is part of the versioned, tested package and should be treated
-as the source of truth for current BobLib architecture, usage, extension, and
-validation guidance. BobDocs may mirror or expand this material for web
-reading, but when version-specific details differ, the in-package UsersGuide
-wins.
-
-The web documentation lives at:
-
-https://bobdyn.com/boblib
-
-Organization changes and removed class paths are documented in [MIGRATION.md](MIGRATION.md).
-Current validation scope is recorded in [RELEASE_READINESS.md](RELEASE_READINESS.md).
-
-## Release
-
-Current package version: `0.2.0`, dated `2026-08-09`.
-
-Release notes are maintained in `CHANGELOG.md` and in the `BobLib` package
-revision annotation. The in-library tutorial lives at
-`BobLib.UsersGuide`.
-
-## License and Third-Party Notices
-
-BobLib is licensed under GPL-3.0; see `LICENSE`.
-
-BobLib depends on Modelica Standard Library 4.1.0 and VehicleInterfaces 2.0.2
-through the package `uses(...)` annotation. The dependency notices are recorded
-in `THIRD_PARTY_NOTICES.md`. If a release bundle vendors either dependency, the
-corresponding full dependency license text should be distributed with that
-bundle as well.
-
-## Status
-
-BobLib is active engineering infrastructure, not a finished general-purpose
-vehicle standard library. It is suitable for Modelica-capable users who can run
-OpenModelica checks, manage vehicle records carefully, and validate model
-outputs against measured data.
-
-The repository is useful as:
-
-- a reference implementation for detailed FSAE-style vehicle modeling
-- a development layer for BobDyn vehicle components
-- a regression-tested Modelica package for advanced simulation teams
-
-It is not yet:
-
-- a plug-and-play workflow for a new team to model its car in one afternoon
-- a substitute for vehicle-specific validation
-- a safety-certified design or controls tool
-
-## Supported Stack
-
-Current checks target:
-
-- Modelica Standard Library 4.1.0
-- VehicleInterfaces 2.0.2 for `BobLib`
-- OpenModelica via the CI container `openmodelica/openmodelica:v1.27.1-ompython`
-- Python with `pytest` and `ruff`, plus `fmpy` for the existing FMU checks
-
-Install Modelica dependencies with:
+Install OpenModelica, then install the Modelica dependencies:
 
 ```sh
 make modelica-deps
 ```
 
-## Primary Entrypoints
+Open `BobLib/package.mo` in your Modelica environment. Start with
+`BobLib.UsersGuide`, the authoritative guide for this package version.
+Current checks target Modelica Standard Library **4.1.0**, VehicleInterfaces
+**2.0.2**, and OpenModelica **1.27.1** in CI.
 
-- `BobLib.Experiments.Standards.VehicleFMI`: driver-input FMI/DIL/SIL vehicle boundary
-- `BobLib.Experiments.Standards.VehicleSim`: full-vehicle maneuver benchmark
-- `BobLib.Experiments.Standards.FourPostSim`: four-post benchmark
-- `BobLib.Experiments.Standards.KnCSteerable` and `KnCLocked`: single-axle kinematics/compliance rigs
+## Entry points
 
-`BobLib` is the forward-looking standalone package. It builds
-BobLib physics inside the public subsystem contracts from VehicleInterfaces
-while keeping regression tests in the `BobLibTest` Modelica package under
-the repository `Tests/` directory.
+| Model | Purpose |
+|---|---|
+| `BobLib.Experiments.Standards.VehicleSim` | Full-vehicle maneuver simulations |
+| `BobLib.Experiments.Standards.VehicleFMI` | Driver-input FMI boundary |
+| `BobLib.Experiments.Standards.FourPostSim` | Four-post suspension studies |
+| `BobLib.Experiments.Standards.KnCSteerable` / `KnCLocked` | Axle kinematics and compliance |
 
-## Local Health Checks
+See [export tools](Tools/README.md) for reusable native binaries, FMUs, and cross-runtime
+verification. The ownership and layout for native runtime adapters are documented
+in [Tools/native/](Tools/native/README.md).
 
-Run the full local gate before trusting a branch:
+## Repository map
 
-```sh
-make ci
-```
+| Directory | Purpose |
+|---|---|
+| [BobLib/](BobLib/) | Modelica package and its UsersGuide |
+| [Tools/](Tools/README.md) | Export/build entry points and native wrappers |
+| [Tests/](Tests/) | BobLibTest fixtures, regression tests, and benchmarks |
+| [docs/](docs/README.md) | Development, migration, and release notes |
+| [development/](development/) | Compiler reproductions and visual design drafts |
 
-GitHub CI intentionally uses a lighter default gate for pushes and pull
-requests: Python lint/tests, Modelica formatting, smoke translation,
-initialization baselines, and mirrored fixture simulations/profiles.
-Version tags use that same gate and also start the separate `Release Gate`
-workflow. The full OpenModelica gate is a release activity: run it locally with
-`make test`/`make ci`, or on a runner through that workflow (Actions -> Release
-Gate -> Run workflow).
+Generated binaries and simulation outputs belong under the ignored `build/`
+directory or an external output directory. Run `make help` for development
+commands and [validation guidance](docs/development.md) before changing physics.
 
-The release workflow separates lint, formatting, coverage, translation,
-initialization, physics, signal regressions, and component/contract tests into
-named steps and retains their individual test reports. Inspect skipped tests:
-a passing default gate alone does not certify an FMU distribution or provide
-rendered diagram sign-off. Use [Tools/README.md](Tools/README.md) to build reusable native binaries and FMUs
-with editable independent calibration. SS/GGV analysis remains excluded.
-The FMU export/test support already merged in #30 is retained: use
-`make modelica-fmu-export` to export VehicleFMI and `make modelica-fmu`
-to run its checks. See Tests/modelica_fmu_export.py for runtime limitations.
+BobLib is active engineering infrastructure. Results need vehicle-specific
+validation; experimental envelope benchmarks do not establish a production
+workflow or measured vehicle fidelity.
 
-Python tooling versions are pinned in `Tests/requirements-dev.txt` and the ruff
-rule selection is pinned in `ruff.toml`, so a new ruff or pytest release cannot
-turn CI red without a deliberate bump.
-
-For narrower checks:
-
-```sh
-make test-python
-make modelica-lint
-make modelica-smoke
-make test-pytest
-make modelica-translation
-make modelica-initialization
-make modelica-physics
-make modelica-regression
-make modelica-fmu
-```
-
-The CI workflow runs on pull requests and on pushes to `main` and version tags.
-Feature branches are validated through their pull request; open it as a draft if
-you want signal before the branch is ready for review. Running on both events
-for the same branch produced two runs per commit writing to the same commit SHA,
-which made required status checks resolve unpredictably.
-
-Modelica translation, initialization, and signal regressions are collected as
-individual pytest cases. A failing model should appear directly in the pytest
-node id, for example `Tests/test_modelica_translation.py::test_modelica_model_translates[BobLib.Experiments.Standards.VehicleSim]`.
-Physical validation baselines also run through pytest and compare small
-simulation outputs against checked-in signal baselines. Runtime budgets are
-checked with a hardware-tolerant scale factor; override it with
-`BOBLIB_RUNTIME_SCALE` or `--boblib-runtime-scale` for strict benchmarking.
-
-## Adoption Guidance
-
-For an FSAE or student engineering team, start by treating BobLib as a reference
-and BobSim as the workflow entry point. A practical adoption path is:
-
-1. Run the included baseline without modifying records.
-2. Replace a small parameter set first: mass, CG, wheelbase, track, tire radius,
-   simple aero, and basic powertrain limits.
-3. Compare against simple known cases before trusting lap-time, damper,
-   powertrain, tire, or aero conclusions.
-4. Validate against your measured corner weights, inertias, suspension
-   kinematics, damper curves, tire data, aero maps, drivetrain limits,
-   controller behavior, and track-test signals.
-5. Keep `make ci` passing as you adapt the model.
-
-BobLib can support advanced vehicle dynamics and controls teams, but deep
-customization assumes a modeling lead who is comfortable with Modelica package
-debugging, OpenModelica diagnostics, and Python regression tooling.
+Package version **0.2.0**. See [CHANGELOG.md](CHANGELOG.md) for release notes.
+Licensed under [GPL-3.0](LICENSE); dependencies and attribution are recorded in
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

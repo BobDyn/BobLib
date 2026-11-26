@@ -81,7 +81,7 @@ test-python:
 	$(PYTEST) $(PYTEST_FLAGS) $(PYTHON_TESTS)
 
 modelica-deps:
-	omc msl_setup.mos
+	omc Tools/msl_setup.mos
 
 modelica-smoke: modelica-deps
 	$(PYTHON) Tests/modelica_translation_checks.py --package-root $(PACKAGE_ROOT) $(MODELICA_SMOKE_FLAGS)

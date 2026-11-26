@@ -186,7 +186,7 @@ supported. Check connection types and equation balance with the compiler.
 Run make ci and inspect failures and skips. Initialization baselines were migrated
 with their fixtures; do not regenerate snapshots to silence mismatches. Static
 route checks do not replace OMEdit review of inherited and conditional views.
-See RELEASE_READINESS.md for current draft scope and remaining validation.
+See [release-readiness.md](release-readiness.md) for current draft scope and remaining validation.
 
 ## Maneuver exit status
 
