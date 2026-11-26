@@ -172,6 +172,14 @@ docs-only PR skips the OpenModelica jobs; skipped jobs count as passing for
 the required checks. Pushes to `main`, tags and manual runs always run
 everything.
 
+The component contract tests run as parallel shards,
+`OpenModelica Component Contracts (1/4)` to `(4/4)` on a full run and `(1/1)`
+on a test-only one. Require the single `OpenModelica Component Contracts`
+check instead of the shards: it waits for all of them, always reports, and
+fails if `Changes`, `Python Checks` or any shard fails or is cancelled. A
+skipped matrix job reports only its unexpanded name, so a ruleset that names
+the shards would leave a PR that skips them waiting forever.
+
 Modelica translation, initialization, and signal regressions are collected as
 individual pytest cases. A failing model should appear directly in the pytest
 node id, for example `Tests/test_modelica_translation.py::test_modelica_model_translates[BobLib.Experiments.Standards.VehicleSim]`.
