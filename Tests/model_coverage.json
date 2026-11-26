@@ -891,6 +891,13 @@
       "stop_time": 0.01
     },
     {
+      "model": "BobLib.Utilities.Mechanics.MultiBody.TunableFixedRotation",
+      "test": "BobLibTest.Utilities.Mechanics.MultiBody.TestTunableFixedRotation",
+      "mode": "simulate",
+      "scope": "component",
+      "stop_time": 0.01
+    },
+    {
       "model": "BobLib.Utilities.Mechanics.MultiBody.Joints.Internal.UniversalSpherical",
       "test": "BobLibTest.Utilities.Mechanics.MultiBody.Joints.Internal.TestUniversalSpherical",
       "mode": "simulate",
