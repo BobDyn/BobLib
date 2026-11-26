@@ -81,3 +81,11 @@ combined mass, all CG coordinates and all inertia entries. To compare a reused
 full-vehicle artifact with separately translated calibration families, set
 `BOBLIB_CALIBRATION_FMU` and `BOBLIB_CALIBRATION_NATIVE` and run
 `Tests/test_calibration_rebuild.py`.
+
+## Source organization
+
+Native runtime adapters have a dedicated home in [native/](native/README.md).
+Build/export commands remain here; model equations belong in `BobLib/`, and
+verification fixtures belong in `Tests/`. Generated artifacts stay under `build/`
+or an external output directory. See [development guidance](../docs/development.md)
+for checks and [release status](../docs/release-readiness.md) for validation scope.

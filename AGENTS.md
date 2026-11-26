@@ -5,7 +5,7 @@ future agents preserve the package boundaries.
 
 ## Active work
 
-- Read `MIGRATION.md` and `RELEASE_READINESS.md` for migration scope and remaining release work.
+- Read `docs/migration.md` and `docs/release-readiness.md` for migration scope and remaining release work.
 
 ## BobLib Architecture
 

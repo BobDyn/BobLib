@@ -39,7 +39,7 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ~/.openmodelica
-          key: om-libs-${{ hashFiles('msl_setup.mos') }}
+          key: om-libs-${{ hashFiles('Tools/msl_setup.mos') }}
 
       - name: Lint Python checks
         run: make lint

@@ -7,8 +7,8 @@
 - Add single-axle KnC rigs and mirrored component fixtures.
 - Standardize diagrams and validation gates.
 
-See [MIGRATION.md](MIGRATION.md) for breaking class/record changes and
-[RELEASE_READINESS.md](RELEASE_READINESS.md) for remaining validation.
+See [docs/migration.md](docs/migration.md) for breaking class/record changes and
+[docs/release-readiness.md](docs/release-readiness.md) for remaining validation.
 Native/FMU export now includes editable independent calibration, dependency
 validation and build provenance. SS/GGV analysis remains excluded.
 
