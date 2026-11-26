@@ -8,6 +8,8 @@ TESTS_DIR = Path(__file__).resolve().parent
 if str(TESTS_DIR) not in sys.path:
     sys.path.insert(0, str(TESTS_DIR))
 
+import shard_plan  # noqa: E402
+
 
 def pytest_addoption(parser) -> None:
     group = parser.getgroup("boblib")
@@ -67,11 +69,15 @@ def pytest_collection_modifyitems(config, items) -> None:
     if not 1 <= index <= count:
         raise ValueError(f"--boblib-shard {shard} must be INDEX/COUNT with 1 <= INDEX <= COUNT.")
     # A file stays whole so its module fixtures run once, unless it sets BOBLIB_SHARD_BY_TEST.
-    per_test = sorted(item.nodeid for item in items if getattr(item.module, "BOBLIB_SHARD_BY_TEST", False))
-    files = sorted({item.path for item in items if not getattr(item.module, "BOBLIB_SHARD_BY_TEST", False)})
-    keep = {node for position, node in enumerate(per_test) if position % count == index - 1}
-    keep |= {path for position, path in enumerate(files) if position % count == index - 1}
-    selected = [item for item in items if item.nodeid in keep or item.path in keep]
+    # Units are keyed from the repo root so they match shard_durations.json whatever rootdir pytest picked.
+    def unit(item) -> str:
+        path = Path(str(item.path)).resolve().relative_to(shard_plan.ROOT).as_posix()
+        if getattr(item.module, "BOBLIB_SHARD_BY_TEST", False):
+            return f"{path}::{item.nodeid.split('::', 1)[1]}"
+        return path
+
+    keep = shard_plan.plan({unit(item) for item in items}, count, shard_plan.load_durations())[index - 1]
+    selected = [item for item in items if unit(item) in keep]
     if len(selected) != len(items):
         config.hook.pytest_deselected(items=[item for item in items if item not in selected])
         items[:] = selected

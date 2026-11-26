@@ -141,6 +141,14 @@ you want signal before the branch is ready for review. Running on both events
 for the same branch produced two runs per commit writing to the same commit SHA,
 which made required status checks resolve unpredictably.
 
+The component job runs in four shards. `Tests/shard_plan.py` deals the heaviest
+test files out first, each to the shard with the least work, from the times in
+`Tests/shard_durations.json`, so the shards finish together instead of waiting
+on one 40-minute shard. A new test file counts as a median file until the
+durations are refreshed. After a big change to the slow tests, download the
+`boblib-component-contracts-*` JUnit artifacts from a run and refresh with
+`python3 Tests/shard_plan.py path/to/*.xml`, which also prints the new split.
+
 Modelica translation, initialization, and signal regressions are collected as
 individual pytest cases. A failing model should appear directly in the pytest
 node id, for example `Tests/test_modelica_translation.py::test_modelica_model_translates[BobLib.Experiments.Standards.VehicleSim]`.
