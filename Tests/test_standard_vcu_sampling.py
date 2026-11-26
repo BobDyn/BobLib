@@ -6,6 +6,8 @@ from pathlib import Path
 
 import pytest
 
+pytestmark = pytest.mark.modelica_models('BobLibTest.Drivers.TestStandardDriver')
+
 
 def test_sampled_steering(tmp_path):
     omc = shutil.which('omc')

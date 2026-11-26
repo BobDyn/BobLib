@@ -5,6 +5,8 @@ from pathlib import Path
 
 import pytest
 
+pytestmark = pytest.mark.modelica_models('BobLib.Utilities.Mechanics.MultiBody.InboardShaft', 'BobLib.Brakes.BasicVCUBrakes')
+
 ROOT = Path(__file__).resolve().parents[1]
 
 

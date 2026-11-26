@@ -16,6 +16,8 @@ MODELICA_FMU_TIMEOUT_S ?= 900
 
 PYTHON_TESTS := \
 	Tests/test_ci_changes.py \
+	Tests/test_modelica_impact.py \
+	Tests/test_impact_selection.py \
 	Tests/test_modelica_linter.py \
 	Tests/test_modelica_fmu_source_edits.py \
 	Tests/test_fmu_export.py \
@@ -101,7 +103,7 @@ test-pytest: modelica-deps
 	$(PYTEST) $(PYTEST_PARALLEL) $(PYTEST_FLAGS) $(ALL_TESTS) --boblib-package-root $(PACKAGE_ROOT) --boblib-initialization-timeout-s $(MODELICA_INIT_TIMEOUT_S) --boblib-fmu-timeout-s $(MODELICA_FMU_TIMEOUT_S)
 
 test-additional: modelica-deps
-	$(PYTEST) $(PYTEST_PARALLEL) $(PYTEST_FLAGS) $(ADDITIONAL_TESTS) --boblib-package-root $(PACKAGE_ROOT) --boblib-initialization-timeout-s $(MODELICA_INIT_TIMEOUT_S)
+	$(PYTEST) $(PYTEST_PARALLEL) $(PYTEST_FLAGS) $(sort $(ADDITIONAL_TESTS) $(EXTRA_TESTS)) --boblib-package-root $(PACKAGE_ROOT) --boblib-initialization-timeout-s $(MODELICA_INIT_TIMEOUT_S)
 
 modelica-translation: modelica-deps
 	$(PYTEST) $(PYTEST_FLAGS) $(MODELICA_TRANSLATION_TESTS) --boblib-package-root $(PACKAGE_ROOT)
