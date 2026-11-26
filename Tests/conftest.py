@@ -15,7 +15,7 @@ def pytest_addoption(parser) -> None:
         "--boblib-shard",
         action="store",
         default=os.environ.get("BOBLIB_SHARD"),
-        help="Run one shard of the test files, as INDEX/COUNT with INDEX from 1.",
+        help="Run one shard of the tests, as INDEX/COUNT with INDEX from 1.",
     )
     group.addoption(
         "--boblib-package-root",
@@ -59,6 +59,13 @@ def pytest_addoption(parser) -> None:
     )
 
 
+def _shard_key(item) -> str:
+    group = item.get_closest_marker("xdist_group")
+    if group is None:
+        return item.nodeid
+    return "group:" + str(group.args[0] if group.args else group.kwargs.get("name"))
+
+
 def pytest_collection_modifyitems(config, items) -> None:
     shard = config.getoption("--boblib-shard")
     if not shard:
@@ -66,12 +73,11 @@ def pytest_collection_modifyitems(config, items) -> None:
     index, count = (int(part) for part in shard.split("/"))
     if not 1 <= index <= count:
         raise ValueError(f"--boblib-shard {shard} must be INDEX/COUNT with 1 <= INDEX <= COUNT.")
-    # A file stays whole so its module fixtures run once, unless it sets BOBLIB_SHARD_BY_TEST.
-    per_test = sorted(item.nodeid for item in items if getattr(item.module, "BOBLIB_SHARD_BY_TEST", False))
-    files = sorted({item.path for item in items if not getattr(item.module, "BOBLIB_SHARD_BY_TEST", False)})
-    keep = {node for position, node in enumerate(per_test) if position % count == index - 1}
-    keep |= {path for position, path in enumerate(files) if position % count == index - 1}
-    selected = [item for item in items if item.nodeid in keep or item.path in keep]
+    # Deal tests out one at a time so a slow parametrized family spreads across
+    # shards. An xdist_group stays whole so its module fixture still builds once.
+    keys = sorted({_shard_key(item) for item in items})
+    keep = {key for position, key in enumerate(keys) if position % count == index - 1}
+    selected = [item for item in items if _shard_key(item) in keep]
     if len(selected) != len(items):
-        config.hook.pytest_deselected(items=[item for item in items if item not in selected])
+        config.hook.pytest_deselected(items=[item for item in items if _shard_key(item) not in keep])
         items[:] = selected

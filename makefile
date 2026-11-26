@@ -1,6 +1,13 @@
 PYTHON ?= python3
 PYTEST ?= $(PYTHON) -m pytest
 PYTEST_FLAGS ?=
+# The OpenModelica suites spend their time in one omc process per case, so they
+# run across PYTEST_WORKERS pytest-xdist workers: auto = one per physical core,
+# logical = one per CPU thread, a number caps it, 0 runs serially.
+# loadgroup keeps modules marked xdist_group on one worker so their module
+# fixtures build once.
+PYTEST_WORKERS ?= auto
+PYTEST_PARALLEL = -n $(PYTEST_WORKERS) --dist loadgroup
 PACKAGE_ROOT ?= BobLib
 MODELICA_INIT_TIMEOUT_S ?= 600
 MODELICA_LINT_PATHS ?= BobLib Tests/BobLibTest
@@ -40,7 +47,7 @@ ADDITIONAL_TESTS := $(filter-out \
 	$(MODELICA_PHYSICS_TESTS) $(MODELICA_REGRESSION_TESTS) $(MODELICA_FMU_TESTS), \
 	$(wildcard Tests/test_*.py))
 
-.PHONY: help lint modelica-lint modelica-format test test-python test-pytest test-additional test-modelica modelica-deps modelica-smoke modelica-translation modelica-initialization modelica-physics modelica-regression modelica-fmu modelica-fmu-export ci check
+.PHONY: help docker-test lint modelica-lint modelica-format test test-python test-pytest test-additional test-modelica modelica-deps modelica-smoke modelica-translation modelica-initialization modelica-physics modelica-regression modelica-fmu modelica-fmu-export ci check
 
 help:
 	@printf '%s\n' \
@@ -48,7 +55,10 @@ help:
 		'  make lint                 Run Python lint checks' \
 		'  make modelica-lint        Check Modelica formatting without rewriting files' \
 		'  make modelica-format      Rewrite Modelica formatting in MODELICA_LINT_PATHS' \
-		'  make test                 Run the full local pytest gate' \
+		'  make test                 Run the full local pytest gate in parallel' \
+		'      PYTEST_WORKERS=4 sets the worker count (default auto, 0 = serial)' \
+		'  make docker-test          Run make test inside the CI OpenModelica image' \
+		'      DOCKER_TARGET=test-additional runs another target there instead' \
 		'  make test-python          Run pure Python pytest checks only' \
 		'  make test-pytest          Run every pytest-collected check in one invocation' \
 		'  make test-additional      Run component, contract and Python tests' \
@@ -87,10 +97,10 @@ modelica-smoke: modelica-deps
 	$(PYTHON) Tests/modelica_translation_checks.py --package-root $(PACKAGE_ROOT) $(MODELICA_SMOKE_FLAGS)
 
 test-pytest: modelica-deps
-	$(PYTEST) $(PYTEST_FLAGS) $(ALL_TESTS) --boblib-package-root $(PACKAGE_ROOT) --boblib-initialization-timeout-s $(MODELICA_INIT_TIMEOUT_S) --boblib-fmu-timeout-s $(MODELICA_FMU_TIMEOUT_S)
+	$(PYTEST) $(PYTEST_PARALLEL) $(PYTEST_FLAGS) $(ALL_TESTS) --boblib-package-root $(PACKAGE_ROOT) --boblib-initialization-timeout-s $(MODELICA_INIT_TIMEOUT_S) --boblib-fmu-timeout-s $(MODELICA_FMU_TIMEOUT_S)
 
 test-additional: modelica-deps
-	$(PYTEST) $(PYTEST_FLAGS) $(ADDITIONAL_TESTS) --boblib-package-root $(PACKAGE_ROOT) --boblib-initialization-timeout-s $(MODELICA_INIT_TIMEOUT_S)
+	$(PYTEST) $(PYTEST_PARALLEL) $(PYTEST_FLAGS) $(ADDITIONAL_TESTS) --boblib-package-root $(PACKAGE_ROOT) --boblib-initialization-timeout-s $(MODELICA_INIT_TIMEOUT_S)
 
 modelica-translation: modelica-deps
 	$(PYTEST) $(PYTEST_FLAGS) $(MODELICA_TRANSLATION_TESTS) --boblib-package-root $(PACKAGE_ROOT)
@@ -114,6 +124,16 @@ test-modelica: modelica-fmu modelica-translation modelica-initialization modelic
 
 ci: lint modelica-lint modelica-coverage test
 
+# For machines without OpenModelica: the same image CI uses, with the repo
+# mounted and the installed Modelica libraries kept in a named volume.
+OM_IMAGE ?= openmodelica/openmodelica:v1.27.1-ompython
+DOCKER_TARGET ?= test
+docker-test:
+	docker run --rm -v "$(CURDIR)":/work -w /work -v boblib-openmodelica:/root/.openmodelica \
+		-e PYTHONDONTWRITEBYTECODE=1 -e PIP_ROOT_USER_ACTION=ignore $(OM_IMAGE) sh -c '\
+		python3 -m pip install -q --upgrade pip -r Tests/requirements-dev.txt && \
+		make $(DOCKER_TARGET) PYTEST_WORKERS=$(PYTEST_WORKERS) PYTEST_FLAGS="-p no:cacheprovider"'
+
 check: ci
 
 # PROFILE_DIR must be new; override it to preserve successive measurements.
@@ -127,4 +147,4 @@ modelica-profile:
 
 .PHONY: modelica-components
 modelica-components: modelica-deps
-	$(PYTEST) $(PYTEST_FLAGS) Tests/test_modelica_components.py
+	$(PYTEST) $(PYTEST_PARALLEL) $(PYTEST_FLAGS) Tests/test_modelica_components.py
