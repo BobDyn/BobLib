@@ -11,6 +11,9 @@ if str(TESTS_DIR) not in sys.path:
 
 def pytest_addoption(parser) -> None:
     group = parser.getgroup("boblib")
+    group.addoption("--boblib-impact-plan", default=os.environ.get("BOBLIB_IMPACT_PLAN"),
+                    help="JSON dependency selection plan from Tests/ci_changes.py")
+    group.addoption("--boblib-impact-report", help="Write selection decisions as JSON")
     group.addoption(
         "--boblib-shard",
         action="store",
@@ -67,6 +70,9 @@ def _shard_key(item) -> str:
 
 
 def pytest_collection_modifyitems(config, items) -> None:
+    import impact_selection
+
+    impact_selection.apply(config, items, TESTS_DIR.parent)
     shard = config.getoption("--boblib-shard")
     if not shard:
         return
@@ -81,3 +87,19 @@ def pytest_collection_modifyitems(config, items) -> None:
     if len(selected) != len(items):
         config.hook.pytest_deselected(items=[item for item in items if _shard_key(item) not in keep])
         items[:] = selected
+
+
+def pytest_configure(config) -> None:
+    import impact_selection
+
+    impact_selection.configure(config, TESTS_DIR.parent)
+    config.addinivalue_line(
+        "markers", "modelica_models(*names): complete local Modelica dependencies; empty means none"
+    )
+
+
+def pytest_sessionfinish(session, exitstatus) -> None:
+    # A valid impact plan can leave a job or shard with no affected tests.
+    # Collection errors and test failures must retain their nonzero status.
+    if exitstatus == 5 and hasattr(session.config, "_boblib_impact_plan"):
+        session.exitstatus = 0

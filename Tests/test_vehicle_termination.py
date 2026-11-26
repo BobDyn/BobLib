@@ -9,7 +9,10 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 
 # One worker builds the vehicle once for every case (needs --dist loadgroup).
-pytestmark = pytest.mark.xdist_group("vehicle_termination")
+pytestmark = [
+    pytest.mark.xdist_group("vehicle_termination"),
+    pytest.mark.modelica_models("BobLib.Experiments.Standards.VehicleSim"),
+]
 
 
 @pytest.fixture(scope="module")

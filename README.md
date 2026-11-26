@@ -162,15 +162,50 @@ you want signal before the branch is ready for review. Running on both events
 for the same branch produced two runs per commit writing to the same commit SHA,
 which made required status checks resolve unpredictably.
 
-On a pull request, the `Changes` job decides how much OpenModelica work the
-diff needs (`Tests/ci_changes.py`). Any change to the library, the makefile,
-the workflow, shared test helpers or anything it doesn't recognise runs the
-full gate. A PR that changes only `Tests/test_*.py` modules runs just those
-modules in one component shard, plus the smoke job when it touches the
-initialization suite and the FMU job when it touches an FMU test. A
-docs-only PR skips the OpenModelica jobs; skipped jobs count as passing for
-the required checks. Pushes to `main`, tags and manual runs always run
-everything.
+On a pull request, the `Changes` job writes a dependency plan without translating
+or compiling Modelica. Changes to a model, record, function or fixture select its
+transitive users using the **union of merge-base and checkout dependencies**.
+Deleted references still select their old consumers. Package changes select the
+package's descendants. Every changed Python test module runs in full, including
+translation, physics and regression suites outside the normal component list.
+Docs-only changes skip the Modelica jobs. Shared helpers, compiler/library inputs,
+unknown files, unavailable history or unsupported Modelica syntax select the full
+gate. Pushes, tags and manual runs retain the full gate.
+
+The graph in `Tests/modelica_impact.py` is a conservative source analysis, not a
+resolved compiler graph. It follows qualified references, inheritance, imports,
+replaceable defaults/constraints, redeclarations and conditional branches. Short
+names retain every matching class and package references retain all descendants;
+this may select more tests than a compiler-resolved graph. It does not narrow to a
+single instantiated architecture. Python tests are filtered only when their model
+dependencies are explicitly known: the parametrized component, translation,
+initialization and baseline families have adapters in `Tests/impact_selection.py`.
+Other tests stay selected unless they declare a complete contract with
+`@pytest.mark.modelica_models("BobLib.Some.Model", ...)`. An empty marker declares
+no local Modelica dependency. Include all models used by fixtures and generated
+sources; an unknown model name retains the test conservatively. Changes to test
+helpers always run the full gate. New test families without contracts still run.
+
+Selection happens **before sharding**, so the existing xdist groups stay together.
+A valid plan with no selected tests passes; collection errors and test failures
+still fail. A plan from different Modelica source content is rejected. Each run
+uploads `modelica-impact-plan` (changed files, affected classes and dependency
+chains) and per-job selection reports (test IDs and keep/drop reasons).
+
+To inspect a proposed change locally, use the merge base of your branch and its
+base branch. The working tree supplies the current sources:
+
+```sh
+git diff --name-only --no-renames BASE...HEAD > /tmp/changed.txt
+python3 Tests/ci_changes.py --base "$(git merge-base BASE HEAD)" \
+  --plan /tmp/impact-plan.json < /tmp/changed.txt
+python3 -m pytest --collect-only Tests --boblib-impact-plan /tmp/impact-plan.json \
+  --boblib-impact-report /tmp/test-selection.json
+```
+
+Dependency selection reduces redundant work; it is not a substitute for the full
+release gate or evidence that the physical results are unchanged. Full-run timing
+and differential coverage should be checked as new dependency contracts are added.
 
 The component contract tests run as parallel shards,
 `OpenModelica Component Contracts (1/4)` to `(4/4)` on a full run and `(1/1)`
